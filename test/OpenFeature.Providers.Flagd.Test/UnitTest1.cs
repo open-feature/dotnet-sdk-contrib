@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace OpenFeature.Providers.Flagd.Test {
+namespace OpenFeature.Providers.Flagd.Test
+{
     [TestClass]
     public class UnitTest1
     {
