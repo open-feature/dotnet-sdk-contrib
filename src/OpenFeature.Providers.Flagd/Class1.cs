@@ -1,5 +1,8 @@
-﻿namespace OpenFeature.Providers.Flagd;
-public class Class1
-{
+﻿namespace OpenFeature.Providers.Flagd {
+  public class Class1
+  {
 
+  }
 }
+
+

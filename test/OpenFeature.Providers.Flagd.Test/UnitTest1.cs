@@ -1,10 +1,12 @@
-namespace OpenFeature.Providers.Flagd.Test;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-[TestClass]
-public class UnitTest1
-{
-    [TestMethod]
-    public void TestMethod1()
+namespace OpenFeature.Providers.Flagd.Test {
+    [TestClass]
+    public class UnitTest1
     {
+        [TestMethod]
+        public void TestMethod1()
+        {
+        }
     }
 }
