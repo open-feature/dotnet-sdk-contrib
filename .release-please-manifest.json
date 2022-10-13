@@ -1,0 +1,4 @@
+{
+  "src/OpenFeature.Hooks.Otel": "0.0.2",
+  "src/OpenFeature.Providers.Flagd": "0.0.2"
+}
