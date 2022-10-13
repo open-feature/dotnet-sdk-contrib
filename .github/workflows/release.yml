@@ -39,4 +39,4 @@ jobs:
       - name: Publish to Nuget
         if: ${{ steps.release.outputs.releases_created }}
         run: |
-          dotnet nuget push --skip-duplicate "**/*.nupkg" --source http://localhost:8081/repository/nuget-hosted/index.json --api-key=$API_KEY
+          dotnet nuget push --skip-duplicate "**/*.nupkg" --source http://localhost:8081/repository/nuget-hosted/index.json --api-key ${{secrets.NUGET_TOKEN}}
