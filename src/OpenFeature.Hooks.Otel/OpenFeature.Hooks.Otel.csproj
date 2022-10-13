@@ -3,6 +3,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <Version>0.0.1</Version> <!--x-release-please-version -->
+    <Description>Open Telemetry Hook for .NET</Description>
+    <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
+    <Authors>Todd Baert</Authors>
   </PropertyGroup>
 
 </Project>
