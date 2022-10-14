@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="OpenFeature" Version="$(OpenFeatureVer)">
+      <PrivateAssets>runtime;contentfiles;analyzers;build</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
