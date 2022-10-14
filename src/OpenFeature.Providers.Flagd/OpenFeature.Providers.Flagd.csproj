@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <VersionNumber>0.0.2</VersionNumber> <!--x-release-please-version -->
+    <Version>$(VersionNumber)</Version>
+    <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
+    <FileVersion>$(VersionNumber)</FileVersion>
+    <Description>flagd provider for .NET</Description>
+    <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
+    <Authors>Todd Baert</Authors>
+  </PropertyGroup>
+
+</Project>
