@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0E563821-BD08-4B7F-BF9D-395CAD80F026}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Providers.Flagd", "src\OpenFeature.Providers.Flagd\OpenFeature.Providers.Flagd.csproj", "{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Hooks.Otel", "src\OpenFeature.Hooks.Otel\OpenFeature.Hooks.Otel.csproj", "{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Hooks.Otel.Test", "test\OpenFeature.Hooks.Otel.Test\OpenFeature.Hooks.Otel.Test.csproj", "{199FA48A-06EF-4E15-8206-C095D1455A99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Providers.Flagd.Test", "test\OpenFeature.Providers.Flagd.Test\OpenFeature.Providers.Flagd.Test.csproj", "{206323A0-7334-4723-8394-C31C150B95DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{199FA48A-06EF-4E15-8206-C095D1455A99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{199FA48A-06EF-4E15-8206-C095D1455A99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{199FA48A-06EF-4E15-8206-C095D1455A99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{199FA48A-06EF-4E15-8206-C095D1455A99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{206323A0-7334-4723-8394-C31C150B95DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{206323A0-7334-4723-8394-C31C150B95DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{206323A0-7334-4723-8394-C31C150B95DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{206323A0-7334-4723-8394-C31C150B95DC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
+		{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
+		{199FA48A-06EF-4E15-8206-C095D1455A99} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
+		{206323A0-7334-4723-8394-C31C150B95DC} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
+	EndGlobalSection
+EndGlobal
