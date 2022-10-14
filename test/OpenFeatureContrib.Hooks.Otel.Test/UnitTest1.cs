@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace OpenFeature.Hooks.Otel.Test
+namespace OpenFeatureContrib.Hooks.Otel.Test
 {
     public class UnitTest1
     {
