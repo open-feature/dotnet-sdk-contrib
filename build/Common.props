@@ -1,8 +1,7 @@
 <Project>
 
   <ItemGroup>
-    <PackageReference Include="OpenFeature" Version="$(OpenFeatureVer)">
-    </PackageReference>
+    <PackageReference Include="OpenFeature" Version="$(OpenFeatureVer)" />
   </ItemGroup>
 
   <PropertyGroup>
