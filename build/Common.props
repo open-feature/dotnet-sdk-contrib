@@ -24,6 +24,7 @@
       Refer to https://docs.microsoft.com/nuget/concepts/package-versioning for semver syntax.
     -->
     <MicrosoftSourceLinkGitHubPkgVer>[1.0.0,2.0)</MicrosoftSourceLinkGitHubPkgVer>
-    <OpenFeatureVer>[0.5,0.6)</OpenFeatureVer>
+    <!-- 0.5+ -->
+    <OpenFeatureVer>[0.5,)</OpenFeatureVer>
   </PropertyGroup>
 </Project>
