@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -5,15 +5,15 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0E563821-BD08-4B7F-BF9D-395CAD80F026}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Providers.Flagd", "src\OpenFeature.Providers.Flagd\OpenFeature.Providers.Flagd.csproj", "{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagd", "src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj", "{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Hooks.Otel", "src\OpenFeature.Hooks.Otel\OpenFeature.Hooks.Otel.csproj", "{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Hooks.Otel", "src\OpenFeature.Contrib.Hooks.Otel\OpenFeature.Contrib.Hooks.Otel.csproj", "{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Hooks.Otel.Test", "test\OpenFeature.Hooks.Otel.Test\OpenFeature.Hooks.Otel.Test.csproj", "{199FA48A-06EF-4E15-8206-C095D1455A99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Hooks.Otel.Test", "test\OpenFeature.Contrib.Hooks.Otel.Test\OpenFeature.Contrib.Hooks.Otel.Test.csproj", "{199FA48A-06EF-4E15-8206-C095D1455A99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Providers.Flagd.Test", "test\OpenFeature.Providers.Flagd.Test\OpenFeature.Providers.Flagd.Test.csproj", "{206323A0-7334-4723-8394-C31C150B95DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagd.Test", "test\OpenFeature.Contrib.Providers.Flagd.Test\OpenFeature.Contrib.Providers.Flagd.Test.csproj", "{206323A0-7334-4723-8394-C31C150B95DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
