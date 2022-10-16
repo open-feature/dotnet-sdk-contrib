@@ -26,7 +26,7 @@ Sample `.csproj` file:
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>OpenFeature.MyComponent</PackageId>
+    <PackageId>OpenFeature.Contrib.MyComponent</PackageId>
     <VersionNumber>0.0.1</VersionNumber> <!--x-release-please-version -->
     <Version>$(VersionNumber)</Version>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
