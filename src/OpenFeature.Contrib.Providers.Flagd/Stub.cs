@@ -1,6 +1,4 @@
-﻿using OpenFeatureSDK;
-
-namespace OpenFeatureContrib.Providers.Flagd
+﻿namespace OpenFeature.Contrib.Providers.Flagd
 {
     /// <summary>
     /// A stub class.
@@ -12,7 +10,7 @@ namespace OpenFeatureContrib.Providers.Flagd
         /// </summary>
         public static string GetProviderName()
         {
-            return OpenFeature.Instance.GetProviderMetadata().Name;
+            return Api.Instance.GetProviderMetadata().Name;
         }
     }
 }

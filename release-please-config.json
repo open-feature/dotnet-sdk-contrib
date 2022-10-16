@@ -1,24 +1,24 @@
 {
   "bootstrap-sha": "fd59f2328fd5aba0b7705b2fdbf76e39afa244dd",
   "packages": {
-    "src/OpenFeatureContrib.Hooks.Otel": {
-      "package-name": "OpenFeature.Hooks.Otel",
+    "src/OpenFeature.Contrib.Hooks.Otel": {
+      "package-name": "OpenFeature.Contrib.Hooks.Otel",
       "release-type": "simple",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
       "extra-files": [
-        "OpenFeatureContrib.Hooks.Otel.csproj"
+        "OpenFeature.Contrib.Hooks.Otel.csproj"
       ]
     },
-    "src/OpenFeatureContrib.Providers.Flagd": {
-      "package-name": "OpenFeature.Providers.Flagd",
+    "src/OpenFeature.Contrib.Providers.Flagd": {
+      "package-name": "OpenFeature.Contrib.Providers.Flagd",
       "release-type": "simple",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
       "extra-files": [
-        "OpenFeatureContrib.Providers.Flagd.csproj"
+        "OpenFeature.Contrib.Providers.Flagd.csproj"
       ]
     }
   }

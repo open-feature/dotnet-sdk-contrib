@@ -1,8 +1,8 @@
 
 using Xunit;
-using OpenFeatureContrib.Providers.Flagd;
+using OpenFeature.Contrib.Providers.Flagd;
 
-namespace OpenFeatureContrib.Providers.Flagd.Test
+namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
     public class UnitTest1
     {

@@ -1,4 +1,4 @@
-﻿namespace OpenFeatureContrib.Hooks.Otel
+﻿namespace OpenFeature.Contrib.Hooks.Otel
 {
     /// <summary>
     /// Stub.
