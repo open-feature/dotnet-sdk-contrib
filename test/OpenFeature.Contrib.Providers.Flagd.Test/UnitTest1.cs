@@ -1,6 +1,4 @@
-
 using Xunit;
-using OpenFeature.Contrib.Providers.Flagd;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
@@ -9,7 +7,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestMethod1()
         {
-            Assert.Equal("No-op Provider", Stub.GetProviderName());
+            Assert.Equal("No-op Provider", FlagdProvider.GetProviderName());
         }
     }
 }
