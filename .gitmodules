@@ -1,0 +1,3 @@
+[submodule "src/OpenFeature.Contrib.Providers.Flagd/schemas"]
+	path = src/OpenFeature.Contrib.Providers.Flagd/schemas
+	url = git@github.com:open-feature/schemas.git
