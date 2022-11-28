@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using Newtonsoft.Json;
+using System.Text.Json;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 using OpenFeature.Model;
@@ -364,12 +364,12 @@ public class GoFeatureFlagProviderTest
         });
         var res = g.ResolveStructureValue("object_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
-        var want = JsonConvert.SerializeObject(new Value(new Structure(new Dictionary<string, Value>
+        var want = JsonSerializer.Serialize(new Value(new Structure(new Dictionary<string, Value>
         {
             { "test", new Value("test1") }, { "test2", new Value(false) }, { "test3", new Value(123.3) },
             { "test4", new Value(1) }
         })));
-        Assert.Equal(want, JsonConvert.SerializeObject(res.Result.Value));
+        Assert.Equal(want, JsonSerializer.Serialize(res.Result.Value));
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
         Assert.Equal(Reason.TargetingMatch, res.Result.Reason);
         Assert.Equal("True", res.Result.Variant);
@@ -433,9 +433,9 @@ public class GoFeatureFlagProviderTest
 
         var res = g.ResolveStructureValue("list_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
-        var want = JsonConvert.SerializeObject(new Value(new List<Value>
+        var want = JsonSerializer.Serialize(new Value(new List<Value>
             { new("test"), new("test1"), new("test2"), new("false"), new("test3") }));
-        Assert.Equal(want, JsonConvert.SerializeObject(res.Result.Value));
+        Assert.Equal(want, JsonSerializer.Serialize(res.Result.Value));
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
         Assert.Equal(Reason.TargetingMatch, res.Result.Reason);
         Assert.Equal("True", res.Result.Variant);

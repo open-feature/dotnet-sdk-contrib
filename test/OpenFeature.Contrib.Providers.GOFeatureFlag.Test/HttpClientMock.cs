@@ -1,11 +1,11 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using Moq.Protected;
-using Newtonsoft.Json;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test;
 
@@ -15,7 +15,7 @@ public class HttpClientMock
     {
         var mockResponse = new HttpResponseMessage
         {
-            Content = new StringContent(JsonConvert.SerializeObject(response)),
+            Content = new StringContent(JsonSerializer.Serialize(response)),
             StatusCode = HttpStatusCode.OK
         };
 
