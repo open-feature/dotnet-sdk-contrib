@@ -114,8 +114,11 @@ public class GoFeatureFlagProviderTest
     [Fact]
     private void constructor_options_only_timeout()
     {
-        Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-            { Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond) }));
+        Assert.Throws<InvalidOption>(
+            () => new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions { Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond) }
+            )
+        );
     }
 
     [Fact]
@@ -362,7 +365,10 @@ public class GoFeatureFlagProviderTest
         var res = g.ResolveStructureValue("object_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         var want = JsonConvert.SerializeObject(new Value(new Structure(new Dictionary<string, Value>
-            { { "test", new Value("test1") }, { "test2", new Value(false) }, { "test3", new Value(123.3) }, {"test4", new Value(1)}})));
+        {
+            { "test", new Value("test1") }, { "test2", new Value(false) }, { "test3", new Value(123.3) },
+            { "test4", new Value(1) }
+        })));
         Assert.Equal(want, JsonConvert.SerializeObject(res.Result.Value));
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
         Assert.Equal(Reason.TargetingMatch, res.Result.Reason);
@@ -427,7 +433,8 @@ public class GoFeatureFlagProviderTest
 
         var res = g.ResolveStructureValue("list_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
-        var want =  JsonConvert.SerializeObject(new Value(new List<Value> { new("test"), new("test1"), new("test2"), new("false"), new("test3") }));
+        var want = JsonConvert.SerializeObject(new Value(new List<Value>
+            { new("test"), new("test1"), new("test2"), new("false"), new("test3") }));
         Assert.Equal(want, JsonConvert.SerializeObject(res.Result.Value));
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
         Assert.Equal(Reason.TargetingMatch, res.Result.Reason);

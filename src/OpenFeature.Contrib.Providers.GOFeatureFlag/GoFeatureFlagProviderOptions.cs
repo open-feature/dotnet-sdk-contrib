@@ -24,6 +24,6 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         ///     (optional) If you want to provide your own HttpMessageHandler.
         ///     Default: null
         /// </Summary>
-        public HttpMessageHandler HttpMessageHandler { get; set; } = null;
+        public HttpMessageHandler HttpMessageHandler { get; set; }
     }
 }
