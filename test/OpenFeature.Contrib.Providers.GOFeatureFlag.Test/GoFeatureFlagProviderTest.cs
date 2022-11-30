@@ -202,7 +202,7 @@ public class GoFeatureFlagProviderTest
         Assert.Equal(Reason.TargetingMatch, res.Result.Reason);
         Assert.Equal("True", res.Result.Variant);
     }
-    
+
     [Fact]
     private void should_return_custom_reason_if_returned_by_relay_proxy()
     {
@@ -252,7 +252,7 @@ public class GoFeatureFlagProviderTest
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetStringDetails("bool_targeting_match", "default", _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
-        Assert.Equal("default",res.Result.Value);
+        Assert.Equal("default", res.Result.Value);
         Assert.Equal(ErrorType.TypeMismatch, res.Result.ErrorType);
         Assert.Equal(Reason.Error, res.Result.Reason);
     }
@@ -306,7 +306,7 @@ public class GoFeatureFlagProviderTest
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetIntegerDetails("string_key", 200, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
-        Assert.Equal(200,res.Result.Value);
+        Assert.Equal(200, res.Result.Value);
         Assert.Equal(ErrorType.TypeMismatch, res.Result.ErrorType);
         Assert.Equal(Reason.Error, res.Result.Reason);
     }
@@ -360,7 +360,7 @@ public class GoFeatureFlagProviderTest
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetIntegerDetails("double_key", 200, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
-        Assert.Equal(200,res.Result.Value);
+        Assert.Equal(200, res.Result.Value);
         Assert.Equal(ErrorType.TypeMismatch, res.Result.ErrorType);
         Assert.Equal(Reason.Error, res.Result.Reason);
     }
@@ -475,7 +475,7 @@ public class GoFeatureFlagProviderTest
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetStringDetails("list_key", "empty", EvaluationContext.Empty);
         Assert.NotNull(res.Result);
-        Assert.Equal("empty",res.Result.Value);
+        Assert.Equal("empty", res.Result.Value);
         Assert.Equal(ErrorType.InvalidContext, res.Result.ErrorType);
         Assert.Equal(Reason.Error, res.Result.Reason);
     }
