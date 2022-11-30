@@ -307,8 +307,9 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
 
             if (value.ValueKind == JsonValueKind.Array)
             {
+                using var arrayEnumerator = value.EnumerateArray();
                 var arr = new List<Value>();
-                var arrayEnumerator = value.EnumerateArray();
+
                 while (arrayEnumerator.MoveNext())
                 {
                     var current = arrayEnumerator.Current;
