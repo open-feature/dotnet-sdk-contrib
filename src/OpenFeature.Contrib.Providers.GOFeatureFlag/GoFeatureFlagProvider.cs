@@ -292,7 +292,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             if (value.ValueKind == JsonValueKind.Object)
             {
                 var dict = new Dictionary<string, Value>();
-                var objEnumerator = value.EnumerateObject();
+                using var objEnumerator = value.EnumerateObject();
                 while (objEnumerator.MoveNext())
                 {
                     var current = objEnumerator.Current;
