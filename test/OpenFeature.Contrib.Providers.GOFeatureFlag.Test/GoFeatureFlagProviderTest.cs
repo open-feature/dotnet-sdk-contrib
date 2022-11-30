@@ -23,33 +23,33 @@ public class GoFeatureFlagProviderTest
     {
         const string mediaType = "application/json";
         var mockHttp = new MockHttpMessageHandler();
-        mockHttp.When(prefixEval + "fail_500" + suffixEval).Respond(HttpStatusCode.InternalServerError);
-        mockHttp.When(prefixEval + "flag_not_found" + suffixEval).Respond(HttpStatusCode.NotFound);
-        mockHttp.When(prefixEval + "bool_targeting_match" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}fail_500{suffixEval}").Respond(HttpStatusCode.InternalServerError);
+        mockHttp.When($"{prefixEval}flag_not_found{suffixEval}").Respond(HttpStatusCode.NotFound);
+        mockHttp.When($"{prefixEval}bool_targeting_match{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":true}");
-        mockHttp.When(prefixEval + "disabled" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}disabled{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":true}");
-        mockHttp.When(prefixEval + "disabled_double" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}disabled_double{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":100.25}");
-        mockHttp.When(prefixEval + "disabled_integer" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}disabled_integer{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":100}");
-        mockHttp.When(prefixEval + "disabled_object" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}disabled_object{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":null}");
-        mockHttp.When(prefixEval + "disabled_string" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}disabled_string{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":\"\"}");
-        mockHttp.When(prefixEval + "double_key" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}double_key{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":100.25}");
-        mockHttp.When(prefixEval + "flag_not_found" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}flag_not_found{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"SdkDefault\",\"failed\":true,\"version\":\"\",\"reason\":\"ERROR\",\"errorCode\":\"FLAG_NOT_FOUND\",\"value\":\"false\"}");
-        mockHttp.When(prefixEval + "integer_key" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}integer_key{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":100}");
-        mockHttp.When(prefixEval + "list_key" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}list_key{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":[\"test\",\"test1\",\"test2\",\"false\",\"test3\"]}");
-        mockHttp.When(prefixEval + "object_key" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}object_key{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":{\"test\":\"test1\",\"test2\":false,\"test3\":123.3,\"test4\":1,\"test5\":null}}");
-        mockHttp.When(prefixEval + "string_key" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}string_key{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":\"CC0000\"}");
-        mockHttp.When(prefixEval + "unknown_reason" + suffixEval).Respond(mediaType,
+        mockHttp.When($"{prefixEval}unknown_reason{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"CUSTOM_REASON\",\"errorCode\":\"\",\"value\":true}");
 
         return mockHttp;

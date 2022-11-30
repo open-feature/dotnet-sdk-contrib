@@ -39,9 +39,9 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <exception cref="InvalidOption">if no options are provided or we have a wrong configuration.</exception>
         private void ValidateInputOptions(GoFeatureFlagProviderOptions options)
         {
-            if (options == null) throw new InvalidOption("No options provided");
+            if (options is null) throw new InvalidOption("No options provided");
 
-            if (options.Endpoint == null || "".Equals(options.Endpoint))
+            if (string.IsNullOrEmpty(options.Endpoint))
                 throw new InvalidOption("endpoint is a mandatory field when initializing the provider");
         }
 
@@ -94,7 +94,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             }
             catch (FormatException e)
             {
-                throw new TypeMismatchError("Flag value " + flagKey + " had unexpected type.", e);
+                throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
             }
             catch (FlagDisabled)
             {
@@ -120,13 +120,13 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
                 if (!(resp.value is JsonElement element && element.ValueKind == JsonValueKind.String))
-                    throw new TypeMismatchError("Flag value " + flagKey + " had unexpected type.");
+                    throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
                 return new ResolutionDetails<string>(flagKey, resp.value.ToString(), ErrorType.None, resp.reason,
                     resp.variationType);
             }
             catch (FormatException e)
             {
-                throw new TypeMismatchError("Flag value " + flagKey + " had unexpected type.", e);
+                throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
             }
             catch (FlagDisabled)
             {
@@ -156,7 +156,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             }
             catch (FormatException e)
             {
-                throw new TypeMismatchError("Flag value " + flagKey + " had unexpected type.", e);
+                throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
             }
             catch (FlagDisabled)
             {
@@ -186,7 +186,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             }
             catch (FormatException e)
             {
-                throw new TypeMismatchError("Flag value " + flagKey + " had unexpected type.", e);
+                throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
             }
             catch (FlagDisabled)
             {
@@ -218,11 +218,11 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                         resp.variationType);
                 }
 
-                throw new TypeMismatchError("Flag value " + flagKey + " had unexpected type.");
+                throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
             }
             catch (FormatException e)
             {
-                throw new TypeMismatchError("Flag value " + flagKey + " had unexpected type.", e);
+                throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
             }
             catch (FlagDisabled)
             {
@@ -252,11 +252,11 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             };
             var goffRequest = JsonSerializer.Serialize(request, _serializerOptions);
 
-            var response = await _httpClient.PostAsync("v1/feature/" + flagKey + "/eval",
+            var response = await _httpClient.PostAsync($"v1/feature/{flagKey}/eval",
                 new StringContent(goffRequest, Encoding.UTF8, ApplicationJson));
 
             if (response.StatusCode == HttpStatusCode.NotFound)
-                throw new FlagNotFoundError("Flag " + flagKey + " was not found in your configuration");
+                throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
             if (response.StatusCode >= HttpStatusCode.BadRequest)
                 throw new GeneralError("impossible to contact GO Feature Flag relay proxy instance");
@@ -269,7 +269,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                 throw new FlagDisabled();
 
             if (ErrorType.FlagNotFound.ToString().Equals(goffResp.errorCode))
-                throw new FlagNotFoundError("Flag " + flagKey + " was not found in your configuration");
+                throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
             return goffResp;
         }
@@ -319,7 +319,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                 return new Value(arr);
             }
 
-            throw new InvalidCastException();
+            throw new ImpossibleToConvertTypeError($"impossible to convert the object {value}");
         }
     }
 }
