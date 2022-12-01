@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>OpenFeature.Contrib.GOFeatureFlag</PackageId>
+    <VersionNumber>0.1.0</VersionNumber> <!--x-release-please-version -->
+    <Version>$(VersionNumber)</Version>
+    <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
+    <FileVersion>$(VersionNumber)</FileVersion>
+    <Description>GO Feature Flag provider for .NET</Description>
+    <PackageProjectUrl>https://gofeatureflag.org</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
+    <Authors>Thomas Poignant</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="7.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+</Project>
