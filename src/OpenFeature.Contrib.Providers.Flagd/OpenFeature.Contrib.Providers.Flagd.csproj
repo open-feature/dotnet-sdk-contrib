@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>OpenFeature.Contrib.Providers.Flagd</PackageId>
-    <VersionNumber>0.1.0</VersionNumber> <!--x-release-please-version -->
+    <PackageId>OpenFeature.Providers.Flagd</PackageId>
+    <VersionNumber>0.0.2</VersionNumber> <!--x-release-please-version -->
     <Version>$(VersionNumber)</Version>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
@@ -11,5 +11,18 @@
     <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
     <Authors>Todd Baert</Authors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.21.7" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.49.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Proto" />
+  </ItemGroup>
 
 </Project>
