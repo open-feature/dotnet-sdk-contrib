@@ -20,6 +20,16 @@
       "extra-files": [
         "OpenFeature.Contrib.Providers.Flagd.csproj"
       ]
+    },
+    "src/OpenFeature.Contrib.Providers.GOFeatureFlag": {
+      "package-name": "OpenFeature.Contrib.Providers.GOFeatureFlag",
+      "release-type": "simple",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "versioning": "default",
+      "extra-files": [
+        "OpenFeature.Contrib.Providers.GOFeatureFlag.csproj"
+      ]
     }
   }
 }
