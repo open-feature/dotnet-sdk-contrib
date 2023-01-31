@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Hooks.O
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagd.Test", "test\OpenFeature.Contrib.Providers.Flagd.Test\OpenFeature.Contrib.Providers.Flagd.Test.csproj", "{206323A0-7334-4723-8394-C31C150B95DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.GOFeatureFlag", "src\OpenFeature.Contrib.Providers.GOFeatureFlag\OpenFeature.Contrib.Providers.GOFeatureFlag.csproj", "{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.GOFeatureFlag.Test", "test\OpenFeature.Contrib.Providers.GOFeatureFlag.Test\OpenFeature.Contrib.Providers.GOFeatureFlag.Test.csproj", "{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,11 +44,21 @@ Global
 		{206323A0-7334-4723-8394-C31C150B95DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{206323A0-7334-4723-8394-C31C150B95DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{206323A0-7334-4723-8394-C31C150B95DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
 		{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
 		{199FA48A-06EF-4E15-8206-C095D1455A99} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
 		{206323A0-7334-4723-8394-C31C150B95DC} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
+		{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
+		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
 	EndGlobalSection
 EndGlobal
