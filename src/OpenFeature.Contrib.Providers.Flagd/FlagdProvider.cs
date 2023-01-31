@@ -31,7 +31,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 throw new ArgumentNullException(nameof(url));
             }
 
-            #if NETSTANDARD2_0
+#if NETSTANDARD2_0
             _client = new Service.ServiceClient(GrpcChannel.ForAddress(url));
 #else
             _client = new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
@@ -50,7 +50,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             _client = client;
         }
-        
+
         /// <summary>
         /// Get the provider name.
         /// </summary>
@@ -58,7 +58,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             return Api.Instance.GetProviderMetadata().Name;
         }
-        
+
         /// <summary>
         ///     Return the metadata associated to this provider.
         /// </summary>
@@ -82,9 +82,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 });
 
                 return new ResolutionDetails<bool>(
-                    flagKey: flagKey, 
+                    flagKey: flagKey,
                     value: resolveBooleanResponse.Value,
-                    reason: resolveBooleanResponse.Reason, 
+                    reason: resolveBooleanResponse.Reason,
                     variant: resolveBooleanResponse.Variant
                 );
             }
@@ -103,7 +103,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            try 
+            try
             {
                 var resolveBooleanResponse = await _client.ResolveStringAsync(new ResolveStringRequest
                 {
@@ -112,9 +112,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 });
 
                 return new ResolutionDetails<string>(
-                    flagKey: flagKey, 
+                    flagKey: flagKey,
                     value: resolveBooleanResponse.Value,
-                    reason: resolveBooleanResponse.Reason, 
+                    reason: resolveBooleanResponse.Reason,
                     variant: resolveBooleanResponse.Variant
                 );
             }
@@ -122,7 +122,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 return GetDefaultWithException<string>(e, flagKey, defaultValue);
             }
-            
+
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            try 
+            try
             {
                 var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
                 {
@@ -143,9 +143,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 });
 
                 return new ResolutionDetails<int>(
-                    flagKey: flagKey, 
+                    flagKey: flagKey,
                     value: (int)resolveIntResponse.Value,
-                    reason: resolveIntResponse.Reason, 
+                    reason: resolveIntResponse.Reason,
                     variant: resolveIntResponse.Variant
                 );
             }
@@ -164,7 +164,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            try 
+            try
             {
                 var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
                 {
@@ -173,9 +173,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 });
 
                 return new ResolutionDetails<double>(
-                    flagKey: flagKey, 
+                    flagKey: flagKey,
                     value: resolveDoubleResponse.Value,
-                    reason: resolveDoubleResponse.Reason, 
+                    reason: resolveDoubleResponse.Reason,
                     variant: resolveDoubleResponse.Variant
                 );
             }
@@ -203,9 +203,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 });
 
                 return new ResolutionDetails<Value>(
-                    flagKey: flagKey, 
+                    flagKey: flagKey,
                     value: ConvertObjectToValue(resolveObjectResponse.Value),
-                    reason: resolveObjectResponse.Reason, 
+                    reason: resolveObjectResponse.Reason,
                     variant: resolveObjectResponse.Variant
                 );
             }
@@ -224,29 +224,30 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         private ResolutionDetails<T> GetDefaultWithException<T>(Grpc.Core.RpcException e, String flagKey, T defaultValue)
         {
-            if (e.Status.StatusCode == Grpc.Core.StatusCode.NotFound) 
+            if (e.Status.StatusCode == Grpc.Core.StatusCode.NotFound)
             {
                 return new ResolutionDetails<T>(
-                    flagKey: flagKey, 
+                    flagKey: flagKey,
                     value: defaultValue,
                     reason: Constant.Reason.Error,
                     errorType: Constant.ErrorType.FlagNotFound,
                     errorMessage: e.Status.Detail.ToString()
-                );  
-            }
-            else if (e.Status.StatusCode == Grpc.Core.StatusCode.Unavailable) 
-            {
-                 return new ResolutionDetails<T>(
-                    flagKey: flagKey, 
-                    value: defaultValue,
-                    reason: Constant.Reason.Error,
-                    errorType: Constant.ErrorType.ProviderNotReady,
-                    errorMessage: e.Status.Detail.ToString()
                 );
             }
-            else if (e.Status.StatusCode == Grpc.Core.StatusCode.InvalidArgument) {
+            else if (e.Status.StatusCode == Grpc.Core.StatusCode.Unavailable)
+            {
                 return new ResolutionDetails<T>(
-                    flagKey: flagKey, 
+                   flagKey: flagKey,
+                   value: defaultValue,
+                   reason: Constant.Reason.Error,
+                   errorType: Constant.ErrorType.ProviderNotReady,
+                   errorMessage: e.Status.Detail.ToString()
+               );
+            }
+            else if (e.Status.StatusCode == Grpc.Core.StatusCode.InvalidArgument)
+            {
+                return new ResolutionDetails<T>(
+                    flagKey: flagKey,
                     value: defaultValue,
                     reason: Constant.Reason.Error,
                     errorType: Constant.ErrorType.TypeMismatch,
@@ -254,7 +255,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 );
             }
             return new ResolutionDetails<T>(
-                flagKey: flagKey, 
+                flagKey: flagKey,
                 value: defaultValue,
                 reason: Constant.Reason.Error,
                 errorType: Constant.ErrorType.General,
@@ -273,13 +274,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 return new Struct();
             }
-            
+
             var values = new Struct();
             foreach (var entry in ctx)
             {
                 values.Fields.Add(entry.Key, ConvertToProtoValue(entry.Value));
             }
-            
+
             return values;
         }
 
