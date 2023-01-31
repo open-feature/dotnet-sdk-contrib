@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.Client;
 using OpenFeature.Model;
+
 using Schema.V1;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
@@ -12,21 +12,26 @@ using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 namespace OpenFeature.Contrib.Providers.Flagd
 {
     /// <summary>
-    /// A stub class.
+    ///     FlagdProvider is the OpenFeature provider for flagD.
     /// </summary>
     public sealed class FlagdProvider : FeatureProvider
     {
         private readonly Service.ServiceClient _client;
         private readonly Metadata _providerMetadata = new Metadata("flagD Provider");
 
+        /// <summary>
+        ///     Constructor of the provider.
+        ///     <param name="url">The URL of the flagD server</param>
+        ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
+        /// </summary>
         public FlagdProvider(Uri url)
         {
             if (url == null)
             {
                 throw new ArgumentNullException(nameof(url));
             }
-            
-#if NETSTANDARD2_0
+
+            #if NETSTANDARD2_0
             _client = new Service.ServiceClient(GrpcChannel.ForAddress(url));
 #else
             _client = new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
@@ -34,6 +39,16 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 HttpHandler = new WinHttpHandler()
             }));
 #endif
+        }
+
+        /// <summary>
+        ///     Constructor of the provider.
+        ///     <param name="client">The Grpc client used to communicate with the server</param>
+        ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
+        /// </summary>
+        public FlagdProvider(Service.ServiceClient client)
+        {
+            _client = client;
         }
         
         /// <summary>
@@ -44,88 +59,214 @@ namespace OpenFeature.Contrib.Providers.Flagd
             return Api.Instance.GetProviderMetadata().Name;
         }
         
+        /// <summary>
+        ///     Return the metadata associated to this provider.
+        /// </summary>
         public override Metadata GetMetadata() => _providerMetadata;
 
+        /// <summary>
+        ///     ResolveBooleanValue resolve the value for a Boolean Flag.
+        /// </summary>
+        /// <param name="flagKey">Name of the flag</param>
+        /// <param name="defaultValue">Default value used in case of error.</param>
+        /// <param name="context">Context about the user</param>
+        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            var resolveBooleanResponse = await _client.ResolveBooleanAsync(new ResolveBooleanRequest
+            try
             {
-                Context = ConvertToContext(context),
-                FlagKey = flagKey
-            });
+                var resolveBooleanResponse = await _client.ResolveBooleanAsync(new ResolveBooleanRequest
+                {
+                    Context = ConvertToContext(context),
+                    FlagKey = flagKey
+                });
 
-            return new ResolutionDetails<bool>(
-                flagKey: flagKey, 
-                value: resolveBooleanResponse.Value,
-                reason: resolveBooleanResponse.Reason, 
-                variant: resolveBooleanResponse.Variant
-            );
+                return new ResolutionDetails<bool>(
+                    flagKey: flagKey, 
+                    value: resolveBooleanResponse.Value,
+                    reason: resolveBooleanResponse.Reason, 
+                    variant: resolveBooleanResponse.Variant
+                );
+            }
+            catch (Grpc.Core.RpcException e)
+            {
+                return GetDefaultWithException<bool>(e, flagKey, defaultValue);
+            }
         }
 
+        /// <summary>
+        ///     ResolveStringValue resolve the value for a string Flag.
+        /// </summary>
+        /// <param name="flagKey">Name of the flag</param>
+        /// <param name="defaultValue">Default value used in case of error.</param>
+        /// <param name="context">Context about the user</param>
+        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            var resolveBooleanResponse = await _client.ResolveStringAsync(new ResolveStringRequest
+            try 
             {
-                Context = ConvertToContext(context),
-                FlagKey = flagKey
-            });
+                var resolveBooleanResponse = await _client.ResolveStringAsync(new ResolveStringRequest
+                {
+                    Context = ConvertToContext(context),
+                    FlagKey = flagKey
+                });
 
-            return new ResolutionDetails<string>(
-                flagKey: flagKey, 
-                value: resolveBooleanResponse.Value,
-                reason: resolveBooleanResponse.Reason, 
-                variant: resolveBooleanResponse.Variant
-            );
+                return new ResolutionDetails<string>(
+                    flagKey: flagKey, 
+                    value: resolveBooleanResponse.Value,
+                    reason: resolveBooleanResponse.Reason, 
+                    variant: resolveBooleanResponse.Variant
+                );
+            }
+            catch (Grpc.Core.RpcException e)
+            {
+                return GetDefaultWithException<string>(e, flagKey, defaultValue);
+            }
+            
         }
 
+        /// <summary>
+        ///     ResolveIntegerValue resolve the value for an int Flag.
+        /// </summary>
+        /// <param name="flagKey">Name of the flag</param>
+        /// <param name="defaultValue">Default value used in case of error.</param>
+        /// <param name="context">Context about the user</param>
+        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
+            try 
             {
-                Context = ConvertToContext(context),
-                FlagKey = flagKey
-            });
+                var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
+                {
+                    Context = ConvertToContext(context),
+                    FlagKey = flagKey
+                });
 
-            return new ResolutionDetails<int>(
-                flagKey: flagKey, 
-                value: (int)resolveIntResponse.Value,
-                reason: resolveIntResponse.Reason, 
-                variant: resolveIntResponse.Variant
-            );
+                return new ResolutionDetails<int>(
+                    flagKey: flagKey, 
+                    value: (int)resolveIntResponse.Value,
+                    reason: resolveIntResponse.Reason, 
+                    variant: resolveIntResponse.Variant
+                );
+            }
+            catch (Grpc.Core.RpcException e)
+            {
+                return GetDefaultWithException<int>(e, flagKey, defaultValue);
+            }
         }
 
+        /// <summary>
+        ///     ResolveDoubleValue resolve the value for a double Flag.
+        /// </summary>
+        /// <param name="flagKey">Name of the flag</param>
+        /// <param name="defaultValue">Default value used in case of error.</param>
+        /// <param name="context">Context about the user</param>
+        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
+            try 
             {
-                Context = ConvertToContext(context),
-                FlagKey = flagKey
-            });
+                var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
+                {
+                    Context = ConvertToContext(context),
+                    FlagKey = flagKey
+                });
 
-            return new ResolutionDetails<double>(
-                flagKey: flagKey, 
-                value: resolveDoubleResponse.Value,
-                reason: resolveDoubleResponse.Reason, 
-                variant: resolveDoubleResponse.Variant
-            );
+                return new ResolutionDetails<double>(
+                    flagKey: flagKey, 
+                    value: resolveDoubleResponse.Value,
+                    reason: resolveDoubleResponse.Reason, 
+                    variant: resolveDoubleResponse.Variant
+                );
+            }
+            catch (Grpc.Core.RpcException e)
+            {
+                return GetDefaultWithException<double>(e, flagKey, defaultValue);
+            }
         }
 
+        /// <summary>
+        ///     ResolveStructureValue resolve the value for a Boolean Flag.
+        /// </summary>
+        /// <param name="flagKey">Name of the flag</param>
+        /// <param name="defaultValue">Default value used in case of error.</param>
+        /// <param name="context">Context about the user</param>
+        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            var resolveObjectResponse = await _client.ResolveObjectAsync(new ResolveObjectRequest
+            try
             {
-                Context = ConvertToContext(context),
-                FlagKey = flagKey
-            });
+                var resolveObjectResponse = await _client.ResolveObjectAsync(new ResolveObjectRequest
+                {
+                    Context = ConvertToContext(context),
+                    FlagKey = flagKey
+                });
 
-            return new ResolutionDetails<Value>(
+                return new ResolutionDetails<Value>(
+                    flagKey: flagKey, 
+                    value: ConvertObjectToValue(resolveObjectResponse.Value),
+                    reason: resolveObjectResponse.Reason, 
+                    variant: resolveObjectResponse.Variant
+                );
+            }
+            catch (Grpc.Core.RpcException e)
+            {
+                return GetDefaultWithException<Value>(e, flagKey, defaultValue);
+            }
+        }
+
+        /// <summary>
+        ///     GetDefaultWithException returns the default value for a flag, together with some error information about why thy flag could not be retrieved by the provider.
+        /// </summary>
+        /// <param name="e">The exception thrown by the Grpc client</param>
+        /// <param name="flagKey">Name of the flag</param>
+        /// <param name="defaultValue">Default value to return</param>
+        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
+        private ResolutionDetails<T> GetDefaultWithException<T>(Grpc.Core.RpcException e, String flagKey, T defaultValue)
+        {
+            if (e.Status.StatusCode == Grpc.Core.StatusCode.NotFound) 
+            {
+                return new ResolutionDetails<T>(
+                    flagKey: flagKey, 
+                    value: defaultValue,
+                    reason: Constant.Reason.Error,
+                    errorType: Constant.ErrorType.FlagNotFound,
+                    errorMessage: e.Status.Detail.ToString()
+                );  
+            }
+            else if (e.Status.StatusCode == Grpc.Core.StatusCode.Unavailable) 
+            {
+                 return new ResolutionDetails<T>(
+                    flagKey: flagKey, 
+                    value: defaultValue,
+                    reason: Constant.Reason.Error,
+                    errorType: Constant.ErrorType.ProviderNotReady,
+                    errorMessage: e.Status.Detail.ToString()
+                );
+            }
+            else if (e.Status.StatusCode == Grpc.Core.StatusCode.InvalidArgument) {
+                return new ResolutionDetails<T>(
+                    flagKey: flagKey, 
+                    value: defaultValue,
+                    reason: Constant.Reason.Error,
+                    errorType: Constant.ErrorType.TypeMismatch,
+                    errorMessage: e.Status.Detail.ToString()
+                );
+            }
+            return new ResolutionDetails<T>(
                 flagKey: flagKey, 
-                value: ConvertObjectToValue(resolveObjectResponse.Value),
-                reason: resolveObjectResponse.Reason, 
-                variant: resolveObjectResponse.Variant
+                value: defaultValue,
+                reason: Constant.Reason.Error,
+                errorType: Constant.ErrorType.General,
+                errorMessage: e.Status.Detail.ToString()
             );
         }
 
+        /// <summary>
+        ///     ConvertToContext converts the given EvaluationContext to a Struct.
+        /// </summary>
+        /// <param name="ctx">The evaluation context</param>
+        /// <returns>A Struct object containing the evaluation context</returns>
         private static Struct ConvertToContext(EvaluationContext ctx)
         {
             if (ctx == null)
@@ -142,6 +283,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
             return values;
         }
 
+        /// <summary>   
+        ///     ConvertToProtoValue converts the given Value to a ProtoValue.
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <returns>A ProtoValue object representing the given value</returns>
         private static ProtoValue ConvertToProtoValue(Value value)
         {
             if (value.IsList)
@@ -179,10 +325,20 @@ namespace OpenFeature.Contrib.Providers.Flagd
             return ProtoValue.ForNull();
         }
 
+        /// <summary>   
+        ///     ConvertObjectToValue converts the given Struct to a Value.
+        /// </summary>
+        /// <param name="src">The struct</param>
+        /// <returns>A Value object representing the given struct</returns>
         private static Value ConvertObjectToValue(Struct src) =>
             new Value(new Structure(src.Fields
                 .ToDictionary(entry => entry.Key, entry => ConvertToValue(entry.Value))));
 
+        /// <summary>   
+        ///     ConvertToValue converts the given ProtoValue to a Value.
+        /// </summary>
+        /// <param name="src">The value, represented as ProtoValue</param>
+        /// <returns>A Value object representing the given value</returns>
         private static Value ConvertToValue(ProtoValue src)
         {
             switch (src.KindCase)
@@ -201,6 +357,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
 
+        /// <summary>   
+        ///     ConvertToPrimitiveValue converts the given ProtoValue to a Value.
+        /// </summary>
+        /// <param name="value">The value, represented as ProtoValue</param>
+        /// <returns>A Value object representing the given value as a primitive data type</returns>
         private static Value ConvertToPrimitiveValue(ProtoValue value)
         {
             switch (value.KindCase)
@@ -221,5 +382,4 @@ namespace OpenFeature.Contrib.Providers.Flagd
         }
     }
 }
-
 
