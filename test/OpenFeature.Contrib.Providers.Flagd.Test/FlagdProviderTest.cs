@@ -124,7 +124,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestResolveStructureValue()
         {
             var resp = new ResolveObjectResponse();
-            
+
             var returnedValue = new Struct();
             returnedValue.Fields.Add("my-key", ProtoValue.ForString("my-value"));
 
@@ -155,7 +155,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestResolveFlagNotFound()
         {
             var exc = new RpcException(new Grpc.Core.Status(Grpc.Core.StatusCode.NotFound, Constant.ErrorType.FlagNotFound.ToString()));
-            
+
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
                 System.Threading.Tasks.Task.FromException<ResolveBooleanResponse>(exc),
                 System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
@@ -186,7 +186,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestResolveGrpcHostUnavailable()
         {
             var exc = new RpcException(new Grpc.Core.Status(Grpc.Core.StatusCode.Unavailable, Constant.ErrorType.ProviderNotReady.ToString()));
-            
+
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
                 System.Threading.Tasks.Task.FromException<ResolveBooleanResponse>(exc),
                 System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
@@ -217,7 +217,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestResolveTypeMismatch()
         {
             var exc = new RpcException(new Grpc.Core.Status(Grpc.Core.StatusCode.InvalidArgument, Constant.ErrorType.TypeMismatch.ToString()));
-            
+
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
                 System.Threading.Tasks.Task.FromException<ResolveBooleanResponse>(exc),
                 System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
@@ -248,7 +248,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestResolveUnknownError()
         {
             var exc = new RpcException(new Grpc.Core.Status(Grpc.Core.StatusCode.Internal, "unknown error"));
-            
+
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
                 System.Threading.Tasks.Task.FromException<ResolveBooleanResponse>(exc),
                 System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
