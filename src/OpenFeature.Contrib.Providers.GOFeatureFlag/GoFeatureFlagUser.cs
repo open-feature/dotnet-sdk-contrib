@@ -12,14 +12,26 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
     {
         private const string AnonymousField = "anonymous";
         private const string KeyField = "targetingKey";
-        private string Key { get; set; }
-        private bool Anonymous { get; set; }
-        private Dictionary<string, object> Custom { get; set; }
+     
+        /// <summary>
+        ///   The targeting key for the user.
+        /// </summary>
+        public string Key { get; private set; }
+
+        /// <summary>
+        ///   Is the user Anonymous.
+        /// </summary>
+        public bool Anonymous { get; private set; }
+
+        /// <summary>
+        ///   Additional Custom Data to pass to GO Feature Flag.
+        /// </summary>
+        public Dictionary<string, object> Custom { get; private set; }
 
         /**
-         * FromEvaluationContext convert the evaluation context into a GOFeatureFlagUser Object.
+         * Convert the evaluation context into a GOFeatureFlagUser Object.
          */
-        public static GoFeatureFlagUser FromEvaluationContext(EvaluationContext ctx)
+        public static implicit operator GoFeatureFlagUser(EvaluationContext ctx)
         {
             try
             {
