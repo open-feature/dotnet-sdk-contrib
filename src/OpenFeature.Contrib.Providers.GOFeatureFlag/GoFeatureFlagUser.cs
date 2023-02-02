@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 using OpenFeature.Model;
 
@@ -12,7 +13,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
     {
         private const string AnonymousField = "anonymous";
         private const string KeyField = "targetingKey";
-     
+
         /// <summary>
         ///   The targeting key for the user.
         /// </summary>
