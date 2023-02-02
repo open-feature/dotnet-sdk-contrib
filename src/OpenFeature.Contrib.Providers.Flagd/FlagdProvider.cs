@@ -34,12 +34,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _client = new Service.ServiceClient(GrpcChannel.ForAddress(url));
         }
 
-        /// <summary>
-        ///     Constructor of the provider.
-        ///     <param name="client">The Grpc client used to communicate with the server</param>
-        ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
-        /// </summary>
-        public FlagdProvider(Service.ServiceClient client)
+        // just for testing, internal but visible in tests
+        internal FlagdProvider(Service.ServiceClient client)
         {
             _client = client;
         }
