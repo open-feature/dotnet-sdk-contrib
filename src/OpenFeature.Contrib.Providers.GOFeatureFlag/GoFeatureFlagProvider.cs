@@ -244,10 +244,9 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         private async Task<GoFeatureFlagResponse> CallApi<T>(string flagKey, T defaultValue,
             EvaluationContext context = null)
         {
-            var user = GoFeatureFlagUser.FromEvaluationContext(context);
             var request = new GOFeatureFlagRequest<T>
             {
-                User = user,
+                User = context,
                 DefaultValue = defaultValue
             };
             var goffRequest = JsonSerializer.Serialize(request, _serializerOptions);
