@@ -14,6 +14,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         {
             Assert.Equal("No-op Provider", FlagdProvider.GetProviderName());
         }
+        
+        [Fact]
+        public void TestGetProviderWithDefaultConfig()
+        {
+            var flagdProvider = new FlagdProvider();
+
+            var client = flagdProvider.GetClient();
+
+            Assert.NotNull(client);
+        }
 
         [Fact]
         public void TestResolveBooleanValue()

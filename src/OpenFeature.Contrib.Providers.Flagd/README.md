@@ -71,3 +71,26 @@ namespace OpenFeatureTestApp
     }
 }
 ```
+
+### Configuring the FlagdProvider
+
+The URI of the flagd server to which the `FlagdProvider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
+
+| Option name           | Environment variable name       | Type    | Default   | Values        |
+| --------------------- | ------------------------------- | ------- | --------- | ------------- |
+| host                  | FLAGD_HOST                      | string  | localhost |               |
+| port                  | FLAGD_PORT                      | number  | 8013      |               |
+| tls                   | FLAGD_TLS                       | boolean | false     |               |
+
+So for example, if you would like to pass the URI directly, you can initialise it as follows:
+
+```csharp
+var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
+```
+
+Or, if you rely on the environment variables listed above, you can use the empty costructor:
+
+
+```csharp
+var flagdProvider = new FlagdProvider();
+```

@@ -9,6 +9,7 @@ using Schema.V1;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 
+
 namespace OpenFeature.Contrib.Providers.Flagd
 {
     /// <summary>
@@ -17,8 +18,34 @@ namespace OpenFeature.Contrib.Providers.Flagd
     public sealed class FlagdProvider : FeatureProvider
     {
         private readonly Service.ServiceClient _client;
-        private readonly Metadata _providerMetadata = new Metadata("flagD Provider");
+        private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
 
+        /// <summary>
+        ///     Constructor of the provider. This constructor uses the value of the following
+        ///     environment variables to initialise its client:
+        ///     FLAGD_HOST - The host name of the flagd server (default="localhost")
+        ///     FLAGD_PORT - The port of the flagd server (default="8013")
+        ///     FLAGD_TLS  - Determines whether to use https or not (default="false")
+        /// </summary>
+        public FlagdProvider()
+        {
+            var flagdHost = Environment.GetEnvironmentVariable("FLAGD_HOST") ?? "localhost";
+            var flagdPort = Environment.GetEnvironmentVariable("FLAGD_PORT") ?? "8013";
+            var flagdUseTLSStr = Environment.GetEnvironmentVariable("FLAGD_TLS") ?? "false";
+
+            
+            var protocol = "http";
+            var useTLS = bool.Parse(flagdUseTLSStr);
+
+            if (useTLS)
+            {
+                protocol = "https";
+            }
+
+            var url = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
+            _client = new Service.ServiceClient(GrpcChannel.ForAddress(url));
+        }
+        
         /// <summary>
         ///     Constructor of the provider.
         ///     <param name="url">The URL of the flagD server</param>
@@ -52,6 +79,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     Return the metadata associated to this provider.
         /// </summary>
         public override Metadata GetMetadata() => _providerMetadata;
+        
+        /// <summary>
+        ///     Return the Grpc client of the provider
+        /// </summary>
+        public Service.ServiceClient GetClient() => _client;
 
         /// <summary>
         ///     ResolveBooleanValue resolve the value for a Boolean Flag.

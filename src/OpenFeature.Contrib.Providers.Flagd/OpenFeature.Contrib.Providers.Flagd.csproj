@@ -12,7 +12,6 @@
     <Authors>Todd Baert</Authors>
   </PropertyGroup>
 
-
   <ItemGroup>
     <Folder Include="Proto" />
   </ItemGroup>
