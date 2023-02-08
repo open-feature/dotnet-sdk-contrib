@@ -13,8 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Proto" />
+    <Protobuf Include="schemas\protobuf\schema\v1\schema.proto" GrpcServices="Client" />
   </ItemGroup>
+  
   <ItemGroup>
     <!-- make the internal methods visble to our test project -->
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">

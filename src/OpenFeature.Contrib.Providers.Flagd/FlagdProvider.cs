@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
 using OpenFeature.Model;
 using OpenFeature.Error;
 
-using Schema.V1;
+using OpenFeature.Flagd.Grpc;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;

@@ -1,6 +1,6 @@
 using Xunit;
 using Moq;
-using Schema.V1;
+using OpenFeature.Flagd.Grpc;
 using Grpc.Core;
 using Google.Protobuf.WellKnownTypes;
 using OpenFeature.Error;
