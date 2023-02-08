@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using Grpc.Net.Client;
 using OpenFeature.Model;
 using OpenFeature.Error;
 
 using Schema.V1;
+using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 
@@ -95,11 +98,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            try
+            return await ResolveValue(async contextStruct =>
             {
                 var resolveBooleanResponse = await _client.ResolveBooleanAsync(new ResolveBooleanRequest
                 {
-                    Context = ConvertToContext(context),
+                    Context = contextStruct,
                     FlagKey = flagKey
                 });
 
@@ -109,11 +112,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveBooleanResponse.Reason,
                     variant: resolveBooleanResponse.Variant
                 );
-            }
-            catch (Grpc.Core.RpcException e)
-            {
-                throw GetOFException(e);
-            }
+            }, context);
         }
 
         /// <summary>
@@ -125,25 +124,21 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            try
+            return await ResolveValue(async contextStruct =>
             {
-                var resolveBooleanResponse = await _client.ResolveStringAsync(new ResolveStringRequest
+                var resolveStringResponse = await _client.ResolveStringAsync(new ResolveStringRequest
                 {
-                    Context = ConvertToContext(context),
+                    Context = contextStruct,
                     FlagKey = flagKey
                 });
 
                 return new ResolutionDetails<string>(
                     flagKey: flagKey,
-                    value: resolveBooleanResponse.Value,
-                    reason: resolveBooleanResponse.Reason,
-                    variant: resolveBooleanResponse.Variant
+                    value: resolveStringResponse.Value,
+                    reason: resolveStringResponse.Reason,
+                    variant: resolveStringResponse.Variant
                 );
-            }
-            catch (Grpc.Core.RpcException e)
-            {
-                throw GetOFException(e);
-            }
+            }, context);
         }
 
         /// <summary>
@@ -155,11 +150,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            try
+            return await ResolveValue(async contextStruct =>
             {
                 var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
                 {
-                    Context = ConvertToContext(context),
+                    Context = contextStruct,
                     FlagKey = flagKey
                 });
 
@@ -169,11 +164,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveIntResponse.Reason,
                     variant: resolveIntResponse.Variant
                 );
-            }
-            catch (Grpc.Core.RpcException e)
-            {
-                throw GetOFException(e);
-            }
+            }, context);
         }
 
         /// <summary>
@@ -185,11 +176,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            try
+            return await ResolveValue(async contextStruct =>
             {
                 var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
                 {
-                    Context = ConvertToContext(context),
+                    Context = contextStruct,
                     FlagKey = flagKey
                 });
 
@@ -199,11 +190,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveDoubleResponse.Reason,
                     variant: resolveDoubleResponse.Variant
                 );
-            }
-            catch (Grpc.Core.RpcException e)
-            {
-                throw GetOFException(e);
-            }
+            }, context);
         }
 
         /// <summary>
@@ -215,11 +202,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            try
+            return await ResolveValue(async contextStruct =>
             {
                 var resolveObjectResponse = await _client.ResolveObjectAsync(new ResolveObjectRequest
                 {
-                    Context = ConvertToContext(context),
+                    Context = contextStruct,
                     FlagKey = flagKey
                 });
 
@@ -229,8 +216,18 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveObjectResponse.Reason,
                     variant: resolveObjectResponse.Variant
                 );
+            }, context);
+        }
+        
+        private async Task<ResolutionDetails<T>> ResolveValue<T>(Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
+        {
+            try
+            {
+                var result = await resolveDelegate.Invoke(ConvertToContext(context));
+
+                return result;
             }
-            catch (Grpc.Core.RpcException e)
+            catch (RpcException e)
             {
                 throw GetOFException(e);
             }
@@ -247,48 +244,12 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 case Grpc.Core.StatusCode.NotFound:
                     return new FeatureProviderException(Constant.ErrorType.FlagNotFound, e.Status.Detail, e);
-                    /*
-                return new ResolutionDetails<T>(
-                    flagKey: flagKey,
-                    value: defaultValue,
-                    reason: Constant.Reason.Error,
-                    errorType: Constant.ErrorType.FlagNotFound,
-                    errorMessage: e.Status.Detail.ToString()
-                );
-                */
                 case Grpc.Core.StatusCode.Unavailable:
                     return new FeatureProviderException(Constant.ErrorType.ProviderNotReady, e.Status.Detail, e);
-                    /*
-                    return new ResolutionDetails<T>(
-                        flagKey: flagKey,
-                        value: defaultValue,
-                        reason: Constant.Reason.Error,
-                        errorType: Constant.ErrorType.ProviderNotReady,
-                        errorMessage: e.Status.Detail.ToString()
-                    );
-                    */
                 case Grpc.Core.StatusCode.InvalidArgument:
                     return new FeatureProviderException(Constant.ErrorType.TypeMismatch, e.Status.Detail, e);
-                    /*
-                    return new ResolutionDetails<T>(
-                        flagKey: flagKey,
-                        value: defaultValue,
-                        reason: Constant.Reason.Error,
-                        errorType: Constant.ErrorType.TypeMismatch,
-                        errorMessage: e.Status.Detail.ToString()
-                    );
-                    */
                 default:
                     return new FeatureProviderException(Constant.ErrorType.General, e.Status.Detail, e);
-                    /*
-                    return new ResolutionDetails<T>(
-                        flagKey: flagKey,
-                        value: defaultValue,
-                        reason: Constant.Reason.Error,
-                        errorType: Constant.ErrorType.General,
-                        errorMessage: e.Status.Detail.ToString()
-                    );
-                    */
             }
         }
 
