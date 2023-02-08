@@ -3,6 +3,7 @@ using Moq;
 using Schema.V1;
 using Grpc.Core;
 using Google.Protobuf.WellKnownTypes;
+using OpenFeature.Error;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
@@ -181,15 +182,20 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var flagdProvider = new FlagdProvider(mockGrpcClient.Object);
 
-            // resolve with default set to true
-            var val = flagdProvider.ResolveBooleanValue("my-key", true, null);
-
-            // here we should get the default value regardless of the failed grpc call
-            Assert.True(val.Result.Value);
-            // check for error information to be included in the result
-            Assert.Equal(Constant.Reason.Error, val.Result.Reason);
-            Assert.Equal(Constant.ErrorType.FlagNotFound, val.Result.ErrorType);
-            Assert.Equal(Constant.ErrorType.FlagNotFound.ToString(), val.Result.ErrorMessage);
+            // make sure the correct exception is thrown
+            Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            {
+                try
+                {
+                    await flagdProvider.ResolveBooleanValue("my-key", true, null);
+                }
+                catch (FeatureProviderException e)
+                {
+                    Assert.Equal(Constant.ErrorType.FlagNotFound, e.ErrorType);
+                    Assert.Equal(Constant.ErrorType.FlagNotFound.ToString(), e.Message);
+                    throw;
+                }
+            });
         }
 
         [Fact]
@@ -211,16 +217,21 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(mockGrpcClient.Object);
-
-            // resolve with default set to true
-            var val = flagdProvider.ResolveBooleanValue("my-key", true, null);
-
-            // here we should get the default value regardless of the failed grpc call
-            Assert.True(val.Result.Value);
-            // check for error information to be included in the result
-            Assert.Equal(Constant.Reason.Error, val.Result.Reason);
-            Assert.Equal(Constant.ErrorType.ProviderNotReady, val.Result.ErrorType);
-            Assert.Equal(Constant.ErrorType.ProviderNotReady.ToString(), val.Result.ErrorMessage);
+            
+            // make sure the correct exception is thrown
+            Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            {
+                try
+                {
+                    await flagdProvider.ResolveBooleanValue("my-key", true, null);
+                }
+                catch (FeatureProviderException e)
+                {
+                    Assert.Equal(Constant.ErrorType.ProviderNotReady, e.ErrorType);
+                    Assert.Equal(Constant.ErrorType.ProviderNotReady.ToString(), e.Message);
+                    throw;
+                }
+            });
         }
 
         [Fact]
@@ -243,15 +254,20 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var flagdProvider = new FlagdProvider(mockGrpcClient.Object);
 
-            // resolve with default set to true
-            var val = flagdProvider.ResolveBooleanValue("my-key", true, null);
-
-            // here we should get the default value regardless of the failed grpc call
-            Assert.True(val.Result.Value);
-            // check for error information to be included in the result
-            Assert.Equal(Constant.Reason.Error, val.Result.Reason);
-            Assert.Equal(Constant.ErrorType.TypeMismatch, val.Result.ErrorType);
-            Assert.Equal(Constant.ErrorType.TypeMismatch.ToString(), val.Result.ErrorMessage);
+            // make sure the correct exception is thrown
+            Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            {
+                try
+                {
+                    await flagdProvider.ResolveBooleanValue("my-key", true, null);
+                }
+                catch (FeatureProviderException e)
+                {
+                    Assert.Equal(Constant.ErrorType.TypeMismatch, e.ErrorType);
+                    Assert.Equal(Constant.ErrorType.TypeMismatch.ToString(), e.Message);
+                    throw;
+                }
+            });
         }
 
         [Fact]
@@ -274,15 +290,20 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var flagdProvider = new FlagdProvider(mockGrpcClient.Object);
 
-            // resolve with default set to true
-            var val = flagdProvider.ResolveBooleanValue("my-key", true, null);
-
-            // here we should get the default value regardless of the failed grpc call
-            Assert.True(val.Result.Value);
-            // check for error information to be included in the result
-            Assert.Equal(Constant.Reason.Error, val.Result.Reason);
-            Assert.Equal(Constant.ErrorType.General, val.Result.ErrorType);
-            Assert.Equal("unknown error", val.Result.ErrorMessage);
+            // make sure the correct exception is thrown
+            Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            {
+                try
+                {
+                    await flagdProvider.ResolveBooleanValue("my-key", true, null);
+                }
+                catch (FeatureProviderException e)
+                {
+                    Assert.Equal(Constant.ErrorType.General, e.ErrorType);
+                    Assert.Equal(Constant.ErrorType.General.ToString(), e.Message);
+                    throw;
+                }
+            });
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.Client;
 using OpenFeature.Model;
+using OpenFeature.Error;
 
 using Schema.V1;
 using Value = OpenFeature.Model.Value;
@@ -111,7 +112,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             catch (Grpc.Core.RpcException e)
             {
-                return GetDefaultWithException<bool>(e, flagKey, defaultValue);
+                throw GetOFException(e);
             }
         }
 
@@ -141,9 +142,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             catch (Grpc.Core.RpcException e)
             {
-                return GetDefaultWithException<string>(e, flagKey, defaultValue);
+                throw GetOFException(e);
             }
-
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             catch (Grpc.Core.RpcException e)
             {
-                return GetDefaultWithException<int>(e, flagKey, defaultValue);
+                throw GetOFException(e);
             }
         }
 
@@ -202,7 +202,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             catch (Grpc.Core.RpcException e)
             {
-                return GetDefaultWithException<double>(e, flagKey, defaultValue);
+                throw GetOFException(e);
             }
         }
 
@@ -232,21 +232,22 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             catch (Grpc.Core.RpcException e)
             {
-                return GetDefaultWithException<Value>(e, flagKey, defaultValue);
+                throw GetOFException(e);
             }
         }
 
         /// <summary>
-        ///     GetDefaultWithException returns the default value for a flag, together with some error information about why thy flag could not be retrieved by the provider.
+        ///     GetOFException returns a OpenFeature Exception containing an error code to describe the encountered error.
         /// </summary>
         /// <param name="e">The exception thrown by the Grpc client</param>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value to return</param>
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        private ResolutionDetails<T> GetDefaultWithException<T>(Grpc.Core.RpcException e, String flagKey, T defaultValue)
+        private FeatureProviderException GetOFException(Grpc.Core.RpcException e)
         {
-            if (e.Status.StatusCode == Grpc.Core.StatusCode.NotFound)
+            switch (e.Status.StatusCode)
             {
+                case Grpc.Core.StatusCode.NotFound:
+                    return new FeatureProviderException(Constant.ErrorType.FlagNotFound, e.Status.Detail, e);
+                    /*
                 return new ResolutionDetails<T>(
                     flagKey: flagKey,
                     value: defaultValue,
@@ -254,34 +255,41 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     errorType: Constant.ErrorType.FlagNotFound,
                     errorMessage: e.Status.Detail.ToString()
                 );
+                */
+                case Grpc.Core.StatusCode.Unavailable:
+                    return new FeatureProviderException(Constant.ErrorType.ProviderNotReady, e.Status.Detail, e);
+                    /*
+                    return new ResolutionDetails<T>(
+                        flagKey: flagKey,
+                        value: defaultValue,
+                        reason: Constant.Reason.Error,
+                        errorType: Constant.ErrorType.ProviderNotReady,
+                        errorMessage: e.Status.Detail.ToString()
+                    );
+                    */
+                case Grpc.Core.StatusCode.InvalidArgument:
+                    return new FeatureProviderException(Constant.ErrorType.TypeMismatch, e.Status.Detail, e);
+                    /*
+                    return new ResolutionDetails<T>(
+                        flagKey: flagKey,
+                        value: defaultValue,
+                        reason: Constant.Reason.Error,
+                        errorType: Constant.ErrorType.TypeMismatch,
+                        errorMessage: e.Status.Detail.ToString()
+                    );
+                    */
+                default:
+                    return new FeatureProviderException(Constant.ErrorType.General, e.Status.Detail, e);
+                    /*
+                    return new ResolutionDetails<T>(
+                        flagKey: flagKey,
+                        value: defaultValue,
+                        reason: Constant.Reason.Error,
+                        errorType: Constant.ErrorType.General,
+                        errorMessage: e.Status.Detail.ToString()
+                    );
+                    */
             }
-            else if (e.Status.StatusCode == Grpc.Core.StatusCode.Unavailable)
-            {
-                return new ResolutionDetails<T>(
-                   flagKey: flagKey,
-                   value: defaultValue,
-                   reason: Constant.Reason.Error,
-                   errorType: Constant.ErrorType.ProviderNotReady,
-                   errorMessage: e.Status.Detail.ToString()
-               );
-            }
-            else if (e.Status.StatusCode == Grpc.Core.StatusCode.InvalidArgument)
-            {
-                return new ResolutionDetails<T>(
-                    flagKey: flagKey,
-                    value: defaultValue,
-                    reason: Constant.Reason.Error,
-                    errorType: Constant.ErrorType.TypeMismatch,
-                    errorMessage: e.Status.Detail.ToString()
-                );
-            }
-            return new ResolutionDetails<T>(
-                flagKey: flagKey,
-                value: defaultValue,
-                reason: Constant.Reason.Error,
-                errorType: Constant.ErrorType.General,
-                errorMessage: e.Status.Detail.ToString()
-            );
         }
 
         /// <summary>
