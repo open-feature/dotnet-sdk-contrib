@@ -15,32 +15,32 @@ The first things we will do is install the **Open Feature SDK** and the **GO Fea
 
 ### .NET Cli
 ```shell
-dotnet add package OpenFeature.Contrib.Providers.GOFeatureFlag
+dotnet add package OpenFeature.Contrib.GOFeatureFlag
 ```
 ### Package Manager
 
 ```shell
-NuGet\Install-Package OpenFeature.Contrib.Providers.GOFeatureFlag
+NuGet\Install-Package OpenFeature.Contrib.GOFeatureFlag
 ```
 ### Package Reference
 
 ```xml
-<PackageReference Include="OpenFeature.Contrib.Providers.GOFeatureFlag" />
+<PackageReference Include="OpenFeature.Contrib.GOFeatureFlag" />
 ```
 ### Packet cli
 
 ```shell
-paket add OpenFeature.Contrib.Providers.GOFeatureFlag
+paket add OpenFeature.Contrib.GOFeatureFlag
 ```
 
 ### Cake
 
 ```shell
-// Install OpenFeature.Contrib.Providers.GOFeatureFlag as a Cake Addin
-#addin nuget:?package=OpenFeature.Contrib.Providers.GOFeatureFlag
+// Install OpenFeature.Contrib.GOFeatureFlag as a Cake Addin
+#addin nuget:?package=OpenFeature.Contrib.GOFeatureFlag
 
-// Install OpenFeature.Contrib.Providers.GOFeatureFlag as a Cake Tool
-#tool nuget:?package=OpenFeature.Contrib.Providers.GOFeatureFlag
+// Install OpenFeature.Contrib.GOFeatureFlag as a Cake Tool
+#tool nuget:?package=OpenFeature.Contrib.GOFeatureFlag
 ```
 
 ## Initialize your Open Feature client
