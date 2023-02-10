@@ -11,7 +11,7 @@ using OpenFeature.Flagd.Grpc;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-
+using System.Net.Http;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -46,7 +46,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
 
             var url = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
-            _client = new Service.ServiceClient(GrpcChannel.ForAddress(url));
+            _client = buildClientForPlatform(url);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 throw new ArgumentNullException(nameof(url));
             }
 
-            _client = new Service.ServiceClient(GrpcChannel.ForAddress(url));
+            _client = buildClientForPlatform(url);
         }
 
         // just for testing, internal but visible in tests
@@ -369,6 +369,18 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 default:
                     return new Value();
             }
+        }
+
+        private static Service.ServiceClient buildClientForPlatform(Uri url)
+        {
+#if NETSTANDARD2_0
+            return new Service.ServiceClient(GrpcChannel.ForAddress(url));
+#else
+            return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+            {
+                HttpHandler = new WinHttpHandler()
+            }));
+#endif
         }
     }
 }
