@@ -15,7 +15,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         {
             Assert.Equal("No-op Provider", FlagdProvider.GetProviderName());
         }
-        
+
         [Fact]
         public void TestGetProviderWithDefaultConfig()
         {
@@ -217,7 +217,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(mockGrpcClient.Object);
-            
+
             // make sure the correct exception is thrown
             Assert.ThrowsAsync<FeatureProviderException>(async () =>
             {

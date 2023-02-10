@@ -36,7 +36,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             var flagdPort = Environment.GetEnvironmentVariable("FLAGD_PORT") ?? "8013";
             var flagdUseTLSStr = Environment.GetEnvironmentVariable("FLAGD_TLS") ?? "false";
 
-            
+
             var protocol = "http";
             var useTLS = bool.Parse(flagdUseTLSStr);
 
@@ -48,7 +48,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             var url = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
             _client = new Service.ServiceClient(GrpcChannel.ForAddress(url));
         }
-        
+
         /// <summary>
         ///     Constructor of the provider.
         ///     <param name="url">The URL of the flagD server</param>
@@ -82,7 +82,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     Return the metadata associated to this provider.
         /// </summary>
         public override Metadata GetMetadata() => _providerMetadata;
-        
+
         /// <summary>
         ///     Return the Grpc client of the provider
         /// </summary>
@@ -217,7 +217,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 );
             }, context);
         }
-        
+
         private async Task<ResolutionDetails<T>> ResolveValue<T>(Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
         {
             try
