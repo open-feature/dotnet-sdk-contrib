@@ -4,4 +4,8 @@
     <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Grpc" Version="2.46.6" />
+  </ItemGroup>
+
 </Project>
