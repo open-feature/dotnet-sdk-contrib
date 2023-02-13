@@ -11,10 +11,6 @@
     <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
     <Authors>Todd Baert</Authors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Protobuf Include="schemas\protobuf\schema\v1\schema.proto" GrpcServices="Client" />
-  </ItemGroup>
   
   <ItemGroup>
     <!-- make the internal methods visble to our test project -->
@@ -26,6 +22,9 @@
     <PackageReference Include="System.Net.Http.WinHttpHandler" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <!-- The schema.proto file referenced here will be used to automatically generate the Grpc client when executing 'dotnet build' -->
+    <!-- The generated files will be placed in ./obj/Debug/netstandard2.0/Protos -->
+    <Protobuf Include="schemas\protobuf\schema\v1\schema.proto" GrpcServices="Client" />
     <PackageReference Include="Google.Protobuf" Version="3.21.12" />
     <PackageReference Include="Grpc.Net.Client" Version="2.51.0" />
     <PackageReference Include="Grpc.Tools" Version="2.51.0">
