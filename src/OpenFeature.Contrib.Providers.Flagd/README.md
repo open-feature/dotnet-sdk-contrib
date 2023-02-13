@@ -1,6 +1,6 @@
-# Flagd Feature Flag .NET Provider
+# flagd Feature Flag .NET Provider
 
-The Flagd Flag provider allows you to connect to your Flagd instance.  
+The flagd Flag provider allows you to connect to your flagd instance.  
 
 # .Net SDK usage
 
@@ -38,7 +38,7 @@ paket add OpenFeature.Contrib.Providers.Flagd
 #tool nuget:?package=OpenFeature.Contrib.Providers.Flagd
 ```
 
-## Using the FlagdProvider with the OpenFeature SDK
+## Using the flagd Provider with the OpenFeature SDK
 
 This example assumes that the flagd server is running locally
 For example, you can start flagd with the following example configuration:
@@ -47,7 +47,7 @@ For example, you can start flagd with the following example configuration:
 flagd start --uri https://raw.githubusercontent.com/open-feature/flagd/main/config/samples/example_flags.json
 ```
 
-When the flagd service is running, you can use the SDK with the FlagdProvider as in the following example console application:
+When the flagd service is running, you can use the SDK with the flagd Provider as in the following example console application:
 
 ```csharp
 using OpenFeature.Contrib.Providers.Flagd;
@@ -74,7 +74,7 @@ namespace OpenFeatureTestApp
 
 ### Configuring the FlagdProvider
 
-The URI of the flagd server to which the `FlagdProvider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
+The URI of the flagd server to which the `flagd Provider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
 
 | Option name           | Environment variable name       | Type    | Default   | Values        |
 | --------------------- | ------------------------------- | ------- | --------- | ------------- |
