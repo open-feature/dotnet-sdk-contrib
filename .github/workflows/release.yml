@@ -21,6 +21,7 @@ jobs:
         if: ${{ steps.release.outputs.releases_created }}
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Install dependencies
         if: ${{ steps.release.outputs.releases_created }}
