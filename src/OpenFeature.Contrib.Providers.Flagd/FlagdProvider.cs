@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -12,6 +13,7 @@ using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 using System.Net.Http;
+using System.Net.Sockets;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -35,18 +37,28 @@ namespace OpenFeature.Contrib.Providers.Flagd
             var flagdHost = Environment.GetEnvironmentVariable("FLAGD_HOST") ?? "localhost";
             var flagdPort = Environment.GetEnvironmentVariable("FLAGD_PORT") ?? "8013";
             var flagdUseTLSStr = Environment.GetEnvironmentVariable("FLAGD_TLS") ?? "false";
+            var flagdSocketPath = Environment.GetEnvironmentVariable("FLAGD_SOCKET_PATH") ?? "";
 
 
-            var protocol = "http";
-            var useTLS = bool.Parse(flagdUseTLSStr);
-
-            if (useTLS)
+            Uri uri;
+            if (flagdSocketPath != "")
             {
-                protocol = "https";
+                uri = new Uri("unix://" + flagdSocketPath);
+            }
+            else
+            {
+                var protocol = "http";
+                var useTLS = bool.Parse(flagdUseTLSStr);
+
+                if (useTLS)
+                {
+                    protocol = "https";
+                }
+
+                uri = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
             }
 
-            var url = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
-            _client = buildClientForPlatform(url);
+            _client = buildClientForPlatform(uri);
         }
 
         /// <summary>
@@ -373,13 +385,36 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         private static Service.ServiceClient buildClientForPlatform(Uri url)
         {
-#if NETSTANDARD2_0
-            return new Service.ServiceClient(GrpcChannel.ForAddress(url));
-#else
+            var useUnixSocket = url.ToString().StartsWith("unix://"); 
+#if NET462
+            if (useUnixSocket) {
+                // unix socket support is not available in this dotnet version
+                throw new Exception("unix sockets are not supported in this version.");
+            }
             return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
             {
                 HttpHandler = new WinHttpHandler()
             }));
+#elif NET5_0_OR_GREATER
+            if (!useUnixSocket) return new Service.ServiceClient(GrpcChannel.ForAddress(url));
+            
+            var udsEndPoint = new UnixDomainSocketEndPoint(url.ToString().Substring("unix://".Length));
+            var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
+            var socketsHttpHandler = new SocketsHttpHandler
+            {
+                ConnectCallback = connectionFactory.ConnectAsync
+            };
+            
+            return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+            {
+                HttpHandler = socketsHttpHandler
+            }));
+#else
+            if (useUnixSocket) {
+                // unix socket support is not available in this dotnet version
+                throw new Exception("unix sockets are not supported in this version.");
+            }
+            return new Service.ServiceClient(GrpcChannel.ForAddress(url));
 #endif
         }
     }
