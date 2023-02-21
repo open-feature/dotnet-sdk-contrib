@@ -8,16 +8,26 @@ using System.Threading.Tasks;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
+    /// <inheritdoc/>
     public class UnixDomainSocketConnectionFactory
     {
         private readonly EndPoint _endPoint;
 
+        /// <summary>
+        ///     Constructor of the connection factory
+        ///     <param name="endpoint">The path to the unix socket</param>
+        /// </summary>
         public UnixDomainSocketConnectionFactory(EndPoint endPoint)
         {
             _endPoint = endPoint;
         }
-        
+
 #if NET5_0_OR_GREATER
+        /// <summary>   
+        ///     ConnectAsync is a custom implementation of the ConnectAsync method used by the grpc client
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>A ValueTask object representing the given</returns>
         public async ValueTask<Stream> ConnectAsync(SocketsHttpConnectionContext _, CancellationToken cancellationToken = default)
         {
             var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);

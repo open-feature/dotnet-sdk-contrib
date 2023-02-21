@@ -386,7 +386,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         private static Service.ServiceClient buildClientForPlatform(Uri url)
         {
-            var useUnixSocket = url.ToString().StartsWith("unix://"); 
+            var useUnixSocket = url.ToString().StartsWith("unix://");
 #if NET462
             if (useUnixSocket) {
                 // unix socket support is not available in this dotnet version
@@ -413,7 +413,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 HttpHandler = socketsHttpHandler
             }));
 #else
-            if (useUnixSocket) {
+            if (useUnixSocket)
+            {
                 // unix socket support is not available in this dotnet version
                 throw new Exception("unix sockets are not supported in this version.");
             }
