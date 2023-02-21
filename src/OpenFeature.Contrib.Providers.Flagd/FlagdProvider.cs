@@ -28,9 +28,10 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <summary>
         ///     Constructor of the provider. This constructor uses the value of the following
         ///     environment variables to initialise its client:
-        ///     FLAGD_HOST - The host name of the flagd server (default="localhost")
-        ///     FLAGD_PORT - The port of the flagd server (default="8013")
-        ///     FLAGD_TLS  - Determines whether to use https or not (default="false")
+        ///     FLAGD_HOST         - The host name of the flagd server (default="localhost")
+        ///     FLAGD_PORT         - The port of the flagd server (default="8013")
+        ///     FLAGD_TLS          - Determines whether to use https or not (default="false")
+        ///     FLAGD_SOCKET_PATH - Path to the unix socket (default="")
         /// </summary>
         public FlagdProvider()
         {
@@ -405,6 +406,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 ConnectCallback = connectionFactory.ConnectAsync
             };
             
+            // point to localhost and let the custom ConnectCallback handle the communication over the unix socket
+            // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
             return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
             {
                 HttpHandler = socketsHttpHandler
