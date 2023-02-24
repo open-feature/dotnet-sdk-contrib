@@ -387,18 +387,20 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private static Service.ServiceClient buildClientForPlatform(Uri url)
         {
             var useUnixSocket = url.ToString().StartsWith("unix://");
-#if NET462
-            if (useUnixSocket) {
-                // unix socket support is not available in this dotnet version
-                throw new Exception("unix sockets are not supported in this version.");
-            }
-            return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+
+            if (!useUnixSocket) 
             {
-                HttpHandler = new WinHttpHandler()
-            }));
-#elif NET5_0_OR_GREATER
-            if (!useUnixSocket) return new Service.ServiceClient(GrpcChannel.ForAddress(url));
-            
+#if NET462
+                 return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+                {
+                    HttpHandler = new WinHttpHandler()
+                }));
+#else
+                return new Service.ServiceClient(GrpcChannel.ForAddress(url));
+#endif
+            }
+           
+#if NET5_0_OR_GREATER
             var udsEndPoint = new UnixDomainSocketEndPoint(url.ToString().Substring("unix://".Length));
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
             var socketsHttpHandler = new SocketsHttpHandler
@@ -412,14 +414,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 HttpHandler = socketsHttpHandler
             }));
-#else
-            if (useUnixSocket)
-            {
-                // unix socket support is not available in this dotnet version
-                throw new Exception("unix sockets are not supported in this version.");
-            }
-            return new Service.ServiceClient(GrpcChannel.ForAddress(url));
 #endif
+            // unix socket support is not available in this dotnet version
+            throw new Exception("unix sockets are not supported in this version.");
         }
     }
 }

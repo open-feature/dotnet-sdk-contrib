@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [net462,net6.0]
+        version: [net462,net6.0,net7.0]
 
     steps:
     - uses: actions/checkout@v3
