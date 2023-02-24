@@ -388,7 +388,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             var useUnixSocket = url.ToString().StartsWith("unix://");
 
-            if (!useUnixSocket) 
+            if (!useUnixSocket)
             {
 #if NET462
                  return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
@@ -399,7 +399,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 return new Service.ServiceClient(GrpcChannel.ForAddress(url));
 #endif
             }
-           
+
 #if NET5_0_OR_GREATER
             var udsEndPoint = new UnixDomainSocketEndPoint(url.ToString().Substring("unix://".Length));
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
