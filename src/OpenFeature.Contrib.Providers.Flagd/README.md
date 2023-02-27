@@ -76,21 +76,29 @@ namespace OpenFeatureTestApp
 
 The URI of the flagd server to which the `flagd Provider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
 
-| Option name           | Environment variable name       | Type    | Default   | Values        |
-| --------------------- | ------------------------------- | ------- | --------- | ------------- |
-| host                  | FLAGD_HOST                      | string  | localhost |               |
-| port                  | FLAGD_PORT                      | number  | 8013      |               |
-| tls                   | FLAGD_TLS                       | boolean | false     |               |
+| Option name      | Environment variable name      | Type    | Default   | Values        |
+|------------------|--------------------------------|---------|-----------| ------------- |
+| host             | FLAGD_HOST                     | string  | localhost |               |
+| port             | FLAGD_PORT                     | number  | 8013      |               |
+| tls              | FLAGD_TLS                      | boolean | false     |               |
+| unix socket path | FLAGD_SOCKET_PATH              | string  |           |               |
 
-So for example, if you would like to pass the URI directly, you can initialise it as follows:
+Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`) are disregarded.
 
-```csharp
-var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
-```
 
-Or, if you rely on the environment variables listed above, you can use the empty costructor:
-
+If you rely on the environment variables listed above, you can use the empty constructor which then configures the provider accordingly:
 
 ```csharp
 var flagdProvider = new FlagdProvider();
 ```
+
+Alternatively, if you would like to pass the URI directly, you can initialise it as follows:
+
+```csharp
+// either communicate with Flagd over HTTP ...
+var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
+
+// ... or use the unix:// prefix if the provider should communicate via a unix socket
+var unixFlagdProvider = new FlagdProvider(new Uri("unix://socket.tmp"));  
+```
+

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -12,6 +13,7 @@ using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 using System.Net.Http;
+using System.Net.Sockets;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -26,27 +28,38 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <summary>
         ///     Constructor of the provider. This constructor uses the value of the following
         ///     environment variables to initialise its client:
-        ///     FLAGD_HOST - The host name of the flagd server (default="localhost")
-        ///     FLAGD_PORT - The port of the flagd server (default="8013")
-        ///     FLAGD_TLS  - Determines whether to use https or not (default="false")
+        ///     FLAGD_HOST         - The host name of the flagd server (default="localhost")
+        ///     FLAGD_PORT         - The port of the flagd server (default="8013")
+        ///     FLAGD_TLS          - Determines whether to use https or not (default="false")
+        ///     FLAGD_SOCKET_PATH - Path to the unix socket (default="")
         /// </summary>
         public FlagdProvider()
         {
             var flagdHost = Environment.GetEnvironmentVariable("FLAGD_HOST") ?? "localhost";
             var flagdPort = Environment.GetEnvironmentVariable("FLAGD_PORT") ?? "8013";
             var flagdUseTLSStr = Environment.GetEnvironmentVariable("FLAGD_TLS") ?? "false";
+            var flagdSocketPath = Environment.GetEnvironmentVariable("FLAGD_SOCKET_PATH") ?? "";
 
 
-            var protocol = "http";
-            var useTLS = bool.Parse(flagdUseTLSStr);
-
-            if (useTLS)
+            Uri uri;
+            if (flagdSocketPath != "")
             {
-                protocol = "https";
+                uri = new Uri("unix://" + flagdSocketPath);
+            }
+            else
+            {
+                var protocol = "http";
+                var useTLS = bool.Parse(flagdUseTLSStr);
+
+                if (useTLS)
+                {
+                    protocol = "https";
+                }
+
+                uri = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
             }
 
-            var url = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
-            _client = buildClientForPlatform(url);
+            _client = buildClientForPlatform(uri);
         }
 
         /// <summary>
@@ -373,14 +386,37 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         private static Service.ServiceClient buildClientForPlatform(Uri url)
         {
-#if NETSTANDARD2_0
-            return new Service.ServiceClient(GrpcChannel.ForAddress(url));
-#else
-            return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+            var useUnixSocket = url.ToString().StartsWith("unix://");
+
+            if (!useUnixSocket)
             {
-                HttpHandler = new WinHttpHandler()
+#if NET462
+                 return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+                {
+                    HttpHandler = new WinHttpHandler()
+                }));
+#else
+                return new Service.ServiceClient(GrpcChannel.ForAddress(url));
+#endif
+            }
+
+#if NET5_0_OR_GREATER
+            var udsEndPoint = new UnixDomainSocketEndPoint(url.ToString().Substring("unix://".Length));
+            var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
+            var socketsHttpHandler = new SocketsHttpHandler
+            {
+                ConnectCallback = connectionFactory.ConnectAsync
+            };
+            
+            // point to localhost and let the custom ConnectCallback handle the communication over the unix socket
+            // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
+            return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+            {
+                HttpHandler = socketsHttpHandler
             }));
 #endif
+            // unix socket support is not available in this dotnet version
+            throw new Exception("unix sockets are not supported in this version.");
         }
     }
 }
