@@ -12,4 +12,10 @@
     <Authors>Todd Baert</Authors>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="OpenFeature" Version="1.1.0" />
+    <PackageReference Include="OpenTelemetry" Version="1.4.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.4.0" />
+  </ItemGroup>
+
 </Project>
