@@ -11,7 +11,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
     /// <summary>
     /// Stub.
     /// </summary>
-    public class OpenTelemetryHook : Hook
+    public class OtelHook : Hook
     {
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
                 span.AddEvent("feature_flag", new SpanAttributes(attributes));
             }
             
-            return default;
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
                 span.RecordException(error);
             }
             
-            return default;
+            return Task.CompletedTask;
         }
 
     }
