@@ -35,7 +35,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
                 };
                 span.AddEvent("feature_flag", new SpanAttributes(attributes));
             }
-            
+
             return Task.CompletedTask;
         }
 
@@ -54,7 +54,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
             {
                 span.RecordException(error);
             }
-            
+
             return Task.CompletedTask;
         }
 

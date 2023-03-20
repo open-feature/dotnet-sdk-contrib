@@ -48,15 +48,15 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
             var rootSpan = exportedItems[0];
 
             Assert.Single(rootSpan.Events);
-            
+
             var eventsEnum = rootSpan.Events.GetEnumerator();
             eventsEnum.MoveNext();
 
             ActivityEvent ev = (ActivityEvent)eventsEnum.Current;
             Assert.Equal("feature_flag", ev.Name);
 
-            bool foundFlagKey = false; 
-            bool foundFlagVariant = false; 
+            bool foundFlagKey = false;
+            bool foundFlagVariant = false;
             bool foundFlagProviderName = false;
             var tagsEnum = ev.Tags.GetEnumerator();
 
@@ -66,15 +66,15 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
                 switch (tag.Key)
                 {
-                    case "feature_flag.key": 
+                    case "feature_flag.key":
                         foundFlagKey = true;
                         Assert.Equal("my-flag", tag.Value);
                         break;
-                    case "feature_flag.variant": 
+                    case "feature_flag.variant":
                         foundFlagVariant = true;
                         Assert.Equal("default", tag.Value);
                         break;
-                    case "feature_flag.provider_name": 
+                    case "feature_flag.provider_name":
                         foundFlagProviderName = true;
                         Assert.Equal("my-provider", tag.Value);
                         break;
@@ -172,7 +172,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
                 switch (tag.Key)
                 {
-                    case "exception.message": 
+                    case "exception.message":
                         foundExceptionMessage = true;
                         Assert.Equal("unexpected error", tag.Value);
                         break;
