@@ -22,44 +22,37 @@ namespace OpenFeature.Contrib.Providers.Flagd
     /// </summary>
     public sealed class FlagdProvider : FeatureProvider
     {
+        private readonly FlagdConfig _config;
         private readonly Service.ServiceClient _client;
         private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
+
+        private readonly ICache<string, ResolutionDetails<Value>> _cache;
 
         /// <summary>
         ///     Constructor of the provider. This constructor uses the value of the following
         ///     environment variables to initialise its client:
-        ///     FLAGD_HOST         - The host name of the flagd server (default="localhost")
-        ///     FLAGD_PORT         - The port of the flagd server (default="8013")
-        ///     FLAGD_TLS          - Determines whether to use https or not (default="false")
-        ///     FLAGD_SOCKET_PATH - Path to the unix socket (default="")
+        ///     FLAGD_HOST                     - The host name of the flagd server (default="localhost")
+        ///     FLAGD_PORT                     - The port of the flagd server (default="8013")
+        ///     FLAGD_TLS                      - Determines whether to use https or not (default="false")
+        ///     FLAGD_SOCKET_PATH              - Path to the unix socket (default="")
+        ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
+        ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
+        ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
         /// </summary>
         public FlagdProvider()
         {
-            var flagdHost = Environment.GetEnvironmentVariable("FLAGD_HOST") ?? "localhost";
-            var flagdPort = Environment.GetEnvironmentVariable("FLAGD_PORT") ?? "8013";
-            var flagdUseTLSStr = Environment.GetEnvironmentVariable("FLAGD_TLS") ?? "false";
-            var flagdSocketPath = Environment.GetEnvironmentVariable("FLAGD_SOCKET_PATH") ?? "";
+            _config = new FlagdConfig();
 
+            _client = buildClientForPlatform(_config.GetUri());
 
-            Uri uri;
-            if (flagdSocketPath != "")
+            if (_config.CacheEnabled)
             {
-                uri = new Uri("unix://" + flagdSocketPath);
-            }
-            else
-            {
-                var protocol = "http";
-                var useTLS = bool.Parse(flagdUseTLSStr);
-
-                if (useTLS)
+                _cache = new LRUCache<string, ResolutionDetails<Value>>(_config.MaxCacheSize);
+                Task.Run(async () =>
                 {
-                    protocol = "https";
-                }
-
-                uri = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
+                    await HandleEvents();
+                });
             }
-
-            _client = buildClientForPlatform(uri);
         }
 
         /// <summary>
@@ -110,7 +103,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            var val = await ResolveValue<Value>(flagKey, async contextStruct =>
             {
                 var resolveBooleanResponse = await _client.ResolveBooleanAsync(new ResolveBooleanRequest
                 {
@@ -118,13 +111,20 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     FlagKey = flagKey
                 });
 
-                return new ResolutionDetails<bool>(
+                return new ResolutionDetails<Value>(
                     flagKey: flagKey,
-                    value: resolveBooleanResponse.Value,
+                    value: new Value(resolveBooleanResponse.Value),
                     reason: resolveBooleanResponse.Reason,
                     variant: resolveBooleanResponse.Variant
                 );
             }, context);
+            return new ResolutionDetails<bool>(
+                flagKey: flagKey,
+                value: (bool)val.Value.AsBoolean,
+                reason: val.Reason,
+                variant: val.Variant
+            ); 
+
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            var val = await ResolveValue<Value>(flagKey, async contextStruct =>
             {
                 var resolveStringResponse = await _client.ResolveStringAsync(new ResolveStringRequest
                 {
@@ -144,13 +144,20 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     FlagKey = flagKey
                 });
 
-                return new ResolutionDetails<string>(
+                return new ResolutionDetails<Value>(
                     flagKey: flagKey,
-                    value: resolveStringResponse.Value,
+                    value: new Value(resolveStringResponse.Value),
                     reason: resolveStringResponse.Reason,
                     variant: resolveStringResponse.Variant
                 );
             }, context);
+
+            return new ResolutionDetails<string>(
+                flagKey: flagKey,
+                value: val.Value.AsString,
+                reason: val.Reason,
+                variant: val.Variant
+            ); 
         }
 
         /// <summary>
@@ -162,7 +169,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            var val = await ResolveValue<Value>(flagKey, async contextStruct =>
             {
                 var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
                 {
@@ -170,13 +177,20 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     FlagKey = flagKey
                 });
 
-                return new ResolutionDetails<int>(
+                return new ResolutionDetails<Value>(
                     flagKey: flagKey,
-                    value: (int)resolveIntResponse.Value,
+                    value: new Value(resolveIntResponse.Value),
                     reason: resolveIntResponse.Reason,
                     variant: resolveIntResponse.Variant
                 );
             }, context);
+
+            return new ResolutionDetails<int>(
+                flagKey: flagKey,
+                value: (int)val.Value.AsInteger,
+                reason: val.Reason,
+                variant: val.Variant
+            );
         }
 
         /// <summary>
@@ -188,7 +202,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            var val = await ResolveValue<Value>(flagKey, async contextStruct =>
             {
                 var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
                 {
@@ -196,13 +210,20 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     FlagKey = flagKey
                 });
 
-                return new ResolutionDetails<double>(
+                return new ResolutionDetails<Value>(
                     flagKey: flagKey,
-                    value: resolveDoubleResponse.Value,
+                    value: new Value(resolveDoubleResponse.Value),
                     reason: resolveDoubleResponse.Reason,
                     variant: resolveDoubleResponse.Variant
                 );
             }, context);
+
+            return new ResolutionDetails<double>(
+                flagKey: flagKey,
+                value: (double)val.Value.AsDouble,
+                reason: val.Reason,
+                variant: val.Variant
+            );
         }
 
         /// <summary>
@@ -214,7 +235,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            return await ResolveValue<Value>(flagKey, async contextStruct =>
             {
                 var resolveObjectResponse = await _client.ResolveObjectAsync(new ResolveObjectRequest
                 {
@@ -231,11 +252,28 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }, context);
         }
 
-        private async Task<ResolutionDetails<T>> ResolveValue<T>(Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
+        private async Task<ResolutionDetails<Value>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<Value>>> resolveDelegate, EvaluationContext context = null)
         {
             try
             {
+                if (_config.CacheEnabled)
+                {
+                    var value = _cache.TryGet(flagKey);
+
+                    if (value != null)
+                    {
+                        Console.WriteLine("returned from cache:" + value.ToString());
+                        Console.WriteLine("cache hit");
+                        return value;
+                    }
+                }
                 var result = await resolveDelegate.Invoke(ConvertToContext(context));
+
+                if (result.Reason.Equals("STATIC") && _config.CacheEnabled)
+                {
+                    Console.WriteLine("adding to cache");
+                    _cache.Add(flagKey, result);
+                }
 
                 return result;
             }
@@ -262,6 +300,19 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     return new FeatureProviderException(Constant.ErrorType.TypeMismatch, e.Status.Detail, e);
                 default:
                     return new FeatureProviderException(Constant.ErrorType.General, e.Status.Detail, e);
+            }
+        }
+
+        private async Task HandleEvents()
+        {
+            var call = _client.EventStream(new Empty());
+            {
+                // Read the response stream asynchronously
+                while (await call.ResponseStream.MoveNext())
+                {
+                    var response = call.ResponseStream.Current;
+                    Console.WriteLine($"Received message from server: {response.Type}");
+                }
             }
         }
 
