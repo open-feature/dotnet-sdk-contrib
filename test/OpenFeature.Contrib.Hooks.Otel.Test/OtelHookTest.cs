@@ -6,6 +6,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Collections.Generic;
 using OpenTelemetry.Exporter;
+using System.Linq;
 
 namespace OpenFeature.Contrib.Hooks.Otel.Test
 {
@@ -55,36 +56,23 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
             ActivityEvent ev = (ActivityEvent)eventsEnum.Current;
             Assert.Equal("feature_flag", ev.Name);
 
-            bool foundFlagKey = false;
-            bool foundFlagVariant = false;
-            bool foundFlagProviderName = false;
             var tagsEnum = ev.Tags.GetEnumerator();
 
-            while (tagsEnum.MoveNext())
-            {
-                var tag = (KeyValuePair<string, object>)tagsEnum.Current;
-
-                switch (tag.Key)
-                {
-                    case "feature_flag.key":
-                        foundFlagKey = true;
-                        Assert.Equal("my-flag", tag.Value);
-                        break;
-                    case "feature_flag.variant":
-                        foundFlagVariant = true;
-                        Assert.Equal("default", tag.Value);
-                        break;
-                    case "feature_flag.provider_name":
-                        foundFlagProviderName = true;
-                        Assert.Equal("my-provider", tag.Value);
-                        break;
-                    default: break;
-                }
-            }
-
-            Assert.True(foundFlagKey);
-            Assert.True(foundFlagVariant);
-            Assert.True(foundFlagProviderName);
+            Assert.True(
+                Enumerable.Contains<KeyValuePair<string, object>>(
+                    ev.Tags, new KeyValuePair<string, object>("feature_flag.key", "my-flag")
+                )
+            );
+            Assert.True(
+                Enumerable.Contains<KeyValuePair<string, object>>(
+                    ev.Tags, new KeyValuePair<string, object>("feature_flag.variant", "default")
+                )
+            );
+            Assert.True(
+                Enumerable.Contains<KeyValuePair<string, object>>(
+                    ev.Tags, new KeyValuePair<string, object>("feature_flag.provider_name", "my-provider")
+                )
+            );
         }
 
         [Fact]
@@ -162,25 +150,11 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             Assert.Equal("exception", ev.Name);
 
-            bool foundExceptionMessage = false;
-
-            var tagsEnum = ev.Tags.GetEnumerator();
-
-            while (tagsEnum.MoveNext())
-            {
-                var tag = (KeyValuePair<string, object>)tagsEnum.Current;
-
-                switch (tag.Key)
-                {
-                    case "exception.message":
-                        foundExceptionMessage = true;
-                        Assert.Equal("unexpected error", tag.Value);
-                        break;
-                    default: break;
-                }
-            }
-
-            Assert.True(foundExceptionMessage);
+            Assert.True(
+                Enumerable.Contains<KeyValuePair<string, object>>(
+                    ev.Tags, new KeyValuePair<string, object>("exception.message", "unexpected error")
+                )
+            );
         }
 
         [Fact]
