@@ -3,19 +3,19 @@ using System;
 namespace OpenFeature.Contrib.Providers.Flagd
 
 {
-    public class FlagdConfig
+    internal class FlagdConfig
     {
-        public string Host
+        internal string Host
         {
             get { return _host; }
         }
 
-        public bool CacheEnabled
+        internal bool CacheEnabled
         {
             get { return _cache; }
         }
 
-        public int MaxCacheSize
+        internal int MaxCacheSize
         {
             get { return _maxCacheSize; }
         }
@@ -28,7 +28,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private readonly int _maxCacheSize;
         private readonly int _maxEventStreamRetries;
 
-        public FlagdConfig()
+        internal FlagdConfig()
         {
             _host = Environment.GetEnvironmentVariable("FLAGD_HOST") ?? "localhost";
             _port = Environment.GetEnvironmentVariable("FLAGD_PORT") ?? "8013";
@@ -44,7 +44,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
 
-        public Uri GetUri()
+        internal Uri GetUri()
         {
             Uri uri;
             if (_socketPath != "")
@@ -64,6 +64,5 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             return uri;
         }
-
     }
 }
