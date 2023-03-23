@@ -53,6 +53,26 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
 
+        public void Delete(TKey key)
+        {
+            if (_map.TryGetValue(key, out Node node))
+            {
+                if (node == _head)
+                {
+                    _head = node.Next;
+                } 
+                else 
+                {
+                    node.Prev.Next = node.Next;
+                }
+                if (node.Next != null)
+                {
+                    node.Next.Prev = node.Prev;
+                }
+                _map.Remove(key);
+            }
+        }
+
         private void MoveToFront(Node node)
         {
             if (node == _head)
@@ -85,11 +105,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 _tail.Next = null;
             else
                 _head = null;
-        }
-
-        public void Delete(TKey key)
-        {
-            throw new System.NotImplementedException();
         }
 
         private class Node
