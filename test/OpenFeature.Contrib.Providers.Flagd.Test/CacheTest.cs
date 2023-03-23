@@ -95,5 +95,23 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("head", cache.TryGet("head"));
             Assert.Equal("tail", cache.TryGet("tail"));
         }
+
+        [Fact]
+        public void TestPurge()
+        {
+            int capacity = 5;
+            var cache = new LRUCache<string, string>(capacity);
+
+
+            cache.Add("tail", "tail");
+            cache.Add("middle", "middle");
+            cache.Add("head", "head");
+
+            cache.Purge();
+            
+            Assert.Null(cache.TryGet("head"));
+            Assert.Null(cache.TryGet("middle"));
+            Assert.Null(cache.TryGet("tail"));
+        }
     }
 }

@@ -7,6 +7,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         void Add(TKey key, TValue value);
         TValue TryGet(TKey key);
         void Delete(TKey key);
+        void Purge();
     }
     class LRUCache<TKey, TValue> : ICache<TKey, TValue> where TValue : class
     {
@@ -15,61 +16,101 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private Node _head;
         private Node _tail;
 
+        private System.Threading.Mutex _mtx;
+
         public LRUCache(int capacity)
         {
             _capacity = capacity;
             _map = new Dictionary<TKey, Node>();
+            _mtx = new System.Threading.Mutex();
         }
 
         public TValue TryGet(TKey key)
         {
-            System.Console.WriteLine("looking for " + key.ToString());
-            if (_map.TryGetValue(key, out Node node))
+            try
             {
-                System.Console.WriteLine("found: " + key.ToString() + " with value: " + node.ToString());
-                MoveToFront(node);
-                return node.Value;
+                _mtx.WaitOne();
+                if (_map.TryGetValue(key, out Node node))
+                {
+                    MoveToFront(node);
+                    return node.Value;
+                }
+                return default(TValue);
             }
-            return default(TValue);
+            finally
+            {
+                _mtx.ReleaseMutex();
+            }
+            
         }
 
         public void Add(TKey key, TValue value)
         {
-            if (_map.TryGetValue(key, out Node node))
+            try
             {
-                node.Value = value;
-                MoveToFront(node);
-            }
-            else
-            {
-                if (_map.Count == _capacity)
+                _mtx.WaitOne();
+                if (_map.TryGetValue(key, out Node node))
                 {
-                    _map.Remove(_tail.Key);
-                    RemoveTail();
+                    node.Value = value;
+                    MoveToFront(node);
                 }
-                node = new Node(key, value);
-                _map.Add(key, node);
-                AddToFront(node);
+                else
+                {
+                    if (_map.Count == _capacity)
+                    {
+                        _map.Remove(_tail.Key);
+                        RemoveTail();
+                    }
+                    node = new Node(key, value);
+                    _map.Add(key, node);
+                    AddToFront(node);
+                }
             }
+            finally
+            {
+                _mtx.ReleaseMutex();
+            }
+            
         }
 
         public void Delete(TKey key)
         {
-            if (_map.TryGetValue(key, out Node node))
+            try
             {
-                if (node == _head)
+                _mtx.WaitOne();
+                if (_map.TryGetValue(key, out Node node))
                 {
-                    _head = node.Next;
-                } 
-                else 
-                {
-                    node.Prev.Next = node.Next;
+                    if (node == _head)
+                    {
+                        _head = node.Next;
+                    } 
+                    else 
+                    {
+                        node.Prev.Next = node.Next;
+                    }
+                    if (node.Next != null)
+                    {
+                        node.Next.Prev = node.Prev;
+                    }
+                    _map.Remove(key);
                 }
-                if (node.Next != null)
-                {
-                    node.Next.Prev = node.Prev;
-                }
-                _map.Remove(key);
+            }
+            finally
+            {
+                _mtx.ReleaseMutex();
+            }
+        }
+
+        public void Purge()
+        {
+            try
+            {
+                _mtx.WaitOne();
+                _map.Clear();
+            }
+            finally
+            {
+                _mtx.ReleaseMutex();
             }
         }
 
