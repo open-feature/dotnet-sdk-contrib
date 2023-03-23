@@ -12,8 +12,8 @@ using OpenFeature.Flagd.Grpc;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Net.Http;
 using System.Net.Sockets;
+using System.Net.Http;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -22,11 +22,16 @@ namespace OpenFeature.Contrib.Providers.Flagd
     /// </summary>
     public sealed class FlagdProvider : FeatureProvider
     {
+        static int EventStreamRetryBaseBackoff = 1;
         private readonly FlagdConfig _config;
         private readonly Service.ServiceClient _client;
         private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
 
         private readonly ICache<string, ResolutionDetails<Value>> _cache;
+        private int _eventStreamRetries;
+        private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+
+        private System.Threading.Mutex _mtx;
 
         /// <summary>
         ///     Constructor of the provider. This constructor uses the value of the following
@@ -44,6 +49,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _config = new FlagdConfig();
 
             _client = buildClientForPlatform(_config.GetUri());
+
+            _mtx = new System.Threading.Mutex();
 
             if (_config.CacheEnabled)
             {
@@ -67,12 +74,15 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 throw new ArgumentNullException(nameof(url));
             }
 
+            _mtx = new System.Threading.Mutex();
+
             _client = buildClientForPlatform(url);
         }
 
         // just for testing, internal but visible in tests
         internal FlagdProvider(Service.ServiceClient client)
         {
+            _mtx = new System.Threading.Mutex();
             _client = client;
         }
 
@@ -305,15 +315,93 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         private async Task HandleEvents()
         {
-            var call = _client.EventStream(new Empty());
+            while (_eventStreamRetries < _config.MaxEventStreamRetries)
             {
-                // Read the response stream asynchronously
-                while (await call.ResponseStream.MoveNext())
+                var call = _client.EventStream(new Empty());
+                try
                 {
-                    var response = call.ResponseStream.Current;
-                    Console.WriteLine($"Received message from server: {response.Type}");
+                    // Read the response stream asynchronously
+                    while (await call.ResponseStream.MoveNext())
+                    {
+                        var response = call.ResponseStream.Current;
+                        Console.WriteLine($"Received message from server: {response.Type}");
+
+                        switch (response.Type.ToLower())
+                        {
+                            case "configuration_change": 
+                                HandleConfigurationChangeEvent(response.Data);
+                                break;
+                            case "provider_ready":
+                                HandleProviderReadyEvent();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
+                {
+                    // Handle the dropped connection by reconnecting and retrying the stream
+                    Console.WriteLine($"Connection to server lost: {ex}");
+                    await HandleErrorEvent();
                 }
             }
+        }
+
+        private void HandleConfigurationChangeEvent(Struct data)
+        {
+            // if we don't have a cache, we don't need to remove anything
+            if (!_config.CacheEnabled || !data.Fields.ContainsKey("flags"))
+            {
+                return;
+            }
+
+            try
+            {
+                if (data.Fields.TryGetValue("flags", out ProtoValue val))
+                {
+                    if (val.KindCase == ProtoValue.KindOneofCase.StructValue)
+                    {
+                        var changedFlags = val.StructValue.Fields.AsEnumerable().GetEnumerator();
+                        while (changedFlags.MoveNext())
+                        {
+                            var flag = changedFlags.Current;
+                            Console.WriteLine($"removing changed flag {flag.Key}: {flag.Value.ToString()}");
+                            _cache.Delete(flag.Key);
+                        }
+                    }
+                    var structVal = val.StructValue;
+                }
+            }
+            catch (Exception)
+            {
+                // purge the cache if we could not handle the configuration change event
+                _cache.Purge();
+            }
+            
+        }
+
+        private void HandleProviderReadyEvent()
+        {
+            _mtx.WaitOne();
+            _eventStreamRetries = 0;
+            _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+            _mtx.ReleaseMutex();
+            _cache.Purge();
+        }
+
+        private async Task HandleErrorEvent()
+        {
+            _mtx.WaitOne();
+            _eventStreamRetries++;
+
+            if (_eventStreamRetries > _config.MaxEventStreamRetries)
+            {
+                return;
+            }
+            _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
+            _mtx.ReleaseMutex();
+            await Task.Delay(_eventStreamRetryBackoff * 1000);
         }
 
         /// <summary>
@@ -444,7 +532,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 #if NET462
                  return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
                 {
-                    HttpHandler = new WinHttpHandler()
+                    HttpHandler = new WinHttpHandler(),
                 }));
 #else
                 return new Service.ServiceClient(GrpcChannel.ForAddress(url));
@@ -463,7 +551,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
             return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
             {
-                HttpHandler = socketsHttpHandler
+                HttpHandler = socketsHttpHandler,
             }));
 #endif
             // unix socket support is not available in this dotnet version

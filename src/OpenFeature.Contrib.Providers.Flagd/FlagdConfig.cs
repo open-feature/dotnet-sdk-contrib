@@ -21,6 +21,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
             get { return _maxCacheSize; }
         }
 
+        internal int MaxEventStreamRetries
+        {
+            get { return _maxEventStreamRetries; }
+        }
+
         private readonly string _host;
         private readonly string _port;
         private readonly bool _useTLS;
