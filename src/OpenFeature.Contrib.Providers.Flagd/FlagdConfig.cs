@@ -5,6 +5,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 {
     internal class FlagdConfig
     {
+        internal static int CacheSizeDefault = 10;
         internal string Host
         {
             get { return _host; }
@@ -39,7 +40,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             if (cacheStr.ToUpper().Equals("LRU"))
             {
                 _cache = true;
-                _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable("FLAGD_MAX_CACHE_SIZE") ?? "10");
+                _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable("FLAGD_MAX_CACHE_SIZE") ?? $"{CacheSizeDefault}");
                 _maxEventStreamRetries = int.Parse(Environment.GetEnvironmentVariable("FLAGD_MAX_EVENT_STREAM_RETRIES") ?? "3");
             }
         }
