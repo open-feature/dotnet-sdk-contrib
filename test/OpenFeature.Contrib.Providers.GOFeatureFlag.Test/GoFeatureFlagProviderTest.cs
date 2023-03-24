@@ -501,7 +501,7 @@ public class GoFeatureFlagProviderTest
         Assert.Equal(Reason.TargetingMatch, res.Result.Reason);
         Assert.Equal("True", res.Result.Variant);
     }
-    
+
     [Fact]
     private void should_use_object_default_value_if_flag_not_found()
     {
