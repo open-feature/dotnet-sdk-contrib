@@ -181,7 +181,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
-                return new ResolutionDetails<double>(flagKey, double.Parse(resp.value.ToString()), ErrorType.None,
+                return new ResolutionDetails<double>(flagKey, double.Parse(resp.value.ToString(), System.Globalization.CultureInfo.InvariantCulture), ErrorType.None,
                     resp.reason, resp.variationType);
             }
             catch (FormatException e)
