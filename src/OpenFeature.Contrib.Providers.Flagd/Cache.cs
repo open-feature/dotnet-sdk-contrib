@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
-    interface ICache<TKey, TValue>
+    internal interface ICache<TKey, TValue>
     {
         void Add(TKey key, TValue value);
         TValue TryGet(TKey key);

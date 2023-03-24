@@ -30,6 +30,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private readonly ICache<string, ResolutionDetails<Value>> _cache;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+        private bool _providerReady;
 
         private System.Threading.Mutex _mtx;
 
@@ -79,11 +80,22 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _client = buildClientForPlatform(url);
         }
 
+
         // just for testing, internal but visible in tests
-        internal FlagdProvider(Service.ServiceClient client)
+        internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, ResolutionDetails<Value>> cache = null)
         {
             _mtx = new System.Threading.Mutex();
             _client = client;
+            _config = config;
+            _cache = cache;
+
+            if (_config.CacheEnabled)
+            {
+                Task.Run(async () =>
+                {
+                    await HandleEvents();
+                });
+            }
         }
 
         /// <summary>
@@ -272,8 +284,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
                     if (value != null)
                     {
-                        Console.WriteLine("returned from cache:" + value.ToString());
-                        Console.WriteLine("cache hit");
                         return value;
                     }
                 }
@@ -281,7 +291,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
                 if (result.Reason.Equals("STATIC") && _config.CacheEnabled)
                 {
-                    Console.WriteLine("adding to cache");
                     _cache.Add(flagKey, result);
                 }
 
@@ -386,6 +395,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _mtx.WaitOne();
             _eventStreamRetries = 0;
             _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+            _providerReady = true;
             _mtx.ReleaseMutex();
             _cache.Purge();
         }

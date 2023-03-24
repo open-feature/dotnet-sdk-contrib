@@ -14,6 +14,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal bool CacheEnabled
         {
             get { return _cache; }
+            set { _cache = value; }
         }
 
         internal int MaxCacheSize
@@ -24,15 +25,16 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal int MaxEventStreamRetries
         {
             get { return _maxEventStreamRetries; }
+            set { _maxEventStreamRetries = value; }
         }
 
-        private readonly string _host;
-        private readonly string _port;
-        private readonly bool _useTLS;
-        private readonly string _socketPath;
-        private readonly bool _cache;
-        private readonly int _maxCacheSize;
-        private readonly int _maxEventStreamRetries;
+        private string _host;
+        private string _port;
+        private bool _useTLS;
+        private string _socketPath;
+        private bool _cache;
+        private int _maxCacheSize;
+        private int _maxEventStreamRetries;
 
         internal FlagdConfig()
         {
