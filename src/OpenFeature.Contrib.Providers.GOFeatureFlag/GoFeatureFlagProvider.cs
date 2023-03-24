@@ -267,7 +267,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             if (goffResp != null && Reason.Disabled.Equals(goffResp.reason))
                 throw new FlagDisabled();
 
-            if (ErrorType.FlagNotFound.ToString().Equals(goffResp.errorCode))
+            if ("FLAG_NOT_FOUND".Equals(goffResp.errorCode))
                 throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
             return goffResp;

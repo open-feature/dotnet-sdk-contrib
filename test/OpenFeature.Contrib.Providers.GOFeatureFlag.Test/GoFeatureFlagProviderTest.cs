@@ -51,7 +51,8 @@ public class GoFeatureFlagProviderTest
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":\"CC0000\"}");
         mockHttp.When($"{prefixEval}unknown_reason{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"CUSTOM_REASON\",\"errorCode\":\"\",\"value\":true}");
-
+        mockHttp.When($"{prefixEval}does_not_exists{suffixEval}").Respond(mediaType,
+            "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":true,\"version\":\"\",\"reason\":\"ERROR\",\"errorCode\":\"FLAG_NOT_FOUND\",\"value\":\"\"}");
         return mockHttp;
     }
 
@@ -499,5 +500,24 @@ public class GoFeatureFlagProviderTest
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
         Assert.Equal(Reason.TargetingMatch, res.Result.Reason);
         Assert.Equal("True", res.Result.Variant);
+    }
+    
+    [Fact]
+    private void should_use_object_default_value_if_flag_not_found()
+    {
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = _mockHttp,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
+        });
+        Api.Instance.SetProvider(g);
+        var client = Api.Instance.GetClient("test-client");
+        var res = client.GetObjectDetails("does_not_exists", new Value("default"), _defaultEvaluationCtx);
+        Assert.NotNull(res.Result);
+        Assert.Equal(new Value("default").AsString, res.Result.Value.AsString);
+        Assert.Equal(Reason.Error, res.Result.Reason);
+        Assert.Equal(ErrorType.FlagNotFound, res.Result.ErrorType);
+        Assert.Equal("flag does_not_exists was not found in your configuration", res.Result.ErrorMessage);
     }
 }
