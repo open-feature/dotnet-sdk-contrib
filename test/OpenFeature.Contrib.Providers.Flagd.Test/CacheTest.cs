@@ -51,7 +51,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal(expectedValue, value);
 
             cache.Delete(key);
-            
+
             value = cache.TryGet(key);
             Assert.Null(value);
 
@@ -72,7 +72,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             cache.Add("head", "head");
 
             cache.Delete("head");
-            
+
             Assert.Null(cache.TryGet("head"));
             Assert.Equal("middle", cache.TryGet("middle"));
             Assert.Equal("tail", cache.TryGet("tail"));
@@ -90,7 +90,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             cache.Add("head", "head");
 
             cache.Delete("middle");
-            
+
             Assert.Null(cache.TryGet("middle"));
             Assert.Equal("head", cache.TryGet("head"));
             Assert.Equal("tail", cache.TryGet("tail"));
@@ -108,7 +108,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             cache.Add("head", "head");
 
             cache.Purge();
-            
+
             Assert.Null(cache.TryGet("head"));
             Assert.Null(cache.TryGet("middle"));
             Assert.Null(cache.TryGet("tail"));

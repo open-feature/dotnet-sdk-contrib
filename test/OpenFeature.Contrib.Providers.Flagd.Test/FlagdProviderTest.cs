@@ -344,11 +344,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             asyncStreamReader.Setup(a => a.Current).Returns(() => enumerator.Current);
 
             var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
-                asyncStreamReader.Object, 
-                null, 
-                null, 
-                null, 
-                null, 
+                asyncStreamReader.Object,
+                null,
+                null,
+                null,
+                null,
                 null
             );
 
@@ -369,6 +369,144 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            Assert.True(val.Result.Value);
+
+            mockCache.VerifyAll();
+            mockGrpcClient.VerifyAll();
+        }
+
+        [Fact]
+        public void TestCacheHit()
+        {
+
+            var mockGrpcClient = new Mock<Service.ServiceClient>();
+
+            var asyncStreamReader = new Mock<IAsyncStreamReader<EventStreamResponse>>();
+
+            var l = new List<EventStreamResponse>
+            {
+                new EventStreamResponse{
+                    Type = "provider_ready"
+                }
+            };
+
+            var enumerator = l.GetEnumerator();
+
+            asyncStreamReader.Setup(a => a.MoveNext(It.IsAny<System.Threading.CancellationToken>())).ReturnsAsync(() => enumerator.MoveNext());
+            asyncStreamReader.Setup(a => a.Current).Returns(() => enumerator.Current);
+
+            var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
+                asyncStreamReader.Object,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+
+            mockGrpcClient
+                .Setup(m => m.EventStream(
+                    It.IsAny<Empty>(), null, null, System.Threading.CancellationToken.None))
+                .Returns(grpcEventStreamResp);
+
+            var mockCache = new Mock<ICache<string, ResolutionDetails<Model.Value>>>();
+            mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(
+                () => new ResolutionDetails<Model.Value>("my-key", new Model.Value(true))
+            );
+
+            var config = new FlagdConfig();
+            config.CacheEnabled = true;
+            config.MaxEventStreamRetries = 1;
+            var flagdProvider = new FlagdProvider(mockGrpcClient.Object, config, mockCache.Object);
+
+            // resolve with default set to false to make sure we return what the grpc server gives us
+            var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            Assert.True(val.Result.Value);
+
+            mockCache.VerifyAll();
+            mockGrpcClient.VerifyAll();
+        }
+
+        [Fact]
+        public void TestCacheInvalidation()
+        {
+            var resp = new ResolveBooleanResponse();
+            resp.Value = true;
+            resp.Reason = "STATIC";
+
+            var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
+                System.Threading.Tasks.Task.FromResult(resp),
+                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                () => Status.DefaultSuccess,
+                () => new Grpc.Core.Metadata(),
+                () => { });
+
+            var mockGrpcClient = new Mock<Service.ServiceClient>();
+            mockGrpcClient
+                .Setup(m => m.ResolveBooleanAsync(
+                    It.IsAny<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None))
+                .Returns(grpcResp);
+
+            var asyncStreamReader = new Mock<IAsyncStreamReader<EventStreamResponse>>();
+
+            var configurationChangeData = new Struct();
+            var changedFlag = new Struct();
+            changedFlag.Fields.Add("my-key", new Google.Protobuf.WellKnownTypes.Value());
+            configurationChangeData.Fields.Add("flags", ProtoValue.ForStruct(changedFlag));
+
+
+            var firstCall = true;
+
+            asyncStreamReader.Setup(a => a.MoveNext(It.IsAny<System.Threading.CancellationToken>())).ReturnsAsync(() => true);
+            // as long as we did not send our first request to the provider, we will not send a configuration_change event
+            // after the value of the flag has been retrieved the first time, we will send a configuration_change to test if the
+            // item is deleted from the cache
+            asyncStreamReader.Setup(a => a.Current).Returns(
+                () => firstCall == true ?
+                new EventStreamResponse
+                {
+                    Type = "provider_ready"
+                } :
+                new EventStreamResponse
+                {
+                    Type = "configuration_change",
+                    Data = configurationChangeData
+                }
+            );
+
+            var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
+                asyncStreamReader.Object,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+
+            mockGrpcClient
+                .Setup(m => m.EventStream(
+                    It.IsAny<Empty>(), null, null, System.Threading.CancellationToken.None))
+                .Returns(grpcEventStreamResp);
+
+            var mockCache = new Mock<ICache<string, ResolutionDetails<Model.Value>>>();
+            mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(() => null);
+            mockCache.Setup(c => c.Add(It.Is<string>(s => s == "my-key"), It.IsAny<ResolutionDetails<Model.Value>>()));
+            mockCache.Setup(c => c.Delete(It.Is<string>(s => s == "my-key")));
+
+
+            var config = new FlagdConfig();
+            config.CacheEnabled = true;
+            config.MaxEventStreamRetries = 1;
+            var flagdProvider = new FlagdProvider(mockGrpcClient.Object, config, mockCache.Object);
+
+            // resolve with default set to false to make sure we return what the grpc server gives us
+            var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            Assert.True(val.Result.Value);
+
+            // set firstCall to true to make the mock EventStream return a configuration_change event
+            firstCall = false;
+
+            val = flagdProvider.ResolveBooleanValue("my-key", false, null);
             Assert.True(val.Result.Value);
 
             mockCache.VerifyAll();

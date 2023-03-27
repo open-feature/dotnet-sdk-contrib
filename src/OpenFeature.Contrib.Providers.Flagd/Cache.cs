@@ -44,7 +44,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 _mtx.ReleaseMutex();
             }
-            
+
         }
 
         public void Add(TKey key, TValue value)
@@ -73,7 +73,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 _mtx.ReleaseMutex();
             }
-            
+
         }
 
         public void Delete(TKey key)
@@ -86,8 +86,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     if (node == _head)
                     {
                         _head = node.Next;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         node.Prev.Next = node.Next;
                     }

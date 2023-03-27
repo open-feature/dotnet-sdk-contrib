@@ -145,7 +145,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 value: (bool)val.Value.AsBoolean,
                 reason: val.Reason,
                 variant: val.Variant
-            ); 
+            );
 
         }
 
@@ -179,7 +179,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 value: val.Value.AsString,
                 reason: val.Reason,
                 variant: val.Variant
-            ); 
+            );
         }
 
         /// <summary>
@@ -333,11 +333,10 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     while (await call.ResponseStream.MoveNext())
                     {
                         var response = call.ResponseStream.Current;
-                        Console.WriteLine($"Received message from server: {response.Type}");
 
                         switch (response.Type.ToLower())
                         {
-                            case "configuration_change": 
+                            case "configuration_change":
                                 HandleConfigurationChangeEvent(response.Data);
                                 break;
                             case "provider_ready":
@@ -351,7 +350,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
                 {
                     // Handle the dropped connection by reconnecting and retrying the stream
-                    Console.WriteLine($"Connection to server lost: {ex}");
                     await HandleErrorEvent();
                 }
             }
@@ -375,7 +373,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
                         while (changedFlags.MoveNext())
                         {
                             var flag = changedFlags.Current;
-                            Console.WriteLine($"removing changed flag {flag.Key}: {flag.Value.ToString()}");
                             _cache.Delete(flag.Key);
                         }
                     }
@@ -387,7 +384,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 // purge the cache if we could not handle the configuration change event
                 _cache.Purge();
             }
-            
+
         }
 
         private void HandleProviderReadyEvent()
