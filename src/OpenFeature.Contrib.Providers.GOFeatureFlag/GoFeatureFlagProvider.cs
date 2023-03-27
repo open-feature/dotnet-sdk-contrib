@@ -181,7 +181,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
-                return new ResolutionDetails<double>(flagKey, double.Parse(resp.value.ToString()), ErrorType.None,
+                return new ResolutionDetails<double>(flagKey, double.Parse(resp.value.ToString(), System.Globalization.CultureInfo.InvariantCulture), ErrorType.None,
                     resp.reason, resp.variationType);
             }
             catch (FormatException e)
@@ -267,7 +267,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             if (goffResp != null && Reason.Disabled.Equals(goffResp.reason))
                 throw new FlagDisabled();
 
-            if (ErrorType.FlagNotFound.ToString().Equals(goffResp.errorCode))
+            if ("FLAG_NOT_FOUND".Equals(goffResp.errorCode))
                 throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
             return goffResp;
