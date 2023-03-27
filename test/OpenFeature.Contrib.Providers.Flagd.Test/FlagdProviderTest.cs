@@ -8,6 +8,7 @@ using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 using System.Collections.Generic;
 using System.Linq;
 using OpenFeature.Model;
+using System.Threading;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
@@ -461,16 +462,26 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             // as long as we did not send our first request to the provider, we will not send a configuration_change event
             // after the value of the flag has been retrieved the first time, we will send a configuration_change to test if the
             // item is deleted from the cache
+
+            // create an autoResetEvent which we will wait for in our test verification
+            AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
+            
             asyncStreamReader.Setup(a => a.Current).Returns(
-                () => firstCall == true ?
-                new EventStreamResponse
-                {
-                    Type = "provider_ready"
-                } :
-                new EventStreamResponse
-                {
-                    Type = "configuration_change",
-                    Data = configurationChangeData
+                () => {
+                    if (firstCall)
+                    {
+                        return new EventStreamResponse
+                        {
+                            Type = "provider_ready"
+                        };
+                    }
+                    // set the autoResetEvent since this path should be the last one that's reached in the background task
+                    _autoResetEvent.Set();
+                    return new EventStreamResponse
+                    {
+                        Type = "configuration_change",
+                        Data = configurationChangeData
+                    };
                 }
             );
 
@@ -486,7 +497,10 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockGrpcClient
                 .Setup(m => m.EventStream(
                     It.IsAny<Empty>(), null, null, System.Threading.CancellationToken.None))
-                .Returns(grpcEventStreamResp);
+                .Returns(() => 
+                {
+                    return grpcEventStreamResp;
+                });
 
             var mockCache = new Mock<ICache<string, ResolutionDetails<Model.Value>>>();
             mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(() => null);
@@ -508,6 +522,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             val = flagdProvider.ResolveBooleanValue("my-key", false, null);
             Assert.True(val.Result.Value);
+
+            Assert.True(_autoResetEvent.WaitOne());
 
             mockCache.VerifyAll();
             mockGrpcClient.VerifyAll();
