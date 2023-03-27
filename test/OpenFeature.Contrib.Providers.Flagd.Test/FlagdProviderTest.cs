@@ -345,7 +345,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var _autoResetEvent = new AutoResetEvent(false);
 
             asyncStreamReader.Setup(a => a.MoveNext(It.IsAny<System.Threading.CancellationToken>())).ReturnsAsync(() => enumerator.MoveNext());
-            asyncStreamReader.Setup(a => a.Current).Returns(() => {
+            asyncStreamReader.Setup(a => a.Current).Returns(() =>
+            {
                 // set the autoResetEvent since this path should be the last one that's reached in the background task
                 _autoResetEvent.Set();
                 return enumerator.Current;
@@ -405,7 +406,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
 
             asyncStreamReader.Setup(a => a.MoveNext(It.IsAny<System.Threading.CancellationToken>())).ReturnsAsync(() => enumerator.MoveNext());
-            asyncStreamReader.Setup(a => a.Current).Returns(() => 
+            asyncStreamReader.Setup(a => a.Current).Returns(() =>
             {
                 // set the autoResetEvent since this path should be the last one that's reached in the background task
                 _autoResetEvent.Set();
@@ -483,9 +484,10 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             // create an autoResetEvent which we will wait for in our test verification
             AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
-            
+
             asyncStreamReader.Setup(a => a.Current).Returns(
-                () => {
+                () =>
+                {
                     if (firstCall)
                     {
                         return new EventStreamResponse
@@ -493,8 +495,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                             Type = "provider_ready"
                         };
                     }
-                    // set the autoResetEvent since this path should be the last one that's reached in the background task
-                    _autoResetEvent.Set();
                     return new EventStreamResponse
                     {
                         Type = "configuration_change",
@@ -515,7 +515,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockGrpcClient
                 .Setup(m => m.EventStream(
                     It.IsAny<Empty>(), null, null, System.Threading.CancellationToken.None))
-                .Returns(() => 
+                .Returns(() =>
                 {
                     return grpcEventStreamResp;
                 });
@@ -523,7 +523,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var mockCache = new Mock<ICache<string, ResolutionDetails<Model.Value>>>();
             mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(() => null);
             mockCache.Setup(c => c.Add(It.Is<string>(s => s == "my-key"), It.IsAny<ResolutionDetails<Model.Value>>()));
-            mockCache.Setup(c => c.Delete(It.Is<string>(s => s == "my-key")));
+            mockCache.Setup(c => c.Delete(It.Is<string>(s => s == "my-key"))).Callback(() =>
+            {
+                // set the autoResetEvent since this path should be the last one that's reached in the background task
+                _autoResetEvent.Set();
+            });
 
 
             var config = new FlagdConfig();
