@@ -341,8 +341,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var enumerator = l.GetEnumerator();
 
+            // create an autoResetEvent which we will wait for in our test verification
+            var _autoResetEvent = new AutoResetEvent(false);
+
             asyncStreamReader.Setup(a => a.MoveNext(It.IsAny<System.Threading.CancellationToken>())).ReturnsAsync(() => enumerator.MoveNext());
-            asyncStreamReader.Setup(a => a.Current).Returns(() => enumerator.Current);
+            asyncStreamReader.Setup(a => a.Current).Returns(() => {
+                // set the autoResetEvent since this path should be the last one that's reached in the background task
+                _autoResetEvent.Set();
+                return enumerator.Current;
+            });
 
             var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
                 asyncStreamReader.Object,
@@ -372,6 +379,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
             Assert.True(val.Result.Value);
 
+            Assert.True(_autoResetEvent.WaitOne());
             mockCache.VerifyAll();
             mockGrpcClient.VerifyAll();
         }
@@ -393,8 +401,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var enumerator = l.GetEnumerator();
 
+            // create an autoResetEvent which we will wait for in our test verification
+            AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
+
             asyncStreamReader.Setup(a => a.MoveNext(It.IsAny<System.Threading.CancellationToken>())).ReturnsAsync(() => enumerator.MoveNext());
-            asyncStreamReader.Setup(a => a.Current).Returns(() => enumerator.Current);
+            asyncStreamReader.Setup(a => a.Current).Returns(() => 
+            {
+                // set the autoResetEvent since this path should be the last one that's reached in the background task
+                _autoResetEvent.Set();
+                return enumerator.Current;
+            });
 
             var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
                 asyncStreamReader.Object,
@@ -424,6 +440,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
             Assert.True(val.Result.Value);
 
+            // wait for the autoReset event to be fired before verifying the invocation of the mocked functions
+            Assert.True(_autoResetEvent.WaitOne());
             mockCache.VerifyAll();
             mockGrpcClient.VerifyAll();
         }
