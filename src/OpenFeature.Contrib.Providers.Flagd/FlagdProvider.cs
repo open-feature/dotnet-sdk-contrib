@@ -30,7 +30,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private readonly ICache<string, ResolutionDetails<Value>> _cache;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-        private bool _providerReady;
 
         private System.Threading.Mutex _mtx;
 
@@ -392,7 +391,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _mtx.WaitOne();
             _eventStreamRetries = 0;
             _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-            _providerReady = true;
             _mtx.ReleaseMutex();
             _cache.Purge();
         }
