@@ -76,12 +76,15 @@ namespace OpenFeatureTestApp
 
 The URI of the flagd server to which the `flagd Provider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
 
-| Option name      | Environment variable name      | Type    | Default   | Values        |
-|------------------|--------------------------------|---------|-----------| ------------- |
-| host             | FLAGD_HOST                     | string  | localhost |               |
-| port             | FLAGD_PORT                     | number  | 8013      |               |
-| tls              | FLAGD_TLS                      | boolean | false     |               |
-| unix socket path | FLAGD_SOCKET_PATH              | string  |           |               |
+| Option name                  | Environment variable name      | Type    | Default   | Values        |
+|------------------------------|--------------------------------|---------|-----------| ------------- |
+| host                         | FLAGD_HOST                     | string  | localhost |               |
+| port                         | FLAGD_PORT                     | number  | 8013      |               |
+| tls                          | FLAGD_TLS                      | boolean | false     |               |
+| unix socket path             | FLAGD_SOCKET_PATH              | string  |           |               |
+| Caching                      | FLAGD_CACHE                    | string  |           |     LRU       |
+| Maximum cache size           | FLAGD_MAX_CACHE_SIZE           | number  | 10        |               |
+| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |               |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`) are disregarded.
 
