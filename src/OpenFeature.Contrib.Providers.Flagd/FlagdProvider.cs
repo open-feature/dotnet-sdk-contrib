@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
 
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -387,16 +390,40 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private static Service.ServiceClient buildClientForPlatform(Uri url)
         {
             var useUnixSocket = url.ToString().StartsWith("unix://");
+            X509Certificate2 certificate = null;
 
             if (!useUnixSocket)
             {
-#if NET462
-                 return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+                var flagdCertPath = Environment.GetEnvironmentVariable("FLAGD_SERVER_CERT_PATH") ?? "";
+
+                if (flagdCertPath != "")
                 {
-                    HttpHandler = new WinHttpHandler()
+                    if (!File.Exists(flagdCertPath))
+                    {
+                        return null;
+                    }
+                    certificate = new X509Certificate2(flagdCertPath);
+
+                }
+#if NET462
+                var handler = new WinHttpHandler();
+                if (flagdCertPath != "") {
+                    handler.ClientCertificates.Add(certificate);
+                }
+                return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+                {
+                    HttpHandler = handler
                 }));
 #else
-                return new Service.ServiceClient(GrpcChannel.ForAddress(url));
+                var handler = new HttpClientHandler();
+                if (flagdCertPath != "")
+                {
+                    handler.ClientCertificates.Add(certificate);
+                }
+                return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+                {
+                    HttpHandler = handler
+                }));
 #endif
             }
 
