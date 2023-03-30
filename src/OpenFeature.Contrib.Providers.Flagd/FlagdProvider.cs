@@ -27,7 +27,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private readonly Service.ServiceClient _client;
         private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
 
-        private readonly ICache<string, ResolutionDetails<Value>> _cache;
+        private readonly ICache<string, object> _cache;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
 
@@ -54,7 +54,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             if (_config.CacheEnabled)
             {
-                _cache = new LRUCache<string, ResolutionDetails<Value>>(_config.MaxCacheSize);
+                _cache = new LRUCache<string, object>(_config.MaxCacheSize);
                 Task.Run(async () =>
                 {
                     await HandleEvents();
@@ -81,7 +81,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
 
         // just for testing, internal but visible in tests
-        internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, ResolutionDetails<Value>> cache = null)
+        internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
         {
             _mtx = new System.Threading.Mutex();
             _client = client;
@@ -124,7 +124,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            var val = await ResolveValue<Value>(flagKey, async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveBooleanResponse = await _client.ResolveBooleanAsync(new ResolveBooleanRequest
                 {
@@ -132,20 +132,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     FlagKey = flagKey
                 });
 
-                return new ResolutionDetails<Value>(
+                return new ResolutionDetails<bool>(
                     flagKey: flagKey,
-                    value: new Value(resolveBooleanResponse.Value),
+                    value: (bool)resolveBooleanResponse.Value,
                     reason: resolveBooleanResponse.Reason,
                     variant: resolveBooleanResponse.Variant
                 );
             }, context);
-            return new ResolutionDetails<bool>(
-                flagKey: flagKey,
-                value: (bool)val.Value.AsBoolean,
-                reason: val.Reason,
-                variant: val.Variant
-            );
-
         }
 
         /// <summary>
@@ -157,7 +150,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            var val = await ResolveValue<Value>(flagKey, async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveStringResponse = await _client.ResolveStringAsync(new ResolveStringRequest
                 {
@@ -165,20 +158,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     FlagKey = flagKey
                 });
 
-                return new ResolutionDetails<Value>(
+                return new ResolutionDetails<string>(
                     flagKey: flagKey,
-                    value: new Value(resolveStringResponse.Value),
+                    value: resolveStringResponse.Value,
                     reason: resolveStringResponse.Reason,
                     variant: resolveStringResponse.Variant
                 );
             }, context);
-
-            return new ResolutionDetails<string>(
-                flagKey: flagKey,
-                value: val.Value.AsString,
-                reason: val.Reason,
-                variant: val.Variant
-            );
         }
 
         /// <summary>
@@ -190,7 +176,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            var val = await ResolveValue<Value>(flagKey, async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
                 {
@@ -198,20 +184,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     FlagKey = flagKey
                 });
 
-                return new ResolutionDetails<Value>(
+                return new ResolutionDetails<int>(
                     flagKey: flagKey,
-                    value: new Value(resolveIntResponse.Value),
+                    value: (int)resolveIntResponse.Value,
                     reason: resolveIntResponse.Reason,
                     variant: resolveIntResponse.Variant
                 );
             }, context);
-
-            return new ResolutionDetails<int>(
-                flagKey: flagKey,
-                value: (int)val.Value.AsInteger,
-                reason: val.Reason,
-                variant: val.Variant
-            );
         }
 
         /// <summary>
@@ -223,7 +202,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            var val = await ResolveValue<Value>(flagKey, async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
                 {
@@ -231,20 +210,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     FlagKey = flagKey
                 });
 
-                return new ResolutionDetails<Value>(
+                return new ResolutionDetails<double>(
                     flagKey: flagKey,
-                    value: new Value(resolveDoubleResponse.Value),
+                    value: resolveDoubleResponse.Value,
                     reason: resolveDoubleResponse.Reason,
                     variant: resolveDoubleResponse.Variant
                 );
             }, context);
-
-            return new ResolutionDetails<double>(
-                flagKey: flagKey,
-                value: (double)val.Value.AsDouble,
-                reason: val.Reason,
-                variant: val.Variant
-            );
         }
 
         /// <summary>
@@ -256,7 +228,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue<Value>(flagKey, async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveObjectResponse = await _client.ResolveObjectAsync(new ResolveObjectRequest
                 {
@@ -273,7 +245,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }, context);
         }
 
-        private async Task<ResolutionDetails<Value>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<Value>>> resolveDelegate, EvaluationContext context = null)
+        private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
         {
             try
             {
@@ -283,7 +255,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
                     if (value != null)
                     {
-                        return value;
+                        return (ResolutionDetails<T>)value;
                     }
                 }
                 var result = await resolveDelegate.Invoke(ConvertToContext(context));

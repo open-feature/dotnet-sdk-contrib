@@ -65,7 +65,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var counter = 0;
             for (int i = 0; i < capacity; i++)
             {
-                tasks.Add(System.Threading.Tasks.Task.Run(() => 
+                tasks.Add(System.Threading.Tasks.Task.Run(() =>
                 {
                     var id = System.Threading.Interlocked.Increment(ref counter);
                     cache.Add($"key-{id}", $"value-{id}");

@@ -366,9 +366,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     It.IsAny<Empty>(), null, null, System.Threading.CancellationToken.None))
                 .Returns(grpcEventStreamResp);
 
-            var mockCache = new Mock<ICache<string, ResolutionDetails<Model.Value>>>();
+            var mockCache = new Mock<ICache<string, object>>();
             mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(() => null);
-            mockCache.Setup(c => c.Add(It.Is<string>(s => s == "my-key"), It.IsAny<ResolutionDetails<Model.Value>>()));
+            mockCache.Setup(c => c.Add(It.Is<string>(s => s == "my-key"), It.IsAny<object>()));
 
 
             var config = new FlagdConfig();
@@ -380,7 +380,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
             Assert.True(val.Result.Value);
 
-            Assert.True(_autoResetEvent.WaitOne());
+            Assert.True(_autoResetEvent.WaitOne(10000));
             mockCache.VerifyAll();
             mockGrpcClient.VerifyAll();
         }
@@ -427,9 +427,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     It.IsAny<Empty>(), null, null, System.Threading.CancellationToken.None))
                 .Returns(grpcEventStreamResp);
 
-            var mockCache = new Mock<ICache<string, ResolutionDetails<Model.Value>>>();
+            var mockCache = new Mock<ICache<string, object>>();
             mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(
-                () => new ResolutionDetails<Model.Value>("my-key", new Model.Value(true))
+                () => new ResolutionDetails<bool>("my-key", true)
             );
 
             var config = new FlagdConfig();
@@ -442,7 +442,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.True(val.Result.Value);
 
             // wait for the autoReset event to be fired before verifying the invocation of the mocked functions
-            Assert.True(_autoResetEvent.WaitOne());
+            Assert.True(_autoResetEvent.WaitOne(10000));
             mockCache.VerifyAll();
             mockGrpcClient.VerifyAll();
         }
@@ -520,9 +520,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     return grpcEventStreamResp;
                 });
 
-            var mockCache = new Mock<ICache<string, ResolutionDetails<Model.Value>>>();
+            var mockCache = new Mock<ICache<string, object>>();
             mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(() => null);
-            mockCache.Setup(c => c.Add(It.Is<string>(s => s == "my-key"), It.IsAny<ResolutionDetails<Model.Value>>()));
+            mockCache.Setup(c => c.Add(It.Is<string>(s => s == "my-key"), It.IsAny<object>()));
             mockCache.Setup(c => c.Delete(It.Is<string>(s => s == "my-key"))).Callback(() =>
             {
                 // set the autoResetEvent since this path should be the last one that's reached in the background task
@@ -545,7 +545,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             val = flagdProvider.ResolveBooleanValue("my-key", false, null);
             Assert.True(val.Result.Value);
 
-            Assert.True(_autoResetEvent.WaitOne());
+            Assert.True(_autoResetEvent.WaitOne(10000));
 
             mockCache.VerifyAll();
             mockGrpcClient.VerifyAll();

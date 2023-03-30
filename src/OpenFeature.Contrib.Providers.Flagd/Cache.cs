@@ -54,7 +54,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 }
                 else
                 {
-                    if (_map.Count == _capacity)
+                    if (_map.Count >= _capacity)
                     {
                         _map.Remove(_tail.Key);
                         RemoveTail();
@@ -151,7 +151,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
 
             public System.Threading.Mutex _mtx;
-            
+
             public Mutex(ref System.Threading.Mutex mtx)
             {
                 _mtx = mtx;
