@@ -2,22 +2,86 @@ using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
+
     public class UnitTestLRUCache
     {
+        [Fact]
+        public void TestCacheSetGet()
+        {
+            int capacity = 5;
+            var cache = new LRUCache<string, string>(capacity);
+
+            cache.Add("my-key", "my-value");
+
+            var value = cache.TryGet("my-key");
+            Assert.Equal("my-value", value);
+        }
         [Fact]
         public void TestCacheCapacity()
         {
             int capacity = 5;
             var cache = new LRUCache<string, string>(capacity);
 
+            var tasks = new System.Collections.Generic.List<System.Threading.Tasks.Task>();
+
             for (int i = 0; i < capacity; i++)
             {
                 cache.Add($"key-{i}", $"value-{i}");
             }
 
+            var e = tasks.GetEnumerator();
+            while (e.MoveNext())
+            {
+                e.Current.Wait();
+            }
+
             string value;
             // verify that we can retrieve all items
             for (int i = 0; i < capacity; i++)
+            {
+                value = cache.TryGet($"key-{i}");
+
+                Assert.Equal($"value-{i}", value);
+            }
+
+            // add another item - now the least recently used item ("key-0") should be replaced
+            cache.Add("new-item", "new-value");
+
+            value = cache.TryGet("key-0");
+            Assert.Null(value);
+
+            value = cache.TryGet("new-item");
+            Assert.Equal("new-value", value);
+        }
+
+        [Fact]
+        public void TestCacheCapacityMultiThreaded()
+        {
+            int capacity = 5;
+            var cache = new LRUCache<string, string>(capacity);
+
+            var tasks = new System.Collections.Generic.List<System.Threading.Tasks.Task>();
+
+            var counter = 0;
+            for (int i = 0; i < capacity; i++)
+            {
+                tasks.Add(System.Threading.Tasks.Task.Run(() => 
+                {
+                    var id = System.Threading.Interlocked.Increment(ref counter);
+                    cache.Add($"key-{id}", $"value-{id}");
+                }));
+                //cache.Add($"key-{i}", $"value-{i}");
+            }
+
+            var e = tasks.GetEnumerator();
+            while (e.MoveNext())
+            {
+                e.Current.Wait();
+            }
+
+            string value;
+            // verify that we can retrieve all items
+            for (int i = 1; i <= capacity; i++)
             {
                 value = cache.TryGet($"key-{i}");
 

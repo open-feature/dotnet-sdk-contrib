@@ -30,9 +30,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         public TValue TryGet(TKey key)
         {
-            try
+            using (var mtx = new Mutex(ref _mtx))
             {
-                _mtx.WaitOne();
+                mtx.Lock();
                 if (_map.TryGetValue(key, out Node node))
                 {
                     MoveToFront(node);
@@ -40,18 +40,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 }
                 return default(TValue);
             }
-            finally
-            {
-                _mtx.ReleaseMutex();
-            }
-
         }
 
         public void Add(TKey key, TValue value)
         {
-            try
+            using (var mtx = new Mutex(ref _mtx))
             {
-                _mtx.WaitOne();
+                mtx.Lock();
                 if (_map.TryGetValue(key, out Node node))
                 {
                     node.Value = value;
@@ -69,18 +64,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     AddToFront(node);
                 }
             }
-            finally
-            {
-                _mtx.ReleaseMutex();
-            }
-
         }
 
         public void Delete(TKey key)
         {
-            try
+            using (var mtx = new Mutex(ref _mtx))
             {
-                _mtx.WaitOne();
+                mtx.Lock();
                 if (_map.TryGetValue(key, out Node node))
                 {
                     if (node == _head)
@@ -98,22 +88,14 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     _map.Remove(key);
                 }
             }
-            finally
-            {
-                _mtx.ReleaseMutex();
-            }
         }
 
         public void Purge()
         {
-            try
+            using (var mtx = new Mutex(ref _mtx))
             {
-                _mtx.WaitOne();
+                mtx.Lock();
                 _map.Clear();
-            }
-            finally
-            {
-                _mtx.ReleaseMutex();
             }
         }
 
@@ -162,6 +144,27 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 Key = key;
                 Value = value;
+            }
+        }
+
+        private class Mutex : System.IDisposable
+        {
+
+            public System.Threading.Mutex _mtx;
+            
+            public Mutex(ref System.Threading.Mutex mtx)
+            {
+                _mtx = mtx;
+            }
+
+            public void Lock()
+            {
+                _mtx.WaitOne();
+            }
+
+            public void Dispose()
+            {
+                _mtx.ReleaseMutex();
             }
         }
     }
