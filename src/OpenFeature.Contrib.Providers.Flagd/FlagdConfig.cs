@@ -5,6 +5,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
 {
     internal class FlagdConfig
     {
+        internal const string EnvVarHost = "FLAGD_HOST";
+        internal const string EnvVarPort = "FLAGD_PORT";
+        internal const string EnvVarTLS = "FLAGD_TLS";
+        internal const string EnvVarSocketPath = "FLAGD_SOCKET_PATH";
+        internal const string EnvVarCache = "FLAGD_CACHE";
+        internal const string EnvVarMaxCacheSize = "FLAGD_MAX_CACHE_SIZE";
+        internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
         internal static int CacheSizeDefault = 10;
         internal string Host
         {
@@ -38,17 +45,17 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         internal FlagdConfig()
         {
-            _host = Environment.GetEnvironmentVariable("FLAGD_HOST") ?? "localhost";
-            _port = Environment.GetEnvironmentVariable("FLAGD_PORT") ?? "8013";
-            _useTLS = bool.Parse(Environment.GetEnvironmentVariable("FLAGD_TLS") ?? "false");
-            _socketPath = Environment.GetEnvironmentVariable("FLAGD_SOCKET_PATH") ?? "";
-            var cacheStr = Environment.GetEnvironmentVariable("FLAGD_CACHE") ?? "";
+            _host = Environment.GetEnvironmentVariable(EnvVarHost) ?? "localhost";
+            _port = Environment.GetEnvironmentVariable(EnvVarPort) ?? "8013";
+            _useTLS = bool.Parse(Environment.GetEnvironmentVariable(EnvVarTLS) ?? "false");
+            _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
+            var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
             if (cacheStr.ToUpper().Equals("LRU"))
             {
                 _cache = true;
-                _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable("FLAGD_MAX_CACHE_SIZE") ?? $"{CacheSizeDefault}");
-                _maxEventStreamRetries = int.Parse(Environment.GetEnvironmentVariable("FLAGD_MAX_EVENT_STREAM_RETRIES") ?? "3");
+                _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
+                _maxEventStreamRetries = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries) ?? "3");
             }
         }
 

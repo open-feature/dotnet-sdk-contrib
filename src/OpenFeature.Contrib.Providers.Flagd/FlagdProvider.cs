@@ -14,6 +14,7 @@ using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 using System.Net.Sockets;
 using System.Net.Http;
+using System.Collections.Generic;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -340,12 +341,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     if (val.KindCase == ProtoValue.KindOneofCase.StructValue)
                     {
-                        var changedFlags = val.StructValue.Fields.AsEnumerable().GetEnumerator();
-                        while (changedFlags.MoveNext())
-                        {
-                            var flag = changedFlags.Current;
+                        val.StructValue.Fields.ToList().ForEach(flag => {
                             _cache.Delete(flag.Key);
-                        }
+                        });
                     }
                     var structVal = val.StructValue;
                 }

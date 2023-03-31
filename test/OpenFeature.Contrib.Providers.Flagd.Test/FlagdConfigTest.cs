@@ -18,7 +18,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestFlagdConfigUseTLS()
         {
             CleanEnvVars();
-            System.Environment.SetEnvironmentVariable("FLAGD_TLS", "true");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "true");
 
             var config = new FlagdConfig();
 
@@ -29,7 +29,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestFlagdConfigUnixSocket()
         {
             CleanEnvVars();
-            System.Environment.SetEnvironmentVariable("FLAGD_SOCKET_PATH", "tmp.sock");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "tmp.sock");
 
             var config = new FlagdConfig();
 
@@ -40,7 +40,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestFlagdConfigEnabledCacheDefaultCacheSize()
         {
             CleanEnvVars();
-            System.Environment.SetEnvironmentVariable("FLAGD_CACHE", "LRU");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
 
             var config = new FlagdConfig();
 
@@ -52,8 +52,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestFlagdConfigEnabledCacheApplyCacheSize()
         {
             CleanEnvVars();
-            System.Environment.SetEnvironmentVariable("FLAGD_CACHE", "LRU");
-            System.Environment.SetEnvironmentVariable("FLAGD_MAX_CACHE_SIZE", "20");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
             var config = new FlagdConfig();
 
@@ -63,10 +63,10 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
         private void CleanEnvVars()
         {
-            System.Environment.SetEnvironmentVariable("FLAGD_TLS", "");
-            System.Environment.SetEnvironmentVariable("FLAGD_SOCKET_PATH", "");
-            System.Environment.SetEnvironmentVariable("FLAGD_CACHE", "");
-            System.Environment.SetEnvironmentVariable("FLAGD_MAX_CACHE_SIZE", "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
         }
     }
 }
