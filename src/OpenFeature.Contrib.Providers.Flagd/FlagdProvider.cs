@@ -400,14 +400,24 @@ namespace OpenFeature.Contrib.Providers.Flagd
 #else
                 var handler = new HttpClientHandler();
 #endif
-                if (flagdCertPath != "")
-                {
-                    if (!File.Exists(flagdCertPath))
-                    {
-                        return null;
+                if (flagdCertPath != "") {
+#if NET5_0_OR_GREATER
+                    if (File.Exists(flagdCertPath)) {
+                        certificate = new X509Certificate2(flagdCertPath);
+                        handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
+                            // the the custom cert to the chain, Build returns a bool if valid.
+                            chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+                            chain.ChainPolicy.CustomTrustStore.Add(certificate);
+                            return chain.Build(cert);
+                        };
+                    } else {
+                        throw new ArgumentException("Specified certificate cannot be found.");
                     }
-                    certificate = new X509Certificate2(flagdCertPath);
-                    handler.ClientCertificates.Add(certificate);
+#else
+                    // Pre-NET5.0 APIs for custom CA validation are cumbersome.
+                    // Looking for additional contributions here.
+                    throw new ArgumentException("Custom certificate authorities not supported on this platform.");
+#endif
                 }
                 return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
                 {
