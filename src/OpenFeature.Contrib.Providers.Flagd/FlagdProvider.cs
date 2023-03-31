@@ -395,7 +395,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
             if (!useUnixSocket)
             {
                 var flagdCertPath = Environment.GetEnvironmentVariable("FLAGD_SERVER_CERT_PATH") ?? "";
-
+#if NET462
+                var handler = new WinHttpHandler();
+#else
+                var handler = new HttpClientHandler();
+#endif
                 if (flagdCertPath != "")
                 {
                     if (!File.Exists(flagdCertPath))
@@ -403,28 +407,12 @@ namespace OpenFeature.Contrib.Providers.Flagd
                         return null;
                     }
                     certificate = new X509Certificate2(flagdCertPath);
-
-                }
-#if NET462
-                var handler = new WinHttpHandler();
-                if (flagdCertPath != "") {
                     handler.ClientCertificates.Add(certificate);
                 }
                 return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
                 {
                     HttpHandler = handler
                 }));
-#else
-                var handler = new HttpClientHandler();
-                if (flagdCertPath != "")
-                {
-                    handler.ClientCertificates.Add(certificate);
-                }
-                return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
-                {
-                    HttpHandler = handler
-                }));
-#endif
             }
 
 #if NET5_0_OR_GREATER
