@@ -341,7 +341,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     if (val.KindCase == ProtoValue.KindOneofCase.StructValue)
                     {
-                        val.StructValue.Fields.ToList().ForEach(flag => {
+                        val.StructValue.Fields.ToList().ForEach(flag =>
+                        {
                             _cache.Delete(flag.Key);
                         });
                     }
