@@ -12,8 +12,9 @@ using OpenFeature.Flagd.Grpc;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Net.Http;
 using System.Net.Sockets;
+using System.Net.Http;
+using System.Collections.Generic;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -22,44 +23,44 @@ namespace OpenFeature.Contrib.Providers.Flagd
     /// </summary>
     public sealed class FlagdProvider : FeatureProvider
     {
+        static int EventStreamRetryBaseBackoff = 1;
+        private readonly FlagdConfig _config;
         private readonly Service.ServiceClient _client;
         private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
+
+        private readonly ICache<string, object> _cache;
+        private int _eventStreamRetries;
+        private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+
+        private System.Threading.Mutex _mtx;
 
         /// <summary>
         ///     Constructor of the provider. This constructor uses the value of the following
         ///     environment variables to initialise its client:
-        ///     FLAGD_HOST         - The host name of the flagd server (default="localhost")
-        ///     FLAGD_PORT         - The port of the flagd server (default="8013")
-        ///     FLAGD_TLS          - Determines whether to use https or not (default="false")
-        ///     FLAGD_SOCKET_PATH - Path to the unix socket (default="")
+        ///     FLAGD_HOST                     - The host name of the flagd server (default="localhost")
+        ///     FLAGD_PORT                     - The port of the flagd server (default="8013")
+        ///     FLAGD_TLS                      - Determines whether to use https or not (default="false")
+        ///     FLAGD_SOCKET_PATH              - Path to the unix socket (default="")
+        ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
+        ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
+        ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
         /// </summary>
         public FlagdProvider()
         {
-            var flagdHost = Environment.GetEnvironmentVariable("FLAGD_HOST") ?? "localhost";
-            var flagdPort = Environment.GetEnvironmentVariable("FLAGD_PORT") ?? "8013";
-            var flagdUseTLSStr = Environment.GetEnvironmentVariable("FLAGD_TLS") ?? "false";
-            var flagdSocketPath = Environment.GetEnvironmentVariable("FLAGD_SOCKET_PATH") ?? "";
+            _config = new FlagdConfig();
 
+            _client = buildClientForPlatform(_config.GetUri());
 
-            Uri uri;
-            if (flagdSocketPath != "")
+            _mtx = new System.Threading.Mutex();
+
+            if (_config.CacheEnabled)
             {
-                uri = new Uri("unix://" + flagdSocketPath);
-            }
-            else
-            {
-                var protocol = "http";
-                var useTLS = bool.Parse(flagdUseTLSStr);
-
-                if (useTLS)
+                _cache = new LRUCache<string, object>(_config.MaxCacheSize);
+                Task.Run(async () =>
                 {
-                    protocol = "https";
-                }
-
-                uri = new Uri(protocol + "://" + flagdHost + ":" + flagdPort);
+                    await HandleEvents();
+                });
             }
-
-            _client = buildClientForPlatform(uri);
         }
 
         /// <summary>
@@ -74,13 +75,27 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 throw new ArgumentNullException(nameof(url));
             }
 
+            _mtx = new System.Threading.Mutex();
+
             _client = buildClientForPlatform(url);
         }
 
+
         // just for testing, internal but visible in tests
-        internal FlagdProvider(Service.ServiceClient client)
+        internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
         {
+            _mtx = new System.Threading.Mutex();
             _client = client;
+            _config = config;
+            _cache = cache;
+
+            if (_config.CacheEnabled)
+            {
+                Task.Run(async () =>
+                {
+                    await HandleEvents();
+                });
+            }
         }
 
         /// <summary>
@@ -110,7 +125,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveBooleanResponse = await _client.ResolveBooleanAsync(new ResolveBooleanRequest
                 {
@@ -120,7 +135,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
                 return new ResolutionDetails<bool>(
                     flagKey: flagKey,
-                    value: resolveBooleanResponse.Value,
+                    value: (bool)resolveBooleanResponse.Value,
                     reason: resolveBooleanResponse.Reason,
                     variant: resolveBooleanResponse.Variant
                 );
@@ -136,7 +151,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveStringResponse = await _client.ResolveStringAsync(new ResolveStringRequest
                 {
@@ -162,7 +177,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
                 {
@@ -188,7 +203,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
                 {
@@ -214,7 +229,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(async contextStruct =>
+            return await ResolveValue(flagKey, async contextStruct =>
             {
                 var resolveObjectResponse = await _client.ResolveObjectAsync(new ResolveObjectRequest
                 {
@@ -231,11 +246,25 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }, context);
         }
 
-        private async Task<ResolutionDetails<T>> ResolveValue<T>(Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
+        private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
         {
             try
             {
+                if (_config.CacheEnabled)
+                {
+                    var value = _cache.TryGet(flagKey);
+
+                    if (value != null)
+                    {
+                        return (ResolutionDetails<T>)value;
+                    }
+                }
                 var result = await resolveDelegate.Invoke(ConvertToContext(context));
+
+                if (result.Reason.Equals("STATIC") && _config.CacheEnabled)
+                {
+                    _cache.Add(flagKey, result);
+                }
 
                 return result;
             }
@@ -263,6 +292,92 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 default:
                     return new FeatureProviderException(Constant.ErrorType.General, e.Status.Detail, e);
             }
+        }
+
+        private async Task HandleEvents()
+        {
+            while (_eventStreamRetries < _config.MaxEventStreamRetries)
+            {
+                var call = _client.EventStream(new Empty());
+                try
+                {
+                    // Read the response stream asynchronously
+                    while (await call.ResponseStream.MoveNext())
+                    {
+                        var response = call.ResponseStream.Current;
+
+                        switch (response.Type.ToLower())
+                        {
+                            case "configuration_change":
+                                HandleConfigurationChangeEvent(response.Data);
+                                break;
+                            case "provider_ready":
+                                HandleProviderReadyEvent();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
+                {
+                    // Handle the dropped connection by reconnecting and retrying the stream
+                    await HandleErrorEvent();
+                }
+            }
+        }
+
+        private void HandleConfigurationChangeEvent(Struct data)
+        {
+            // if we don't have a cache, we don't need to remove anything
+            if (!_config.CacheEnabled || !data.Fields.ContainsKey("flags"))
+            {
+                return;
+            }
+
+            try
+            {
+                if (data.Fields.TryGetValue("flags", out ProtoValue val))
+                {
+                    if (val.KindCase == ProtoValue.KindOneofCase.StructValue)
+                    {
+                        val.StructValue.Fields.ToList().ForEach(flag =>
+                        {
+                            _cache.Delete(flag.Key);
+                        });
+                    }
+                    var structVal = val.StructValue;
+                }
+            }
+            catch (Exception)
+            {
+                // purge the cache if we could not handle the configuration change event
+                _cache.Purge();
+            }
+
+        }
+
+        private void HandleProviderReadyEvent()
+        {
+            _mtx.WaitOne();
+            _eventStreamRetries = 0;
+            _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+            _mtx.ReleaseMutex();
+            _cache.Purge();
+        }
+
+        private async Task HandleErrorEvent()
+        {
+            _mtx.WaitOne();
+            _eventStreamRetries++;
+
+            if (_eventStreamRetries > _config.MaxEventStreamRetries)
+            {
+                return;
+            }
+            _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
+            _mtx.ReleaseMutex();
+            await Task.Delay(_eventStreamRetryBackoff * 1000);
         }
 
         /// <summary>
@@ -393,7 +508,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 #if NET462
                  return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
                 {
-                    HttpHandler = new WinHttpHandler()
+                    HttpHandler = new WinHttpHandler(),
                 }));
 #else
                 return new Service.ServiceClient(GrpcChannel.ForAddress(url));
@@ -412,7 +527,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
             return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
             {
-                HttpHandler = socketsHttpHandler
+                HttpHandler = socketsHttpHandler,
             }));
 #endif
             // unix socket support is not available in this dotnet version
