@@ -18,29 +18,37 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void BuildClientForPlatform_Should_Throw_Exception_When_FlagdCertPath_Not_Exists()
         {
             // Arrange
-            var url = new Uri("https://localhost:5001");
             System.Environment.SetEnvironmentVariable("FLAGD_SERVER_CERT_PATH", "non-existing-path");
+            System.Environment.SetEnvironmentVariable("FLAGD_HOST", "localhost");
+            System.Environment.SetEnvironmentVariable("FLAGD_PORT", "5001");
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => new FlagdProvider(url));
+            Assert.Throws<ArgumentException>(() => new FlagdProvider());
 
             // Cleanup
             System.Environment.SetEnvironmentVariable("FLAGD_SERVER_CERT_PATH", "");
+            System.Environment.SetEnvironmentVariable("FLAGD_HOST", "");
+            System.Environment.SetEnvironmentVariable("FLAGD_PORT", "");
         }
 
         [Fact]
         public void BuildClientForPlatform_Should_Return_Client_For_Non_Unix_Socket_Without_Certificate()
         {
             // Arrange
-            var url = new Uri("https://localhost:5001");
+            System.Environment.SetEnvironmentVariable("FLAGD_HOST", "localhost");
+            System.Environment.SetEnvironmentVariable("FLAGD_PORT", "5001");
 
             // Act
-            var flagdProvider = new FlagdProvider(url);
+            var flagdProvider = new FlagdProvider();
             var client = flagdProvider.GetClient();
 
             // Assert
             Assert.NotNull(client);
             Assert.IsType<Service.ServiceClient>(client);
+
+            // Cleanup
+            System.Environment.SetEnvironmentVariable("FLAGD_HOST", "");
+            System.Environment.SetEnvironmentVariable("FLAGD_PORT", "");
         }
 
 #if NET462
