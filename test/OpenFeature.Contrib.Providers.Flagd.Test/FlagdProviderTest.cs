@@ -18,25 +18,25 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void BuildClientForPlatform_Should_Throw_Exception_When_FlagdCertPath_Not_Exists()
         {
             // Arrange
-            System.Environment.SetEnvironmentVariable("FLAGD_SERVER_CERT_PATH", "non-existing-path");
-            System.Environment.SetEnvironmentVariable("FLAGD_HOST", "localhost");
-            System.Environment.SetEnvironmentVariable("FLAGD_PORT", "5001");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "non-existing-path");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => new FlagdProvider());
 
             // Cleanup
-            System.Environment.SetEnvironmentVariable("FLAGD_SERVER_CERT_PATH", "");
-            System.Environment.SetEnvironmentVariable("FLAGD_HOST", "");
-            System.Environment.SetEnvironmentVariable("FLAGD_PORT", "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
         }
 
         [Fact]
         public void BuildClientForPlatform_Should_Return_Client_For_Non_Unix_Socket_Without_Certificate()
         {
             // Arrange
-            System.Environment.SetEnvironmentVariable("FLAGD_HOST", "localhost");
-            System.Environment.SetEnvironmentVariable("FLAGD_PORT", "5001");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
 
             // Act
             var flagdProvider = new FlagdProvider();
@@ -47,8 +47,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.IsType<Service.ServiceClient>(client);
 
             // Cleanup
-            System.Environment.SetEnvironmentVariable("FLAGD_HOST", "");
-            System.Environment.SetEnvironmentVariable("FLAGD_PORT", "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
         }
 
 #if NET462
