@@ -61,12 +61,32 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal(20, config.MaxCacheSize);
         }
 
+        [Fact]
+        public void TestFlagdConfigSetCertificatePath()
+        {
+            CleanEnvVars();
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "/cert/path");
+
+            var config = new FlagdConfig();
+
+            Assert.Equal("/cert/path", config.CertificatePath);
+            Assert.True(config.UseCertificate);
+
+            CleanEnvVars();
+
+            config = new FlagdConfig();
+
+            Assert.Equal("", config.CertificatePath);
+            Assert.False(config.UseCertificate);
+        }
+
         private void CleanEnvVars()
         {
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "");
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
         }
     }
 }

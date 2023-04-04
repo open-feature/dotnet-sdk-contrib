@@ -8,6 +8,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal const string EnvVarHost = "FLAGD_HOST";
         internal const string EnvVarPort = "FLAGD_PORT";
         internal const string EnvVarTLS = "FLAGD_TLS";
+        internal const string EnvCertPart = "FLAGD_SERVER_CERT_PATH";
         internal const string EnvVarSocketPath = "FLAGD_SOCKET_PATH";
         internal const string EnvVarCache = "FLAGD_CACHE";
         internal const string EnvVarMaxCacheSize = "FLAGD_MAX_CACHE_SIZE";
@@ -29,6 +30,17 @@ namespace OpenFeature.Contrib.Providers.Flagd
             get { return _maxCacheSize; }
         }
 
+        internal bool UseCertificate
+        {
+            get { return _cert.Length > 0; }
+        }
+
+        internal string CertificatePath
+        {
+            get { return _cert; }
+            set { _cert = value; }
+        }
+
         internal int MaxEventStreamRetries
         {
             get { return _maxEventStreamRetries; }
@@ -38,6 +50,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private string _host;
         private string _port;
         private bool _useTLS;
+        private string _cert;
         private string _socketPath;
         private bool _cache;
         private int _maxCacheSize;
@@ -48,6 +61,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _host = Environment.GetEnvironmentVariable(EnvVarHost) ?? "localhost";
             _port = Environment.GetEnvironmentVariable(EnvVarPort) ?? "8013";
             _useTLS = bool.Parse(Environment.GetEnvironmentVariable(EnvVarTLS) ?? "false");
+            _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
             _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
             var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 

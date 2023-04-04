@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
 
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -40,6 +43,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     FLAGD_HOST                     - The host name of the flagd server (default="localhost")
         ///     FLAGD_PORT                     - The port of the flagd server (default="8013")
         ///     FLAGD_TLS                      - Determines whether to use https or not (default="false")
+        ///     FLAGD_FLAGD_SERVER_CERT_PATH   - The path to the client certificate (default="")
         ///     FLAGD_SOCKET_PATH              - Path to the unix socket (default="")
         ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
         ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
@@ -49,7 +53,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             _config = new FlagdConfig();
 
-            _client = buildClientForPlatform(_config.GetUri());
+            _client = BuildClientForPlatform(_config.GetUri());
 
             _mtx = new System.Threading.Mutex();
 
@@ -77,7 +81,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             _mtx = new System.Threading.Mutex();
 
-            _client = buildClientForPlatform(url);
+            _client = BuildClientForPlatform(url);
         }
 
 
@@ -499,20 +503,41 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
 
-        private static Service.ServiceClient buildClientForPlatform(Uri url)
+        private Service.ServiceClient BuildClientForPlatform(Uri url)
         {
             var useUnixSocket = url.ToString().StartsWith("unix://");
 
             if (!useUnixSocket)
             {
 #if NET462
-                 return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
-                {
-                    HttpHandler = new WinHttpHandler(),
-                }));
+                var handler = new WinHttpHandler();
 #else
-                return new Service.ServiceClient(GrpcChannel.ForAddress(url));
+                var handler = new HttpClientHandler();
 #endif
+                if (_config.UseCertificate)
+                {
+#if NET5_0_OR_GREATER
+                    if (File.Exists(_config.CertificatePath)) {
+                        X509Certificate2 certificate = new X509Certificate2(_config.CertificatePath);
+                        handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
+                            // the the custom cert to the chain, Build returns a bool if valid.
+                            chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+                            chain.ChainPolicy.CustomTrustStore.Add(certificate);
+                            return chain.Build(cert);
+                        };
+                    } else {
+                        throw new ArgumentException("Specified certificate cannot be found.");
+                    }
+#else
+                    // Pre-NET5.0 APIs for custom CA validation are cumbersome.
+                    // Looking for additional contributions here.
+                    throw new ArgumentException("Custom certificate authorities not supported on this platform.");
+#endif
+                }
+                return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+                {
+                    HttpHandler = handler
+                }));
             }
 
 #if NET5_0_OR_GREATER
