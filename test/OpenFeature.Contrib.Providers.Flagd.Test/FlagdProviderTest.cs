@@ -6,14 +6,54 @@ using Google.Protobuf.WellKnownTypes;
 using OpenFeature.Error;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 using System.Collections.Generic;
-using System.Linq;
 using OpenFeature.Model;
 using System.Threading;
+using System;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
     public class UnitTestFlagdProvider
     {
+        [Fact]
+        public void BuildClientForPlatform_Should_Throw_Exception_When_FlagdCertPath_Not_Exists()
+        {
+            // Arrange
+            var url = new Uri("https://localhost:5001");
+            System.Environment.SetEnvironmentVariable("FLAGD_SERVER_CERT_PATH", "non-existing-path");
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => new FlagdProvider(url));
+
+            // Cleanup
+            System.Environment.SetEnvironmentVariable("FLAGD_SERVER_CERT_PATH", "");
+        }
+
+        [Fact]
+        public void BuildClientForPlatform_Should_Return_Client_For_Non_Unix_Socket_Without_Certificate()
+        {
+            // Arrange
+            var url = new Uri("https://localhost:5001");
+
+            // Act
+            var flagdProvider = new FlagdProvider(url);
+            var client = flagdProvider.GetClient();
+
+            // Assert
+            Assert.NotNull(client);
+            Assert.IsType<Service.ServiceClient>(client);
+        }
+
+#if NET462
+        [Fact]
+        public void BuildClientForPlatform_Should_Throw_Exception_For_Unsupported_DotNet_Version()
+        {
+            // Arrange
+            var url = new Uri("unix:///var/run/flagd.sock");
+
+            // Act & Assert
+            Assert.Throws<Exception>(() => new FlagdProvider(url));
+        }
+#endif
         [Fact]
         public void TestGetProviderName()
         {

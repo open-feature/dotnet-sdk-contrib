@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
 
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -505,14 +508,36 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             if (!useUnixSocket)
             {
+                var flagdCertPath = Environment.GetEnvironmentVariable("FLAGD_SERVER_CERT_PATH") ?? "";
 #if NET462
-                 return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
-                {
-                    HttpHandler = new WinHttpHandler(),
-                }));
+                var handler = new WinHttpHandler();
 #else
-                return new Service.ServiceClient(GrpcChannel.ForAddress(url));
+                var handler = new HttpClientHandler();
 #endif
+                if (flagdCertPath != "")
+                {
+#if NET5_0_OR_GREATER
+                    if (File.Exists(flagdCertPath)) {
+                        X509Certificate2 certificate = new X509Certificate2(flagdCertPath);
+                        handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
+                            // the the custom cert to the chain, Build returns a bool if valid.
+                            chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+                            chain.ChainPolicy.CustomTrustStore.Add(certificate);
+                            return chain.Build(cert);
+                        };
+                    } else {
+                        throw new ArgumentException("Specified certificate cannot be found.");
+                    }
+#else
+                    // Pre-NET5.0 APIs for custom CA validation are cumbersome.
+                    // Looking for additional contributions here.
+                    throw new ArgumentException("Custom certificate authorities not supported on this platform.");
+#endif
+                }
+                return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+                {
+                    HttpHandler = handler
+                }));
             }
 
 #if NET5_0_OR_GREATER
