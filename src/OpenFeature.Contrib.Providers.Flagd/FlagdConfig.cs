@@ -3,7 +3,10 @@ using System;
 namespace OpenFeature.Contrib.Providers.Flagd
 
 {
-    internal class FlagdConfig
+    /// <summary>
+    ///     FlagdConfig is the configuration object for flagD.
+    /// </summary>
+    public class FlagdConfig
     {
         internal const string EnvVarHost = "FLAGD_HOST";
         internal const string EnvVarPort = "FLAGD_PORT";

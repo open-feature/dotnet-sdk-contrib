@@ -79,6 +79,17 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
+        public void TestGetProviderWithConfig()
+        {
+            var config = new FlagdConfig();
+            var flagdProvider = new FlagdProvider(config);
+
+            var client = flagdProvider.GetClient();
+
+            Assert.NotNull(client);
+        }
+
+        [Fact]
         public void TestResolveBooleanValue()
         {
             var resp = new ResolveBooleanResponse();

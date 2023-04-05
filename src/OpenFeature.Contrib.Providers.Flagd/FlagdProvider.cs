@@ -84,6 +84,33 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _client = BuildClientForPlatform(url);
         }
 
+        /// <summary>
+        ///     Constructor of the provider.
+        ///     <param name="config">The FlagdConfig object</param>
+        ///     <exception cref="ArgumentNullException">if no config object is provided.</exception>
+        /// </summary>
+        public FlagdProvider(FlagdConfig config)
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            _config = config;
+
+            _client = BuildClientForPlatform(_config.GetUri());
+
+            _mtx = new System.Threading.Mutex();
+
+            if (_config.CacheEnabled)
+            {
+                _cache = new LRUCache<string, object>(_config.MaxCacheSize);
+                Task.Run(async () =>
+                {
+                    await HandleEvents();
+                });
+            }
+        }
 
         // just for testing, internal but visible in tests
         internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
