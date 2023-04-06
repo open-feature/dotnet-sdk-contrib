@@ -129,6 +129,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
 
+        // just for testing, internal but visible in tests
+        internal FlagdConfig GetConfig() => _config;
+
         /// <summary>
         /// Get the provider name.
         /// </summary>
