@@ -5,7 +5,7 @@ using OpenFeature.Error;
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag.exception
 {
     /// <summary>
-    ///     Exception throw when we don't have a specific case.
+    ///     Exception throw when we are not authorized to call the API in the relay proxy.
     /// </summary>
     public class UnauthorizedError : FeatureProviderException
     {
