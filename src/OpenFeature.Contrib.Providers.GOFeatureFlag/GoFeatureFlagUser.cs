@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 using OpenFeature.Model;
 
@@ -15,17 +14,17 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         private const string KeyField = "targetingKey";
 
         /// <summary>
-        ///   The targeting key for the user.
+        ///     The targeting key for the user.
         /// </summary>
         public string Key { get; private set; }
 
         /// <summary>
-        ///   Is the user Anonymous.
+        ///     Is the user Anonymous.
         /// </summary>
         public bool Anonymous { get; private set; }
 
         /// <summary>
-        ///   Additional Custom Data to pass to GO Feature Flag.
+        ///     Additional Custom Data to pass to GO Feature Flag.
         /// </summary>
         public Dictionary<string, object> Custom { get; private set; }
 
