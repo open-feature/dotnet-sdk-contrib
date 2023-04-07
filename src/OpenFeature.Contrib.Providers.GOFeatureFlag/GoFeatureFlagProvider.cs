@@ -264,7 +264,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                 throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
-                throw new UnauthorizedError("invalid api key, impossible to authenticate the provider");
+                throw new UnauthorizedError("invalid token used to contact GO Feature Flag relay proxy instance");
 
             if (response.StatusCode >= HttpStatusCode.BadRequest)
                 throw new GeneralError("impossible to contact GO Feature Flag relay proxy instance");
