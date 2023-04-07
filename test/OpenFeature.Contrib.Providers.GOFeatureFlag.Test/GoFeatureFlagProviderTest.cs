@@ -150,7 +150,7 @@ public class GoFeatureFlagProviderTest
         Assert.Equal(ErrorType.General, res.Result.ErrorType);
         Assert.Equal(Reason.Error, res.Result.Reason);
     }
-    
+
     [Fact]
     private void should_have_bad_request_if_no_token()
     {
@@ -168,7 +168,7 @@ public class GoFeatureFlagProviderTest
         Assert.Equal(Reason.Error, res.Result.Reason);
         Assert.Equal(ErrorType.General, res.Result.ErrorType);
     }
-    
+
     [Fact]
     private void should_have_unauthorized_if_invalid_token()
     {
@@ -177,7 +177,7 @@ public class GoFeatureFlagProviderTest
             Endpoint = baseUrl,
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
-            ApiKey  = "ff877c7a-4594-43b5-89a8-df44c9984bd8"
+            ApiKey = "ff877c7a-4594-43b5-89a8-df44c9984bd8"
         });
         Api.Instance.SetProvider(g);
         var client = Api.Instance.GetClient("test-client");

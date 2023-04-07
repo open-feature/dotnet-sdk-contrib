@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -64,9 +65,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             _serializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
             if (options.ApiKey != null)
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiKey);
-            }
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", options.ApiKey);
         }
 
         /// <summary>
@@ -186,7 +186,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
-                return new ResolutionDetails<double>(flagKey, double.Parse(resp.value.ToString(), System.Globalization.CultureInfo.InvariantCulture), ErrorType.None,
+                return new ResolutionDetails<double>(flagKey,
+                    double.Parse(resp.value.ToString(), CultureInfo.InvariantCulture), ErrorType.None,
                     resp.reason, resp.variationType);
             }
             catch (FormatException e)
@@ -264,7 +265,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
                 throw new UnauthorizedError("invalid api key, impossible to authenticate the provider");
-            
+
             if (response.StatusCode >= HttpStatusCode.BadRequest)
                 throw new GeneralError("impossible to contact GO Feature Flag relay proxy instance");
 
