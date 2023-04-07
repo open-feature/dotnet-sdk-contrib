@@ -24,6 +24,8 @@ public class GoFeatureFlagProviderTest
         const string mediaType = "application/json";
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When($"{prefixEval}fail_500{suffixEval}").Respond(HttpStatusCode.InternalServerError);
+        mockHttp.When($"{prefixEval}api_key_missing{suffixEval}").Respond(HttpStatusCode.BadRequest);
+        mockHttp.When($"{prefixEval}invalid_api_key{suffixEval}").Respond(HttpStatusCode.Unauthorized);
         mockHttp.When($"{prefixEval}flag_not_found{suffixEval}").Respond(HttpStatusCode.NotFound);
         mockHttp.When($"{prefixEval}bool_targeting_match{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":true}");
@@ -147,6 +149,43 @@ public class GoFeatureFlagProviderTest
         Assert.False(res.Result.Value);
         Assert.Equal(ErrorType.General, res.Result.ErrorType);
         Assert.Equal(Reason.Error, res.Result.Reason);
+    }
+    
+    [Fact]
+    private void should_have_bad_request_if_no_token()
+    {
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = _mockHttp,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
+        });
+        Api.Instance.SetProvider(g);
+        var client = Api.Instance.GetClient("test-client");
+        var res = client.GetBooleanDetails("api_key_missing", false, _defaultEvaluationCtx);
+        Assert.NotNull(res.Result);
+        Assert.False(res.Result.Value);
+        Assert.Equal(Reason.Error, res.Result.Reason);
+        Assert.Equal(ErrorType.General, res.Result.ErrorType);
+    }
+    
+    [Fact]
+    private void should_have_unauthorized_if_invalid_token()
+    {
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = _mockHttp,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
+            ApiKey  = "ff877c7a-4594-43b5-89a8-df44c9984bd8"
+        });
+        Api.Instance.SetProvider(g);
+        var client = Api.Instance.GetClient("test-client");
+        var res = client.GetBooleanDetails("invalid_api_key", false, _defaultEvaluationCtx);
+        Assert.NotNull(res.Result);
+        Assert.False(res.Result.Value);
+        Assert.Equal(Reason.Error, res.Result.Reason);
+        Assert.Equal(ErrorType.General, res.Result.ErrorType);
     }
 
     [Fact]

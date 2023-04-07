@@ -62,6 +62,11 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApplicationJson));
             _httpClient.BaseAddress = new Uri(options.Endpoint);
             _serializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+            if (options.ApiKey != null)
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiKey);
+            }
         }
 
         /// <summary>
@@ -257,6 +262,9 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             if (response.StatusCode == HttpStatusCode.NotFound)
                 throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+                throw new UnauthorizedError("invalid api key, impossible to authenticate the provider");
+            
             if (response.StatusCode >= HttpStatusCode.BadRequest)
                 throw new GeneralError("impossible to contact GO Feature Flag relay proxy instance");
 
