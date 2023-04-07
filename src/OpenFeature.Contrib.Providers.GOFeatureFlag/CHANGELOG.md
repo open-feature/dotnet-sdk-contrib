@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.3...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.4) (2023-04-07)
+
+
+### Features
+
+* Support apiKey for GO Feature Flag relay proxy v1.7.0 ([#59](https://github.com/open-feature/dotnet-sdk-contrib/issues/59)) ([74eb627](https://github.com/open-feature/dotnet-sdk-contrib/commit/74eb627c28cd9c7cafc37e2ac735f43a35eca12b))
+
 ## [0.1.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.2...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.3) (2023-03-27)
 
 
