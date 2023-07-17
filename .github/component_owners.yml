@@ -1,0 +1,13 @@
+# Keep all in alphabetical order
+components:
+  src/OpenFeature.Contrib.Hooks.Otel:
+    - bacherfl
+    - toddbaert
+  src/OpenFeature.Contrib.Providers.Flagd:
+    - bacherfl
+    - toddbaert
+  src/OpenFeature.Contrib.Providers.GOFeatureFlag:
+    - thomaspoignant
+
+ignored-authors:
+  - renovate-bot
