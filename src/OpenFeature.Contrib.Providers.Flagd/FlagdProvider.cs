@@ -333,7 +333,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             while (_eventStreamRetries < _config.MaxEventStreamRetries)
             {
-                var call = _client.EventStream(new EventStreamRequest());
+                var call = _client.EventStream(new Empty());
                 try
                 {
                     // Read the response stream asynchronously
@@ -533,8 +533,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     return new Value();
             }
         }
-
-        
 
         private Service.ServiceClient BuildClientForPlatform(Uri url)
         {
