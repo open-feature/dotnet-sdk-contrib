@@ -559,7 +559,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                         };
 #elif NET462_OR_GREATER
                         handler.ServerCertificateValidationCallback = (message, cert, chain, errors) => {
-                            if ((errors & SslPolicyErrors.None) > 0) { return true; }
+                            if (errors == SslPolicyErrors.None) { return true; }
 
                             chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
 
