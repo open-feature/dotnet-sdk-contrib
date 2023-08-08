@@ -89,6 +89,7 @@ The URI of the flagd server to which the `flagd Provider` connects to can either
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
 
+Note that if you are on `NET462` through `NET48` as the target framework for your project, you are required to enable TLS and supply a certificate path as part of your configuration.  This is a limitation Microsoft has [documented](https://learn.microsoft.com/en-us/aspnet/core/grpc/netstandard?view=aspnetcore-7.0#net-framework).
 
 If you rely on the environment variables listed above, you can use the empty constructor which then configures the provider accordingly:
 

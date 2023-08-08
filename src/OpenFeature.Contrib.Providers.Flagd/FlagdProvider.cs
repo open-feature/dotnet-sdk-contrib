@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -539,30 +540,49 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             if (!useUnixSocket)
             {
-#if NET462
+#if NET462_OR_GREATER
                 var handler = new WinHttpHandler();
 #else
                 var handler = new HttpClientHandler();
 #endif
                 if (_config.UseCertificate)
                 {
-#if NET5_0_OR_GREATER
-                    if (File.Exists(_config.CertificatePath)) {
+                    if (File.Exists(_config.CertificatePath))
+                    {
                         X509Certificate2 certificate = new X509Certificate2(_config.CertificatePath);
+#if NET5_0_OR_GREATER
                         handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
                             // the the custom cert to the chain, Build returns a bool if valid.
                             chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
                             chain.ChainPolicy.CustomTrustStore.Add(certificate);
                             return chain.Build(cert);
                         };
-                    } else {
+#elif NET462_OR_GREATER
+                        handler.ServerCertificateValidationCallback = (message, cert, chain, errors) => {
+                            if (errors == SslPolicyErrors.None) { return true; }
+
+                            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
+
+                            chain.ChainPolicy.ExtraStore.Add(certificate);
+
+                            var isChainValid = chain.Build(cert);
+
+                            if (!isChainValid) { return false; }
+
+                            var isValid = chain.ChainElements
+                                .Cast<X509ChainElement>()
+                                .Any(x => x.Certificate.RawData.SequenceEqual(certificate.GetRawCertData()));
+
+                            return isValid;
+                        };
+#else
+                        throw new ArgumentException("Custom Certificates are not supported on your platform");
+#endif
+                    }
+                    else
+                    {
                         throw new ArgumentException("Specified certificate cannot be found.");
                     }
-#else
-                    // Pre-NET5.0 APIs for custom CA validation are cumbersome.
-                    // Looking for additional contributions here.
-                    throw new ArgumentException("Custom certificate authorities not supported on this platform.");
-#endif
                 }
                 return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
                 {
