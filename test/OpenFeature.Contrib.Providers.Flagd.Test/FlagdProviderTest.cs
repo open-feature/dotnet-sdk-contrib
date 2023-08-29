@@ -528,108 +528,105 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         //     mockGrpcClient.VerifyAll();
         // }
         //
-        // [Fact]
-        // public void TestCacheInvalidation()
-        // {
-        //     var resp = new ResolveBooleanResponse();
-        //     resp.Value = true;
-        //     resp.Reason = "STATIC";
-        //
-        //     var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
-        //         System.Threading.Tasks.Task.FromResult(resp),
-        //         System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
-        //         () => Status.DefaultSuccess,
-        //         () => new Grpc.Core.Metadata(),
-        //         () => { });
-        //
-        //     var mockGrpcClient = Substitute.For<Service.ServiceClient>();
-        //     mockGrpcClient
-        //         .Setup(m => m.ResolveBooleanAsync(
-        //             Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None))
-        //         .Returns(grpcResp);
-        //
-        //     var asyncStreamReader = Substitute.For<IAsyncStreamReader<EventStreamResponse>>();
-        //
-        //     var configurationChangeData = new Struct();
-        //     var changedFlag = new Struct();
-        //     changedFlag.Fields.Add("my-key", new Google.Protobuf.WellKnownTypes.Value());
-        //     configurationChangeData.Fields.Add("flags", ProtoValue.ForStruct(changedFlag));
-        //
-        //
-        //     var firstCall = true;
-        //
-        //     asyncStreamReader.Setup(a => a.MoveNext(Arg.Any<System.Threading.CancellationToken>())).ReturnsAsync(() => true);
-        //     // as long as we did not send our first request to the provider, we will not send a configuration_change event
-        //     // after the value of the flag has been retrieved the first time, we will send a configuration_change to test if the
-        //     // item is deleted from the cache
-        //
-        //     // create an autoResetEvent which we will wait for in our test verification
-        //     AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
-        //
-        //     asyncStreamReader.Setup(a => a.Current).Returns(
-        //         () =>
-        //         {
-        //             if (firstCall)
-        //             {
-        //                 return new EventStreamResponse
-        //                 {
-        //                     Type = "provider_ready"
-        //                 };
-        //             }
-        //             return new EventStreamResponse
-        //             {
-        //                 Type = "configuration_change",
-        //                 Data = configurationChangeData
-        //             };
-        //         }
-        //     );
-        //
-        //     var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
-        //         asyncStreamReader.Object,
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         null
-        //     );
-        //
-        //     mockGrpcClient
-        //         .Setup(m => m.EventStream(
-        //             Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None))
-        //         .Returns(() =>
-        //         {
-        //             return grpcEventStreamResp;
-        //         });
-        //
-        //     var mockCache = Substitute.For<ICache<string, object>>();
-        //     mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(() => null);
-        //     mockCache.Setup(c => c.Add(It.Is<string>(s => s == "my-key"), Arg.Any<object>()));
-        //     mockCache.Setup(c => c.Delete(It.Is<string>(s => s == "my-key"))).Callback(() =>
-        //     {
-        //         // set the autoResetEvent since this path should be the last one that's reached in the background task
-        //         _autoResetEvent.Set();
-        //     });
-        //
-        //
-        //     var config = new FlagdConfig();
-        //     config.CacheEnabled = true;
-        //     config.MaxEventStreamRetries = 1;
-        //     var flagdProvider = new FlagdProvider(mockGrpcClient.Object, config, mockCache.Object);
-        //
-        //     // resolve with default set to false to make sure we return what the grpc server gives us
-        //     var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
-        //     Assert.True(val.Result.Value);
-        //
-        //     // set firstCall to true to make the mock EventStream return a configuration_change event
-        //     firstCall = false;
-        //
-        //     val = flagdProvider.ResolveBooleanValue("my-key", false, null);
-        //     Assert.True(val.Result.Value);
-        //
-        //     Assert.True(_autoResetEvent.WaitOne(10000));
-        //
-        //     mockCache.VerifyAll();
-        //     mockGrpcClient.VerifyAll();
-        // }
+        [Fact]
+        public void TestCacheInvalidation()
+        {
+            var resp = new ResolveBooleanResponse();
+            resp.Value = true;
+            resp.Reason = "STATIC";
+        
+            var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
+                System.Threading.Tasks.Task.FromResult(resp),
+                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                () => Status.DefaultSuccess,
+                () => new Grpc.Core.Metadata(),
+                () => { });
+        
+            var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+            mockGrpcClient.ResolveBooleanAsync(
+                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None)
+                .Returns(grpcResp);
+        
+            var asyncStreamReader = Substitute.For<IAsyncStreamReader<EventStreamResponse>>();
+        
+            var configurationChangeData = new Struct();
+            var changedFlag = new Struct();
+            changedFlag.Fields.Add("my-key", new Google.Protobuf.WellKnownTypes.Value());
+            configurationChangeData.Fields.Add("flags", ProtoValue.ForStruct(changedFlag));
+        
+        
+            var firstCall = true;
+        
+            asyncStreamReader.MoveNext(Arg.Any<System.Threading.CancellationToken>()).Returns(true);
+            // as long as we did not send our first request to the provider, we will not send a configuration_change event
+            // after the value of the flag has been retrieved the first time, we will send a configuration_change to test if the
+            // item is deleted from the cache
+        
+            // create an autoResetEvent which we will wait for in our test verification
+            AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
+        
+            asyncStreamReader.Current.Returns(
+                _ =>
+                {
+                    if (firstCall)
+                    {
+                        return new EventStreamResponse
+                        {
+                            Type = "provider_ready"
+                        };
+                    }
+                    return new EventStreamResponse
+                    {
+                        Type = "configuration_change",
+                        Data = configurationChangeData
+                    };
+                }
+            );
+        
+            var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
+                asyncStreamReader,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+        
+            mockGrpcClient.EventStream(
+                    Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None)
+                .Returns(grpcEventStreamResp);
+        
+            var mockCache = Substitute.For<ICache<string, object>>();
+            mockCache.TryGet(It.Is<string>(s => s == "my-key")).Returns(null);
+            mockCache.Add(It.Is<string>(s => s == "my-key"), Arg.Any<object>());
+            mockCache.When(x => x.Delete("my-key")).Do(_ =>
+            {
+                // set the autoResetEvent since this path should be the last one that's reached in the background task
+                _autoResetEvent.Set();
+            });
+        
+        
+            var config = new FlagdConfig();
+            config.CacheEnabled = true;
+            config.MaxEventStreamRetries = 1;
+            var flagdProvider = new FlagdProvider(mockGrpcClient, config, mockCache);
+        
+            // resolve with default set to false to make sure we return what the grpc server gives us
+            var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            Assert.True(val.Result.Value);
+        
+            // set firstCall to true to make the mock EventStream return a configuration_change event
+            firstCall = false;
+        
+            val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            Assert.True(val.Result.Value);
+        
+            Assert.True(_autoResetEvent.WaitOne(10000));
+
+            mockCache.Received(2).TryGet("my-key");
+            mockCache.Received(2).Add("my-key", Arg.Any<object>());
+            mockCache.Received().Delete("my-key");
+            mockGrpcClient.Received(1).EventStream(Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None);
+        }
     }
 }
