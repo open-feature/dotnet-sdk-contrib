@@ -1,5 +1,4 @@
 using Xunit;
-using Moq;
 using OpenFeature.Flagd.Grpc;
 using Grpc.Core;
 using Google.Protobuf.WellKnownTypes;
@@ -596,8 +595,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 .Returns(grpcEventStreamResp);
         
             var mockCache = Substitute.For<ICache<string, object>>();
-            mockCache.TryGet(It.Is<string>(s => s == "my-key")).Returns(null);
-            mockCache.Add(It.Is<string>(s => s == "my-key"), Arg.Any<object>());
+            mockCache.TryGet(Arg.Is<string>(s => s == "my-key")).Returns(null);
+            mockCache.Add(Arg.Is<string>(s => s == "my-key"), Arg.Any<object>());
             mockCache.When(x => x.Delete("my-key")).Do(_ =>
             {
                 // set the autoResetEvent since this path should be the last one that's reached in the background task
