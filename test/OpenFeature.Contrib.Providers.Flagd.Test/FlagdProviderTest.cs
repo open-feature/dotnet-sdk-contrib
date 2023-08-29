@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using OpenFeature.Model;
 using System.Threading;
 using System;
+using NSubstitute;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
@@ -130,13 +131,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 () => new Grpc.Core.Metadata(),
                 () => { });
 
-            var mockGrpcClient = new Mock<Service.ServiceClient>();
-            mockGrpcClient
-                .Setup(m => m.ResolveBooleanAsync(
-                    It.IsAny<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None))
+            var substituteGrpcClient = Substitute.For<Service.ServiceClient>();
+            substituteGrpcClient
+                .ResolveBooleanAsync(
+                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient.Object, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(substituteGrpcClient, new FlagdConfig());
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
