@@ -465,69 +465,68 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockCache.Received(1).Add(Arg.Is<string>(s => s == "my-key"), Arg.Any<object>());
             mockGrpcClient.Received(1).EventStream(Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None);
         }
-        //
-        // [Fact]
-        // public void TestCacheHit()
-        // {
-        //
-        //     var mockGrpcClient = Substitute.For<Service.ServiceClient>();
-        //
-        //     var asyncStreamReader = Substitute.For<IAsyncStreamReader<EventStreamResponse>>();
-        //
-        //     var l = new List<EventStreamResponse>
-        //     {
-        //         new EventStreamResponse{
-        //             Type = "provider_ready"
-        //         }
-        //     };
-        //
-        //     var enumerator = l.GetEnumerator();
-        //
-        //     // create an autoResetEvent which we will wait for in our test verification
-        //     AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
-        //
-        //     asyncStreamReader.Setup(a => a.MoveNext(Arg.Any<System.Threading.CancellationToken>())).ReturnsAsync(() => enumerator.MoveNext());
-        //     asyncStreamReader.Setup(a => a.Current).Returns(() =>
-        //     {
-        //         // set the autoResetEvent since this path should be the last one that's reached in the background task
-        //         _autoResetEvent.Set();
-        //         return enumerator.Current;
-        //     });
-        //
-        //     var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
-        //         asyncStreamReader.Object,
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         null
-        //     );
-        //
-        //     mockGrpcClient
-        //         .Setup(m => m.EventStream(
-        //             Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None))
-        //         .Returns(grpcEventStreamResp);
-        //
-        //     var mockCache = Substitute.For<ICache<string, object>>();
-        //     mockCache.Setup(c => c.TryGet(It.Is<string>(s => s == "my-key"))).Returns(
-        //         () => new ResolutionDetails<bool>("my-key", true)
-        //     );
-        //
-        //     var config = new FlagdConfig();
-        //     config.CacheEnabled = true;
-        //     config.MaxEventStreamRetries = 1;
-        //     var flagdProvider = new FlagdProvider(mockGrpcClient.Object, config, mockCache.Object);
-        //
-        //     // resolve with default set to false to make sure we return what the grpc server gives us
-        //     var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
-        //     Assert.True(val.Result.Value);
-        //
-        //     // wait for the autoReset event to be fired before verifying the invocation of the mocked functions
-        //     Assert.True(_autoResetEvent.WaitOne(10000));
-        //     mockCache.VerifyAll();
-        //     mockGrpcClient.VerifyAll();
-        // }
-        //
+        
+        [Fact]
+        public void TestCacheHit()
+        {
+        
+            var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+        
+            var asyncStreamReader = Substitute.For<IAsyncStreamReader<EventStreamResponse>>();
+        
+            var l = new List<EventStreamResponse>
+            {
+                new EventStreamResponse{
+                    Type = "provider_ready"
+                }
+            };
+        
+            var enumerator = l.GetEnumerator();
+        
+            // create an autoResetEvent which we will wait for in our test verification
+            AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
+        
+            asyncStreamReader.MoveNext(Arg.Any<System.Threading.CancellationToken>()).Returns(enumerator.MoveNext());
+            asyncStreamReader.Current.Returns(_ =>
+            {
+                // set the autoResetEvent since this path should be the last one that's reached in the background task
+                _autoResetEvent.Set();
+                return enumerator.Current;
+            });
+        
+            var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(
+                asyncStreamReader,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+        
+            mockGrpcClient.EventStream(
+                    Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None)
+                .Returns(grpcEventStreamResp);
+        
+            var mockCache = Substitute.For<ICache<string, object>>();
+            mockCache.TryGet("my-key").Returns(new ResolutionDetails<bool>("my-key", true));
+        
+            var config = new FlagdConfig
+            {
+                CacheEnabled = true,
+                MaxEventStreamRetries = 1
+            };
+            var flagdProvider = new FlagdProvider(mockGrpcClient, config, mockCache);
+        
+            // resolve with default set to false to make sure we return what the grpc server gives us
+            var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            Assert.True(val.Result.Value);
+        
+            // wait for the autoReset event to be fired before verifying the invocation of the mocked functions
+            Assert.True(_autoResetEvent.WaitOne(10000));
+            mockCache.Received(1).TryGet("my-key");
+            mockGrpcClient.Received(1).EventStream(Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None);
+        }
+        
         [Fact]
         public void TestCacheInvalidation()
         {
