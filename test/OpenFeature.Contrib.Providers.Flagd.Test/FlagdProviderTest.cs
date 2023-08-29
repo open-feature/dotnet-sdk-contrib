@@ -121,8 +121,10 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestResolveBooleanValue()
         {
-            var resp = new ResolveBooleanResponse();
-            resp.Value = true;
+            var resp = new ResolveBooleanResponse
+            {
+                Value = true
+            };
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
                 System.Threading.Tasks.Task.FromResult(resp),
@@ -148,8 +150,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestResolveStringValue()
         {
-            var resp = new ResolveStringResponse();
-            resp.Value = "my-value";
+            var resp = new ResolveStringResponse { Value = "my-value" };
 
             var grpcResp = new AsyncUnaryCall<ResolveStringResponse>(
                 System.Threading.Tasks.Task.FromResult(resp),
@@ -158,13 +159,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 () => new Grpc.Core.Metadata(),
                 () => { });
 
-            var mockGrpcClient = new Mock<Service.ServiceClient>();
-            mockGrpcClient
-                .Setup(m => m.ResolveStringAsync(
-                    It.IsAny<ResolveStringRequest>(), null, null, System.Threading.CancellationToken.None))
+            var subGrpcClient = Substitute.For<Service.ServiceClient>();
+
+            subGrpcClient.ResolveStringAsync(
+                    Arg.Any<ResolveStringRequest>(), null, null, System.Threading.CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient.Object, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(subGrpcClient, new FlagdConfig());
 
             var val = flagdProvider.ResolveStringValue("my-key", "", null);
 
@@ -174,8 +175,10 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestResolveIntegerValue()
         {
-            var resp = new ResolveIntResponse();
-            resp.Value = 10;
+            var resp = new ResolveIntResponse
+            {
+                Value = 10
+            };
 
             var grpcResp = new AsyncUnaryCall<ResolveIntResponse>(
                 System.Threading.Tasks.Task.FromResult(resp),
@@ -184,13 +187,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 () => new Grpc.Core.Metadata(),
                 () => { });
 
-            var mockGrpcClient = new Mock<Service.ServiceClient>();
-            mockGrpcClient
-                .Setup(m => m.ResolveIntAsync(
-                    It.IsAny<ResolveIntRequest>(), null, null, System.Threading.CancellationToken.None))
+            var subGrpcClient = Substitute.For<Service.ServiceClient>();
+            subGrpcClient.ResolveIntAsync(Arg.Any<ResolveIntRequest>(), null, null, System.Threading.CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient.Object, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(subGrpcClient, new FlagdConfig());
 
             var val = flagdProvider.ResolveIntegerValue("my-key", 0, null);
 
