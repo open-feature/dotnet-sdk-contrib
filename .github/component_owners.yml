@@ -1,5 +1,6 @@
 # Keep all in alphabetical order
 components:
+  # src/
   src/OpenFeature.Contrib.Hooks.Otel:
     - bacherfl
     - toddbaert
@@ -7,6 +8,16 @@ components:
     - bacherfl
     - toddbaert
   src/OpenFeature.Contrib.Providers.GOFeatureFlag:
+    - thomaspoignant
+
+  # test/
+  test/OpenFeature.Contrib.Hooks.Otel.Test:
+    - bacherfl
+    - toddbaert
+  test/OpenFeature.Contrib.Providers.Flagd.Test:
+    - bacherfl
+    - toddbaert
+  test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test:
     - thomaspoignant
 
 ignored-authors:
