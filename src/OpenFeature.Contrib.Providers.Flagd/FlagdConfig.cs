@@ -78,6 +78,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
         
         internal FlagdConfig(Uri url)
         {
+            if (url == null)
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+            
             _host = url.Host;
             _port = url.Port.ToString();
             _useTLS = url.Scheme.ToLower().Equals("https");
