@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
@@ -78,6 +79,80 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             Assert.Equal("", config.CertificatePath);
             Assert.False(config.UseCertificate);
+        }
+
+        [Fact]
+        public void TestFlagdConfigFromUriHttp()
+        {
+            CleanEnvVars();
+            var config = new FlagdConfig(new Uri("http://domain:8123"));
+
+            Assert.False(config.CacheEnabled);
+            Assert.Equal(new System.Uri("http://domain:8123"), config.GetUri());
+        }
+        
+        [Fact]
+        public void TestFlagdConfigFromUriHttps()
+        {
+            CleanEnvVars();
+            var config = new FlagdConfig(new Uri("https://domain:8123"));
+
+            Assert.False(config.CacheEnabled);
+            Assert.Equal(new System.Uri("https://domain:8123"), config.GetUri());
+        }
+        
+        [Fact]
+        public void TestFlagdConfigFromUriUnix()
+        {
+            CleanEnvVars();
+            var config = new FlagdConfig(new Uri("unix:///var/run/tmp.sock/"));
+
+            Assert.False(config.CacheEnabled);
+            Assert.Equal(new System.Uri("unix:///var/run/tmp.sock/"), config.GetUri());
+        }
+        
+        [Fact]
+        public void TestFlagdConfigFromUriSetCertificatePath()
+        {
+            CleanEnvVars();
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "/cert/path");
+
+            var config = new FlagdConfig(new Uri("http://localhost:8013"));
+
+            Assert.Equal("/cert/path", config.CertificatePath);
+            Assert.True(config.UseCertificate);
+
+            CleanEnvVars();
+
+            config = new FlagdConfig(new Uri("http://localhost:8013"));
+
+            Assert.Equal("", config.CertificatePath);
+            Assert.False(config.UseCertificate);
+        }
+        
+        [Fact]
+        public void TestFlagdConfigFromUriEnabledCacheDefaultCacheSize()
+        {
+            CleanEnvVars();
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
+
+            var config = new FlagdConfig(new Uri("http://localhost:8013"));
+
+            Assert.True(config.CacheEnabled);
+            Assert.Equal(FlagdConfig.CacheSizeDefault, config.MaxCacheSize);
+        }
+        
+        [Fact]
+        public void TestFlagdConfigFromUriEnabledCacheApplyCacheSize()
+        {
+            CleanEnvVars();
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
+
+            var config = new FlagdConfig(new Uri("http://localhost:8013"));
+
+            Assert.True(config.CacheEnabled);
+            Assert.Equal(20, config.MaxCacheSize);
         }
 
         private void CleanEnvVars()

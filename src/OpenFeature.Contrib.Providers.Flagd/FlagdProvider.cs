@@ -69,7 +69,12 @@ namespace OpenFeature.Contrib.Providers.Flagd
         }
 
         /// <summary>
-        ///     Constructor of the provider.
+        ///     Constructor of the provider. This constructor uses the value of the following
+        ///     environment variables to initialise its client:
+        ///     FLAGD_FLAGD_SERVER_CERT_PATH   - The path to the client certificate (default="")
+        ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
+        ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
+        ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
         ///     <param name="url">The URL of the flagD server</param>
         ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
         /// </summary>
@@ -79,10 +84,21 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 throw new ArgumentNullException(nameof(url));
             }
+            
+            _config = new FlagdConfig(url);
 
             _mtx = new System.Threading.Mutex();
 
             _client = BuildClientForPlatform(url);
+            
+            if (_config.CacheEnabled)
+            {
+                _cache = new LRUCache<string, object>(_config.MaxCacheSize);
+                Task.Run(async () =>
+                {
+                    await HandleEvents();
+                });
+            }
         }
 
         /// <summary>
@@ -610,4 +626,3 @@ namespace OpenFeature.Contrib.Providers.Flagd
         }
     }
 }
-
