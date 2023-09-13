@@ -118,6 +118,44 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
+        public void TestGetProviderWithUri()
+        {
+            // Set env variables (should be used by the constructor)
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
+
+            // Set env variables (should be ignored by the constructor)
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost111");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "false");
+
+            // Create provider, which ignores the env vars and uses the config
+            var flagdProvider = new FlagdProvider(new Uri("https://localhost:8013"));
+
+            // Client should no be nil
+            var client = flagdProvider.GetClient();
+            Assert.NotNull(client);
+
+            // Retrieve config for assertions
+            var config = flagdProvider.GetConfig();
+
+            // Assert
+            Assert.Equal("", config.CertificatePath);
+            Assert.Equal(new Uri("https://localhost:8013"), config.GetUri());
+            Assert.True(config.CacheEnabled);
+            Assert.Equal(20, config.MaxCacheSize);
+
+            // Cleanup
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
+            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
+        }
+
+        [Fact]
         public void TestResolveBooleanValue()
         {
             var resp = new ResolveBooleanResponse

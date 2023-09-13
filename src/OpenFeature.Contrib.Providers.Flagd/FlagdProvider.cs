@@ -50,39 +50,22 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
         ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
         /// </summary>
-        public FlagdProvider()
+        public FlagdProvider() : this(new FlagdConfig())
         {
-            _config = new FlagdConfig();
-
-            _client = BuildClientForPlatform(_config.GetUri());
-
-            _mtx = new System.Threading.Mutex();
-
-            if (_config.CacheEnabled)
-            {
-                _cache = new LRUCache<string, object>(_config.MaxCacheSize);
-                Task.Run(async () =>
-                {
-                    await HandleEvents();
-                });
-            }
         }
 
         /// <summary>
-        ///     Constructor of the provider.
+        ///     Constructor of the provider. This constructor uses the value of the following
+        ///     environment variables to initialise its client:
+        ///     FLAGD_FLAGD_SERVER_CERT_PATH   - The path to the client certificate (default="")
+        ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
+        ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
+        ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
         ///     <param name="url">The URL of the flagD server</param>
         ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
         /// </summary>
-        public FlagdProvider(Uri url)
+        public FlagdProvider(Uri url) : this(new FlagdConfig(url))
         {
-            if (url == null)
-            {
-                throw new ArgumentNullException(nameof(url));
-            }
-
-            _mtx = new System.Threading.Mutex();
-
-            _client = BuildClientForPlatform(url);
         }
 
         /// <summary>
@@ -610,4 +593,3 @@ namespace OpenFeature.Contrib.Providers.Flagd
         }
     }
 }
-
