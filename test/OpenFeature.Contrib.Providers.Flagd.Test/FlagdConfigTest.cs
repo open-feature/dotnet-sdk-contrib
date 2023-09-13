@@ -90,7 +90,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.False(config.CacheEnabled);
             Assert.Equal(new System.Uri("http://domain:8123"), config.GetUri());
         }
-        
+
         [Fact]
         public void TestFlagdConfigFromUriHttps()
         {
@@ -100,7 +100,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.False(config.CacheEnabled);
             Assert.Equal(new System.Uri("https://domain:8123"), config.GetUri());
         }
-        
+
         [Fact]
         public void TestFlagdConfigFromUriUnix()
         {
@@ -110,7 +110,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.False(config.CacheEnabled);
             Assert.Equal(new System.Uri("unix:///var/run/tmp.sock/"), config.GetUri());
         }
-        
+
         [Fact]
         public void TestFlagdConfigFromUriSetCertificatePath()
         {
@@ -129,7 +129,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("", config.CertificatePath);
             Assert.False(config.UseCertificate);
         }
-        
+
         [Fact]
         public void TestFlagdConfigFromUriEnabledCacheDefaultCacheSize()
         {
@@ -141,7 +141,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.True(config.CacheEnabled);
             Assert.Equal(FlagdConfig.CacheSizeDefault, config.MaxCacheSize);
         }
-        
+
         [Fact]
         public void TestFlagdConfigFromUriEnabledCacheApplyCacheSize()
         {

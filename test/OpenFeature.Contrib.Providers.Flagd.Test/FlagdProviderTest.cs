@@ -116,7 +116,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
         }
-        
+
         [Fact]
         public void TestGetProviderWithUri()
         {
@@ -124,7 +124,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
-            
+
             // Set env variables (should be ignored by the constructor)
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost111");
             System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
