@@ -76,6 +76,28 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
 
+        internal FlagdConfig(Uri url)
+        {
+            if (url == null)
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
+            _host = url.Host;
+            _port = url.Port.ToString();
+            _useTLS = url.Scheme.ToLower().Equals("https");
+            _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
+            _socketPath = url.Scheme.ToLower().Equals("unix") ? url.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "";
+            var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
+
+            if (cacheStr.ToUpper().Equals("LRU"))
+            {
+                _cache = true;
+                _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
+                _maxEventStreamRetries = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries) ?? "3");
+            }
+        }
+
         internal Uri GetUri()
         {
             Uri uri;
