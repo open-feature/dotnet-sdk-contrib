@@ -5,27 +5,28 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0E563821-BD08-4B7F-BF9D-395CAD80F026}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagd", "src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj", "{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Providers.Flagd", "src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj", "{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Hooks.Otel", "src\OpenFeature.Contrib.Hooks.Otel\OpenFeature.Contrib.Hooks.Otel.csproj", "{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Hooks.Otel", "src\OpenFeature.Contrib.Hooks.Otel\OpenFeature.Contrib.Hooks.Otel.csproj", "{82D10BAE-F1EE-432A-BD5D-DECAD07A84FE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Hooks.Otel.Test", "test\OpenFeature.Contrib.Hooks.Otel.Test\OpenFeature.Contrib.Hooks.Otel.Test.csproj", "{199FA48A-06EF-4E15-8206-C095D1455A99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Hooks.Otel.Test", "test\OpenFeature.Contrib.Hooks.Otel.Test\OpenFeature.Contrib.Hooks.Otel.Test.csproj", "{199FA48A-06EF-4E15-8206-C095D1455A99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagd.Test", "test\OpenFeature.Contrib.Providers.Flagd.Test\OpenFeature.Contrib.Providers.Flagd.Test.csproj", "{206323A0-7334-4723-8394-C31C150B95DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Providers.Flagd.Test", "test\OpenFeature.Contrib.Providers.Flagd.Test\OpenFeature.Contrib.Providers.Flagd.Test.csproj", "{206323A0-7334-4723-8394-C31C150B95DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.GOFeatureFlag", "src\OpenFeature.Contrib.Providers.GOFeatureFlag\OpenFeature.Contrib.Providers.GOFeatureFlag.csproj", "{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Providers.GOFeatureFlag", "src\OpenFeature.Contrib.Providers.GOFeatureFlag\OpenFeature.Contrib.Providers.GOFeatureFlag.csproj", "{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.GOFeatureFlag.Test", "test\OpenFeature.Contrib.Providers.GOFeatureFlag.Test\OpenFeature.Contrib.Providers.GOFeatureFlag.Test.csproj", "{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Providers.GOFeatureFlag.Test", "test\OpenFeature.Contrib.Providers.GOFeatureFlag.Test\OpenFeature.Contrib.Providers.GOFeatureFlag.Test.csproj", "{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Providers.Flagsmith", "src\OpenFeature.Contrib.Providers.Flagsmith\OpenFeature.Contrib.Providers.Flagsmith.csproj", "{47008BEE-7888-4B9B-8884-712A922C3F9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagsmith.Test", "test\OpenFeature.Contrib.Providers.Flagsmith.Test\OpenFeature.Contrib.Providers.Flagsmith.Test.csproj", "{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -52,6 +53,17 @@ Global
 		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47008BEE-7888-4B9B-8884-712A922C3F9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47008BEE-7888-4B9B-8884-712A922C3F9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47008BEE-7888-4B9B-8884-712A922C3F9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47008BEE-7888-4B9B-8884-712A922C3F9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6F8FF25A-F22B-4083-B3F9-B4B9BB6FB699} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
@@ -60,5 +72,7 @@ Global
 		{206323A0-7334-4723-8394-C31C150B95DC} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
 		{F7BE205B-0375-4EC5-9B18-FAFEF7A78D71} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
 		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
+		{47008BEE-7888-4B9B-8884-712A922C3F9B} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
+		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
 	EndGlobalSection
 EndGlobal

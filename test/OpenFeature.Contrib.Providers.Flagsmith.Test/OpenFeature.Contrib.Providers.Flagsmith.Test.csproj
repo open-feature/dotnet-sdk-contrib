@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Flagsmith\OpenFeature.Contrib.Providers.Flagsmith.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Flagsmith" Version="5.1.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+</Project>

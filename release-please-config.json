@@ -31,6 +31,16 @@
       "extra-files": [
         "OpenFeature.Contrib.Providers.GOFeatureFlag.csproj"
       ]
+    },
+    "src/OpenFeature.Contrib.Providers.Flagsmith": {
+      "package-name": "OpenFeature.Contrib.Providers.Flagsmith",
+      "release-type": "simple",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "versioning": "default",
+      "extra-files": [
+        "OpenFeature.Contrib.Providers.Flagsmith.csproj"
+      ]
     }
   },
   "changelog-sections": [
