@@ -25,6 +25,6 @@
     -->
     <MicrosoftSourceLinkGitHubPkgVer>[1.0.0,2.0)</MicrosoftSourceLinkGitHubPkgVer>
     <!-- 0.5+ -->
-    <OpenFeatureVer>[0.5,)</OpenFeatureVer>
+    <OpenFeatureVer>[1.2,)</OpenFeatureVer>
   </PropertyGroup>
 </Project>
