@@ -132,28 +132,6 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public async Task GetBooleanValue_ForDisabledFeatureWithValidFormat_ReturnDefaultValue()
-        {
-            // Arrange
-            var flagsmithClient = Substitute.For<IFlagsmithClient>();
-            var flags = Substitute.For<IFlags>();
-            flags.GetFeatureValue("example-feature").Returns("false");
-            flags.IsFeatureEnabled("example-feature").Returns(false);
-            flagsmithClient.GetEnvironmentFlags().Returns(flags);
-
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
-
-            // Act
-            var result = await flagsmithProvider.ResolveBooleanValue("example-feature", true);
-
-            // Assert
-            Assert.True(result.Value);
-            Assert.Equal("example-feature", result.FlagKey);
-            Assert.Equal(Reason.Disabled, result.Reason);
-            Assert.Equal(ErrorType.None, result.ErrorType);
-        }
-
-        [Fact]
         public async Task GetBooleanValue_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
         {
             // Arrange
@@ -163,7 +141,10 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(flagsmithClient)
+            {
+                UsingBooleanConfigValue = true
+            };
 
             // Act and Assert
             await Assert.ThrowsAsync<TypeMismatchException>( () =>  flagsmithProvider.ResolveBooleanValue("example-feature", true));
