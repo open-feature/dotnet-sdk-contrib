@@ -125,10 +125,10 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
         }
 
         /// <summary>
-        ///     convertValue is converting the object return by the proxy response in the right type.
+        ///     convertValue is converting the dynamically typed object received from Flagsmith into the correct type
         /// </summary>
-        /// <param name="node">The value we have received</param>
-        /// <returns>A converted object</returns>
+        /// <param name="node">The dynamically typed value we received from Flagsmith</param>
+        /// <returns>A correctly typed object representing the flag value</returns>
         private Value ConvertValue(JsonNode node)
         {
             if (node == null)
