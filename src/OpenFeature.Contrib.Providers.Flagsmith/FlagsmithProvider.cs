@@ -23,9 +23,18 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
         internal readonly IFlagsmithClient _flagsmithClient;
 
         /// <summary>
-        /// Key that will be used as identity for Flagsmith requests. Default value is "targetingKey"
+        /// Key that will be used as identity for Flagsmith requests. Default: "targetingKey"
         /// </summary>
         public string TargetingKey { get; set; } = "targetingKey";
+
+        /// <summary>
+        /// Determines whether to resolve a feature value as a boolean or use
+        /// the isFeatureEnabled as the flag itself. These values will be false
+        /// and true respectively.
+        /// Default: false
+        /// </summary>
+        public bool UsingBooleanConfigValue { get; set; }
+
         /// <summary>
         /// Creates new instance of <see cref="FlagsmithProvider"/>
         /// </summary>
@@ -70,17 +79,24 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
             var isFlagEnabled = await flags.IsFeatureEnabled(flagKey);
             if (!isFlagEnabled)
             {
-                return new ResolutionDetails<T>(flagKey, defaultValue, reason: Reason.Disabled);
+                return new(flagKey, defaultValue, reason: Reason.Disabled);
             }
 
             var stringValue = await flags.GetFeatureValue(flagKey);
 
             if (tryParse(stringValue, out var parsedValue))
             {
-                return new ResolutionDetails<T>(flagKey, parsedValue);
+                return new(flagKey, parsedValue);
             }
             throw new TypeMismatchException("Failed to parse value in the expected type");
 
+        }
+
+        private async Task<ResolutionDetails<bool>> IsFeatureEnabled(string flagKey, EvaluationContext context)
+        {
+            var flags = await GetFlags(context);
+            var isFeatureEnabled =  await flags.IsFeatureEnabled(flagKey);
+            return new(flagKey, isFeatureEnabled);
         }
 
 
@@ -90,7 +106,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
         /// <inheritdoc/>
 
         public override Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
-            => ResolveValue(flagKey, defaultValue, bool.TryParse, context);
+            => UsingBooleanConfigValue
+            ? ResolveValue(flagKey, defaultValue, bool.TryParse, context)
+            : IsFeatureEnabled(flagKey, context);
 
         /// <inheritdoc/>
         public override Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
@@ -141,25 +159,25 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
                     var convertedValue = ConvertValue(item);
                     if (convertedValue != null) arr.Add(convertedValue);
                 }
-                return new Value(arr);
+                return new(arr);
             }
 
             if (node is JsonObject jsonObject)
             {
                 var dict = jsonObject.ToDictionary(x => x.Key, x => ConvertValue(x.Value));
 
-                return new Value(new Structure(dict));
+                return new(new Structure(dict));
             }
 
             if (node.AsValue().TryGetValue<JsonElement>(out var jsonElement))
             {
                 if (jsonElement.ValueKind == JsonValueKind.False || jsonElement.ValueKind == JsonValueKind.True)
-                    return new Value(jsonElement.GetBoolean());
+                    return new(jsonElement.GetBoolean());
                 if (jsonElement.ValueKind == JsonValueKind.Number)
-                    return new Value(jsonElement.GetDouble());
+                    return new(jsonElement.GetDouble());
 
                 if (jsonElement.ValueKind == JsonValueKind.String)
-                    return new Value(jsonElement.ToString());
+                    return new(jsonElement.ToString());
             }
             return null;
         }

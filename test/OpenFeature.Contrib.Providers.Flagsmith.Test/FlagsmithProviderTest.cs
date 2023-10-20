@@ -82,25 +82,52 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             Assert.Equal(ErrorType.None, result.ErrorType);
         }
 
-        [Fact]
-        public async Task GetBooleanValue_ForEnabledFeatureWithValidFormat_ReturnCorrectValue()
+
+        [Theory]
+        [InlineData(true, true, "true", true, null, true)]
+        [InlineData(false, true, "true", true, null, true)]
+        [InlineData(true, false, "true", true, null, true)]
+        [InlineData(false, false, "true", true, null, true)]
+        [InlineData(true, true, "false", true, null, false)]
+        [InlineData(false, true, "false", true, null, false)]
+        [InlineData(true, false, "false", true, null, true)]
+        [InlineData(false, false, "false", true, null, true)]
+
+        [InlineData(true, true, "true", false, "DISABLED", true)]
+        [InlineData(false, true, "true", false, "DISABLED", false)]
+        [InlineData(true, false, "true", false, null, false)]
+        [InlineData(false, false, "true", false, null, false)]
+        [InlineData(true, true, "false", false, "DISABLED", true)]
+        [InlineData(false, true, "false", false, "DISABLED", false)]
+        [InlineData(true, false, "false", false, null, false)]
+        [InlineData(false, false, "false", false, null, false)]
+        public async Task GetBooleanValue_ForEnabledFeatureWithValidFormatAndSettedConfigValue_ReturnExpectedResult(
+            bool defaultValue,
+            bool enabledValueConfig,
+            string settedValue,
+            bool featureEnabled,
+            string expectedReason,
+            bool expectedResult)
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
             var flags = Substitute.For<IFlags>();
-            flags.GetFeatureValue("example-feature").Returns("true");
-            flags.IsFeatureEnabled("example-feature").Returns(true);
+            flags.GetFeatureValue("example-feature").Returns(settedValue);
+            flags.IsFeatureEnabled("example-feature").Returns(featureEnabled);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(flagsmithClient)
+            {
+                UsingBooleanConfigValue = enabledValueConfig,
+            };
 
             // Act
-            var result = await flagsmithProvider.ResolveBooleanValue("example-feature", false);
+            var result = await flagsmithProvider.ResolveBooleanValue("example-feature", defaultValue);
 
             // Assert
-            Assert.True(result.Value);
+            Assert.Equal(expectedResult, result.Value);
             Assert.Equal("example-feature", result.FlagKey);
-            Assert.Null(result.Reason);
+            Assert.Equal(expectedReason, result.Reason);
             Assert.Equal(ErrorType.None, result.ErrorType);
         }
 
@@ -422,11 +449,4 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveStructureValue("example-feature", defaultObject));
         }
     }
-
-    public class ExampleConfig
-    {
-        public string ExampleText { get; set; }
-        public int ExampleInt {  get; set; }
-    }
-
 }
