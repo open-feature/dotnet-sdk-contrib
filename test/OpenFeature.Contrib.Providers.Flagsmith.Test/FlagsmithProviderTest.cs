@@ -25,7 +25,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         };
 
         [Fact]
-        public void CreateFlagmithProvider_WithValidCredetials_CreatesInstanceSuccessfully()
+        public void CreateFlagmithProvider_WithValidCredentials_CreatesProviderInstanceSuccessfully()
         {
             // Arrange
             var config = GetDefaultFlagsmithConfiguration();
@@ -39,7 +39,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public void CreateFlagmithProvider_WithValidCredetialsAndCustomHttpClient_CreatesInstanceSuccessfully()
+        public void CreateFlagmithProvider_WithValidCredentialsAndCustomHttpClient_CreatesProviderInstanceSuccessfully()
         {
             // Arrange
             var config = GetDefaultFlagsmithConfiguration();
@@ -190,7 +190,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public async Task GetDoubleValue_ForEnabledFeatureWithWrongFormatValue_ReturnDefaultValue()
+        public async Task GetDoubleValue_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -298,7 +298,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public async Task GetIntValue_ForEnabledFeatureWithWrongFormatValue_ReturnDefaultValue()
+        public async Task GetIntValue_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -406,7 +406,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public async Task GetStructureValue_ForEnabledFeatureWithWrongFormatValue_ReturnDefaultValue()
+        public async Task GetStructureValue_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
