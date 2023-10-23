@@ -9,6 +9,10 @@ components:
     - toddbaert
   src/OpenFeature.Contrib.Providers.GOFeatureFlag:
     - thomaspoignant
+  src/OpenFeature.Contrib.Providers.Flagsmith:
+    - vpetrusevici
+    - matthewelwell
+    - novakzaballa
 
   # test/
   test/OpenFeature.Contrib.Hooks.Otel.Test:
@@ -19,6 +23,10 @@ components:
     - toddbaert
   test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test:
     - thomaspoignant
+  test/OpenFeature.Contrib.Providers.Flagsmith.Test:
+    - vpetrusevici
+    - matthewelwell
+    - novakzaballa
 
 ignored-authors:
   - renovate-bot
