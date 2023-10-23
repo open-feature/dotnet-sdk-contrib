@@ -24,14 +24,19 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             Retries = 1
         };
 
+        private static FlagsmithProviderConfiguration GetDefaultFlagsmithProviderConfigurationConfiguration() => new()
+        {
+            
+        };
         [Fact]
         public void CreateFlagmithProvider_WithValidCredentials_CreatesProviderInstanceSuccessfully()
         {
             // Arrange
             var config = GetDefaultFlagsmithConfiguration();
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
             // Act
-            var flagsmithProvider = new FlagsmithProvider(config);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, config);
 
 
             // Assert
@@ -43,9 +48,10 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         {
             // Arrange
             var config = GetDefaultFlagsmithConfiguration();
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
             using var httpClient = new HttpClient();
             // Act
-            var flagsmithProvider = new FlagsmithProvider(config, httpClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, config, httpClient);
 
 
             // Assert
@@ -62,7 +68,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("true");
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count == 7 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             var contextBuilder = EvaluationContext.Builder()
                 .Set("key1", "value")
@@ -115,11 +123,10 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns(settedValue);
             flags.IsFeatureEnabled("example-feature").Returns(featureEnabled);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+            providerConfig.UsingBooleanConfigValue = enabledValueConfig;
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient)
-            {
-                UsingBooleanConfigValue = enabledValueConfig,
-            };
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var result = await flagsmithProvider.ResolveBooleanValue("example-feature", defaultValue);
@@ -141,10 +148,10 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient)
-            {
-                UsingBooleanConfigValue = true
-            };
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+            providerConfig.UsingBooleanConfigValue = true;
+
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
             await Assert.ThrowsAsync<TypeMismatchException>( () =>  flagsmithProvider.ResolveBooleanValue("example-feature", true));
@@ -161,8 +168,10 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("32.334");
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var result = await flagsmithProvider.ResolveDoubleValue("example-feature", 32.22);
@@ -184,8 +193,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("4112");
             flags.IsFeatureEnabled("example-feature").Returns(false);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var result = await flagsmithProvider.ResolveDoubleValue("example-feature", -32.22);
@@ -206,8 +216,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("hreni");
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
             await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveDoubleValue("example-feature", 2222.22133));
@@ -224,8 +235,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("example");
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var result = await flagsmithProvider.ResolveStringValue("example-feature", "example");
@@ -247,8 +259,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("4112");
             flags.IsFeatureEnabled("example-feature").Returns(false);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var result = await flagsmithProvider.ResolveStringValue("example-feature", "3333a");
@@ -270,8 +283,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("232");
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var result = await flagsmithProvider.ResolveIntegerValue("example-feature", 32);
@@ -292,8 +306,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("4112");
             flags.IsFeatureEnabled("example-feature").Returns(false);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var result = await flagsmithProvider.ResolveIntegerValue("example-feature", -32);
@@ -314,8 +329,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("hreni");
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
             await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveIntegerValue("example-feature", 2222));
@@ -358,8 +374,9 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns(expectedValue);
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var defaultObject = new Value(Structure.Empty);
@@ -401,7 +418,8 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
 
             var defaultObject = new Value("default");
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
             var result = await flagsmithProvider.ResolveStructureValue("example-feature", defaultObject);
@@ -424,7 +442,8 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
 
             var defaultObject = new Value("default");
-            var flagsmithProvider = new FlagsmithProvider(flagsmithClient);
+            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
             await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveStructureValue("example-feature", defaultObject));

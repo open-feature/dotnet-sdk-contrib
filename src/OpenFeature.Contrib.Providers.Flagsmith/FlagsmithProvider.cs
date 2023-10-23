@@ -23,50 +23,49 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
         internal readonly IFlagsmithClient _flagsmithClient;
 
         /// <summary>
-        /// Key that will be used as identity for Flagsmith requests. Default: "targetingKey"
+        /// Settings for Flagsmith Open feature provider
         /// </summary>
-        public string TargetingKey { get; set; } = "targetingKey";
+        public IFlagsmithProviderConfiguration Configuration { get; }
 
-        /// <summary>
-        /// Determines whether to resolve a feature value as a boolean or use
-        /// the isFeatureEnabled as the flag itself. These values will be false
-        /// and true respectively.
-        /// Default: false
-        /// </summary>
-        public bool UsingBooleanConfigValue { get; set; }
 
         /// <summary>
         /// Creates new instance of <see cref="FlagsmithProvider"/>
         /// </summary>
-        /// <param name="options">Flagsmith client options. You can just use <see cref="FlagsmithConfiguration"/> class</param>
-        public FlagsmithProvider(IFlagsmithConfiguration options)
+        /// <param name="providerOptions">Open feature provider options. You can just use <see cref="FlagsmithProviderConfiguration"/> class </param>
+        /// <param name="flagsmithOptions">Flagsmith client options. You can just use <see cref="FlagsmithConfiguration"/> class</param>
+        public FlagsmithProvider(IFlagsmithProviderConfiguration providerOptions, IFlagsmithConfiguration flagsmithOptions)
         {
-            _flagsmithClient = new FlagsmithClient(options);
+            Configuration = providerOptions;
+            _flagsmithClient = new FlagsmithClient(flagsmithOptions);
         }
 
         /// <summary>
         /// Creates new instance of <see cref="FlagsmithProvider"/>
         /// </summary>
-        /// <param name="options">Flagsmith client options. You can just use <see cref="FlagsmithConfiguration"/> class</param>
+        /// <param name="flagsmithOptions">Flagsmith client options. You can just use <see cref="FlagsmithConfiguration"/> class</param>
+        /// <param name="providerOptions">Open feature provider options. You can just use <see cref="FlagsmithProviderConfiguration"/> class </param>
         /// <param name="httpClient">Http client that will be used for flagsmith requests. You also can use it to register <see cref="FeatureProvider"/> as Typed HttpClient with <see cref="FeatureProvider"> as abstraction</see></param>
-        public FlagsmithProvider(IFlagsmithConfiguration options, HttpClient httpClient)
+        public FlagsmithProvider(IFlagsmithProviderConfiguration providerOptions, IFlagsmithConfiguration flagsmithOptions, HttpClient httpClient)
         {
-            _flagsmithClient = new FlagsmithClient(options, httpClient);
+            Configuration = providerOptions;
+            _flagsmithClient = new FlagsmithClient(flagsmithOptions, httpClient);
         }
 
 
         /// <summary>
         /// Creates new instance of <see cref="FlagsmithProvider"/>
         /// </summary>
+        /// <param name="providerOptions">Open feature provider options. You can just use <see cref="FlagsmithProviderConfiguration"/> class </param>
         /// <param name="flagsmithClient">Precreated Flagsmith client. You can just use <see cref="FlagsmithClient"/> class.</param>
-        public FlagsmithProvider(IFlagsmithClient flagsmithClient)
+        public FlagsmithProvider(IFlagsmithProviderConfiguration providerOptions, IFlagsmithClient flagsmithClient)
         {
+            Configuration = providerOptions;
             _flagsmithClient = flagsmithClient;
         }
 
         private Task<IFlags> GetFlags(EvaluationContext ctx)
         {
-            var key = ctx?.GetValue(TargetingKey)?.AsString;
+            var key = ctx?.GetValue(Configuration.TargetingKey)?.AsString;
             return string.IsNullOrEmpty(key)
                 ? _flagsmithClient.GetEnvironmentFlags()
                 : _flagsmithClient.GetIdentityFlags(key, ctx.AsDictionary().Select(x => new Trait(x.Key, x.Value.AsObject) as ITrait).ToList());
@@ -106,7 +105,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
         /// <inheritdoc/>
 
         public override Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
-            => UsingBooleanConfigValue
+            => Configuration.UsingBooleanConfigValue
             ? ResolveValue(flagKey, defaultValue, bool.TryParse, context)
             : IsFeatureEnabled(flagKey, context);
 
