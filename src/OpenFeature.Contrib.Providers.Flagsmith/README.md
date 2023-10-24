@@ -25,7 +25,7 @@ NuGet\Install-Package OpenFeature.Contrib.Providers.Flagsmith
 ### Packet cli
 
 ```shell
-paket add OpenFeature.Contrib.Providers.Flagsmith
+packet add OpenFeature.Contrib.Providers.Flagsmith
 ```
 
 ### Cake
