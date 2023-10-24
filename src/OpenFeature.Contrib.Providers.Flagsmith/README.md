@@ -1,4 +1,4 @@
-# Flagsmith Feature Flag .NET Provider
+# Flagsmith .NET Provider
 
 The Flagsmith provider allows you to connect to your Flagsmith instance through the OpenFeature SDK
 
