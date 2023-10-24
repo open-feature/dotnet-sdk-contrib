@@ -17,7 +17,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
     /// FlagsmithProvider is the .NET provider implementation for the feature flag solution Flagsmith.
     /// </summary>
     public class FlagsmithProvider : FeatureProvider
-    {   
+    {
         private readonly static Metadata Metadata = new("Flagsmith Provider");
         delegate bool TryParseDelegate<T>(string value, out T x);
         internal readonly IFlagsmithClient _flagsmithClient;
@@ -94,7 +94,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
         private async Task<ResolutionDetails<bool>> IsFeatureEnabled(string flagKey, EvaluationContext context)
         {
             var flags = await GetFlags(context);
-            var isFeatureEnabled =  await flags.IsFeatureEnabled(flagKey);
+            var isFeatureEnabled = await flags.IsFeatureEnabled(flagKey);
             return new(flagKey, isFeatureEnabled);
         }
 

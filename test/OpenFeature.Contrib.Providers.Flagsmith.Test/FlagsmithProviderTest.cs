@@ -14,7 +14,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
 {
     public class UnitTestFlagsmithProvider
     {
-        private static FlagsmithConfiguration GetDefaultFlagsmithConfiguration() => new ()
+        private static FlagsmithConfiguration GetDefaultFlagsmithConfiguration() => new()
         {
             ApiUrl = "https://edge.api.flagsmith.com/api/v1/",
             EnvironmentKey = string.Empty,
@@ -24,10 +24,8 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             Retries = 1
         };
 
-        private static FlagsmithProviderConfiguration GetDefaultFlagsmithProviderConfigurationConfiguration() => new()
-        {
-            
-        };
+        private static FlagsmithProviderConfiguration GetDefaultFlagsmithProviderConfigurationConfiguration() => new();
+
         [Fact]
         public void CreateFlagmithProvider_WithValidCredentials_CreatesProviderInstanceSuccessfully()
         {
@@ -154,8 +152,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
-            await Assert.ThrowsAsync<TypeMismatchException>( () =>  flagsmithProvider.ResolveBooleanValue("example-feature", true));
-
+            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveBooleanValue("example-feature", true));
         }
 
 
@@ -168,7 +165,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             flags.GetFeatureValue("example-feature").Returns("32.334");
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
-            
+
             var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
 
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
@@ -343,10 +340,12 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
             var flags = Substitute.For<IFlags>();
+
+            #pragma warning disable format
             var expectedValue =
                 """
                 {
-                  "glossary": {
+                    "glossary": {
                     "title": "example glossary",
                     "GlossDiv": {
                       "title": "S",
@@ -371,6 +370,8 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
                   }
                 }
                 """;
+            #pragma warning restore format
+
             flags.GetFeatureValue("example-feature").Returns(expectedValue);
             flags.IsFeatureEnabled("example-feature").Returns(true);
             flagsmithClient.GetEnvironmentFlags().Returns(flags);
