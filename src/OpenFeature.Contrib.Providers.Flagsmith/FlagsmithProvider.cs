@@ -65,8 +65,13 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
 
         private Task<IFlags> GetFlags(EvaluationContext ctx)
         {
-            var key = ctx?.GetValue(Configuration.TargetingKey)?.AsString;
-            return string.IsNullOrEmpty(key)
+            string key = null;
+            if(ctx != null && ctx.TryGetValue(Configuration.TargetingKey, out var value))
+            {
+                key = value?.AsString;
+            }
+
+            return  string.IsNullOrEmpty(key)
                 ? _flagsmithClient.GetEnvironmentFlags()
                 : _flagsmithClient.GetIdentityFlags(key, ctx.AsDictionary().Select(x => new Trait(x.Key, x.Value.AsObject) as ITrait).ToList());
         }
