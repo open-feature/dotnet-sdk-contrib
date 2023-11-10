@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard20</TargetFrameworks>
     <PackageId>OpenFeature.Contrib.Providers.Flagsmith</PackageId>
-    <VersionNumber>0.1.1</VersionNumber>
+    <VersionNumber>0.1.0</VersionNumber>
     <!--x-release-please-version -->
     <Version>$(VersionNumber)</Version>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
