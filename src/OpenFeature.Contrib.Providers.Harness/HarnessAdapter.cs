@@ -28,7 +28,7 @@ public static class HarnessAdapter
             flagKey,
             defaultValue);
     }
-    
+
     /// <summary>
     /// Convert the OpenFeature EvaluationContext to a harness target.
     /// </summary>
@@ -41,13 +41,13 @@ public static class HarnessAdapter
         {
             return null;
         }
-        
+
         // Get the name, if it is missing or empty return null
         if (context.TryGetValue("name", out var name) != true || name.IsString != true)
         {
             return null;
         }
-        
+
         // Create a target (different targets can get different results based on rules)
         // TODO we need to deal with target attributes
         //  .Attributes(new Dictionary<string, string>(){{"email", "demo@harness.io"}})
@@ -56,8 +56,8 @@ public static class HarnessAdapter
             .Identifier(identifier.AsString)
             .build();
         return target;
-        
+
     }
-    
-    
+
+
 }

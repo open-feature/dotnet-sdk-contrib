@@ -13,9 +13,9 @@ public class Provider : FeatureProvider
 {
     private const string HarnessProviderName = "Harness Provider";
 
-    private readonly Metadata _metadata = new (HarnessProviderName);
+    private readonly Metadata _metadata = new(HarnessProviderName);
     private readonly ICfClient _client;
-    
+
     /// <summary>
     ///     Constructor of the Harness provider.
     /// </summary>
@@ -23,13 +23,13 @@ public class Provider : FeatureProvider
     {
         _client = client;
     }
-    
+
     /// <inheritdoc/>
     public override Metadata GetMetadata()
     {
         return this._metadata;
     }
-    
+
     /// <inheritdoc/>
     public override Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
     {
@@ -60,7 +60,7 @@ public class Provider : FeatureProvider
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
-    { 
+    {
         // TODO need to implement this
         return Task.FromResult(HarnessAdapter.HarnessResponse(flagKey, defaultValue));
     }
