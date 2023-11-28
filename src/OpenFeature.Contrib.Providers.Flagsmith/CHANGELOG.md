@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.1.3...OpenFeature.Contrib.Providers.Flagsmith-v0.1.4) (2023-11-28)
+
+
+### 🐛 Bug Fixes
+
+* flagsmith release metadata ([#107](https://github.com/open-feature/dotnet-sdk-contrib/issues/107)) ([25fb39b](https://github.com/open-feature/dotnet-sdk-contrib/commit/25fb39bf3202b1393d831dadecb8cd4c965f4fc1))
+
 ## [0.1.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.1.2...OpenFeature.Contrib.Providers.Flagsmith-v0.1.3) (2023-11-28)
 
 
