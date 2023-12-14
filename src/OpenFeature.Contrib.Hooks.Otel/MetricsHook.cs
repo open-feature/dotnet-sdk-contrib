@@ -29,10 +29,10 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
-            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<double>(MetricsConstants.ACTIVE_COUNT_NAME, MetricsConstants.UNIT, MetricsConstants.ACTIVE_DESCRIPTION);
-            _evaluationRequestCounter = meter.CreateCounter<double>(MetricsConstants.REQUESTS_TOTAL_NAME, MetricsConstants.UNIT, MetricsConstants.REQUESTS_DESCRIPTION);
-            _evaluationSuccessCounter = meter.CreateCounter<double>(MetricsConstants.SUCCESS_TOTAL_NAME, MetricsConstants.UNIT, MetricsConstants.SUCCESS_DESCRIPTION);
-            _evaluationErrorCounter = meter.CreateCounter<double>(MetricsConstants.ERROR_TOTAL_NAME, MetricsConstants.UNIT, MetricsConstants.ERROR_DESCRIPTION);
+            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<double>(MetricsConstants.ActiveCountName, MetricsConstants.Unit, MetricsConstants.ActiveDescription);
+            _evaluationRequestCounter = meter.CreateCounter<double>(MetricsConstants.RequestsTotalName, MetricsConstants.Unit, MetricsConstants.RequestsDescription);
+            _evaluationSuccessCounter = meter.CreateCounter<double>(MetricsConstants.SuccessTotalName, MetricsConstants.Unit, MetricsConstants.SuccessDescription);
+            _evaluationErrorCounter = meter.CreateCounter<double>(MetricsConstants.ErrorTotalName, MetricsConstants.Unit, MetricsConstants.ErrorDescription);
         }
 
         /// <summary>
@@ -49,8 +49,8 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var tagList = new TagList
             {
-                { MetricsConstants.KEY_ATTR, context.FlagKey },
-                { MetricsConstants.PROVIDER_NAME_ATTR, context.ProviderMetadata.Name }
+                { MetricsConstants.KeyAttr, context.FlagKey },
+                { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name }
             };
 
             _evaluationActiveUpDownCounter.Add(1, tagList);
@@ -74,10 +74,10 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var tagList = new TagList
             {
-                { MetricsConstants.KEY_ATTR, context.FlagKey },
-                { MetricsConstants.PROVIDER_NAME_ATTR, context.ProviderMetadata.Name },
-                { MetricsConstants.VARIANT_ATTR, details.Variant ?? details.Value?.ToString() },
-                { MetricsConstants.REASON_ATTR, details.Reason ?? "UNKNOWN" }
+                { MetricsConstants.KeyAttr, context.FlagKey },
+                { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name },
+                { MetricsConstants.VariantAttr, details.Variant ?? details.Value?.ToString() },
+                { MetricsConstants.ReasonAttr, details.Reason ?? "UNKNOWN" }
             };
 
             _evaluationSuccessCounter.Add(1, tagList);
@@ -99,9 +99,9 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var tagList = new TagList
             {
-                { MetricsConstants.KEY_ATTR, context.FlagKey },
-                { MetricsConstants.PROVIDER_NAME_ATTR, context.ProviderMetadata.Name },
-                { MetricsConstants.EXCEPTION_ATTR, error?.Message ?? "Unknown error" }
+                { MetricsConstants.KeyAttr, context.FlagKey },
+                { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name },
+                { MetricsConstants.ExceptionAttr, error?.Message ?? "Unknown error" }
             };
 
             _evaluationErrorCounter.Add(1, tagList);
@@ -121,8 +121,8 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var tagList = new TagList
             {
-                { MetricsConstants.KEY_ATTR, context.FlagKey },
-                { MetricsConstants.PROVIDER_NAME_ATTR, context.ProviderMetadata.Name }
+                { MetricsConstants.KeyAttr, context.FlagKey },
+                { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name }
             };
 
             _evaluationActiveUpDownCounter.Add(-1, tagList);
