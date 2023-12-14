@@ -10,6 +10,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
 {
     /// <summary>
     /// Represents a hook for capturing metrics related to flag evaluations.
+    /// The meter name is "OpenFeature.Contrib.Hooks.Otel".
     /// </summary>
     public class MetricsHook : Hook
     {
