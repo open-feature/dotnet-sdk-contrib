@@ -93,7 +93,14 @@ namespace OpenFeature.Contrib.Hooks.Otel
 
         public override Task Finally<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null)
         {
-            // evaluationActiveUpDownCounter
+            var tagList = new TagList
+            {
+                { KEY_ATTR, context.FlagKey },
+                { PROVIDER_NAME_ATTR, context.ProviderMetadata.Name }
+            };
+
+            _evaluationActiveUpDownCounter.Add(-1, tagList);
+
             return base.Finally(context, hints);
         }
     }
