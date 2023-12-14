@@ -64,8 +64,16 @@ namespace OpenFeature.Contrib.Hooks.Otel
 
         public override Task After<T>(HookContext<T> context, FlagEvaluationDetails<T> details, IReadOnlyDictionary<string, object> hints = null)
         {
+            var tagList = new TagList
+            {
+                { KEY_ATTR, context.FlagKey },
+                { PROVIDER_NAME_ATTR, context.ProviderMetadata.Name },
+                { VARIANT_ATTR, details.Variant ?? details.Value?.ToString() },
+                { REASON_ATTR, details.Reason ?? "UNKNOWN" }
+            };
 
-            // evaluationSuccessCounter
+            _evaluationSuccessCounter.Add(1, tagList);
+
             return base.After(context, details, hints);
         }
 
