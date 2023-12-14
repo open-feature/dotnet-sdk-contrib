@@ -14,10 +14,10 @@ namespace OpenFeature.Contrib.Hooks.Otel
         internal const string SuccessDescription = "feature flag evaluation success counter";
         internal const string ErrorDescription = "feature flag evaluation error counter";
 
-        internal const string KeyAttr = "feature_flag.key";
-        internal const string ProviderNameAttr = "feature_flag.provider_name";
-        internal const string VariantAttr = "feature_flag.variant";
-        internal const string ReasonAttr = "feature_flag.reason";
+        internal const string KeyAttr = "key";
+        internal const string ProviderNameAttr = "provider_name";
+        internal const string VariantAttr = "variant";
+        internal const string ReasonAttr = "reason";
         internal const string ExceptionAttr = "exception";
     }
 }
