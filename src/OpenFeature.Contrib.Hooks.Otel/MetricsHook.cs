@@ -15,6 +15,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
         private static readonly string InstrumentationVersion = AssemblyName.Version.ToString();
 
         private const string EXCEPTION_ATTR = "exception";
+        private const string UNIT = "double";
 
         private const string ACTIVE_COUNT_NAME = "feature_flag.evaluation_active_count";
         private const string REQUESTS_TOTAL_NAME = "feature_flag.evaluation_requests_total";
@@ -40,10 +41,10 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
-            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<double>(ACTIVE_COUNT_NAME, "double", ACTIVE_DESCRIPTION);
-            _evaluationRequestCounter = meter.CreateCounter<double>(REQUESTS_TOTAL_NAME, "double", REQUESTS_DESCRIPTION);
-            _evaluationSuccessCounter = meter.CreateCounter<double>(SUCCESS_TOTAL_NAME, "double", SUCCESS_DESCRIPTION);
-            _evaluationErrorCounter = meter.CreateCounter<double>(ERROR_TOTAL_NAME, "double", ERROR_DESCRIPTION);
+            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<double>(ACTIVE_COUNT_NAME, UNIT, ACTIVE_DESCRIPTION);
+            _evaluationRequestCounter = meter.CreateCounter<double>(REQUESTS_TOTAL_NAME, UNIT, REQUESTS_DESCRIPTION);
+            _evaluationSuccessCounter = meter.CreateCounter<double>(SUCCESS_TOTAL_NAME, UNIT, SUCCESS_DESCRIPTION);
+            _evaluationErrorCounter = meter.CreateCounter<double>(ERROR_TOTAL_NAME, UNIT, ERROR_DESCRIPTION);
         }
 
 
@@ -63,6 +64,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
 
         public override Task After<T>(HookContext<T> context, FlagEvaluationDetails<T> details, IReadOnlyDictionary<string, object> hints = null)
         {
+
             // evaluationSuccessCounter
             return base.After(context, details, hints);
         }
