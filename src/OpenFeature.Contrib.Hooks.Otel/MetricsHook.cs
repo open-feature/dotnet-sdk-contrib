@@ -47,7 +47,6 @@ namespace OpenFeature.Contrib.Hooks.Otel
             _evaluationErrorCounter = meter.CreateCounter<double>(ERROR_TOTAL_NAME, UNIT, ERROR_DESCRIPTION);
         }
 
-
         public override Task<EvaluationContext> Before<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null)
         {
             var tagList = new TagList
@@ -105,4 +104,3 @@ namespace OpenFeature.Contrib.Hooks.Otel
         }
     }
 }
-
