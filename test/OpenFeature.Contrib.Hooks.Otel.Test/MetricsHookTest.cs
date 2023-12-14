@@ -36,14 +36,14 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             // Assert
             Assert.True(hookTask.IsCompleted);
-            
+
             // Assert metrics
             Assert.NotEmpty(exportedItems);
-            
+
             // check if the metric is present in the exported items
             var metric = exportedItems.FirstOrDefault(m => m.Name == metricName);
             Assert.NotNull(metric);
-            
+
             var noOtherMetric = exportedItems.All(m => m.Name == metricName);
             Assert.True(noOtherMetric);
         }
@@ -72,18 +72,18 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             // Assert
             Assert.True(hookTask.IsCompleted);
-            
+
             // Assert metrics
             Assert.NotEmpty(exportedItems);
-            
+
             // check if the metric is present in the exported items
             var metric = exportedItems.FirstOrDefault(m => m.Name == metricName);
             Assert.NotNull(metric);
-            
+
             var noOtherMetric = exportedItems.All(m => m.Name == metricName);
             Assert.True(noOtherMetric);
         }
-        
+
         [Fact]
         public void Finally_Test()
         {
@@ -108,14 +108,14 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             // Assert
             Assert.True(hookTask.IsCompleted);
-            
+
             // Assert metrics
             Assert.NotEmpty(exportedItems);
-            
+
             // check if the metric feature_flag.evaluation_success_total is present in the exported items
             var metric = exportedItems.FirstOrDefault(m => m.Name == metricName);
             Assert.NotNull(metric);
-            
+
             var noOtherMetric = exportedItems.All(m => m.Name == metricName);
             Assert.True(noOtherMetric);
         }
@@ -145,17 +145,17 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             // Assert
             Assert.True(hookTask.IsCompleted);
-            
+
             // Assert metrics
             Assert.NotEmpty(exportedItems);
-            
+
             // check if the metric is present in the exported items
             var metric1 = exportedItems.FirstOrDefault(m => m.Name == metricName1);
             Assert.NotNull(metric1);
-            
+
             var metric2 = exportedItems.FirstOrDefault(m => m.Name == metricName2);
             Assert.NotNull(metric2);
-            
+
             var noOtherMetric = exportedItems.All(m => m.Name == metricName1 || m.Name == metricName2);
             Assert.True(noOtherMetric);
         }
