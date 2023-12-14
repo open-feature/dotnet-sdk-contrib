@@ -21,6 +21,11 @@ namespace OpenFeature.Contrib.Hooks.Otel
         private const string SUCCESS_TOTAL_NAME = "feature_flag.evaluation_success_total";
         private const string ERROR_TOTAL_NAME = "feature_flag.evaluation_error_total";
 
+        private const string ACTIVE_DESCRIPTION = "active flag evaluations counter";
+        private const string REQUESTS_DESCRIPTION = "feature flag evaluation request counter";
+        private const string SUCCESS_DESCRIPTION = "feature flag evaluation success counter";
+        private const string ERROR_DESCRIPTION = "feature flag evaluation error counter";
+
         private const string KEY_ATTR = "feature_flag.key";
         private const string PROVIDER_NAME_ATTR = "feature_flag.provider_name";
         private const string VARIANT_ATTR = "feature_flag.variant";
@@ -35,10 +40,10 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
-            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<double>(ACTIVE_COUNT_NAME);
-            _evaluationRequestCounter = meter.CreateCounter<double>(REQUESTS_TOTAL_NAME);
-            _evaluationSuccessCounter = meter.CreateCounter<double>(SUCCESS_TOTAL_NAME);
-            _evaluationErrorCounter = meter.CreateCounter<double>(ERROR_TOTAL_NAME);
+            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<double>(ACTIVE_COUNT_NAME, "double", ACTIVE_DESCRIPTION);
+            _evaluationRequestCounter = meter.CreateCounter<double>(REQUESTS_TOTAL_NAME, "double", REQUESTS_DESCRIPTION);
+            _evaluationSuccessCounter = meter.CreateCounter<double>(SUCCESS_TOTAL_NAME, "double", SUCCESS_DESCRIPTION);
+            _evaluationErrorCounter = meter.CreateCounter<double>(ERROR_TOTAL_NAME, "double", ERROR_DESCRIPTION);
         }
 
 
