@@ -79,7 +79,15 @@ namespace OpenFeature.Contrib.Hooks.Otel
 
         public override Task Error<T>(HookContext<T> context, Exception error, IReadOnlyDictionary<string, object> hints = null)
         {
-            // evaluationErrorCounter
+            var tagList = new TagList
+            {
+                { KEY_ATTR, context.FlagKey },
+                { PROVIDER_NAME_ATTR, context.ProviderMetadata.Name },
+                { EXCEPTION_ATTR, error?.Message ?? "Unknown error" }
+            };
+
+            _evaluationErrorCounter.Add(1, tagList);
+
             return base.Error(context, error, hints);
         }
 
