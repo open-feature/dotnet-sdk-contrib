@@ -71,7 +71,7 @@ For this hook to function correctly a global `MeterProvider` must be set, an exa
 
 ### Example
 
-The following example demonstrates the use of the `OpenTelemetry hook` with the `OpenFeature dotnet-sdk`. The metrics are sent to a `prometheus` OTLP collector running at `localhost:4317`.
+The following example demonstrates the use of the `OpenTelemetry hook` with the `OpenFeature dotnet-sdk`. The metrics are sent to the `console`.
 
 ```csharp
 using OpenFeature.Contrib.Providers.Flagd;
