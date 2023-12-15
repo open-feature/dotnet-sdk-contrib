@@ -1,8 +1,6 @@
-﻿using OpenFeature;
-using OpenFeature.Model;
+﻿using OpenFeature.Model;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Trace;
 
 namespace OpenFeature.Contrib.Hooks.Otel
@@ -11,7 +9,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
     /// <summary>
     /// Stub.
     /// </summary>
-    public class OtelHook : Hook
+    public class TracingHook : Hook
     {
 
         /// <summary>
