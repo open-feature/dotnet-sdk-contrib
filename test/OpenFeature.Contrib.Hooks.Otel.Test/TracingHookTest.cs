@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace OpenFeature.Contrib.Hooks.Otel.Test
 {
-    public class OtelHookTest
+    public class TracingHookTest
     {
         [Fact]
         public void TestAfter()
