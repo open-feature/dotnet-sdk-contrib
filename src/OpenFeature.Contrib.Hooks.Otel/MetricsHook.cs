@@ -18,10 +18,10 @@ namespace OpenFeature.Contrib.Hooks.Otel
         private static readonly string InstrumentationName = AssemblyName.Name;
         private static readonly string InstrumentationVersion = AssemblyName.Version.ToString();
 
-        private readonly UpDownCounter<double> _evaluationActiveUpDownCounter;
-        private readonly Counter<double> _evaluationRequestCounter;
-        private readonly Counter<double> _evaluationSuccessCounter;
-        private readonly Counter<double> _evaluationErrorCounter;
+        private readonly UpDownCounter<long> _evaluationActiveUpDownCounter;
+        private readonly Counter<long> _evaluationRequestCounter;
+        private readonly Counter<long> _evaluationSuccessCounter;
+        private readonly Counter<long> _evaluationErrorCounter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MetricsHook"/> class.
@@ -30,10 +30,10 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
-            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<double>(MetricsConstants.ActiveCountName, MetricsConstants.Unit, MetricsConstants.ActiveDescription);
-            _evaluationRequestCounter = meter.CreateCounter<double>(MetricsConstants.RequestsTotalName, MetricsConstants.Unit, MetricsConstants.RequestsDescription);
-            _evaluationSuccessCounter = meter.CreateCounter<double>(MetricsConstants.SuccessTotalName, MetricsConstants.Unit, MetricsConstants.SuccessDescription);
-            _evaluationErrorCounter = meter.CreateCounter<double>(MetricsConstants.ErrorTotalName, MetricsConstants.Unit, MetricsConstants.ErrorDescription);
+            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<long>(MetricsConstants.ActiveCountName, MetricsConstants.Unit, MetricsConstants.ActiveDescription);
+            _evaluationRequestCounter = meter.CreateCounter<long>(MetricsConstants.RequestsTotalName, MetricsConstants.Unit, MetricsConstants.RequestsDescription);
+            _evaluationSuccessCounter = meter.CreateCounter<long>(MetricsConstants.SuccessTotalName, MetricsConstants.Unit, MetricsConstants.SuccessDescription);
+            _evaluationErrorCounter = meter.CreateCounter<long>(MetricsConstants.ErrorTotalName, MetricsConstants.Unit, MetricsConstants.ErrorDescription);
         }
 
         /// <summary>
