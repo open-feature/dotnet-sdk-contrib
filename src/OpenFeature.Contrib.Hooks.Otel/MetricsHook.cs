@@ -16,7 +16,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
     {
         private static readonly AssemblyName AssemblyName = typeof(MetricsHook).Assembly.GetName();
         private static readonly string InstrumentationName = AssemblyName.Name;
-        private static readonly string InstrumentationVersion = AssemblyName.Version.ToString();
+        private static readonly string InstrumentationVersion = AssemblyName.Version?.ToString();
 
         private readonly UpDownCounter<long> _evaluationActiveUpDownCounter;
         private readonly Counter<long> _evaluationRequestCounter;
@@ -30,10 +30,10 @@ namespace OpenFeature.Contrib.Hooks.Otel
         {
             var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
-            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<long>(MetricsConstants.ActiveCountName, MetricsConstants.Unit, MetricsConstants.ActiveDescription);
-            _evaluationRequestCounter = meter.CreateCounter<long>(MetricsConstants.RequestsTotalName, MetricsConstants.Unit, MetricsConstants.RequestsDescription);
-            _evaluationSuccessCounter = meter.CreateCounter<long>(MetricsConstants.SuccessTotalName, MetricsConstants.Unit, MetricsConstants.SuccessDescription);
-            _evaluationErrorCounter = meter.CreateCounter<long>(MetricsConstants.ErrorTotalName, MetricsConstants.Unit, MetricsConstants.ErrorDescription);
+            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<long>(MetricsConstants.ActiveCountName, description: MetricsConstants.ActiveDescription);
+            _evaluationRequestCounter = meter.CreateCounter<long>(MetricsConstants.RequestsTotalName, "{request}", MetricsConstants.RequestsDescription);
+            _evaluationSuccessCounter = meter.CreateCounter<long>(MetricsConstants.SuccessTotalName, "{impression}", MetricsConstants.SuccessDescription);
+            _evaluationErrorCounter = meter.CreateCounter<long>(MetricsConstants.ErrorTotalName, description: MetricsConstants.ErrorDescription);
         }
 
         /// <summary>

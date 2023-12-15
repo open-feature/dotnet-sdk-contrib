@@ -2,8 +2,6 @@ namespace OpenFeature.Contrib.Hooks.Otel
 {
     internal static class MetricsConstants
     {
-        internal const string Unit = "long";
-
         internal const string ActiveCountName = "feature_flag.evaluation_active_count";
         internal const string RequestsTotalName = "feature_flag.evaluation_requests_total";
         internal const string SuccessTotalName = "feature_flag.evaluation_success_total";
