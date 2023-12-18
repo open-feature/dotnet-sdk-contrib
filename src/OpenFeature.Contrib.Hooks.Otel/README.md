@@ -39,7 +39,7 @@ namespace OpenFeatureTestApp
                     .Build();
 
 			// add the Otel Hook to the OpenFeature instance
-		    OpenFeature.Api.Instance.AddHooks(new OtelHook());
+		    OpenFeature.Api.Instance.AddHooks(new TracingHook());
 
             var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
 

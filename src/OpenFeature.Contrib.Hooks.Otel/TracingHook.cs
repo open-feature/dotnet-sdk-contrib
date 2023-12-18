@@ -1,8 +1,7 @@
 ﻿using OpenFeature.Model;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System;
+using OpenTelemetry.Trace;
 
 namespace OpenFeature.Contrib.Hooks.Otel
 
@@ -10,11 +9,8 @@ namespace OpenFeature.Contrib.Hooks.Otel
     /// <summary>
     /// Stub.
     /// </summary>
-    [ExcludeFromCodeCoverage]
-    [Obsolete("This class is obsolete and will be removed in a future version. Please use TracingHook instead.")]
-    public class OtelHook : Hook
+    public class TracingHook : Hook
     {
-        private readonly TracingHook _tracingHook = new TracingHook();
 
         /// <summary>
         ///     After is executed after a feature flag has been evaluated.
@@ -26,7 +22,17 @@ namespace OpenFeature.Contrib.Hooks.Otel
         public override Task After<T>(HookContext<T> context, FlagEvaluationDetails<T> details,
             IReadOnlyDictionary<string, object> hints = null)
         {
-            _tracingHook.After(context, details, hints);
+            var span = Tracer.CurrentSpan;
+            if (span != null)
+            {
+                var attributes = new Dictionary<string, object>
+                {
+                    {"feature_flag.key", details.FlagKey},
+                    {"feature_flag.variant", details.Variant},
+                    {"feature_flag.provider_name", context.ProviderMetadata.Name}
+                };
+                span.AddEvent("feature_flag", new SpanAttributes(attributes));
+            }
 
             return Task.CompletedTask;
         }
@@ -41,7 +47,11 @@ namespace OpenFeature.Contrib.Hooks.Otel
         public override Task Error<T>(HookContext<T> context, System.Exception error,
             IReadOnlyDictionary<string, object> hints = null)
         {
-            _tracingHook.Error(context, error, hints);
+            var span = Tracer.CurrentSpan;
+            if (span != null)
+            {
+                span.RecordException(error);
+            }
 
             return Task.CompletedTask;
         }

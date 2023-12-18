@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace OpenFeature.Contrib.Hooks.Otel.Test
 {
-    public class OtelHookTest
+    public class TracingHookTest
     {
         [Fact]
         public void TestAfter()
@@ -32,7 +32,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             var span = tracer.StartActiveSpan("my-span");
 
-            var otelHook = new OtelHook();
+            var otelHook = new TracingHook();
 
             var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
 
@@ -93,7 +93,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             var tracer = tracerProvider.GetTracer("my-tracer");
 
-            var otelHook = new OtelHook();
+            var otelHook = new TracingHook();
 
             var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
 
@@ -126,7 +126,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             var span = tracer.StartActiveSpan("my-span");
 
-            var otelHook = new OtelHook();
+            var otelHook = new TracingHook();
 
             var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
 
@@ -175,7 +175,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             var tracer = tracerProvider.GetTracer("my-tracer");
 
-            var otelHook = new OtelHook();
+            var otelHook = new TracingHook();
 
             var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
 
