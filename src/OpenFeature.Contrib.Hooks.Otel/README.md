@@ -12,6 +12,7 @@ The `open telemetry hook` taps into the after and error methods of the hook life
 For this, an active span must be set in the `Tracer`, otherwise the hook will no-op.
 
 ### Example
+
 The following example demonstrates the use of the `OpenTelemetry hook` with the `OpenFeature dotnet-sdk`. The traces are sent to a `jaeger` OTLP collector running at `localhost:4317`.
 
 ```csharp
@@ -38,7 +39,7 @@ namespace OpenFeatureTestApp
                     .Build();
 
 			// add the Otel Hook to the OpenFeature instance
-		    OpenFeature.Api.Instance.AddHooks(new OtelHook());
+		    OpenFeature.Api.Instance.AddHooks(new TracingHook());
 
             var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
 
