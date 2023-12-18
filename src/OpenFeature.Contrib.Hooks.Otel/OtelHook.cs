@@ -14,16 +14,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
     [Obsolete("This class is obsolete and will be removed in a future version. Please use TracingHook instead.")]
     public class OtelHook : Hook
     {
-        private readonly TracingHook _tracingHook;
-
-        /// <summary>
-        /// Stub.
-        /// </summary>
-        [Obsolete("This class is obsolete and will be removed in a future version. Please use TracingHook instead.")]
-        public OtelHook()
-        {
-            _tracingHook = new TracingHook();
-        }
+        private readonly TracingHook _tracingHook = new TracingHook();
 
         /// <summary>
         ///     After is executed after a feature flag has been evaluated.
