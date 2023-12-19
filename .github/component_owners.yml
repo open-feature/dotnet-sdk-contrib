@@ -4,6 +4,7 @@ components:
   src/OpenFeature.Contrib.Hooks.Otel:
     - bacherfl
     - toddbaert
+    - askpt
   src/OpenFeature.Contrib.Providers.Flagd:
     - bacherfl
     - toddbaert
@@ -17,6 +18,7 @@ components:
   test/OpenFeature.Contrib.Hooks.Otel.Test:
     - bacherfl
     - toddbaert
+    - askpt
   test/OpenFeature.Contrib.Providers.Flagd.Test:
     - bacherfl
     - toddbaert
