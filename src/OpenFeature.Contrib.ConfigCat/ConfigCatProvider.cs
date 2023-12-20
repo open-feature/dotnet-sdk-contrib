@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using ConfigCat.Client;
 using ConfigCat.Client.Configuration;
@@ -61,7 +60,8 @@ namespace OpenFeature.Contrib.ConfigCat
         /// <inheritdoc/>
         public override Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException(
+                "ConfigCat does not support structure values. Use JSON string instead.");
         }
 
         private async Task<ResolutionDetails<T>> ProcessFlag<T>(string flagKey, EvaluationContext context, T defaultValue)
