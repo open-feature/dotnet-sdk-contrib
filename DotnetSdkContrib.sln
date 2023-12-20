@@ -23,6 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Provide
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagsmith.Test", "test\OpenFeature.Contrib.Providers.Flagsmith.Test\OpenFeature.Contrib.Providers.Flagsmith.Test.csproj", "{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.ConfigCat", "src\OpenFeature.Contrib.ConfigCat\OpenFeature.Contrib.ConfigCat.csproj", "{8A8EC7E5-4844-4F32-AE19-5591FAB9B75C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.ConfigCat.Test", "test\OpenFeature.Contrib.ConfigCat.Test\OpenFeature.Contrib.ConfigCat.Test.csproj", "{047835AC-A8E3-432A-942D-0BDC1E9FC3BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +65,14 @@ Global
 		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A8EC7E5-4844-4F32-AE19-5591FAB9B75C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A8EC7E5-4844-4F32-AE19-5591FAB9B75C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A8EC7E5-4844-4F32-AE19-5591FAB9B75C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A8EC7E5-4844-4F32-AE19-5591FAB9B75C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{047835AC-A8E3-432A-942D-0BDC1E9FC3BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{047835AC-A8E3-432A-942D-0BDC1E9FC3BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{047835AC-A8E3-432A-942D-0BDC1E9FC3BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{047835AC-A8E3-432A-942D-0BDC1E9FC3BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,5 +86,7 @@ Global
 		{4041B63F-9CF6-4886-8FC7-BD1A7E45F859} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
 		{47008BEE-7888-4B9B-8884-712A922C3F9B} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
 		{C3BA23C2-BEC3-4683-A64A-C914C3D8037E} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
+		{047835AC-A8E3-432A-942D-0BDC1E9FC3BC} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
+		{8A8EC7E5-4844-4F32-AE19-5591FAB9B75C} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
 	EndGlobalSection
 EndGlobal
