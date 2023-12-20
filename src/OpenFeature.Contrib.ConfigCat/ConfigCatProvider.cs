@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ConfigCat.Client;
 using ConfigCat.Client.Configuration;
@@ -58,26 +59,25 @@ namespace OpenFeature.Contrib.ConfigCat
         }
 
         /// <inheritdoc/>
-        public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            var stringDefaultValue = defaultValue?.AsString;
-            var result = await ProcessFlag(flagKey, context, stringDefaultValue);
-            var returnValue = result.Value == null ? defaultValue : new Value(result.Value);
-            return new ResolutionDetails<Value>(flagKey, returnValue, variant: result.Variant, errorMessage: result.ErrorMessage);
+            throw new NotSupportedException();
         }
 
         private async Task<ResolutionDetails<T>> ProcessFlag<T>(string flagKey, EvaluationContext context, T defaultValue)
         {
             var user = context?.BuildUser();
             var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user);
-            return new ResolutionDetails<T>(flagKey, result.Value, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
+            return string.IsNullOrEmpty(result.ErrorMessage)
+                ? new ResolutionDetails<T>(flagKey, result.Value, variant: result.VariationId)
+                : new ResolutionDetails<T>(flagKey, defaultValue, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage);
         }
 
         private static ErrorType ParseErrorType(string errorMessage)
         {
-            if (string.IsNullOrEmpty(errorMessage))
+            if(errorMessage.Contains("Config JSON is not present when evaluating setting"))
             {
-                return ErrorType.None;
+                return ErrorType.ParseError;
             }
             if(errorMessage.Contains("Config JSON is not present"))
             {
