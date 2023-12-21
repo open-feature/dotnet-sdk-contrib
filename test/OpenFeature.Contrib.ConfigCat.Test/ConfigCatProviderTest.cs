@@ -68,7 +68,7 @@ namespace OpenFeature.Contrib.ConfigCat.Test
             var configCatProvider = new ConfigCatProvider(sdkKey,
                 options => { options.FlagOverrides = BuildFlagOverrides(("example-feature", defaultValue)); });
 
-            var result = await configCatProvider.ResolveStructureValue( "example-feature", defaultValue);
+            var result = await configCatProvider.ResolveStructureValue("example-feature", defaultValue);
 
             Assert.Equal(defaultValue.AsString, result.Value.AsString);
             Assert.Equal("example-feature", result.FlagKey);

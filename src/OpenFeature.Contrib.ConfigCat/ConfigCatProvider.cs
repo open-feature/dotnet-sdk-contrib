@@ -10,7 +10,7 @@ namespace OpenFeature.Contrib.ConfigCat
     /// <summary>
     /// ConfigCatProvider is the .NET provider implementation for the feature flag solution ConfigCat.
     /// </summary>
-    public class ConfigCatProvider: FeatureProvider
+    public class ConfigCatProvider : FeatureProvider
     {
         private const string Name = "ConfigCat Provider";
         internal readonly IConfigCatClient Client;
@@ -79,15 +79,15 @@ namespace OpenFeature.Contrib.ConfigCat
             {
                 return ErrorType.None;
             }
-            if(errorMessage.Contains("Config JSON is not present"))
+            if (errorMessage.Contains("Config JSON is not present"))
             {
                 return ErrorType.ParseError;
             }
-            if(errorMessage.Contains("the key was not found in config JSON"))
+            if (errorMessage.Contains("the key was not found in config JSON"))
             {
                 return ErrorType.FlagNotFound;
             }
-            if(errorMessage.Contains("The type of a setting must match the type of the specified default value"))
+            if (errorMessage.Contains("The type of a setting must match the type of the specified default value"))
             {
                 return ErrorType.TypeMismatch;
             }

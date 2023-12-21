@@ -8,11 +8,11 @@ namespace OpenFeature.Contrib.ConfigCat
 {
     internal static class UserBuilder
     {
-        private static readonly string[] PossibleUserIds = {"ID", "IDENTIFIER"};
+        private static readonly string[] PossibleUserIds = { "ID", "IDENTIFIER" };
 
         internal static User BuildUser(this EvaluationContext context)
         {
-            if(context == null)
+            if (context == null)
             {
                 return null;
             }
