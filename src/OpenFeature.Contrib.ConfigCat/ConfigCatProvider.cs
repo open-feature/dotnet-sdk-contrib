@@ -70,16 +70,14 @@ namespace OpenFeature.Contrib.ConfigCat
         {
             var user = context?.BuildUser();
             var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user);
-            return string.IsNullOrEmpty(result.ErrorMessage)
-                ? new ResolutionDetails<T>(flagKey, result.Value, variant: result.VariationId)
-                : new ResolutionDetails<T>(flagKey, defaultValue, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage);
+            return new ResolutionDetails<T>(flagKey, result.Value, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
         }
 
         private static ErrorType ParseErrorType(string errorMessage)
         {
-            if(errorMessage.Contains("Config JSON is not present when evaluating setting"))
+            if (string.IsNullOrEmpty(errorMessage))
             {
-                return ErrorType.ParseError;
+                return ErrorType.None;
             }
             if(errorMessage.Contains("Config JSON is not present"))
             {
