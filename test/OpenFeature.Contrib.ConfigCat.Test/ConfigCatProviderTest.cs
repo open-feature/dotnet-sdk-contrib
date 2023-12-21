@@ -59,6 +59,22 @@ namespace OpenFeature.Contrib.ConfigCat.Test
             return ExecuteResolveTest(value, defaultValue, expectedValue, expectedErrorType, sdkKey, (provider, key, def) => provider.ResolveIntegerValue(key, def));
         }
 
+        [Theory]
+        [AutoData]
+        public async Task GetStructureValue_ForFeature_ReturnExpectedResult(string sdkKey)
+        {
+            const string jsonValue = "{ \"key\": \"value\" }";
+            var defaultValue = new Value(jsonValue);
+            var configCatProvider = new ConfigCatProvider(sdkKey,
+                options => { options.FlagOverrides = BuildFlagOverrides(("example-feature", defaultValue)); });
+
+            var result = await configCatProvider.ResolveStructureValue( "example-feature", defaultValue);
+
+            Assert.Equal(defaultValue.AsString, result.Value.AsString);
+            Assert.Equal("example-feature", result.FlagKey);
+            Assert.Equal(ErrorType.None, result.ErrorType);
+        }
+
         private static async Task ExecuteResolveTest<T>(object value, T defaultValue, T expectedValue, ErrorType expectedErrorType, string sdkKey, Func<ConfigCatProvider, string, T, Task<ResolutionDetails<T>>> resolveFunc)
         {
             var configCatProvider = new ConfigCatProvider(sdkKey,

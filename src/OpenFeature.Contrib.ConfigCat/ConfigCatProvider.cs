@@ -58,10 +58,12 @@ namespace OpenFeature.Contrib.ConfigCat
         }
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            throw new NotSupportedException(
-                "ConfigCat does not support structure values. Use JSON string instead.");
+            var stringDefaultValue = defaultValue?.AsString;
+            var result = await ProcessFlag(flagKey, context, stringDefaultValue);
+            var returnValue = result.Value == null ? defaultValue : new Value(result.Value);
+            return new ResolutionDetails<Value>(flagKey, returnValue, variant: result.Variant, errorMessage: result.ErrorMessage);
         }
 
         private async Task<ResolutionDetails<T>> ProcessFlag<T>(string flagKey, EvaluationContext context, T defaultValue)
