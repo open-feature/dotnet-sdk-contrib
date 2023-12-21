@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace OpenFeature.Contrib.Hooks.Otel
@@ -7,7 +9,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
     /// </summary>
     public class MetricHookCustomDimensions
     {
-        private readonly TagList _keyValuePairs = new TagList();
+        private readonly List<KeyValuePair<string, object>> _keyValuePairs = new List<KeyValuePair<string, object>>();
 
         /// <summary>
         /// Adds a custom dimension to the list.
@@ -15,15 +17,15 @@ namespace OpenFeature.Contrib.Hooks.Otel
         /// <param name="key">The key of the custom dimension.</param>
         /// <param name="value">The value of the custom dimension.</param>
         /// <returns>The custom dimension list.</returns>
-        public MetricHookCustomDimensions Add(string key, string value)
+        public MetricHookCustomDimensions Add(string key, object value)
         {
-            _keyValuePairs.Add(key, value);
+            _keyValuePairs.Add(new KeyValuePair<string, object>(key, value));
             return this;
         }
 
-        internal TagList GetTagList()
+        internal KeyValuePair<string, object>[] GetTagList()
         {
-            return _keyValuePairs;
+            return _keyValuePairs.ToArray();
         }
     }
 }
