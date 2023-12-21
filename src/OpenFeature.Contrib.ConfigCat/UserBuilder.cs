@@ -8,6 +8,8 @@ namespace OpenFeature.Contrib.ConfigCat
 {
     internal static class UserBuilder
     {
+        private static readonly string[] PossibleUserIds = {"ID", "IDENTIFIER"};
+
         internal static User BuildUser(this EvaluationContext context)
         {
             if(context == null)
@@ -15,12 +17,9 @@ namespace OpenFeature.Contrib.ConfigCat
                 return null;
             }
 
-            var user = new User(Guid.NewGuid().ToString());
-
-            if(context.TryGetValueInsensitive("id", out var pair))
-            {
-                user = new User(pair.Value.AsString);
-            }
+            var user = context.TryGetValuesInsensitive(PossibleUserIds, out var pair)
+                ? new User(pair.Value.AsString)
+                : new User(Guid.NewGuid().ToString());
 
             foreach (var value in context)
             {
@@ -41,10 +40,10 @@ namespace OpenFeature.Contrib.ConfigCat
             return user;
         }
 
-        private static bool TryGetValueInsensitive(this EvaluationContext context, string key,
+        private static bool TryGetValuesInsensitive(this EvaluationContext context, string[] keys,
             out KeyValuePair<string, Value> pair)
         {
-            pair = context.AsDictionary().FirstOrDefault(item => item.Key.Equals(key, StringComparison.OrdinalIgnoreCase));
+            pair = context.AsDictionary().FirstOrDefault(x => keys.Contains(x.Key.ToUpperInvariant()));
 
             return pair.Key != null;
         }
