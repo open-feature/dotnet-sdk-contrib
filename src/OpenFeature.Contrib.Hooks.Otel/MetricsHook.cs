@@ -22,7 +22,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
         private readonly Counter<long> _evaluationRequestCounter;
         private readonly Counter<long> _evaluationSuccessCounter;
         private readonly Counter<long> _evaluationErrorCounter;
-        private readonly TagList _customDimensionsTagList;
+        private readonly KeyValuePair<string, object>[] _customDimensionsTagList;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MetricsHook"/> class.
@@ -30,7 +30,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
         /// <param name="customDimensions">The optional custom dimensions.</param>
         public MetricsHook(MetricHookCustomDimensions customDimensions = null)
         {
-            _customDimensionsTagList = customDimensions?.GetTagList() ?? new TagList();
+            _customDimensionsTagList = customDimensions?.GetTagList() ?? new KeyValuePair<string, object>[] { };
 
             var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
@@ -77,7 +77,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
         /// <returns>The evaluation context.</returns>
         public override Task After<T>(HookContext<T> context, FlagEvaluationDetails<T> details, IReadOnlyDictionary<string, object> hints = null)
         {
-            var tagList = new TagList
+            var tagList = new TagList(_customDimensionsTagList)
             {
                 { MetricsConstants.KeyAttr, context.FlagKey },
                 { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name },
