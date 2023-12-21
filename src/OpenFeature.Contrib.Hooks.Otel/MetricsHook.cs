@@ -22,12 +22,16 @@ namespace OpenFeature.Contrib.Hooks.Otel
         private readonly Counter<long> _evaluationRequestCounter;
         private readonly Counter<long> _evaluationSuccessCounter;
         private readonly Counter<long> _evaluationErrorCounter;
+        private readonly TagList _customDimensionsTagList;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MetricsHook"/> class.
         /// </summary>
-        public MetricsHook()
+        /// <param name="customDimensions">The optional custom dimensions.</param>
+        public MetricsHook(MetricHookCustomDimensions customDimensions = null)
         {
+            _customDimensionsTagList = customDimensions?.GetTagList() ?? new TagList();
+
             var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
             _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<long>(MetricsConstants.ActiveCountName, description: MetricsConstants.ActiveDescription);
