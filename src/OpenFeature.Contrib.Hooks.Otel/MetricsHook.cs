@@ -30,7 +30,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
         /// <param name="customDimensions">The optional custom dimensions.</param>
         public MetricsHook(MetricHookCustomDimensions customDimensions = null)
         {
-            _customDimensionsTagList = customDimensions?.GetTagList() ?? new KeyValuePair<string, object>[] { };
+            _customDimensionsTagList = customDimensions?.GetTagList() ?? Array.Empty<KeyValuePair<string, object>>();
 
             var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
