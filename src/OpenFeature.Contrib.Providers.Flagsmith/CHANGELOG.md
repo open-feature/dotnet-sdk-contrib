@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.1.4...OpenFeature.Contrib.Providers.Flagsmith-v0.1.5) (2023-12-21)
+
+
+### 🐛 Bug Fixes
+
+* do not send targeting key as separate trait in flagsmith ([#120](https://github.com/open-feature/dotnet-sdk-contrib/issues/120)) ([0725f8f](https://github.com/open-feature/dotnet-sdk-contrib/commit/0725f8f3c726c05a6ccd2580f04b896f0aff4810))
+
 ## [0.1.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.1.3...OpenFeature.Contrib.Providers.Flagsmith-v0.1.4) (2023-11-28)
 
 

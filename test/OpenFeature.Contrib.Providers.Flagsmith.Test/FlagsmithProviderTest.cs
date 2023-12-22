@@ -65,7 +65,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var date = DateTime.Now;
             flags.GetFeatureValue("example-feature").Returns("true");
             flags.IsFeatureEnabled("example-feature").Returns(true);
-            flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count == 7 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
+            flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count == 6 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
 
             var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
@@ -77,7 +77,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
                 .Set("key4", date)
                 .Set("key5", Structure.Empty)
                 .Set("key6", 1.0)
-                .Set("targetingKey", "233");
+                .Set(FlagsmithProviderConfiguration.DefaultTargetingKey, "233");
             // Act
             var result = await flagsmithProvider.ResolveBooleanValue("example-feature", false, contextBuilder.Build());
 
