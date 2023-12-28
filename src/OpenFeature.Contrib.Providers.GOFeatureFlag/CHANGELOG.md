@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.4...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.5) (2023-12-21)
+
+
+### 🧹 Chore
+
+* **deps:** update dependency system.text.json to v7.0.2 ([#50](https://github.com/open-feature/dotnet-sdk-contrib/issues/50)) ([b1690c9](https://github.com/open-feature/dotnet-sdk-contrib/commit/b1690c91843afe012f08e63411ee100ed29e5f5c))
+* **deps:** update dependency system.text.json to v7.0.3 ([#66](https://github.com/open-feature/dotnet-sdk-contrib/issues/66)) ([8a6933a](https://github.com/open-feature/dotnet-sdk-contrib/commit/8a6933a0093be917a60235080ff3dac89a952f81))
+* **deps:** update dependency system.text.json to v7.0.4 ([#101](https://github.com/open-feature/dotnet-sdk-contrib/issues/101)) ([84f453d](https://github.com/open-feature/dotnet-sdk-contrib/commit/84f453ded557491ae69ae7d279d51642327dc8e6))
+* **deps:** update dotnet monorepo to v8 (major) ([#100](https://github.com/open-feature/dotnet-sdk-contrib/issues/100)) ([13d3223](https://github.com/open-feature/dotnet-sdk-contrib/commit/13d32231983e61ec9960cabfbf9a55fc5a6b32cb))
+
 ## [0.1.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.3...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.4) (2023-04-07)
 
 
