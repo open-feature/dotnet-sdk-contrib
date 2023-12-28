@@ -73,7 +73,11 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
 
             return string.IsNullOrEmpty(key)
                 ? _flagsmithClient.GetEnvironmentFlags()
-                : _flagsmithClient.GetIdentityFlags(key, ctx.AsDictionary().Select(x => new Trait(x.Key, x.Value.AsObject) as ITrait).ToList());
+                : _flagsmithClient.GetIdentityFlags(key, ctx
+                    .AsDictionary()
+                    .Where(x => x.Key != Configuration.TargetingKey)
+                    .Select(x => new Trait(x.Key, x.Value.AsObject) as ITrait)
+                    .ToList());
         }
 
         private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, T defaultValue, TryParseDelegate<T> tryParse, EvaluationContext context)
