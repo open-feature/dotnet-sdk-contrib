@@ -11,7 +11,7 @@ namespace OpenFeature.Contrib.ConfigCat
     /// <summary>
     /// ConfigCatProvider is the .NET provider implementation for the feature flag solution ConfigCat.
     /// </summary>
-    public sealed class ConfigCatProvider : FeatureProvider, IDisposable
+    public sealed class ConfigCatProvider : FeatureProvider
     {
         private const string Name = "ConfigCat Provider";
         internal readonly IConfigCatClient Client;
@@ -105,14 +105,6 @@ namespace OpenFeature.Contrib.ConfigCat
                 return ErrorType.TypeMismatch;
             }
             return ErrorType.General;
-        }
-
-        /// <summary>
-        /// Disposes the <see cref="Client"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Client?.Dispose();
         }
     }
 }
