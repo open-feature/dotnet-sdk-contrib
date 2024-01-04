@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ConfigCat.Client;
 using ConfigCat.Client.Configuration;
 using OpenFeature.Constant;
+using OpenFeature.Error;
 using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.ConfigCat
@@ -10,7 +11,7 @@ namespace OpenFeature.Contrib.ConfigCat
     /// <summary>
     /// ConfigCatProvider is the .NET provider implementation for the feature flag solution ConfigCat.
     /// </summary>
-    public class ConfigCatProvider : FeatureProvider
+    public sealed class ConfigCatProvider : FeatureProvider, IDisposable
     {
         private const string Name = "ConfigCat Provider";
         internal readonly IConfigCatClient Client;
@@ -34,43 +35,55 @@ namespace OpenFeature.Contrib.ConfigCat
         }
 
         /// <inheritdoc/>
-        public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            return await ProcessFlag(flagKey, context, defaultValue);
+            return ResolveFlag(flagKey, context, defaultValue);
         }
 
         /// <inheritdoc/>
         public override Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            return ProcessFlag(flagKey, context, defaultValue);
+            return ResolveFlag(flagKey, context, defaultValue);
         }
 
         /// <inheritdoc/>
         public override Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            return ProcessFlag(flagKey, context, defaultValue);
+            return ResolveFlag(flagKey, context, defaultValue);
         }
 
         /// <inheritdoc/>
         public override Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            return ProcessFlag(flagKey, context, defaultValue);
+            return ResolveFlag(flagKey, context, defaultValue);
         }
 
         /// <inheritdoc/>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            var stringDefaultValue = defaultValue?.AsString;
-            var result = await ProcessFlag(flagKey, context, stringDefaultValue);
-            var returnValue = result.Value == null ? defaultValue : new Value(result.Value);
-            return new ResolutionDetails<Value>(flagKey, returnValue, variant: result.Variant, errorMessage: result.ErrorMessage);
+            var user = context?.BuildUser();
+            var result = await Client.GetValueDetailsAsync(flagKey, defaultValue?.AsObject, user);
+            var returnValue = result.IsDefaultValue ? defaultValue : new Value(result.Value);
+            var details = new ResolutionDetails<Value>(flagKey, returnValue, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
+            if(details.ErrorType == ErrorType.None)
+            {
+                return details;
+            }
+
+            throw new FeatureProviderException(details.ErrorType, details.ErrorMessage);
         }
 
-        private async Task<ResolutionDetails<T>> ProcessFlag<T>(string flagKey, EvaluationContext context, T defaultValue)
+        private async Task<ResolutionDetails<T>> ResolveFlag<T>(string flagKey, EvaluationContext context, T defaultValue)
         {
             var user = context?.BuildUser();
             var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user);
-            return new ResolutionDetails<T>(flagKey, result.Value, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
+            var details = new ResolutionDetails<T>(flagKey, result.Value, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
+            if(details.ErrorType == ErrorType.None)
+            {
+                return details;
+            }
+
+            throw new FeatureProviderException(details.ErrorType, details.ErrorMessage);
         }
 
         private static ErrorType ParseErrorType(string errorMessage)
@@ -92,6 +105,14 @@ namespace OpenFeature.Contrib.ConfigCat
                 return ErrorType.TypeMismatch;
             }
             return ErrorType.General;
+        }
+
+        /// <summary>
+        /// Disposes the <see cref="Client"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Client?.Dispose();
         }
     }
 }
