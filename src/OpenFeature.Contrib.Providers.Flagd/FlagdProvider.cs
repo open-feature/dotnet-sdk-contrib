@@ -91,7 +91,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 _cache = new LRUCache<string, object>(_config.MaxCacheSize);
                 Task.Run(async () =>
                 {
-                    await HandleEvents();
+                    await HandleEvents().ConfigureAwait(false);
                 });
             }
         }
@@ -108,7 +108,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 Task.Run(async () =>
                 {
-                    await HandleEvents();
+                    await HandleEvents().ConfigureAwait(false);
                 });
             }
         }
@@ -149,7 +149,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<bool>(
                     flagKey: flagKey,
@@ -157,7 +157,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveBooleanResponse.Reason,
                     variant: resolveBooleanResponse.Variant
                 );
-            }, context);
+            }, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<string>(
                     flagKey: flagKey,
@@ -183,7 +183,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveStringResponse.Reason,
                     variant: resolveStringResponse.Variant
                 );
-            }, context);
+            }, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<int>(
                     flagKey: flagKey,
@@ -209,7 +209,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveIntResponse.Reason,
                     variant: resolveIntResponse.Variant
                 );
-            }, context);
+            }, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<double>(
                     flagKey: flagKey,
@@ -235,7 +235,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveDoubleResponse.Reason,
                     variant: resolveDoubleResponse.Variant
                 );
-            }, context);
+            }, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<Value>(
                     flagKey: flagKey,
@@ -261,7 +261,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     reason: resolveObjectResponse.Reason,
                     variant: resolveObjectResponse.Variant
                 );
-            }, context);
+            }, context).ConfigureAwait(false);
         }
 
         private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
@@ -277,9 +277,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                         return (ResolutionDetails<T>)value;
                     }
                 }
-                var result = await resolveDelegate.Invoke(ConvertToContext(context));
+                var result = await resolveDelegate.Invoke(ConvertToContext(context)).ConfigureAwait(false);
 
-                if (result.Reason.Equals("STATIC") && _config.CacheEnabled)
+                if (string.Equals(result.Reason, "STATIC", StringComparison.Ordinal) && _config.CacheEnabled)
                 {
                     _cache.Add(flagKey, result);
                 }
@@ -320,27 +320,24 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 try
                 {
                     // Read the response stream asynchronously
-                    while (await call.ResponseStream.MoveNext())
+                    while (await call.ResponseStream.MoveNext().ConfigureAwait(false))
                     {
                         var response = call.ResponseStream.Current;
 
-                        switch (response.Type.ToLower())
+                        if (string.Equals(response.Type, "configuration_change", StringComparison.OrdinalIgnoreCase))
                         {
-                            case "configuration_change":
-                                HandleConfigurationChangeEvent(response.Data);
-                                break;
-                            case "provider_ready":
-                                HandleProviderReadyEvent();
-                                break;
-                            default:
-                                break;
+                            HandleConfigurationChangeEvent(response.Data);
+                        }
+                        else if (string.Equals(response.Type, "provider_ready", StringComparison.OrdinalIgnoreCase))
+                        {
+                            HandleProviderReadyEvent();
                         }
                     }
                 }
                 catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
                 {
                     // Handle the dropped connection by reconnecting and retrying the stream
-                    await HandleErrorEvent();
+                    await HandleErrorEvent().ConfigureAwait(false);
                 }
             }
         }
@@ -395,7 +392,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
             _mtx.ReleaseMutex();
-            await Task.Delay(_eventStreamRetryBackoff * 1000);
+            await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -519,7 +516,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         private Service.ServiceClient BuildClientForPlatform(Uri url)
         {
-            var useUnixSocket = url.ToString().StartsWith("unix://");
+            var useUnixSocket = string.Equals(url.Scheme, "unix", StringComparison.Ordinal);
 
             if (!useUnixSocket)
             {
