@@ -68,7 +68,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
             var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
-            if (cacheStr.ToUpper().Equals("LRU"))
+            if (string.Equals(cacheStr, "LRU", StringComparison.OrdinalIgnoreCase))
             {
                 _cache = true;
                 _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
@@ -85,12 +85,12 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             _host = url.Host;
             _port = url.Port.ToString();
-            _useTLS = url.Scheme.ToLower().Equals("https");
+            _useTLS = string.Equals(url.Scheme, "https", StringComparison.OrdinalIgnoreCase);
             _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
-            _socketPath = url.Scheme.ToLower().Equals("unix") ? url.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "";
+            _socketPath = string.Equals(url.Scheme, "unix", StringComparison.OrdinalIgnoreCase) ? url.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "";
             var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
-            if (cacheStr.ToUpper().Equals("LRU"))
+            if (string.Equals(cacheStr, "LRU", StringComparison.OrdinalIgnoreCase))
             {
                 _cache = true;
                 _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
