@@ -65,7 +65,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestGetProviderName()
         {
-            Assert.Equal("No-op Provider", FlagdProvider.GetProviderName());
+            Assert.Equal("flagd Provider", FlagdProvider.GetProviderName());
         }
 
         [Fact]
