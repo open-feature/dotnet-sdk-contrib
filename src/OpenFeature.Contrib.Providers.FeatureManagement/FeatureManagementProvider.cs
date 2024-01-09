@@ -120,6 +120,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
                 return null;
 
             TargetingContext targetingContext = new TargetingContext();
+
             if (evaluationContext.ContainsKey("UserId"))
             {
                 Value userId = evaluationContext.GetValue("UserId");
