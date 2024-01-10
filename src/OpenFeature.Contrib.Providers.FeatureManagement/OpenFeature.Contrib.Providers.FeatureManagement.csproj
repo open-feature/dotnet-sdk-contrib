@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.Provider.FeatureManagement</PackageId>
-    <VersionNumber>0.0.1-preview</VersionNumber>
-    <Version>$(VersionNumber)</Version>
+    <VersionNumber>0.0.1</VersionNumber>
+    <Version>$(VersionNumber)-preview</Version>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>An OpenFeature Provider built on top of the standard Microsoft FeatureManagement Library</Description>

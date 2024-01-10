@@ -45,6 +45,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
         /// <returns>Metadata</returns>
         public override Metadata GetMetadata() => metadata;
 
+        /// <inheritdoc />
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
             var variant = await Evaluate(flagKey, context, CancellationToken.None);
@@ -54,6 +55,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return new ResolutionDetails<bool>(flagKey, defaultValue);
         }
 
+        /// <inheritdoc />
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
             var variant = await Evaluate(flagKey, context, CancellationToken.None);
@@ -64,6 +66,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return new ResolutionDetails<double>(flagKey, defaultValue);
         }
 
+        /// <inheritdoc />
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
             var variant = await Evaluate(flagKey, context, CancellationToken.None);
@@ -74,6 +77,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return new ResolutionDetails<int>(flagKey, defaultValue);
         }
 
+        /// <inheritdoc />
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
             var variant = await Evaluate(flagKey, context, CancellationToken.None);
@@ -84,6 +88,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return new ResolutionDetails<string>(flagKey, variant.Configuration.Value);
         }
 
+        /// <inheritdoc />
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
             var variant = await Evaluate(flagKey, context, CancellationToken.None);
@@ -95,6 +100,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return new ResolutionDetails<Value>(flagKey, parsedVariant);
         }
 
+        /// <inheritdoc />
         private ValueTask<Variant> Evaluate(string flagKey, EvaluationContext evaluationContext, CancellationToken cancellationToken)
         {
             TargetingContext targetingContext = ConvertContext(evaluationContext);
@@ -103,25 +109,30 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return featureManager.GetVariantAsync(flagKey, CancellationToken.None);
         }
 
+        /// <summary>
+        /// Converts the OpenFeature EvaluationContext to the Microsoft.FeatureManagement TargetingContext
+        /// </summary>
+        /// <param name="evaluationContext"></param>
+        /// <returns></returns>
         private TargetingContext ConvertContext(EvaluationContext evaluationContext)
         {
             if (evaluationContext == null)
                 return null;
 
             TargetingContext targetingContext = new TargetingContext();
-            if(evaluationContext.ContainsKey("UserId"))
+            if (evaluationContext.ContainsKey("UserId"))
             {
                 Value userId = evaluationContext.GetValue("UserId");
                 if (userId.IsString) targetingContext.UserId = userId.AsString;
             }
 
-            if(evaluationContext.ContainsKey("Groups"))
+            if (evaluationContext.ContainsKey("Groups"))
             {
                 Value groups = evaluationContext.GetValue("Groups");
-                if(groups.IsList)
+                if (groups.IsList)
                 {
                     List<string> groupList = new List<string>();
-                    foreach(var group in groups.AsList)
+                    foreach (var group in groups.AsList)
                     {
                         if (group.IsString) groupList.Add(group.AsString);
                     }
@@ -132,6 +143,11 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return targetingContext;
         }
 
+        /// <summary>
+        /// Parses an Microsoft.FeatureManagement Variant into an OpenFeature Value
+        /// </summary>
+        /// <param name="variant"></param>
+        /// <returns></returns>
         private Value ParseVariant(Variant variant)
         {
             if (variant == null || variant.Configuration == null)
@@ -143,6 +159,11 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return ParseUnknownType(variant.Configuration.Value);
         }
 
+        /// <summary>
+        /// Iterataes over a Variants configuration to parse it into an OpenFeature Value
+        /// </summary>
+        /// <param name="children"></param>
+        /// <returns></returns>
         private Value ParseChildren(IEnumerable<IConfigurationSection> children)
         {
             IDictionary<string, Value> keyValuePairs = new Dictionary<string, Value>();
@@ -157,6 +178,11 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
             return new Value(new Structure(keyValuePairs));
         }
 
+        /// <summary>
+        /// Attempts to parse an arbitrary string value through a set of parsable types
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private Value ParseUnknownType(string value)
         {
             if (bool.TryParse(value, out bool boolResult))
