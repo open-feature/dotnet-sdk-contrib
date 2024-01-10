@@ -27,10 +27,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
     /// </summary>
     public sealed class FlagdProvider : FeatureProvider
     {
+        const string ProviderName = "flagd Provider";
         static int EventStreamRetryBaseBackoff = 1;
         private readonly FlagdConfig _config;
         private readonly Service.ServiceClient _client;
-        private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
+        private readonly Metadata _providerMetadata = new Metadata(ProviderName);
 
         private readonly ICache<string, object> _cache;
         private int _eventStreamRetries;
@@ -121,7 +122,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// </summary>
         public static string GetProviderName()
         {
-            return Api.Instance.GetProviderMetadata().Name;
+            return ProviderName;
         }
 
         /// <summary>
