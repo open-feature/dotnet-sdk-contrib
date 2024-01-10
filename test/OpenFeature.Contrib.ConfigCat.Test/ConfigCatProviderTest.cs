@@ -45,9 +45,9 @@ namespace OpenFeature.Contrib.ConfigCat.Test
         }
 
         [Theory]
-        [InlineAutoData(1, 0,  ErrorType.TypeMismatch)]
-        [InlineAutoData("false", 0,  ErrorType.TypeMismatch)]
-        [InlineAutoData(false, 0,  ErrorType.TypeMismatch)]
+        [InlineAutoData(1, 0, ErrorType.TypeMismatch)]
+        [InlineAutoData("false", 0, ErrorType.TypeMismatch)]
+        [InlineAutoData(false, 0, ErrorType.TypeMismatch)]
         public Task GetDoubleValue_ForFeature_ShouldThrowException(object value, double defaultValue, ErrorType expectedErrorType, string sdkKey)
         {
             return ExecuteResolveErrorTest(value, defaultValue, expectedErrorType, sdkKey, (provider, key, def) => provider.ResolveDoubleValue(key, def));
@@ -76,9 +76,9 @@ namespace OpenFeature.Contrib.ConfigCat.Test
         }
 
         [Theory]
-        [InlineAutoData(1.0, 0,  ErrorType.TypeMismatch)]
-        [InlineAutoData("false", 0,  ErrorType.TypeMismatch)]
-        [InlineAutoData(false, 0,  ErrorType.TypeMismatch)]
+        [InlineAutoData(1.0, 0, ErrorType.TypeMismatch)]
+        [InlineAutoData("false", 0, ErrorType.TypeMismatch)]
+        [InlineAutoData(false, 0, ErrorType.TypeMismatch)]
         public Task GetIntValue_ForFeature_ShouldThrowException(object value, int defaultValue, ErrorType expectedErrorType, string sdkKey)
         {
             return ExecuteResolveErrorTest(value, defaultValue, expectedErrorType, sdkKey, (provider, key, def) => provider.ResolveIntegerValue(key, def));

@@ -65,7 +65,7 @@ namespace OpenFeature.Contrib.ConfigCat
             var result = await Client.GetValueDetailsAsync(flagKey, defaultValue?.AsObject, user);
             var returnValue = result.IsDefaultValue ? defaultValue : new Value(result.Value);
             var details = new ResolutionDetails<Value>(flagKey, returnValue, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
-            if(details.ErrorType == ErrorType.None)
+            if (details.ErrorType == ErrorType.None)
             {
                 return details;
             }
@@ -78,7 +78,7 @@ namespace OpenFeature.Contrib.ConfigCat
             var user = context?.BuildUser();
             var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user);
             var details = new ResolutionDetails<T>(flagKey, result.Value, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
-            if(details.ErrorType == ErrorType.None)
+            if (details.ErrorType == ErrorType.None)
             {
                 return details;
             }
