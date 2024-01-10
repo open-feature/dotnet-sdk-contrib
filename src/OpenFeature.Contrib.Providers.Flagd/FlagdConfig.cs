@@ -4,7 +4,25 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
 {
     /// <summary>
-    ///     FlagdConfig is the configuration object for flagD.
+    ///     ResolverTpe represents the flag evaluator type.
+    /// </summary>
+    public enum ResolverTpe
+    {
+        /// <summary>
+        ///     This is the default resolver type, which connects to flagd instance with flag evaluation gRPC contract.
+        ///     Evaluations are performed remotely.
+        /// </summary>
+        RPC,
+        /// <summary>
+        ///     This is the in-process resolving type, where flags are fetched with flag sync gRPC contract and stored
+        ///     locally for in-process evaluation.
+        ///     Evaluations are preformed in-process.
+        /// </summary>
+        IN_PROCESS
+    }
+
+    /// <summary>
+    ///     FlagdConfig is the configuration object for flagd.
     /// </summary>
     public class FlagdConfig
     {
@@ -16,6 +34,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal const string EnvVarCache = "FLAGD_CACHE";
         internal const string EnvVarMaxCacheSize = "FLAGD_MAX_CACHE_SIZE";
         internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
+        internal const string EnvVarResolverType = "FLAGD_RESOLVER_TYPE";
+
         internal static int CacheSizeDefault = 10;
         internal string Host
         {
@@ -58,6 +78,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private bool _cache;
         private int _maxCacheSize;
         private int _maxEventStreamRetries;
+        private ResolverTpe _resolverType;
 
         internal FlagdConfig()
         {
@@ -74,6 +95,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
                 _maxEventStreamRetries = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries) ?? "3");
             }
+
+            var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
+            _resolverType = resolverTypeStr.ToUpper().Equals("IN_PROCESS") ? ResolverTpe.IN_PROCESS : ResolverTpe.RPC;
         }
 
         internal FlagdConfig(Uri url)
@@ -96,6 +120,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
                 _maxEventStreamRetries = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries) ?? "3");
             }
+
+            var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
+            _resolverType = resolverTypeStr.ToUpper().Equals("IN_PROCESS") ? ResolverTpe.IN_PROCESS : ResolverTpe.RPC;
         }
 
         internal Uri GetUri()

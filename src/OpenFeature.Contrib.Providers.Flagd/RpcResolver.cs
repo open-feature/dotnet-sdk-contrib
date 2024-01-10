@@ -1,81 +1,30 @@
-﻿using System;
+using System;
 using System.IO;
-using System.Text;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
-using OpenFeature.Model;
-using OpenFeature.Error;
-
 using OpenFeature.Flagd.Grpc;
-using Metadata = OpenFeature.Model.Metadata;
-using Value = OpenFeature.Model.Value;
+using OpenFeature.Model;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Net.Sockets;
-using System.Net.Http;
-using System.Collections.Generic;
+using Value = OpenFeature.Model.Value;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
-    /// <summary>
-    ///     FlagdProvider is the OpenFeature provider for flagD.
-    /// </summary>
-    public sealed class FlagdProvider : FeatureProvider
+    internal class RpcResolver : Resolver
     {
         static int EventStreamRetryBaseBackoff = 1;
         private readonly FlagdConfig _config;
-        private readonly Service.ServiceClient _client;
-        private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
-
         private readonly ICache<string, object> _cache;
+        private readonly Service.ServiceClient _client;
+        private readonly System.Threading.Mutex _mtx;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-
-        private readonly System.Threading.Mutex _mtx;
-
-        /// <summary>
-        ///     Constructor of the provider. This constructor uses the value of the following
-        ///     environment variables to initialise its client:
-        ///     FLAGD_HOST                     - The host name of the flagd server (default="localhost")
-        ///     FLAGD_PORT                     - The port of the flagd server (default="8013")
-        ///     FLAGD_TLS                      - Determines whether to use https or not (default="false")
-        ///     FLAGD_FLAGD_SERVER_CERT_PATH   - The path to the client certificate (default="")
-        ///     FLAGD_SOCKET_PATH              - Path to the unix socket (default="")
-        ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
-        ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
-        ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
-        ///     FLAGD_RESOLVER_TYPE            - The type of resolver (in-process or rpc) to be used for the provider
-        /// </summary>
-        public FlagdProvider() : this(new FlagdConfig())
-        {
-        }
-
-        /// <summary>
-        ///     Constructor of the provider. This constructor uses the value of the following
-        ///     environment variables to initialise its client:
-        ///     FLAGD_FLAGD_SERVER_CERT_PATH   - The path to the client certificate (default="")
-        ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
-        ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
-        ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
-        ///     FLAGD_RESOLVER_TYPE            - The type of resolver (in-process or rpc) to be used for the provider
-        ///     <param name="url">The URL of the flagd server</param>
-        ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
-        /// </summary>
-        public FlagdProvider(Uri url) : this(new FlagdConfig(url))
-        {
-        }
-
-        /// <summary>
-        ///     Constructor of the provider.
-        ///     <param name="config">The FlagdConfig object</param>
-        ///     <exception cref="ArgumentNullException">if no config object is provided.</exception>
-        /// </summary>
-        public FlagdProvider(FlagdConfig config)
+        
+        public RpcResolver(FlagdConfig config)
         {
             if (config == null)
             {
@@ -85,7 +34,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _config = config;
 
             _client = BuildClientForPlatform(_config.GetUri());
-
             _mtx = new System.Threading.Mutex();
 
             if (_config.CacheEnabled)
@@ -98,52 +46,17 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
 
-        // just for testing, internal but visible in tests
-        internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
+        public void Init()
         {
-            _mtx = new System.Threading.Mutex();
-            _client = client;
-            _config = config;
-            _cache = cache;
-
-            if (_config.CacheEnabled)
-            {
-                Task.Run(async () =>
-                {
-                    await HandleEvents();
-                });
-            }
+            throw new System.NotImplementedException();
         }
 
-        // just for testing, internal but visible in tests
-        internal FlagdConfig GetConfig() => _config;
-
-        /// <summary>
-        /// Get the provider name.
-        /// </summary>
-        public static string GetProviderName()
+        public void Shutdown()
         {
-            return Api.Instance.GetProviderMetadata().Name;
+            throw new System.NotImplementedException();
         }
 
-        /// <summary>
-        ///     Return the metadata associated to this provider.
-        /// </summary>
-        public override Metadata GetMetadata() => _providerMetadata;
-
-        /// <summary>
-        ///     Return the Grpc client of the provider
-        /// </summary>
-        public Service.ServiceClient GetClient() => _client;
-
-        /// <summary>
-        ///     ResolveBooleanValue resolve the value for a Boolean Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -158,18 +71,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     value: (bool)resolveBooleanResponse.Value,
                     reason: resolveBooleanResponse.Reason,
                     variant: resolveBooleanResponse.Variant
-                );
+                    );
             }, context);
         }
 
-        /// <summary>
-        ///     ResolveStringValue resolve the value for a string Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -184,18 +90,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     value: resolveStringResponse.Value,
                     reason: resolveStringResponse.Reason,
                     variant: resolveStringResponse.Variant
-                );
+                    );
             }, context);
         }
 
-        /// <summary>
-        ///     ResolveIntegerValue resolve the value for an int Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -210,18 +109,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     value: (int)resolveIntResponse.Value,
                     reason: resolveIntResponse.Reason,
                     variant: resolveIntResponse.Variant
-                );
+                    );
             }, context);
         }
 
-        /// <summary>
-        ///     ResolveDoubleValue resolve the value for a double Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -236,18 +128,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     value: resolveDoubleResponse.Value,
                     reason: resolveDoubleResponse.Reason,
                     variant: resolveDoubleResponse.Variant
-                );
+                    );
             }, context);
         }
 
-        /// <summary>
-        ///     ResolveStructureValue resolve the value for a Boolean Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -262,10 +147,10 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     value: ConvertObjectToValue(resolveObjectResponse.Value),
                     reason: resolveObjectResponse.Reason,
                     variant: resolveObjectResponse.Variant
-                );
+                    );
             }, context);
         }
-
+        
         private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
         {
             try
@@ -290,30 +175,10 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             catch (RpcException e)
             {
-                throw GetOFException(e);
+                throw e;
             }
         }
-
-        /// <summary>
-        ///     GetOFException returns a OpenFeature Exception containing an error code to describe the encountered error.
-        /// </summary>
-        /// <param name="e">The exception thrown by the Grpc client</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        private FeatureProviderException GetOFException(Grpc.Core.RpcException e)
-        {
-            switch (e.Status.StatusCode)
-            {
-                case Grpc.Core.StatusCode.NotFound:
-                    return new FeatureProviderException(Constant.ErrorType.FlagNotFound, e.Status.Detail, e);
-                case Grpc.Core.StatusCode.Unavailable:
-                    return new FeatureProviderException(Constant.ErrorType.ProviderNotReady, e.Status.Detail, e);
-                case Grpc.Core.StatusCode.InvalidArgument:
-                    return new FeatureProviderException(Constant.ErrorType.TypeMismatch, e.Status.Detail, e);
-                default:
-                    return new FeatureProviderException(Constant.ErrorType.General, e.Status.Detail, e);
-            }
-        }
-
+        
         private async Task HandleEvents()
         {
             while (_eventStreamRetries < _config.MaxEventStreamRetries)
@@ -346,7 +211,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 }
             }
         }
-
+        
         private void HandleConfigurationChangeEvent(Struct data)
         {
             // if we don't have a cache, we don't need to remove anything
@@ -399,7 +264,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _mtx.ReleaseMutex();
             await Task.Delay(_eventStreamRetryBackoff * 1000);
         }
-
+        
         /// <summary>
         ///     ConvertToContext converts the given EvaluationContext to a Struct.
         /// </summary>
@@ -582,16 +447,16 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 ConnectCallback = connectionFactory.ConnectAsync
             };
-            
-            // point to localhost and let the custom ConnectCallback handle the communication over the unix socket
-            // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
-            return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
-            {
-                HttpHandler = socketsHttpHandler,
-            }));
+
+// point to localhost and let the custom ConnectCallback handle the communication over the unix socket
+// see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
+return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+{
+    HttpHandler = socketsHttpHandler,
+}));
 #endif
-            // unix socket support is not available in this dotnet version
-            throw new Exception("unix sockets are not supported in this version.");
+// unix socket support is not available in this dotnet version
+throw new Exception("unix sockets are not supported in this version.");
         }
-    }
+    }    
 }
