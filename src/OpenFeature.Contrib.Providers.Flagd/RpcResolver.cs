@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
+using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc;
 using OpenFeature.Model;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
@@ -24,7 +25,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
         
-        public RpcResolver(FlagdConfig config)
+        internal RpcResolver(FlagdConfig config)
         {
             if (config == null)
             {
@@ -39,6 +40,22 @@ namespace OpenFeature.Contrib.Providers.Flagd
             if (_config.CacheEnabled)
             {
                 _cache = new LRUCache<string, object>(_config.MaxCacheSize);
+                Task.Run(async () =>
+                {
+                    await HandleEvents();
+                });
+            }
+        }
+
+        internal RpcResolver(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
+        {
+            _mtx = new System.Threading.Mutex();
+            _client = client;
+            _config = config;
+            _cache = cache;
+
+            if (_config.CacheEnabled)
+            {
                 Task.Run(async () =>
                 {
                     await HandleEvents();
@@ -175,7 +192,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
             catch (RpcException e)
             {
-                throw e;
+                throw GetOFException(e);
             }
         }
         
@@ -381,6 +398,26 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 case ProtoValue.KindOneofCase.None:
                 default:
                     return new Value();
+            }
+        }
+
+        /// <summary>
+        ///     GetOFException returns a OpenFeature Exception containing an error code to describe the encountered error.
+        /// </summary>
+        /// <param name="e">The exception thrown by the Grpc client</param>
+        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
+        private FeatureProviderException GetOFException(Grpc.Core.RpcException e)
+        {
+            switch (e.Status.StatusCode)
+            {
+                case Grpc.Core.StatusCode.NotFound:
+                    return new FeatureProviderException(Constant.ErrorType.FlagNotFound, e.Status.Detail, e);
+                case Grpc.Core.StatusCode.Unavailable:
+                    return new FeatureProviderException(Constant.ErrorType.ProviderNotReady, e.Status.Detail, e);
+                case Grpc.Core.StatusCode.InvalidArgument:
+                    return new FeatureProviderException(Constant.ErrorType.TypeMismatch, e.Status.Detail, e);
+                default:
+                    return new FeatureProviderException(Constant.ErrorType.General, e.Status.Detail, e);
             }
         }
 

@@ -6,7 +6,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
     /// <summary>
     ///     ResolverTpe represents the flag evaluator type.
     /// </summary>
-    public enum ResolverTpe
+    public enum ResolverType
     {
         /// <summary>
         ///     This is the default resolver type, which connects to flagd instance with flag evaluation gRPC contract.
@@ -70,6 +70,12 @@ namespace OpenFeature.Contrib.Providers.Flagd
             set { _maxEventStreamRetries = value; }
         }
 
+        internal ResolverType ResolverType
+        {
+            get => _resolverType;
+            set => _resolverType = value;
+        }
+
         private string _host;
         private string _port;
         private bool _useTLS;
@@ -78,7 +84,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private bool _cache;
         private int _maxCacheSize;
         private int _maxEventStreamRetries;
-        private ResolverTpe _resolverType;
+        private ResolverType _resolverType;
 
         internal FlagdConfig()
         {
