@@ -121,15 +121,15 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
 
             TargetingContext targetingContext = new TargetingContext();
 
-            if (evaluationContext.ContainsKey("UserId"))
+            if (evaluationContext.ContainsKey(nameof(targetingContext.UserId)))
             {
-                Value userId = evaluationContext.GetValue("UserId");
+                Value userId = evaluationContext.GetValue(nameof(targetingContext.UserId));
                 if (userId.IsString) targetingContext.UserId = userId.AsString;
             }
 
-            if (evaluationContext.ContainsKey("Groups"))
+            if (evaluationContext.ContainsKey(nameof(targetingContext.Groups)))
             {
-                Value groups = evaluationContext.GetValue("Groups");
+                Value groups = evaluationContext.GetValue(nameof(targetingContext.Groups));
                 if (groups.IsList)
                 {
                     List<string> groupList = new List<string>();

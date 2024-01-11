@@ -7,28 +7,8 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
     public class FeatureManagementProviderTestNoContext
     {
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task MissingFlagKey_ShouldReturnDefault(bool defaultValue)
-        {
-            // Arrange
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.enabled.json")
-                .Build();
-
-            var provider = new FeatureManagementProvider(configuration);
-
-            // Act
-            var result = await provider.ResolveBooleanValue("MissingFlagKey", defaultValue);
-
-            // Assert
-            Assert.Equal(defaultValue, result.Value);
-        }
-
-        [Theory]
-        [InlineData("Flag_Boolean_AlwaysOn", true)]
-        [InlineData("Flag_Boolean_AlwaysOff", false)]
-        public async Task BooleanValue_ShouldReturnExpected(string key, bool expected)
+        [MemberData(nameof(TestData.BooleanNoContext), MemberType = typeof(TestData))]
+        public async Task BooleanValue_ShouldReturnExpected(string key, bool defaultValue, bool expectedValue)
         {
             // Arrange
             var configuration = new ConfigurationBuilder()
@@ -39,16 +19,15 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Invert the expected value to ensure that the value is being read from the configuration
-            var result = await provider.ResolveBooleanValue(key, !expected);
+            var result = await provider.ResolveBooleanValue(key, defaultValue);
 
             // Assert
-            Assert.Equal(expected, result.Value);
+            Assert.Equal(expectedValue, result.Value);
         }
 
         [Theory]
-        [InlineData("Flag_Double_AlwaysOn", 1.0)]
-        [InlineData("Flag_Double_AlwaysOff", -1.0)]
-        public async Task DoubleValue_ShouldReturnExpected(string key, double expected)
+        [MemberData(nameof(TestData.DoubleNoContext), MemberType = typeof(TestData))]
+        public async Task DoubleValue_ShouldReturnExpected(string key, double defaultValue, double expectedValue)
         {
             // Arrange
             var configuration = new ConfigurationBuilder()
@@ -58,16 +37,15 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0.0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveDoubleValue(key, 0.0f);
+            var result = await provider.ResolveDoubleValue(key, defaultValue);
 
             // Assert
-            Assert.Equal(expected, result.Value);
+            Assert.Equal(expectedValue, result.Value);
         }
 
         [Theory]
-        [InlineData("Flag_Integer_AlwaysOn", 1)]
-        [InlineData("Flag_Integer_AlwaysOff", -1)]
-        public async Task IntegerValue_ShouldReturnExpected(string key, int expected)
+        [MemberData(nameof(TestData.IntegerNoContext), MemberType = typeof(TestData))]
+        public async Task IntegerValue_ShouldReturnExpected(string key, int defaultValue, int expectedValue)
         {
             // Arrange
             var configuration = new ConfigurationBuilder()
@@ -77,16 +55,15 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveIntegerValue(key, 0);
+            var result = await provider.ResolveIntegerValue(key, defaultValue);
 
             // Assert
-            Assert.Equal(expected, result.Value);
+            Assert.Equal(expectedValue, result.Value);
         }
 
         [Theory]
-        [InlineData("Flag_String_AlwaysOn", "FlagEnabled")]
-        [InlineData("Flag_String_AlwaysOff", "FlagDisabled")]
-        public async Task StringValue_ShouldReturnExpected(string key, string expected)
+        [MemberData(nameof(TestData.StringNoContext), MemberType = typeof(TestData))]
+        public async Task StringValue_ShouldReturnExpected(string key, string defaultValue, string expectedValue)
         {
             // Arrange
             var configuration = new ConfigurationBuilder()
@@ -96,14 +73,14 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveStringValue(key, "DefaultValue");
+            var result = await provider.ResolveStringValue(key, defaultValue);
 
             // Assert
-            Assert.Equal(expected, result.Value);
+            Assert.Equal(expectedValue, result.Value);
         }
 
         [Theory]
-        [InlineData("Flag_Structure_AlwaysOn")]
+        [MemberData(nameof(TestData.StructureNoContext), MemberType = typeof(TestData))]
         public async Task StructureValue_ShouldReturnExpected(string key)
         {
             // Arrange
