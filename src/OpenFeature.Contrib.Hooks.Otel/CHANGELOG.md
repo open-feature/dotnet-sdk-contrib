@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Hooks.Otel-v0.1.2...OpenFeature.Contrib.Hooks.Otel-v0.1.3) (2024-01-11)
+
+
+### 🔄 Refactoring
+
+* Reduce OTel dependencies ([#132](https://github.com/open-feature/dotnet-sdk-contrib/issues/132)) ([de86b0e](https://github.com/open-feature/dotnet-sdk-contrib/commit/de86b0e34ea829608360109a5c5f1c61f8efdcaf))
+
 ## [0.1.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Hooks.Otel-v0.1.1...OpenFeature.Contrib.Hooks.Otel-v0.1.2) (2023-12-19)
 
 
