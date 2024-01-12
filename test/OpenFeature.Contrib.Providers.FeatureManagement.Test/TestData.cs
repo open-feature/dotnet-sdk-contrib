@@ -40,10 +40,10 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
         public static IEnumerable<object[]> DoubleWithContext()
         {
             yield return new object[] { "MissingFlagKey", VALID_EMAIL, VALID_GROUP, 1.0, 1.0 };
-            yield return new object[] { "Flag_Double_TargetingUserId", VALID_EMAIL, VALID_GROUP, 0.0, 1.0};
-            yield return new object[] { "Flag_Double_TargetingUserId", INVALID_EMAIL, INVALID_GROUP, 0.0, -1.0};
+            yield return new object[] { "Flag_Double_TargetingUserId", VALID_EMAIL, VALID_GROUP, 0.0, 1.0 };
+            yield return new object[] { "Flag_Double_TargetingUserId", INVALID_EMAIL, INVALID_GROUP, 0.0, -1.0 };
             yield return new object[] { "Flag_Double_TargetingGroup", VALID_EMAIL, VALID_GROUP, 0.0, 1.0 };
-            yield return new object[] { "Flag_Double_TargetingGroup", INVALID_EMAIL, INVALID_GROUP, 0.0, -1.0};
+            yield return new object[] { "Flag_Double_TargetingGroup", INVALID_EMAIL, INVALID_GROUP, 0.0, -1.0 };
         }
 
         public static IEnumerable<object[]> IntegerNoContext()
