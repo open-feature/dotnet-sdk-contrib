@@ -1,6 +1,7 @@
 ﻿using OpenFeature.Model;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Diagnostics;
 using OpenTelemetry.Trace;
 
 namespace OpenFeature.Contrib.Hooks.Otel
@@ -22,17 +23,16 @@ namespace OpenFeature.Contrib.Hooks.Otel
         public override Task After<T>(HookContext<T> context, FlagEvaluationDetails<T> details,
             IReadOnlyDictionary<string, object> hints = null)
         {
-            var span = Tracer.CurrentSpan;
-            if (span != null)
-            {
-                var attributes = new Dictionary<string, object>
+            Activity.Current?
+                .SetTag("feature_flag.key", details.FlagKey)
+                .SetTag("feature_flag.variant", details.Variant)
+                .SetTag("feature_flag.provider_name", context.ProviderMetadata.Name)
+                .AddEvent(new ActivityEvent("feature_flag", tags: new ActivityTagsCollection
                 {
-                    {"feature_flag.key", details.FlagKey},
-                    {"feature_flag.variant", details.Variant},
-                    {"feature_flag.provider_name", context.ProviderMetadata.Name}
-                };
-                span.AddEvent("feature_flag", new SpanAttributes(attributes));
-            }
+                    ["feature_flag.key"] = details.FlagKey,
+                    ["feature_flag.variant"] = details.Variant,
+                    ["feature_flag.provider_name"] = context.ProviderMetadata.Name
+                }));
 
             return Task.CompletedTask;
         }
@@ -47,11 +47,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
         public override Task Error<T>(HookContext<T> context, System.Exception error,
             IReadOnlyDictionary<string, object> hints = null)
         {
-            var span = Tracer.CurrentSpan;
-            if (span != null)
-            {
-                span.RecordException(error);
-            }
+            Activity.Current?.RecordException(error);
 
             return Task.CompletedTask;
         }
