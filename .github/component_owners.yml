@@ -34,7 +34,7 @@ components:
     - matthewelwell
   test/OpenFeature.Contrib.Providers.ConfigCat.Test:
     - luizbon
-  test/OpenFeature.Contrib.Providers.FeatureManagement:
+  test/OpenFeature.Contrib.Providers.FeatureManagement.Test:
     - ericpattison
     - toddbaert
 
