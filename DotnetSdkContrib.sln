@@ -23,9 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFeature.Contrib.Provide
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagsmith.Test", "test\OpenFeature.Contrib.Providers.Flagsmith.Test\OpenFeature.Contrib.Providers.Flagsmith.Test.csproj", "{C3BA23C2-BEC3-4683-A64A-C914C3D8037E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.ConfigCat", "src\OpenFeature.Contrib.ConfigCat\OpenFeature.Contrib.ConfigCat.csproj", "{8A8EC7E5-4844-4F32-AE19-5591FAB9B75C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.ConfigCat", "src\OpenFeature.Contrib.Providers.ConfigCat\OpenFeature.Contrib.Providers.ConfigCat.csproj", "{8A8EC7E5-4844-4F32-AE19-5591FAB9B75C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.ConfigCat.Test", "test\OpenFeature.Contrib.ConfigCat.Test\OpenFeature.Contrib.ConfigCat.Test.csproj", "{047835AC-A8E3-432A-942D-0BDC1E9FC3BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.ConfigCat.Test", "test\OpenFeature.Contrib.Providers.ConfigCat.Test\OpenFeature.Contrib.Providers.ConfigCat.Test.csproj", "{047835AC-A8E3-432A-942D-0BDC1E9FC3BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

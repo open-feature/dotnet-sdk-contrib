@@ -13,6 +13,8 @@ components:
   src/OpenFeature.Contrib.Providers.Flagsmith:
     - vpetrusevici
     - matthewelwell
+  src/OpenFeature.Contrib.Providers.ConfigCat:
+    - luizbon
 
   # test/
   test/OpenFeature.Contrib.Hooks.Otel.Test:
@@ -27,6 +29,8 @@ components:
   test/OpenFeature.Contrib.Providers.Flagsmith.Test:
     - vpetrusevici
     - matthewelwell
+  test/OpenFeature.Contrib.Providers.ConfigCat.Test:
+    - luizbon
 
 ignored-authors:
   - renovate-bot
