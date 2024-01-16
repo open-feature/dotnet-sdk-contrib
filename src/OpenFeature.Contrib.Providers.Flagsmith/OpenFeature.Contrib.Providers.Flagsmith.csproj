@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Flagsmith" Version="5.2.2" />
-    <PackageReference Include="System.Text.Json" Version="8.0.1" />
+    <PackageReference Include="Flagsmith" />
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
   <PropertyGroup>

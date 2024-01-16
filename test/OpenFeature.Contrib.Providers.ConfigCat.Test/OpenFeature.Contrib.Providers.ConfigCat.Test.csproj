@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AutoFixture.Xunit2" Version="4.17.0" />
+    <PackageReference Include="AutoFixture.Xunit2" />
     <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.ConfigCat\OpenFeature.Contrib.Providers.ConfigCat.csproj" />
   </ItemGroup>
 
