@@ -103,7 +103,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
 
             var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
-            _resolverType = resolverTypeStr.ToUpper().Equals("IN_PROCESS") ? ResolverTpe.IN_PROCESS : ResolverTpe.RPC;
+            _resolverType = resolverTypeStr.ToUpper().Equals("IN_PROCESS") ? ResolverType.IN_PROCESS : ResolverType.RPC;
         }
 
         internal FlagdConfig(Uri url)
@@ -128,7 +128,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
 
             var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
-            _resolverType = resolverTypeStr.ToUpper().Equals("IN_PROCESS") ? ResolverTpe.IN_PROCESS : ResolverTpe.RPC;
+            _resolverType = resolverTypeStr.ToUpper().Equals("IN_PROCESS") ? ResolverType.IN_PROCESS : ResolverType.RPC;
         }
 
         internal Uri GetUri()

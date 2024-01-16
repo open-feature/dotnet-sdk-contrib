@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Security;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
 using Google.Protobuf.WellKnownTypes;
@@ -11,6 +12,7 @@ using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc;
 using OpenFeature.Model;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
+using System.Net.Sockets;
 using Value = OpenFeature.Model.Value;
 
 namespace OpenFeature.Contrib.Providers.Flagd
@@ -34,7 +36,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             _config = config;
 
-            _client = BuildClientForPlatform(_config.GetUri());
+            _client = BuildClientForPlatform(_config);
             _mtx = new System.Threading.Mutex();
 
             if (_config.CacheEnabled)
@@ -200,7 +202,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             while (_eventStreamRetries < _config.MaxEventStreamRetries)
             {
-                var call = _client.EventStream(new Empty());
+                var call = _client.EventStream(new EventStreamRequest());
                 try
                 {
                     // Read the response stream asynchronously
@@ -421,9 +423,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
 
-        private Service.ServiceClient BuildClientForPlatform(Uri url)
+        private Service.ServiceClient BuildClientForPlatform(FlagdConfig config)
         {
-            var useUnixSocket = url.ToString().StartsWith("unix://");
+            var useUnixSocket = config.GetUri().ToString().StartsWith("unix://");
 
             if (!useUnixSocket)
             {
@@ -432,11 +434,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
 #else
                 var handler = new HttpClientHandler();
 #endif
-                if (_config.UseCertificate)
+                if (config.UseCertificate)
                 {
-                    if (File.Exists(_config.CertificatePath))
+                    if (File.Exists(config.CertificatePath))
                     {
-                        X509Certificate2 certificate = new X509Certificate2(_config.CertificatePath);
+                        X509Certificate2 certificate = new X509Certificate2(config.CertificatePath);
 #if NET5_0_OR_GREATER
                         handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
                             // the the custom cert to the chain, Build returns a bool if valid.
@@ -471,14 +473,14 @@ namespace OpenFeature.Contrib.Providers.Flagd
                         throw new ArgumentException("Specified certificate cannot be found.");
                     }
                 }
-                return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
+                return new Service.ServiceClient(GrpcChannel.ForAddress(config.GetUri(), new GrpcChannelOptions
                 {
                     HttpHandler = handler
                 }));
             }
 
 #if NET5_0_OR_GREATER
-            var udsEndPoint = new UnixDomainSocketEndPoint(url.ToString().Substring("unix://".Length));
+            var udsEndPoint = new UnixDomainSocketEndPoint(config.GetUri().ToString().Substring("unix://".Length));
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
             var socketsHttpHandler = new SocketsHttpHandler
             {

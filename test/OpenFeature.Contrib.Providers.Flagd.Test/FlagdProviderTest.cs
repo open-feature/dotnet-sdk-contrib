@@ -480,7 +480,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             );
 
             mockGrpcClient.EventStream(
-                    Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None)
                 .Returns(grpcEventStreamResp);
 
             var mockCache = Substitute.For<ICache<string, object>>();
@@ -500,7 +500,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.True(_autoResetEvent.WaitOne(10000));
             mockCache.Received(1).TryGet(Arg.Is<string>(s => s == "my-key"));
             mockCache.Received(1).Add(Arg.Is<string>(s => s == "my-key"), Arg.Any<object>());
-            mockGrpcClient.Received(1).EventStream(Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None);
+            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None);
         }
 
         [Fact]
@@ -541,7 +541,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             );
 
             mockGrpcClient.EventStream(
-                    Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None)
+                Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None)
                 .Returns(grpcEventStreamResp);
 
             var mockCache = Substitute.For<ICache<string, object>>();
@@ -561,7 +561,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             // wait for the autoReset event to be fired before verifying the invocation of the mocked functions
             Assert.True(_autoResetEvent.WaitOne(10000));
             mockCache.Received(1).TryGet("my-key");
-            mockGrpcClient.Received(1).EventStream(Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None);
+            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None);
         }
 
         [Fact]
@@ -629,7 +629,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             );
 
             mockGrpcClient.EventStream(
-                    Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None)
+                Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None)
                 .Returns(grpcEventStreamResp);
 
             var mockCache = Substitute.For<ICache<string, object>>();
@@ -662,7 +662,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockCache.Received(2).TryGet("my-key");
             mockCache.Received(2).Add("my-key", Arg.Any<object>());
             mockCache.Received().Delete("my-key");
-            mockGrpcClient.Received(1).EventStream(Arg.Any<Empty>(), null, null, System.Threading.CancellationToken.None);
+            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None);
         }
     }
 }

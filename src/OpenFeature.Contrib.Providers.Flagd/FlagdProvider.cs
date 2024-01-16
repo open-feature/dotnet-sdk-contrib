@@ -34,10 +34,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         private readonly Resolver _resolver;
 
-        private readonly ICache<string, object> _cache;
-        private int _eventStreamRetries;
-        private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-
         private readonly System.Threading.Mutex _mtx;
 
         /// <summary>
