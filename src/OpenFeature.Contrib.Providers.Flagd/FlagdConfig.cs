@@ -35,6 +35,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal const string EnvVarMaxCacheSize = "FLAGD_MAX_CACHE_SIZE";
         internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
         internal const string EnvVarResolverType = "FLAGD_RESOLVER_TYPE";
+        internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
 
         internal static int CacheSizeDefault = 10;
         internal string Host
@@ -76,6 +77,12 @@ namespace OpenFeature.Contrib.Providers.Flagd
             set => _resolverType = value;
         }
 
+        internal string SourceSelector
+        {
+            get { return _sourceSelector; }
+            set { _sourceSelector = value; }
+        }
+
         private string _host;
         private string _port;
         private bool _useTLS;
@@ -84,6 +91,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private bool _cache;
         private int _maxCacheSize;
         private int _maxEventStreamRetries;
+        private string _sourceSelector;
         private ResolverType _resolverType;
 
         internal FlagdConfig()
@@ -93,6 +101,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _useTLS = bool.Parse(Environment.GetEnvironmentVariable(EnvVarTLS) ?? "false");
             _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
             _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
+            _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
             var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
             if (cacheStr.ToUpper().Equals("LRU"))

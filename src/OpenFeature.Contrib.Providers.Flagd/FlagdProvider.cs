@@ -82,8 +82,15 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             _config = config;
 
-            // TODO set to in process resolver if set appropriately
-            _resolver = new RpcResolver(config);
+            if (_config.ResolverType == ResolverType.IN_PROCESS)
+            {
+                _resolver = new InProcessResolver(_config);
+            }
+            else
+            {
+                _resolver = new RpcResolver(config);
+            }
+            _resolver.Init();
         }
 
         // just for testing, internal but visible in tests

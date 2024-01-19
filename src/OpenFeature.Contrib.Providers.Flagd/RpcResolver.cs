@@ -13,6 +13,7 @@ using OpenFeature.Flagd.Grpc;
 using OpenFeature.Model;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 using System.Net.Sockets;
+using System.Threading;
 using Value = OpenFeature.Model.Value;
 
 namespace OpenFeature.Contrib.Providers.Flagd
@@ -42,10 +43,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
             if (_config.CacheEnabled)
             {
                 _cache = new LRUCache<string, object>(_config.MaxCacheSize);
-                Task.Run(async () =>
-                {
-                    await HandleEvents();
-                });
             }
         }
 
@@ -56,18 +53,16 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _config = config;
             _cache = cache;
 
-            if (_config.CacheEnabled)
-            {
-                Task.Run(async () =>
-                {
-                    await HandleEvents();
-                });
-            }
+
         }
 
         public void Init()
         {
-            throw new System.NotImplementedException();
+            if (_config.CacheEnabled)
+            {
+                var handleEvents = new Thread(HandleEvents)
+               handleEvents.Start();
+            }
         }
 
         public void Shutdown()
@@ -198,7 +193,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
         }
         
-        private async Task HandleEvents()
+        private async void HandleEvents()
         {
             while (_eventStreamRetries < _config.MaxEventStreamRetries)
             {
