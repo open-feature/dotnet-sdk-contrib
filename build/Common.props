@@ -23,7 +23,6 @@
       Please sort alphabetically.
       Refer to https://docs.microsoft.com/nuget/concepts/package-versioning for semver syntax.
     -->
-    <MicrosoftSourceLinkGitHubPkgVer>[1.0.0,2.0)</MicrosoftSourceLinkGitHubPkgVer>
     <!-- 0.5+ -->
     <OpenFeatureVer>[1.2,)</OpenFeatureVer>
   </PropertyGroup>
