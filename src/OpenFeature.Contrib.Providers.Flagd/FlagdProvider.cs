@@ -29,7 +29,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
     {
         static int EventStreamRetryBaseBackoff = 1;
         private readonly FlagdConfig _config;
-        private readonly Service.ServiceClient _client;
+
         private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
 
         private readonly Resolver _resolver;
@@ -97,6 +97,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
         {
             _resolver = new RpcResolver(client, config, cache);
+            _resolver.Init();
         }
 
         // just for testing, internal but visible in tests
@@ -116,9 +117,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
         public override Metadata GetMetadata() => _providerMetadata;
 
         /// <summary>
-        ///     Return the Grpc client of the provider
+        ///     Return the resolver of the provider
         /// </summary>
-        public Service.ServiceClient GetClient() => _client;
+        internal Resolver GetResolver() => _resolver;
 
         /// <summary>
         ///     ResolveBooleanValue resolve the value for a Boolean Flag.

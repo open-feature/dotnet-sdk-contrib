@@ -52,15 +52,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _client = client;
             _config = config;
             _cache = cache;
-
-
         }
 
         public void Init()
         {
             if (_config.CacheEnabled)
             {
-                var handleEvents = new Thread(HandleEvents)
+                var handleEvents = new Thread(HandleEvents);
                handleEvents.Start();
             }
         }

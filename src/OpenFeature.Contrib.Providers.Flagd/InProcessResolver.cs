@@ -23,7 +23,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private readonly FlagSyncService.FlagSyncServiceClient _client;
         private readonly JsonEvaluator _evaluator;
 
-        private readonly System.Threading.Mutex _mtx;
+        private readonly Mutex _mtx;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
         private readonly FlagdConfig _config;

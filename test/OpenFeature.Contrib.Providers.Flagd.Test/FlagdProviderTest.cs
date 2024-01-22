@@ -1,14 +1,17 @@
-using Xunit;
-using OpenFeature.Flagd.Grpc;
-using Grpc.Core;
-using Google.Protobuf.WellKnownTypes;
-using OpenFeature.Error;
-using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Collections.Generic;
-using OpenFeature.Model;
-using System.Threading;
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using NSubstitute;
+using OpenFeature.Constant;
+using OpenFeature.Error;
+using OpenFeature.Flagd.Grpc;
+using OpenFeature.Model;
+using Xunit;
+using Metadata = Grpc.Core.Metadata;
+using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
@@ -18,37 +21,37 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void BuildClientForPlatform_Should_Throw_Exception_When_FlagdCertPath_Not_Exists()
         {
             // Arrange
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "non-existing-path");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "non-existing-path");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => new FlagdProvider());
 
             // Cleanup
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
         }
 
         [Fact]
         public void BuildClientForPlatform_Should_Return_Client_For_Non_Unix_Socket_Without_Certificate()
         {
             // Arrange
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
 
             // Act
             var flagdProvider = new FlagdProvider();
-            var client = flagdProvider.GetClient();
+            var resolver = flagdProvider.GetResolver();
 
             // Assert
-            Assert.NotNull(client);
-            Assert.IsType<Service.ServiceClient>(client);
+            Assert.NotNull(resolver);
+            Assert.IsType<RpcResolver>(resolver);
 
             // Cleanup
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
         }
 
 #if NET462
@@ -73,9 +76,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         {
             var flagdProvider = new FlagdProvider();
 
-            var client = flagdProvider.GetClient();
+            var resolver = flagdProvider.GetResolver();
 
-            Assert.NotNull(client);
+            Assert.NotNull(resolver);
         }
 
         [Fact]
@@ -85,19 +88,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var config = new FlagdConfig();
 
             // Set env variables (should be ignored by the constructor)
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "path");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost111");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "true");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "path");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost111");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "true");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
             // Create provider, which ignores the env vars and uses the config
             var flagdProvider = new FlagdProvider(config);
 
-            // Client should no be nil
-            var client = flagdProvider.GetClient();
-            Assert.NotNull(client);
+            // Resolver should no be nil
+            var resolver = flagdProvider.GetResolver();
+            Assert.NotNull(resolver);
 
             // Retrieve config for assertions
             config = flagdProvider.GetConfig();
@@ -109,33 +112,33 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal(0, config.MaxCacheSize);
 
             // Cleanup
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
         }
 
         [Fact]
         public void TestGetProviderWithUri()
         {
             // Set env variables (should be used by the constructor)
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
             // Set env variables (should be ignored by the constructor)
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost111");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "false");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost111");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "false");
 
             // Create provider, which ignores the env vars and uses the config
             var flagdProvider = new FlagdProvider(new Uri("https://localhost:8013"));
 
-            // Client should no be nil
-            var client = flagdProvider.GetClient();
-            Assert.NotNull(client);
+            // Resolver should no be nil
+            var resolver = flagdProvider.GetResolver();
+            Assert.NotNull(resolver);
 
             // Retrieve config for assertions
             var config = flagdProvider.GetConfig();
@@ -147,12 +150,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal(20, config.MaxCacheSize);
 
             // Cleanup
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
-            System.Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
         }
 
         [Fact]
@@ -164,22 +167,22 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             };
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
-                System.Threading.Tasks.Task.FromResult(resp),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromResult(resp),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var substituteGrpcClient = Substitute.For<Service.ServiceClient>();
             substituteGrpcClient
                 .ResolveBooleanAsync(
-                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(substituteGrpcClient, new FlagdConfig());
 
             // resolve with default set to false to make sure we return what the grpc server gives us
-            var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            var val = flagdProvider.ResolveBooleanValue("my-key", false);
 
             Assert.True(val.Result.Value);
         }
@@ -190,21 +193,21 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var resp = new ResolveStringResponse { Value = "my-value" };
 
             var grpcResp = new AsyncUnaryCall<ResolveStringResponse>(
-                System.Threading.Tasks.Task.FromResult(resp),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromResult(resp),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var subGrpcClient = Substitute.For<Service.ServiceClient>();
 
             subGrpcClient.ResolveStringAsync(
-                    Arg.Any<ResolveStringRequest>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<ResolveStringRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(subGrpcClient, new FlagdConfig());
 
-            var val = flagdProvider.ResolveStringValue("my-key", "", null);
+            var val = flagdProvider.ResolveStringValue("my-key", "");
 
             Assert.Equal("my-value", val.Result.Value);
         }
@@ -218,19 +221,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             };
 
             var grpcResp = new AsyncUnaryCall<ResolveIntResponse>(
-                System.Threading.Tasks.Task.FromResult(resp),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromResult(resp),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var subGrpcClient = Substitute.For<Service.ServiceClient>();
-            subGrpcClient.ResolveIntAsync(Arg.Any<ResolveIntRequest>(), null, null, System.Threading.CancellationToken.None)
+            subGrpcClient.ResolveIntAsync(Arg.Any<ResolveIntRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(subGrpcClient, new FlagdConfig());
 
-            var val = flagdProvider.ResolveIntegerValue("my-key", 0, null);
+            var val = flagdProvider.ResolveIntegerValue("my-key", 0);
 
             Assert.Equal(10, val.Result.Value);
         }
@@ -244,19 +247,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             };
 
             var grpcResp = new AsyncUnaryCall<ResolveFloatResponse>(
-                System.Threading.Tasks.Task.FromResult(resp),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromResult(resp),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var mockGrpcClient = Substitute.For<Service.ServiceClient>();
-            mockGrpcClient.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>(), null, null, System.Threading.CancellationToken.None)
+            mockGrpcClient.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
 
-            var val = flagdProvider.ResolveDoubleValue("my-key", 0.0, null);
+            var val = flagdProvider.ResolveDoubleValue("my-key", 0.0);
 
             Assert.Equal(10.0, val.Result.Value);
         }
@@ -273,19 +276,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             resp.Value = returnedValue;
 
             var grpcResp = new AsyncUnaryCall<ResolveObjectResponse>(
-                System.Threading.Tasks.Task.FromResult(resp),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromResult(resp),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var mockGrpcClient = Substitute.For<Service.ServiceClient>();
-            mockGrpcClient.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>(), null, null, System.Threading.CancellationToken.None)
+            mockGrpcClient.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
 
-            var val = flagdProvider.ResolveStructureValue("my-key", null, null);
+            var val = flagdProvider.ResolveStructureValue("my-key", null);
 
             Assert.True(val.Result.Value.AsStructure.ContainsKey("my-key"));
         }
@@ -293,18 +296,18 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestResolveFlagNotFound()
         {
-            var exc = new RpcException(new Grpc.Core.Status(Grpc.Core.StatusCode.NotFound, Constant.ErrorType.FlagNotFound.ToString()));
+            var exc = new RpcException(new Status(StatusCode.NotFound, ErrorType.FlagNotFound.ToString()));
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
-                System.Threading.Tasks.Task.FromException<ResolveBooleanResponse>(exc),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromException<ResolveBooleanResponse>(exc),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var mockGrpcClient = Substitute.For<Service.ServiceClient>();
             mockGrpcClient.ResolveBooleanAsync(
-                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None).Returns(grpcResp);
+                    Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None).Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
 
@@ -313,12 +316,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             {
                 try
                 {
-                    await flagdProvider.ResolveBooleanValue("my-key", true, null);
+                    await flagdProvider.ResolveBooleanValue("my-key", true);
                 }
                 catch (FeatureProviderException e)
                 {
-                    Assert.Equal(Constant.ErrorType.FlagNotFound, e.ErrorType);
-                    Assert.Equal(Constant.ErrorType.FlagNotFound.ToString(), e.Message);
+                    Assert.Equal(ErrorType.FlagNotFound, e.ErrorType);
+                    Assert.Equal(ErrorType.FlagNotFound.ToString(), e.Message);
                     throw;
                 }
             });
@@ -327,18 +330,18 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestResolveGrpcHostUnavailable()
         {
-            var exc = new RpcException(new Grpc.Core.Status(Grpc.Core.StatusCode.Unavailable, Constant.ErrorType.ProviderNotReady.ToString()));
+            var exc = new RpcException(new Status(StatusCode.Unavailable, ErrorType.ProviderNotReady.ToString()));
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
-                System.Threading.Tasks.Task.FromException<ResolveBooleanResponse>(exc),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromException<ResolveBooleanResponse>(exc),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var mockGrpcClient = Substitute.For<Service.ServiceClient>();
             mockGrpcClient.ResolveBooleanAsync(
-                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
@@ -348,12 +351,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             {
                 try
                 {
-                    await flagdProvider.ResolveBooleanValue("my-key", true, null);
+                    await flagdProvider.ResolveBooleanValue("my-key", true);
                 }
                 catch (FeatureProviderException e)
                 {
-                    Assert.Equal(Constant.ErrorType.ProviderNotReady, e.ErrorType);
-                    Assert.Equal(Constant.ErrorType.ProviderNotReady.ToString(), e.Message);
+                    Assert.Equal(ErrorType.ProviderNotReady, e.ErrorType);
+                    Assert.Equal(ErrorType.ProviderNotReady.ToString(), e.Message);
                     throw;
                 }
             });
@@ -362,18 +365,18 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestResolveTypeMismatch()
         {
-            var exc = new RpcException(new Grpc.Core.Status(Grpc.Core.StatusCode.InvalidArgument, Constant.ErrorType.TypeMismatch.ToString()));
+            var exc = new RpcException(new Status(StatusCode.InvalidArgument, ErrorType.TypeMismatch.ToString()));
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
-                System.Threading.Tasks.Task.FromException<ResolveBooleanResponse>(exc),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromException<ResolveBooleanResponse>(exc),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var mockGrpcClient = Substitute.For<Service.ServiceClient>();
             mockGrpcClient.ResolveBooleanAsync(
-                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
@@ -383,12 +386,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             {
                 try
                 {
-                    await flagdProvider.ResolveBooleanValue("my-key", true, null);
+                    await flagdProvider.ResolveBooleanValue("my-key", true);
                 }
                 catch (FeatureProviderException e)
                 {
-                    Assert.Equal(Constant.ErrorType.TypeMismatch, e.ErrorType);
-                    Assert.Equal(Constant.ErrorType.TypeMismatch.ToString(), e.Message);
+                    Assert.Equal(ErrorType.TypeMismatch, e.ErrorType);
+                    Assert.Equal(ErrorType.TypeMismatch.ToString(), e.Message);
                     throw;
                 }
             });
@@ -397,18 +400,18 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestResolveUnknownError()
         {
-            var exc = new RpcException(new Grpc.Core.Status(Grpc.Core.StatusCode.Internal, "unknown error"));
+            var exc = new RpcException(new Status(StatusCode.Internal, "unknown error"));
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
-                System.Threading.Tasks.Task.FromException<ResolveBooleanResponse>(exc),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromException<ResolveBooleanResponse>(exc),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var mockGrpcClient = Substitute.For<Service.ServiceClient>();
             mockGrpcClient.ResolveBooleanAsync(
-                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
@@ -418,12 +421,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             {
                 try
                 {
-                    await flagdProvider.ResolveBooleanValue("my-key", true, null);
+                    await flagdProvider.ResolveBooleanValue("my-key", true);
                 }
                 catch (FeatureProviderException e)
                 {
-                    Assert.Equal(Constant.ErrorType.General, e.ErrorType);
-                    Assert.Equal(Constant.ErrorType.General.ToString(), e.Message);
+                    Assert.Equal(ErrorType.General, e.ErrorType);
+                    Assert.Equal(ErrorType.General.ToString(), e.Message);
                     throw;
                 }
             });
@@ -437,15 +440,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             resp.Reason = "STATIC";
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
-                System.Threading.Tasks.Task.FromResult(resp),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromResult(resp),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var mockGrpcClient = Substitute.For<Service.ServiceClient>();
             mockGrpcClient.ResolveBooleanAsync(
-                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var asyncStreamReader = Substitute.For<IAsyncStreamReader<EventStreamResponse>>();
@@ -462,7 +465,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             // create an autoResetEvent which we will wait for in our test verification
             var _autoResetEvent = new AutoResetEvent(false);
 
-            asyncStreamReader.MoveNext(Arg.Any<System.Threading.CancellationToken>()).Returns(enumerator.MoveNext());
+            asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(enumerator.MoveNext());
             asyncStreamReader.Current.Returns(_ =>
             {
                 // set the autoResetEvent since this path should be the last one that's reached in the background task
@@ -480,7 +483,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             );
 
             mockGrpcClient.EventStream(
-                    Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcEventStreamResp);
 
             var mockCache = Substitute.For<ICache<string, object>>();
@@ -494,13 +497,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(mockGrpcClient, config, mockCache);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
-            var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            var val = flagdProvider.ResolveBooleanValue("my-key", false);
             Assert.True(val.Result.Value);
 
             Assert.True(_autoResetEvent.WaitOne(10000));
             mockCache.Received(1).TryGet(Arg.Is<string>(s => s == "my-key"));
             mockCache.Received(1).Add(Arg.Is<string>(s => s == "my-key"), Arg.Any<object>());
-            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None);
+            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None);
         }
 
         [Fact]
@@ -523,7 +526,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             // create an autoResetEvent which we will wait for in our test verification
             AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
 
-            asyncStreamReader.MoveNext(Arg.Any<System.Threading.CancellationToken>()).Returns(enumerator.MoveNext());
+            asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(enumerator.MoveNext());
             asyncStreamReader.Current.Returns(_ =>
             {
                 // set the autoResetEvent since this path should be the last one that's reached in the background task
@@ -541,7 +544,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             );
 
             mockGrpcClient.EventStream(
-                Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None)
+                Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcEventStreamResp);
 
             var mockCache = Substitute.For<ICache<string, object>>();
@@ -555,13 +558,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(mockGrpcClient, config, mockCache);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
-            var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            var val = flagdProvider.ResolveBooleanValue("my-key", false);
             Assert.True(val.Result.Value);
 
             // wait for the autoReset event to be fired before verifying the invocation of the mocked functions
             Assert.True(_autoResetEvent.WaitOne(10000));
             mockCache.Received(1).TryGet("my-key");
-            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None);
+            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None);
         }
 
         [Fact]
@@ -572,28 +575,28 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             resp.Reason = "STATIC";
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
-                System.Threading.Tasks.Task.FromResult(resp),
-                System.Threading.Tasks.Task.FromResult(new Grpc.Core.Metadata()),
+                Task.FromResult(resp),
+                Task.FromResult(new Metadata()),
                 () => Status.DefaultSuccess,
-                () => new Grpc.Core.Metadata(),
+                () => new Metadata(),
                 () => { });
 
             var mockGrpcClient = Substitute.For<Service.ServiceClient>();
             mockGrpcClient.ResolveBooleanAsync(
-                    Arg.Any<ResolveBooleanRequest>(), null, null, System.Threading.CancellationToken.None)
+                    Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
             var asyncStreamReader = Substitute.For<IAsyncStreamReader<EventStreamResponse>>();
 
             var configurationChangeData = new Struct();
             var changedFlag = new Struct();
-            changedFlag.Fields.Add("my-key", new Google.Protobuf.WellKnownTypes.Value());
+            changedFlag.Fields.Add("my-key", new ProtoValue());
             configurationChangeData.Fields.Add("flags", ProtoValue.ForStruct(changedFlag));
 
 
             var firstCall = true;
 
-            asyncStreamReader.MoveNext(Arg.Any<System.Threading.CancellationToken>()).Returns(true);
+            asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(true);
             // as long as we did not send our first request to the provider, we will not send a configuration_change event
             // after the value of the flag has been retrieved the first time, we will send a configuration_change to test if the
             // item is deleted from the cache
@@ -629,7 +632,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             );
 
             mockGrpcClient.EventStream(
-                Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None)
+                Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcEventStreamResp);
 
             var mockCache = Substitute.For<ICache<string, object>>();
@@ -648,13 +651,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(mockGrpcClient, config, mockCache);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
-            var val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            var val = flagdProvider.ResolveBooleanValue("my-key", false);
             Assert.True(val.Result.Value);
 
             // set firstCall to true to make the mock EventStream return a configuration_change event
             firstCall = false;
 
-            val = flagdProvider.ResolveBooleanValue("my-key", false, null);
+            val = flagdProvider.ResolveBooleanValue("my-key", false);
             Assert.True(val.Result.Value);
 
             Assert.True(_autoResetEvent.WaitOne(10000));
@@ -662,7 +665,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockCache.Received(2).TryGet("my-key");
             mockCache.Received(2).Add("my-key", Arg.Any<object>());
             mockCache.Received().Delete("my-key");
-            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, System.Threading.CancellationToken.None);
+            mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None);
         }
     }
 }
