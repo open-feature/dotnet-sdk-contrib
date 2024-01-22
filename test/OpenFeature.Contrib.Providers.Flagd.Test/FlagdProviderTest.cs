@@ -8,6 +8,7 @@ using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc;
+using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
 using Xunit;
 using Metadata = Grpc.Core.Metadata;
@@ -179,7 +180,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(substituteGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(substituteGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             var val = flagdProvider.ResolveBooleanValue("my-key", false);
@@ -205,7 +207,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveStringRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(subGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             var val = flagdProvider.ResolveStringValue("my-key", "");
 
@@ -231,7 +234,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             subGrpcClient.ResolveIntAsync(Arg.Any<ResolveIntRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(subGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             var val = flagdProvider.ResolveIntegerValue("my-key", 0);
 
@@ -257,7 +261,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockGrpcClient.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             var val = flagdProvider.ResolveDoubleValue("my-key", 0.0);
 
@@ -286,7 +291,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockGrpcClient.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             var val = flagdProvider.ResolveStructureValue("my-key", null);
 
@@ -309,7 +315,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockGrpcClient.ResolveBooleanAsync(
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None).Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
             Assert.ThrowsAsync<FeatureProviderException>(async () =>
@@ -344,7 +351,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
             Assert.ThrowsAsync<FeatureProviderException>(async () =>
@@ -379,7 +387,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
             Assert.ThrowsAsync<FeatureProviderException>(async () =>
@@ -414,7 +423,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var flagdProvider = new FlagdProvider(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
             Assert.ThrowsAsync<FeatureProviderException>(async () =>
@@ -494,7 +504,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var config = new FlagdConfig();
             config.CacheEnabled = true;
             config.MaxEventStreamRetries = 1;
-            var flagdProvider = new FlagdProvider(mockGrpcClient, config, mockCache);
+
+            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             var val = flagdProvider.ResolveBooleanValue("my-key", false);
@@ -555,7 +567,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 CacheEnabled = true,
                 MaxEventStreamRetries = 1
             };
-            var flagdProvider = new FlagdProvider(mockGrpcClient, config, mockCache);
+
+            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             var val = flagdProvider.ResolveBooleanValue("my-key", false);
@@ -648,7 +662,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var config = new FlagdConfig();
             config.CacheEnabled = true;
             config.MaxEventStreamRetries = 1;
-            var flagdProvider = new FlagdProvider(mockGrpcClient, config, mockCache);
+
+            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+            var flagdProvider = new FlagdProvider(rpcResolver);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             var val = flagdProvider.ResolveBooleanValue("my-key", false);
@@ -666,6 +682,120 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockCache.Received(2).Add("my-key", Arg.Any<object>());
             mockCache.Received().Delete("my-key");
             mockGrpcClient.Received(1).EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task TestInProcessResolver()
+        {
+            var resp = new ResolveBooleanResponse();
+            resp.Value = true;
+            resp.Reason = "STATIC";
+
+            var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();
+
+            var asyncStreamReader = Substitute.For<IAsyncStreamReader<SyncFlagsResponse>>();
+
+            var l = new List<SyncFlagsResponse>
+            {
+                new SyncFlagsResponse{
+                    FlagConfiguration = Utils.flags
+                }
+            };
+
+            var enumerator = l.GetEnumerator();
+
+
+            asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(enumerator.MoveNext());
+            asyncStreamReader.Current.Returns(_ => enumerator.Current);
+
+            var grpcEventStreamResp = new AsyncServerStreamingCall<SyncFlagsResponse>(
+                asyncStreamReader,
+                null,
+                null,
+                null,
+                null,
+                null
+                );
+
+            mockGrpcClient.SyncFlags(
+                Arg.Any<SyncFlagsRequest>(), null, null, CancellationToken.None)
+                .Returns(grpcEventStreamResp);
+
+
+            var config = new FlagdConfig();
+            config.CacheEnabled = true;
+            config.MaxEventStreamRetries = 1;
+            config.SourceSelector = "source-selector";
+
+            var rpcResolver = new InProcessResolver(mockGrpcClient, config);
+            var flagdProvider = new FlagdProvider(rpcResolver);
+
+            // resolve with default set to false to make sure we return what the grpc server gives us
+            await Utils.AssertUntilAsync(
+                _ =>
+                {
+                    var val = flagdProvider.ResolveBooleanValue("staticBoolFlag", false);
+                    Assert.True(val.Result.Value);
+                });
+
+            mockGrpcClient.Received(1).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task TestInProcessResolverDefaultValueIfNotFound()
+        {
+            var resp = new ResolveBooleanResponse();
+            resp.Value = true;
+            resp.Reason = "STATIC";
+
+            var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();
+
+            var asyncStreamReader = Substitute.For<IAsyncStreamReader<SyncFlagsResponse>>();
+
+            var l = new List<SyncFlagsResponse>
+            {
+                new SyncFlagsResponse{
+                    FlagConfiguration = Utils.flags
+                }
+            };
+
+            var enumerator = l.GetEnumerator();
+
+
+            asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(enumerator.MoveNext());
+            asyncStreamReader.Current.Returns(_ => enumerator.Current);
+
+            var grpcEventStreamResp = new AsyncServerStreamingCall<SyncFlagsResponse>(
+                asyncStreamReader,
+                null,
+                null,
+                null,
+                null,
+                null
+                );
+
+            mockGrpcClient.SyncFlags(
+                Arg.Any<SyncFlagsRequest>(), null, null, CancellationToken.None)
+                .Returns(grpcEventStreamResp);
+
+
+            var config = new FlagdConfig();
+            config.CacheEnabled = true;
+            config.MaxEventStreamRetries = 1;
+            config.SourceSelector = "source-selector";
+
+            var rpcResolver = new InProcessResolver(mockGrpcClient, config);
+            var flagdProvider = new FlagdProvider(rpcResolver);
+
+            // resolve with default set to false to make sure we return what the grpc server gives us
+            await Utils.AssertUntilAsync(
+                _ =>
+                {
+                    var val = flagdProvider.ResolveStringValue("unknown", "unknown");
+                    Assert.Equal("unknown", val.Result.Value);
+                });
+
+            mockGrpcClient.Received(1).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
         }
     }
 }

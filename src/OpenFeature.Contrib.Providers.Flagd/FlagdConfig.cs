@@ -127,6 +127,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _useTLS = url.Scheme.ToLower().Equals("https");
             _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
             _socketPath = url.Scheme.ToLower().Equals("unix") ? url.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "";
+            _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
             var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
             if (cacheStr.ToUpper().Equals("LRU"))

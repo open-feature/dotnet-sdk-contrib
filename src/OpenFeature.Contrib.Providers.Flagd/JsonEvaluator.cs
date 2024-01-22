@@ -25,19 +25,19 @@ namespace OpenFeature.Contrib.Providers.Flagd
         [JsonProperty("source")]
         internal string Source { get; set; }
     }
-    
+
     internal class FlagSyncData
     {
         [JsonProperty("flags")]
         internal Dictionary<string, FlagConfiguration> Flags { get; set; }
     }
-    
+
     internal class FlagConfigurationSync
     {
         string FlagData { get; set; }
-        string Source { get; set; } 
+        string Source { get; set; }
     }
-    
+
     internal enum FlagConfigurationUpdateType
     {
         ADD,
@@ -45,20 +45,20 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ALL,
         DELETE
     }
-    
+
     internal class JsonEvaluator
     {
         private Dictionary<string, FlagConfiguration> _flags = new Dictionary<string, FlagConfiguration>();
-        
+
         private string _selector;
-        
+
         private readonly JsonLogicEvaluator _evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-        
+
         internal JsonEvaluator(string selector)
         {
             _selector = selector;
         }
-        
+
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
         {
             var flagConfigsMap = JsonConvert.DeserializeObject<FlagSyncData>(flagConfigurations);
@@ -86,7 +86,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                         _flags.Remove(keyAndValue.Key);
                     }
                     break;
-                    
+
             }
         }
 
@@ -114,8 +114,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
-        
-        private  ResolutionDetails<T> ResolveValue<T>(string flagKey, T defaultValue, EvaluationContext context = null)
+
+        private ResolutionDetails<T> ResolveValue<T>(string flagKey, T defaultValue, EvaluationContext context = null)
         {
             // check if we find the flag key
             var reason = Reason.Default;
@@ -130,16 +130,16 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     // Parse json into hierarchical structure
                     var rule = JObject.Parse(targetingString);
                     // the JsonLogic evaluator will return the variant for the value
-                    
+
                     // convert the EvaluationContext object into something the JsonLogic evaluator can work with
                     dynamic contextObj = (object)ConvertToDynamicObject(context.AsDictionary());
 
                     variant = (string)_evaluator.Apply(rule, contextObj);
                 }
-                
-                
+
+
                 // using the returned variant, go through the available variants and take the correct value if it exists
-                if(variant != null && flagConfiguration.Variants.TryGetValue(variant, out var foundVariantValue))
+                if (variant != null && flagConfiguration.Variants.TryGetValue(variant, out var foundVariantValue))
                 {
                     if (foundVariantValue is Int64)
                     {
@@ -168,7 +168,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 errorType: ErrorType.FlagNotFound
                 );
         }
-        
+
         static dynamic ConvertToDynamicObject(IImmutableDictionary<string, Value> dictionary)
         {
             var expandoObject = new System.Dynamic.ExpandoObject();
@@ -182,7 +182,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             return expandoObject;
         }
-        
+
         static Value ConvertJObjectToOpenFeatureValue(JObject jsonValue)
         {
             var result = new Dictionary<string, Value>();
@@ -198,19 +198,19 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     case JTokenType.Integer:
                         result.Add(property.Name, new Value((Int64)property.Value));
                         break;
-                    
+
                     case JTokenType.Boolean:
                         result.Add(property.Name, new Value((bool)property.Value));
                         break;
-                    
+
                     case JTokenType.Float:
                         result.Add(property.Name, new Value((float)property.Value));
                         break;
-                    
+
                     case JTokenType.Object:
                         result.Add(property.Name, ConvertJObjectToOpenFeatureValue((JObject)property.Value));
                         break;
-                    
+
                     default:
                         // Handle unknown data type or throw an exception
                         throw new InvalidOperationException($"Unsupported data type: {property.Value.Type}");

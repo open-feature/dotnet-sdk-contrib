@@ -155,6 +155,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal(20, config.MaxCacheSize);
         }
 
+        [Fact]
+        public void TestFlagdConfigResolverType()
+        {
+            CleanEnvVars();
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "IN_PROCESS");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceSelector, "source-selector");
+
+            var config = new FlagdConfig(new Uri("http://localhost:8013"));
+
+            Assert.Equal(ResolverType.IN_PROCESS, config.ResolverType);
+            Assert.Equal("source-selector", config.SourceSelector);
+        }
+
         private void CleanEnvVars()
         {
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");

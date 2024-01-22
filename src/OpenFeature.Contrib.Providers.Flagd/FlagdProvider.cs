@@ -94,9 +94,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
         }
 
         // just for testing, internal but visible in tests
-        internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
+        internal FlagdProvider(Resolver resolver)
         {
-            _resolver = new RpcResolver(client, config, cache);
+            _resolver = resolver;
             _resolver.Init();
         }
 

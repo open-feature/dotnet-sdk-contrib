@@ -10,7 +10,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
     {
         void Init();
         void Shutdown();
-        
+
         Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue,
             EvaluationContext context = null);
 

@@ -35,6 +35,14 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _evaluator = new JsonEvaluator(config.SourceSelector);
         }
 
+        internal InProcessResolver(FlagSyncService.FlagSyncServiceClient client, FlagdConfig config)
+        {
+            _config = config;
+            _client = client;
+            _evaluator = new JsonEvaluator(config.SourceSelector);
+        }
+
+
         public void Init()
         {
             var handleEvents = new Thread(HandleEvents);
@@ -262,5 +270,5 @@ namespace OpenFeature.Contrib.Providers.Flagd
             throw new Exception("unix sockets are not supported in this version.");
         }
 
-    }    
+    }
 }

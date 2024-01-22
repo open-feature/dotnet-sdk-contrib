@@ -27,7 +27,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private readonly System.Threading.Mutex _mtx;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-        
+
         internal RpcResolver(FlagdConfig config)
         {
             if (config == null)
@@ -59,7 +59,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             if (_config.CacheEnabled)
             {
                 var handleEvents = new Thread(HandleEvents);
-               handleEvents.Start();
+                handleEvents.Start();
             }
         }
 
@@ -162,7 +162,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     );
             }, context);
         }
-        
+
         private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
         {
             try
@@ -190,7 +190,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 throw GetOFException(e);
             }
         }
-        
+
         private async void HandleEvents()
         {
             while (_eventStreamRetries < _config.MaxEventStreamRetries)
@@ -223,7 +223,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 }
             }
         }
-        
+
         private void HandleConfigurationChangeEvent(Struct data)
         {
             // if we don't have a cache, we don't need to remove anything
@@ -276,7 +276,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _mtx.ReleaseMutex();
             await Task.Delay(_eventStreamRetryBackoff * 1000);
         }
-        
+
         /// <summary>
         ///     ConvertToContext converts the given EvaluationContext to a Struct.
         /// </summary>
@@ -487,8 +487,8 @@ return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new 
     HttpHandler = socketsHttpHandler,
 }));
 #endif
-// unix socket support is not available in this dotnet version
-throw new Exception("unix sockets are not supported in this version.");
+            // unix socket support is not available in this dotnet version
+            throw new Exception("unix sockets are not supported in this version.");
         }
-    }    
+    }
 }
