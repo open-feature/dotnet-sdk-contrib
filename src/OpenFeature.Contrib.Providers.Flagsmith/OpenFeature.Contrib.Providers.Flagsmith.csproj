@@ -4,12 +4,10 @@
     <TargetFrameworks>netstandard20</TargetFrameworks>
     <PackageId>OpenFeature.Contrib.Providers.Flagsmith</PackageId>
     <VersionNumber>0.1.5</VersionNumber> <!--x-release-please-version -->
-    <Version>$(VersionNumber)</Version>
+    <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>Flagsmith provider for .NET</Description>
-    <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
     <Authors>Vladimir Petrusevici</Authors>
   </PropertyGroup>
 

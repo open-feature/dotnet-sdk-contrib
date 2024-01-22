@@ -3,12 +3,11 @@
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.Provider.FeatureManagement</PackageId>
     <VersionNumber>0.0.1</VersionNumber>
-    <Version>$(VersionNumber)-preview</Version>
+    <VersionPrefix>$(VersionNumber)</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>An OpenFeature Provider built on top of the standard Microsoft FeatureManagement Library</Description>
-    <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
     <Authors>Eric Pattison</Authors>
   </PropertyGroup>
 
