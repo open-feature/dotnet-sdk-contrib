@@ -27,4 +27,8 @@
     <!-- 0.5+ -->
     <OpenFeatureVer>[1.2,)</OpenFeatureVer>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(OS)' == 'Unix'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

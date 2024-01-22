@@ -1,14 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.Providers.ConfigCat</PackageId>
     <VersionNumber>0.0.2</VersionNumber> <!--x-release-please-version -->
-    <Version>$(VersionNumber)</Version>
+    <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>ConfigCat provider for .NET</Description>
-    <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
     <Authors>Luiz Bon</Authors>
   </PropertyGroup>
   <ItemGroup>
