@@ -72,12 +72,12 @@ For this hook to function correctly a global `MeterProvider` must be set.
 
 Below are the metrics extracted by this hook and dimensions they carry:
 
-| Metric key                             | Description                     | Unit         | Dimensions                          |
-| -------------------------------------- | ------------------------------- | ------------ | ----------------------------------- |
-| feature_flag.evaluation_requests_total | Number of evaluation requests   | {request}    | key, provider name                  |
-| feature_flag.evaluation_success_total  | Flag evaluation successes       | {impression} | key, provider name, reason, variant |
-| feature_flag.evaluation_error_total    | Flag evaluation errors          | Counter      | key, provider name                  |
-| feature_flag.evaluation_active_count   | Active flag evaluations counter | Counter      | key                                 |
+| Metric key                             | Description                     | Unit         | Dimensions                                               |
+| -------------------------------------- | ------------------------------- | ------------ | -------------------------------------------------------- |
+| feature_flag.evaluation_requests_total | Number of evaluation requests   | {request}    | key, provider name                                       |
+| feature_flag.evaluation_success_total  | Flag evaluation successes       | {impression} | key, provider name, reason, variant, custom dimensions\* |
+| feature_flag.evaluation_error_total    | Flag evaluation errors          | Counter      | key, provider name                                       |
+| feature_flag.evaluation_active_count   | Active flag evaluations counter | Counter      | key                                                      |
 
 Consider the following code example for usage.
 
@@ -124,6 +124,54 @@ namespace OpenFeatureTestApp
 ```
 
 After running this example, you should be able to see some metrics being generated into the console.
+
+### Custom dimensions
+
+The metrics hook can be enriched with custom dimensions. This is only available for the `feature_flag.evaluation_success_total` metric.
+In order to use it, you need to create a instance of the `MetricsHook` class with a dictionary of custom dimensions.
+
+See example:
+
+```csharp
+using OpenFeature.Contrib.Providers.Flagd;
+using OpenFeature;
+using OpenFeature.Contrib.Hooks.Otel;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+
+namespace OpenFeatureTestApp
+{
+    class Hello {
+        static void Main(string[] args) {
+
+            // set up the OpenTelemetry OTLP exporter
+            var meterProvider = Sdk.CreateMeterProviderBuilder()
+                    .AddMeter("OpenFeature.Contrib.Hooks.Otel")
+                    .ConfigureResource(r => r.AddService("openfeature-test"))
+                    .AddConsoleExporter()
+                    .Build();
+
+            // add the Otel Hook to the OpenFeature instance
+            var options = new MetricHookCustomDimensions()
+                .Add("key", "value")
+                .Add("test", "test");
+            OpenFeature.Api.Instance.AddHooks(new MetricsHook(options));
+
+            var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
+
+            // Set the flagdProvider as the provider for the OpenFeature SDK
+            OpenFeature.Api.Instance.SetProvider(flagdProvider);
+
+            var client = OpenFeature.Api.Instance.GetClient("my-app");
+
+            var val = client.GetBooleanValue("myBoolFlag", false, null);
+
+            // Print the value of the 'myBoolFlag' feature flag
+            System.Console.WriteLine(val.Result.ToString());
+        }
+    }
+}
+```
 
 ## License
 
