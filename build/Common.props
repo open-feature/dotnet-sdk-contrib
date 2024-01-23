@@ -25,7 +25,7 @@
     -->
     <MicrosoftSourceLinkGitHubPkgVer>[1.0.0,2.0)</MicrosoftSourceLinkGitHubPkgVer>
     <!-- 0.5+ -->
-    <OpenFeatureVer>[1.2,)</OpenFeatureVer>
+    <OpenFeatureVer>[1.4,)</OpenFeatureVer>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Unix'">
