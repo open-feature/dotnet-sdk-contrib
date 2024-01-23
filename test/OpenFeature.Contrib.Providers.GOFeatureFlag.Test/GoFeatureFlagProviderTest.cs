@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 using OpenFeature.Model;
@@ -84,14 +85,14 @@ public class GoFeatureFlagProviderTest
 
 
     [Fact]
-    private void getMetadata_validate_name()
+    public async Task getMetadata_validate_name()
     {
         var goFeatureFlagProvider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Timeout = new TimeSpan(19 * TimeSpan.TicksPerHour),
             Endpoint = baseUrl
         });
-        Api.Instance.SetProvider(goFeatureFlagProvider);
+        await Api.Instance.SetProviderAsync(goFeatureFlagProvider);
         Assert.Equal("GO Feature Flag Provider", Api.Instance.GetProvider().GetMetadata().Name);
     }
 
@@ -134,7 +135,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_throw_an_error_if_endpoint_not_available()
+    public async Task should_throw_an_error_if_endpoint_not_available()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -142,7 +143,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetBooleanDetails("fail_500", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -152,7 +153,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_have_bad_request_if_no_token()
+    public async Task should_have_bad_request_if_no_token()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -160,7 +161,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetBooleanDetails("api_key_missing", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -170,7 +171,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_have_unauthorized_if_invalid_token()
+    public async Task should_have_unauthorized_if_invalid_token()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -179,7 +180,7 @@ public class GoFeatureFlagProviderTest
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
             ApiKey = "ff877c7a-4594-43b5-89a8-df44c9984bd8"
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetBooleanDetails("invalid_api_key", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -189,7 +190,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_throw_an_error_if_flag_does_not_exists()
+    public async Task should_throw_an_error_if_flag_does_not_exists()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -197,7 +198,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetBooleanDetails("flag_not_found", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -207,7 +208,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_throw_an_error_if_we_expect_a_boolean_and_got_another_type()
+    public async Task should_throw_an_error_if_we_expect_a_boolean_and_got_another_type()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -215,7 +216,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetBooleanDetails("string_key", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -225,7 +226,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_resolve_a_valid_boolean_flag_with_TARGETING_MATCH_reason()
+    public async Task should_resolve_a_valid_boolean_flag_with_TARGETING_MATCH_reason()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -233,7 +234,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetBooleanDetails("bool_targeting_match", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -244,7 +245,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_return_custom_reason_if_returned_by_relay_proxy()
+    public async Task should_return_custom_reason_if_returned_by_relay_proxy()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -252,7 +253,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetBooleanDetails("unknown_reason", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -263,7 +264,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_use_boolean_default_value_if_the_flag_is_disabled()
+    public async Task should_use_boolean_default_value_if_the_flag_is_disabled()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -271,7 +272,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetBooleanDetails("disabled", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -280,7 +281,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_throw_an_error_if_we_expect_a_string_and_got_another_type()
+    public async Task should_throw_an_error_if_we_expect_a_string_and_got_another_type()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -288,7 +289,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetStringDetails("bool_targeting_match", "default", _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -298,7 +299,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_resolve_a_valid_string_flag_with_TARGETING_MATCH_reason()
+    public async Task should_resolve_a_valid_string_flag_with_TARGETING_MATCH_reason()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -306,7 +307,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetStringDetails("string_key", "defaultValue", _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -317,7 +318,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_use_string_default_value_if_the_flag_is_disabled()
+    public async Task should_use_string_default_value_if_the_flag_is_disabled()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -325,7 +326,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetStringDetails("disabled_string", "defaultValue", _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -334,7 +335,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_throw_an_error_if_we_expect_a_integer_and_got_another_type()
+    public async Task should_throw_an_error_if_we_expect_a_integer_and_got_another_type()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -342,7 +343,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetIntegerDetails("string_key", 200, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -352,7 +353,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_resolve_a_valid_integer_flag_with_TARGETING_MATCH_reason()
+    public async Task should_resolve_a_valid_integer_flag_with_TARGETING_MATCH_reason()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -360,7 +361,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetIntegerDetails("integer_key", 1200, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -371,7 +372,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_use_integer_default_value_if_the_flag_is_disabled()
+    public async Task should_use_integer_default_value_if_the_flag_is_disabled()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -379,7 +380,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetIntegerDetails("disabled_integer", 1225, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -388,7 +389,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_throw_an_error_if_we_expect_a_integer_and_double_type()
+    public async Task should_throw_an_error_if_we_expect_a_integer_and_double_type()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -396,7 +397,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetIntegerDetails("double_key", 200, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -406,7 +407,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_resolve_a_valid_double_flag_with_TARGETING_MATCH_reason()
+    public async Task should_resolve_a_valid_double_flag_with_TARGETING_MATCH_reason()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -414,7 +415,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetDoubleDetails("double_key", 1200.25, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -425,7 +426,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_use_double_default_value_if_the_flag_is_disabled()
+    public async Task should_use_double_default_value_if_the_flag_is_disabled()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -433,7 +434,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetDoubleDetails("disabled_double", 1225.34, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -442,7 +443,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_resolve_a_valid_value_flag_with_TARGETING_MATCH_reason()
+    public async Task should_resolve_a_valid_value_flag_with_TARGETING_MATCH_reason()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -450,7 +451,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetObjectDetails("object_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -466,7 +467,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_wrap_into_value_if_wrong_type()
+    public async Task should_wrap_into_value_if_wrong_type()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -474,7 +475,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetObjectDetails("string_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -485,7 +486,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_use_object_default_value_if_the_flag_is_disabled()
+    public async Task should_use_object_default_value_if_the_flag_is_disabled()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -493,7 +494,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetObjectDetails("disabled_object", new Value("default"), _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -503,7 +504,7 @@ public class GoFeatureFlagProviderTest
 
 
     [Fact]
-    private void should_throw_an_error_if_no_targeting_key()
+    public async Task should_throw_an_error_if_no_targeting_key()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -511,7 +512,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetStringDetails("list_key", "empty", EvaluationContext.Empty);
         Assert.NotNull(res.Result);
@@ -521,7 +522,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_resolve_a_valid_value_flag_with_a_list()
+    public async Task should_resolve_a_valid_value_flag_with_a_list()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -529,7 +530,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetObjectDetails("list_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
@@ -542,7 +543,7 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
-    private void should_use_object_default_value_if_flag_not_found()
+    public async Task should_use_object_default_value_if_flag_not_found()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
@@ -550,7 +551,7 @@ public class GoFeatureFlagProviderTest
             HttpMessageHandler = _mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
-        Api.Instance.SetProvider(g);
+        await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var res = client.GetObjectDetails("does_not_exists", new Value("default"), _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
