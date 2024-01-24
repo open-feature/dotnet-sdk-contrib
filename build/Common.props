@@ -24,7 +24,7 @@
       Refer to https://docs.microsoft.com/nuget/concepts/package-versioning for semver syntax.
     -->
     <!-- 0.5+ -->
-    <OpenFeatureVer>[1.2,)</OpenFeatureVer>
+    <OpenFeatureVer>[1.4,)</OpenFeatureVer>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Unix'">
