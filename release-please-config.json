@@ -51,6 +51,16 @@
       "extra-files": [
         "OpenFeature.Contrib.Providers.ConfigCat.csproj"
       ]
+    },
+    "src/OpenFeature.Contrib.Providers.FeatureManagement": {
+      "package-name": "OpenFeature.Contrib.Providers.FeatureManagement",
+      "release-type": "simple",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "versioning": "default",
+      "extra-files": [
+        "OpenFeature.Contrib.Providers.FeatureManagement.csproj"
+      ]
     }
   },
   "changelog-sections": [

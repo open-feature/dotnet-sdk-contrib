@@ -15,6 +15,9 @@ components:
     - matthewelwell
   src/OpenFeature.Contrib.Providers.ConfigCat:
     - luizbon
+  src/OpenFeature.Contrib.Providers.FeatureManagement:
+    - ericpattison
+    - toddbaert
 
   # test/
   test/OpenFeature.Contrib.Hooks.Otel.Test:
@@ -31,6 +34,9 @@ components:
     - matthewelwell
   test/OpenFeature.Contrib.Providers.ConfigCat.Test:
     - luizbon
+  test/OpenFeature.Contrib.Providers.FeatureManagement.Test:
+    - ericpattison
+    - toddbaert
 
 ignored-authors:
   - renovate-bot
