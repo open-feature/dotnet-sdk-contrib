@@ -76,7 +76,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<bool>(
                     flagKey: flagKey,
@@ -95,7 +95,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<string>(
                     flagKey: flagKey,
@@ -114,7 +114,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<int>(
                     flagKey: flagKey,
@@ -133,7 +133,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<double>(
                     flagKey: flagKey,
@@ -152,7 +152,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 {
                     Context = contextStruct,
                     FlagKey = flagKey
-                });
+                }).ConfigureAwait(false);
 
                 return new ResolutionDetails<Value>(
                     flagKey: flagKey,
