@@ -2,19 +2,16 @@
 
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.Hooks.Otel</PackageId>
-    <VersionNumber>0.1.2</VersionNumber> <!--x-release-please-version -->
-    <Version>$(VersionNumber)</Version>
+    <VersionNumber>0.1.4</VersionNumber> <!--x-release-please-version -->
+    <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>Open Telemetry Hook for .NET</Description>
-    <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
     <Authors>Florian Bacher</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTelemetry" Version="1.4.0" />
-    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.4.0" />
+    <PackageReference Include="OpenTelemetry.Api" Version="1.4.0" />
   </ItemGroup>
 
 </Project>

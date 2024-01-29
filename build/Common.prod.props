@@ -2,14 +2,17 @@
   <Import Project=".\Common.props" />
 
   <PropertyGroup>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <Deterministic Condition="'$(CI)' == 'true'">true</Deterministic>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackRelease>true</PackRelease>
   </PropertyGroup>
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462;net5.0;net6.0;net7.0</TargetFrameworks>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk</RepositoryUrl>
-    <Description>OpenFeature is an open standard for feature flag management, created to support a robust feature flag ecosystem using cloud native technologies. OpenFeature will provide a unified API and SDK, and a developer-first, cloud-native implementation, with extensibility for open source and commercial offerings.</Description>
+    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
+    <Description>OpenFeature is an open specification that provides a vendor-agnostic, community-driven API for feature flagging that works with your favorite feature flag management tool or in-house solution.</Description>
     <PackageTags>Feature;OpenFeature;Flags;</PackageTags>
     <PackageIcon>openfeature-icon.png</PackageIcon>
     <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
@@ -22,18 +25,4 @@
     <None Include="$(MSBuildThisFileDirectory)openfeature-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <PropertyGroup Label="SourceLink">
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(Deterministic)'=='true'">
-    <SourceRoot Include="$(MSBuildThisFileDirectory)/" />
-  </ItemGroup>
-
-  <PropertyGroup Condition="'$(Deterministic)'=='true'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
 </Project>

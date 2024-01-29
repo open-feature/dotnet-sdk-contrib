@@ -27,10 +27,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
     /// </summary>
     public sealed class FlagdProvider : FeatureProvider
     {
+        const string ProviderName = "flagd Provider";
         static int EventStreamRetryBaseBackoff = 1;
         private readonly FlagdConfig _config;
 
-        private readonly Metadata _providerMetadata = new Metadata("flagd Provider");
+        private readonly Metadata _providerMetadata = new Metadata(ProviderName);
 
         private readonly Resolver _resolver;
 
@@ -108,7 +109,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// </summary>
         public static string GetProviderName()
         {
-            return Api.Instance.GetProviderMetadata().Name;
+            return ProviderName;
         }
 
         /// <summary>
@@ -130,7 +131,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveBooleanValue(flagKey, defaultValue, context);
+            return await this._resolver.ResolveBooleanValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -142,7 +143,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveStringValue(flagKey, defaultValue, context);
+            return await this._resolver.ResolveStringValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -154,7 +155,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveIntegerValue(flagKey, defaultValue, context);
+
+            return await this._resolver.ResolveIntegerValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -166,7 +168,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveDoubleValue(flagKey, defaultValue, context);
+            return await this._resolver.ResolveDoubleValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -178,7 +180,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveStructureValue(flagKey, defaultValue, context);
+            return await this._resolver.ResolveStructureValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
     }
 }
