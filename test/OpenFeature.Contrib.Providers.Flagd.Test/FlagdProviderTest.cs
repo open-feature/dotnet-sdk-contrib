@@ -41,6 +41,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             // Arrange
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHost, "localhost");
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "5001");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "RPC");
 
             // Act
             var flagdProvider = new FlagdProvider();
