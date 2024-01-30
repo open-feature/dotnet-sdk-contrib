@@ -32,6 +32,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             _config = config;
             _client = BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
+            _mtx = new Mutex();
             _evaluator = new JsonEvaluator(config.SourceSelector);
         }
 
@@ -39,6 +40,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             _config = config;
             _client = client;
+            _mtx = new Mutex();
             _evaluator = new JsonEvaluator(config.SourceSelector);
         }
 

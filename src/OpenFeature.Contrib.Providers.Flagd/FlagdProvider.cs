@@ -28,14 +28,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
     public sealed class FlagdProvider : FeatureProvider
     {
         const string ProviderName = "flagd Provider";
-        static int EventStreamRetryBaseBackoff = 1;
         private readonly FlagdConfig _config;
 
         private readonly Metadata _providerMetadata = new Metadata(ProviderName);
 
         private readonly Resolver _resolver;
-
-        private readonly System.Threading.Mutex _mtx;
 
         /// <summary>
         ///     Constructor of the provider. This constructor uses the value of the following
