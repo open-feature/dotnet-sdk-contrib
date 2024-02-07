@@ -78,11 +78,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestGetProviderWithDefaultConfig()
         {
+            Utils.CleanEnvVars();
             var flagdProvider = new FlagdProvider();
 
             var resolver = flagdProvider.GetResolver();
 
             Assert.NotNull(resolver);
+            Assert.IsType<RpcResolver>(resolver);
         }
 
         [Fact]

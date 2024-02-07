@@ -8,7 +8,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigDefault()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             var config = new FlagdConfig();
 
             Assert.False(config.CacheEnabled);
@@ -18,7 +18,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigUseTLS()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "true");
 
             var config = new FlagdConfig();
@@ -29,7 +29,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigUnixSocket()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "tmp.sock");
 
             var config = new FlagdConfig();
@@ -40,7 +40,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigEnabledCacheDefaultCacheSize()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
 
             var config = new FlagdConfig();
@@ -52,7 +52,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigEnabledCacheApplyCacheSize()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
@@ -65,7 +65,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigSetCertificatePath()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "/cert/path");
 
             var config = new FlagdConfig();
@@ -73,7 +73,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("/cert/path", config.CertificatePath);
             Assert.True(config.UseCertificate);
 
-            CleanEnvVars();
+            Utils.CleanEnvVars();
 
             config = new FlagdConfig();
 
@@ -84,7 +84,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigFromUriHttp()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             var config = new FlagdConfig(new Uri("http://domain:8123"));
 
             Assert.False(config.CacheEnabled);
@@ -94,7 +94,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigFromUriHttps()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             var config = new FlagdConfig(new Uri("https://domain:8123"));
 
             Assert.False(config.CacheEnabled);
@@ -104,7 +104,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigFromUriUnix()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             var config = new FlagdConfig(new Uri("unix:///var/run/tmp.sock"));
 
             Assert.False(config.CacheEnabled);
@@ -114,7 +114,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigFromUriSetCertificatePath()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "/cert/path");
 
             var config = new FlagdConfig(new Uri("http://localhost:8013"));
@@ -122,7 +122,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("/cert/path", config.CertificatePath);
             Assert.True(config.UseCertificate);
 
-            CleanEnvVars();
+            Utils.CleanEnvVars();
 
             config = new FlagdConfig(new Uri("http://localhost:8013"));
 
@@ -133,7 +133,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigFromUriEnabledCacheDefaultCacheSize()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
 
             var config = new FlagdConfig(new Uri("http://localhost:8013"));
@@ -145,7 +145,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigFromUriEnabledCacheApplyCacheSize()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
@@ -158,7 +158,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigResolverType()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "IN_PROCESS");
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceSelector, "source-selector");
 
@@ -171,7 +171,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [Fact]
         public void TestFlagdConfigBuilder()
         {
-            CleanEnvVars();
+            Utils.CleanEnvVars();
             var config = new FlagdConfigBuilder()
                 .WithCache(true)
                 .WithMaxCacheSize(1)
@@ -195,15 +195,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.True(config.UseTls);
             Assert.True(config.UseCertificate);
 
-        }
-
-        private void CleanEnvVars()
-        {
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
         }
     }
 }
