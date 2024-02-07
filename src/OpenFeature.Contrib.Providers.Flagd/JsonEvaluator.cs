@@ -7,6 +7,7 @@ using JsonLogic.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
+using OpenFeature.Error;
 using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.Flagd
@@ -121,6 +122,10 @@ namespace OpenFeature.Contrib.Providers.Flagd
             var reason = Reason.Default;
             if (_flags.TryGetValue(flagKey, out var flagConfiguration))
             {
+                if ("DISABLED" == flagConfiguration.State)
+                {
+                    throw new FlagNotFoundException("flag '" + flagKey + "' is disabled");
+                }
                 reason = Reason.Static;
                 var variant = flagConfiguration.DefaultVariant;
                 if (flagConfiguration.Targeting != null && !String.IsNullOrEmpty(flagConfiguration.Targeting.ToString()) && flagConfiguration.Targeting.ToString() != "{}")
@@ -152,21 +157,19 @@ namespace OpenFeature.Contrib.Providers.Flagd
                     {
                         foundVariantValue = ConvertJObjectToOpenFeatureValue(value);
                     }
-                    return new ResolutionDetails<T>(
-                        flagKey: flagKey,
-                        value: (T)foundVariantValue,
-                        reason: reason,
-                        variant: variant
-                        );
+                    if (foundVariantValue is T castValue)
+                    {
+                        return new ResolutionDetails<T>(
+                            flagKey: flagKey,
+                            value: castValue,
+                            reason: reason,
+                            variant: variant
+                            );
+                    }
+                    throw new TypeMismatchException("flag '" + flagKey + "' does not match the expected type");
                 }
-                reason = Reason.Default;
             }
-            return new ResolutionDetails<T>(
-                flagKey: flagKey,
-                value: defaultValue,
-                reason: reason,
-                errorType: ErrorType.FlagNotFound
-                );
+            throw new FlagNotFoundException("flag '" + flagKey + "' not found");
         }
 
         static dynamic ConvertToDynamicObject(IImmutableDictionary<string, Value> dictionary)

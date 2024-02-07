@@ -8,17 +8,19 @@ using System.Linq;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Grpc.Net.Client;
-using OpenFeature.Flagd.Grpc;
 using System.Net.Sockets;
 using System.Threading;
 using Grpc.Core;
 using Value = OpenFeature.Model.Value;
 
-namespace OpenFeature.Contrib.Providers.Flagd
+namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
 {
-    internal class InProcessResolver : Resolver
+    internal class InProcessResolver : Resolver.Resolver
     {
-        static int EventStreamRetryBaseBackoff = 1;
+        static readonly int EventStreamRetryBaseBackoff = 1;
+        static readonly int MaxEventStreamRetryBackoff = 60;
+        
+        static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         private readonly FlagSyncService.FlagSyncServiceClient _client;
         private readonly JsonEvaluator _evaluator;
@@ -26,7 +28,9 @@ namespace OpenFeature.Contrib.Providers.Flagd
         private readonly Mutex _mtx;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+        
         private readonly FlagdConfig _config;
+        private Thread _handleEvents;
 
         internal InProcessResolver(FlagdConfig config)
         {
@@ -47,13 +51,15 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         public void Init()
         {
-            var handleEvents = new Thread(HandleEvents);
-            handleEvents.Start();
+            var latch = new CountdownEvent(1);
+            _handleEvents = new Thread(() => HandleEvents(latch));
+            _handleEvents.Start();
+            latch.Wait();
         }
 
         public void Shutdown()
         {
-            throw new NotImplementedException();
+            cancellationTokenSource.Cancel();
         }
 
         public Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
@@ -81,9 +87,10 @@ namespace OpenFeature.Contrib.Providers.Flagd
             return Task.FromResult(_evaluator.ResolveStructureValue(flagKey, defaultValue, context));
         }
 
-        private async void HandleEvents()
+        private async void HandleEvents(CountdownEvent latch)
         {
-            while (_eventStreamRetries < _config.MaxEventStreamRetries)
+            CancellationToken token = cancellationTokenSource.Token;
+            while (!token.IsCancellationRequested)
             {
                 var call = _client.SyncFlags(new SyncFlagsRequest
                 {
@@ -92,8 +99,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 try
                 {
                     // Read the response stream asynchronously
-                    while (await call.ResponseStream.MoveNext(CancellationToken.None))
+                    while (await call.ResponseStream.MoveNext(token))
                     {
+                        if (!latch.IsSet)
+                        {
+                            latch.Signal();
+                        }
+                        HandleProviderReadyEvent();
                         var response = call.ResponseStream.Current;
 
                         _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
@@ -106,17 +118,18 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 }
             }
         }
+        
+        private void HandleProviderReadyEvent()
+        {
+            _mtx.WaitOne();
+            _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+            _mtx.ReleaseMutex();
+        }
 
         private async Task HandleErrorEvent()
         {
             _mtx.WaitOne();
-            _eventStreamRetries++;
-
-            if (_eventStreamRetries > _config.MaxEventStreamRetries)
-            {
-                return;
-            }
-            _eventStreamRetryBackoff *= 2;
+            _eventStreamRetryBackoff = Math.Min(_eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
             _mtx.ReleaseMutex();
             await Task.Delay(_eventStreamRetryBackoff * 1000);
         }

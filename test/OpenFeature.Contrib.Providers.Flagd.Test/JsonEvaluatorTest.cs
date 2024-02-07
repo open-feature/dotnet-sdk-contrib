@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Immutable;
 using AutoFixture;
 using OpenFeature.Constant;
+using OpenFeature.Error;
 using OpenFeature.Model;
 using Xunit;
 
@@ -154,6 +156,63 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.True(result.Value.AsStructure.AsDictionary()["key"].AsBoolean);
             Assert.Equal("object1", result.Variant);
             Assert.Equal(Reason.TargetingMatch, result.Reason);
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorDisabledBoolEvaluation()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+            attributes.Add("color", new Value("yellow"));
+
+            var builder = EvaluationContext.Builder();
+            builder
+                .Set("color", "yellow");
+
+            Assert.Throws<FlagNotFoundException>(() => jsonEvaluator.ResolveBooleanValue("disabledFlag", false, builder.Build()));
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorFlagNotFoundEvaluation()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+            attributes.Add("color", new Value("yellow"));
+
+            var builder = EvaluationContext.Builder();
+            builder
+                .Set("color", "yellow");
+
+            Assert.Throws<FlagNotFoundException>(() => jsonEvaluator.ResolveBooleanValue("missingFlag", false, builder.Build()));
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorWrongTypeEvaluation()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+            attributes.Add("color", new Value("yellow"));
+
+            var builder = EvaluationContext.Builder();
+            builder
+                .Set("color", "yellow");
+
+            Assert.Throws<TypeMismatchException>(() => jsonEvaluator.ResolveBooleanValue("staticStringFlag", false, builder.Build()));
         }
     }
 }

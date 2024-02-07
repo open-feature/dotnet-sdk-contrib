@@ -1,24 +1,10 @@
 ﻿using System;
-using System.IO;
-using System.Text;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-
-using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
-using Grpc.Net.Client;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
+using OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess;
 using OpenFeature.Model;
-using OpenFeature.Error;
-
-using OpenFeature.Flagd.Grpc;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
-using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Net.Sockets;
-using System.Net.Http;
-using System.Collections.Generic;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -32,7 +18,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         private readonly Metadata _providerMetadata = new Metadata(ProviderName);
 
-        private readonly Resolver _resolver;
+        private readonly Resolver.Resolver _resolver;
 
         /// <summary>
         ///     Constructor of the provider. This constructor uses the value of the following
@@ -92,7 +78,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         }
 
         // just for testing, internal but visible in tests
-        internal FlagdProvider(Resolver resolver)
+        internal FlagdProvider(Resolver.Resolver resolver)
         {
             _resolver = resolver;
             _resolver.Init();
@@ -117,7 +103,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <summary>
         ///     Return the resolver of the provider
         /// </summary>
-        internal Resolver GetResolver() => _resolver;
+        internal Resolver.Resolver GetResolver() => _resolver;
 
         /// <summary>
         ///     ResolveBooleanValue resolve the value for a Boolean Flag.

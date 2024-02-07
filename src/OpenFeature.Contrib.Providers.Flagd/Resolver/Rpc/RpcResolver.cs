@@ -16,7 +16,7 @@ using System.Net.Sockets;
 using System.Threading;
 using Value = OpenFeature.Model.Value;
 
-namespace OpenFeature.Contrib.Providers.Flagd
+namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
 {
     internal class RpcResolver : Resolver
     {

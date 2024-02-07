@@ -4,7 +4,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
 {
     /// <summary>
-    ///     ResolverTpe represents the flag evaluator type.
+    ///     ResolverType represents the flag evaluator type.
     /// </summary>
     public enum ResolverType
     {
@@ -38,50 +38,98 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
 
         internal static int CacheSizeDefault = 10;
-        internal string Host
+
+        /// <summary>
+        ///     The host for the provider to connect to.
+        /// </summary>
+        public string Host
         {
-            get { return _host; }
+            get => _host;
+            set => _host = value;
         }
 
-        internal bool CacheEnabled
+        /// <summary>
+        ///     The port of the host to connect to.
+        /// </summary>
+        public string Port
         {
-            get { return _cache; }
-            set { _cache = value; }
+            get => _port;
+            set => _port = value;
         }
 
-        internal int MaxCacheSize
+        /// <summary>
+        ///     Use TLS for communication between the provider and the host.
+        /// </summary>
+        public bool UseTls
         {
-            get { return _maxCacheSize; }
+            get => _useTLS;
+            set => _useTLS = value;
         }
 
-        internal bool UseCertificate
+        /// <summary>
+        ///     Enable/disable the local cache for static flag values.
+        /// </summary>
+        public bool CacheEnabled
         {
-            get { return _cert.Length > 0; }
+            get => _cache;
+            set => _cache = value;
         }
 
-        internal string CertificatePath
+        /// <summary>
+        ///     The maximum size of the cache.
+        /// </summary>
+        public int MaxCacheSize
         {
-            get { return _cert; }
-            set { _cert = value; }
+            get => _maxCacheSize;
+            set => _maxCacheSize = value;
         }
 
-        internal int MaxEventStreamRetries
+        /// <summary>
+        ///     Path to the certificate file.
+        /// </summary>
+        public string CertificatePath
         {
-            get { return _maxEventStreamRetries; }
-            set { _maxEventStreamRetries = value; }
+            get => _cert;
+            set => _cert = value;
         }
 
-        internal ResolverType ResolverType
+        /// <summary>
+        ///     Path to the socket.
+        /// </summary>
+        public string SocketPath
+        {
+            get => _socketPath;
+            set => _socketPath = value;
+        }
+
+        /// <summary>
+        ///     Maximum number of times the connection to the event stream should be re-attempted
+        /// </summary>
+        public int MaxEventStreamRetries
+        {
+            get => _maxEventStreamRetries;
+            set => _maxEventStreamRetries = value;
+        }
+
+        /// <summary>
+        ///     Which type of resolver to use.
+        /// </summary>
+        public ResolverType ResolverType
         {
             get => _resolverType;
             set => _resolverType = value;
         }
 
-        internal string SourceSelector
+        /// <summary>
+        ///     Source selector for the in-process provider.
+        /// </summary>
+        public string SourceSelector
         {
-            get { return _sourceSelector; }
-            set { _sourceSelector = value; }
+            get => _sourceSelector;
+            set => _sourceSelector = value;
         }
+
+        internal bool UseCertificate => _cert.Length > 0;
 
         private string _host;
         private string _port;
@@ -161,6 +209,112 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 uri = new Uri(protocol + "://" + _host + ":" + _port);
             }
             return uri;
+        }
+    }
+
+    /// <summary>
+    ///     FlagdConfigBuilder is used to build a FlagdConfig object.
+    /// </summary>
+    public class FlagdConfigBuilder
+    {
+        private FlagdConfig _config = new FlagdConfig();
+
+        /// <summary>
+        ///     The host for the provider to connect to.
+        /// </summary>
+        public FlagdConfigBuilder WithHost(string host)
+        {
+            _config.Host = host;
+            return this;
+        }
+
+        /// <summary>
+        ///     The Port property of the config.
+        /// </summary>
+        public FlagdConfigBuilder WithPort(string port)
+        {
+            _config.Port = port;
+            return this;
+        }
+
+        /// <summary>
+        ///     Use TLS for communication between the provider and the host.
+        /// </summary>
+        public FlagdConfigBuilder WithTls(bool useTls)
+        {
+            _config.UseTls = useTls;
+            return this;
+        }
+
+        /// <summary>
+        ///     Path to the certificate file.
+        /// </summary>
+        public FlagdConfigBuilder WithCertificatePath(string certPath)
+        {
+            _config.CertificatePath = certPath;
+            return this;
+        }
+
+        /// <summary>
+        ///     Path to the socket.
+        /// </summary>
+        public FlagdConfigBuilder WithSocketPath(string socketPath)
+        {
+            _config.SocketPath = socketPath;
+            return this;
+        }
+
+        /// <summary>
+        ///     Enable/disable the local cache for static flag values.
+        /// </summary>
+        public FlagdConfigBuilder WithCache(bool cacheEnabled)
+        {
+            _config.CacheEnabled = cacheEnabled;
+            return this;
+        }
+
+        /// <summary>
+        ///     The maximum size of the cache.
+        /// </summary>
+        public FlagdConfigBuilder WithMaxCacheSize(int maxCacheSize)
+        {
+            _config.MaxCacheSize = maxCacheSize;
+            return this;
+        }
+
+        /// <summary>
+        ///     Maximum number of times the connection to the event stream should be re-attempted
+        /// </summary>
+        public FlagdConfigBuilder WithMaxEventStreamRetries(int maxEventStreamRetries)
+        {
+            _config.MaxEventStreamRetries = maxEventStreamRetries;
+            return this;
+        }
+
+        /// <summary>
+        ///     Which type of resolver to use.
+        /// </summary>
+        public FlagdConfigBuilder WithResolverType(ResolverType resolverType)
+        {
+            _config.ResolverType = resolverType;
+            return this;
+        }
+
+        /// <summary>
+        ///     Source selector for the in-process provider.
+        /// </summary>
+        public FlagdConfigBuilder WithSourceSelector(string sourceSelector)
+        {
+            _config.SourceSelector = sourceSelector;
+            return this;
+        }
+
+        /// <summary>
+        ///     Builds the FlagdConfig object.
+        /// </summary>
+        public FlagdConfig Build()
+        {
+            return _config;
         }
     }
 }

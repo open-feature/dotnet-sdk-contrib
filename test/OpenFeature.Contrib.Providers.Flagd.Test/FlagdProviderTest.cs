@@ -6,6 +6,8 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using NSubstitute;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
+using OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess;
 using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc;
 using OpenFeature.Flagd.Grpc.Sync;
@@ -785,15 +787,14 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             config.MaxEventStreamRetries = 1;
             config.SourceSelector = "source-selector";
 
-            var rpcResolver = new InProcessResolver(mockGrpcClient, config);
-            var flagdProvider = new FlagdProvider(rpcResolver);
+            var inProcessResolver = new InProcessResolver(mockGrpcClient, config);
+            var flagdProvider = new FlagdProvider(inProcessResolver);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             await Utils.AssertUntilAsync(
                 _ =>
                 {
-                    var val = flagdProvider.ResolveStringValue("unknown", "unknown");
-                    Assert.Equal("unknown", val.Result.Value);
+                    Assert.ThrowsAsync<FlagNotFoundException>(() => flagdProvider.ResolveStringValue("unknown", "unknown"));
                 });
 
             mockGrpcClient.Received(1).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);

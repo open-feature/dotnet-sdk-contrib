@@ -168,6 +168,35 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("source-selector", config.SourceSelector);
         }
 
+        [Fact]
+        public void TestFlagdConfigBuilder()
+        {
+            CleanEnvVars();
+            var config = new FlagdConfigBuilder()
+                .WithCache(true)
+                .WithMaxCacheSize(1)
+                .WithCertificatePath("cert-path")
+                .WithHost("some-host")
+                .WithPort("8888")
+                .WithResolverType(ResolverType.IN_PROCESS)
+                .WithSocketPath("some-socket")
+                .WithTls(true)
+                .WithSourceSelector("source-selector")
+                .Build();
+
+            Assert.Equal(ResolverType.IN_PROCESS, config.ResolverType);
+            Assert.Equal("source-selector", config.SourceSelector);
+            Assert.True(config.CacheEnabled);
+            Assert.Equal(1, config.MaxCacheSize);
+            Assert.Equal("cert-path", config.CertificatePath);
+            Assert.Equal("some-host", config.Host);
+            Assert.Equal("8888", config.Port);
+            Assert.Equal("some-socket", config.SocketPath);
+            Assert.True(config.UseTls);
+            Assert.True(config.UseCertificate);
+
+        }
+
         private void CleanEnvVars()
         {
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");

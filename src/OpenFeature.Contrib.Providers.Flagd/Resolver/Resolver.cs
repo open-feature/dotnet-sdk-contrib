@@ -4,7 +4,7 @@ using Google.Protobuf.WellKnownTypes;
 using OpenFeature.Model;
 using Value = OpenFeature.Model.Value;
 
-namespace OpenFeature.Contrib.Providers.Flagd
+namespace OpenFeature.Contrib.Providers.Flagd.Resolver
 {
     internal interface Resolver
     {
