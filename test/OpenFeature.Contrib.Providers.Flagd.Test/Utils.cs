@@ -256,12 +256,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
         internal static void CleanEnvVars()
         {
-          Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
-          Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "");
-          Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
-          Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
-          Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
-          Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "");
         }
     }
 }
