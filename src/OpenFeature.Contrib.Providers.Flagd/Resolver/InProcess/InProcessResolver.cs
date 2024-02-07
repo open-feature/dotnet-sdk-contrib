@@ -20,13 +20,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
         static readonly int EventStreamRetryBaseBackoff = 1;
         static readonly int MaxEventStreamRetryBackoff = 60;
 
-        static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private readonly FlagSyncService.FlagSyncServiceClient _client;
         private readonly JsonEvaluator _evaluator;
 
         private readonly Mutex _mtx;
-        private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
 
         private readonly FlagdConfig _config;
@@ -59,7 +58,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
 
         public void Shutdown()
         {
-            cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Cancel();
         }
 
         public Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
@@ -89,7 +88,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
 
         private async void HandleEvents(CountdownEvent latch)
         {
-            CancellationToken token = cancellationTokenSource.Token;
+            CancellationToken token = _cancellationTokenSource.Token;
             while (!token.IsCancellationRequested)
             {
                 var call = _client.SyncFlags(new SyncFlagsRequest
