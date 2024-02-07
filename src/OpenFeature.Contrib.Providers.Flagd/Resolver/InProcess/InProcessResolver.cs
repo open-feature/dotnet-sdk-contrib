@@ -19,7 +19,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
     {
         static readonly int EventStreamRetryBaseBackoff = 1;
         static readonly int MaxEventStreamRetryBackoff = 60;
-        
+
         static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         private readonly FlagSyncService.FlagSyncServiceClient _client;
@@ -28,7 +28,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
         private readonly Mutex _mtx;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-        
+
         private readonly FlagdConfig _config;
         private Thread _handleEvents;
 
@@ -118,7 +118,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
                 }
             }
         }
-        
+
         private void HandleProviderReadyEvent()
         {
             _mtx.WaitOne();
