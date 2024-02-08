@@ -124,7 +124,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 if ("DISABLED" == flagConfiguration.State)
                 {
-                    throw new FlagNotFoundException("flag '" + flagKey + "' is disabled");
+                    throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' is disabled");
                 }
                 reason = Reason.Static;
                 var variant = flagConfiguration.DefaultVariant;
@@ -166,10 +166,10 @@ namespace OpenFeature.Contrib.Providers.Flagd
                             variant: variant
                             );
                     }
-                    throw new TypeMismatchException("flag '" + flagKey + "' does not match the expected type");
+                    throw new FeatureProviderException(ErrorType.TypeMismatch, "TYPE_MISMATCH: flag '" + flagKey + "' does not match the expected type");
                 }
             }
-            throw new FlagNotFoundException("flag '" + flagKey + "' not found");
+            throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' not found");
         }
 
         static dynamic ConvertToDynamicObject(IImmutableDictionary<string, Value> dictionary)
