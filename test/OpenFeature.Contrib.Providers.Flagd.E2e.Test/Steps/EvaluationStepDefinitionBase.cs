@@ -43,7 +43,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
             _scenarioContext = scenarioContext;
         }
 
-        [Given(@"a provider is registered with cache disabled")]
+        [Given(@"a provider is registered")]
         public void Givenaproviderisregisteredwithcachedisabled()
         {
 
