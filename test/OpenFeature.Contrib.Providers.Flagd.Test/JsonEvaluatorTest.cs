@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Immutable;
 using AutoFixture;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Error;
 using OpenFeature.Model;
 using Xunit;
@@ -174,7 +174,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             builder
                 .Set("color", "yellow");
 
-            Assert.Throws<FlagNotFoundException>(() => jsonEvaluator.ResolveBooleanValue("disabledFlag", false, builder.Build()));
+            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValue("disabledFlag", false, builder.Build()));
         }
 
         [Fact]
@@ -193,7 +193,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             builder
                 .Set("color", "yellow");
 
-            Assert.Throws<FlagNotFoundException>(() => jsonEvaluator.ResolveBooleanValue("missingFlag", false, builder.Build()));
+            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValue("missingFlag", false, builder.Build()));
         }
 
         [Fact]
@@ -212,7 +212,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             builder
                 .Set("color", "yellow");
 
-            Assert.Throws<TypeMismatchException>(() => jsonEvaluator.ResolveBooleanValue("staticStringFlag", false, builder.Build()));
+            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValue("staticStringFlag", false, builder.Build()));
         }
     }
 }

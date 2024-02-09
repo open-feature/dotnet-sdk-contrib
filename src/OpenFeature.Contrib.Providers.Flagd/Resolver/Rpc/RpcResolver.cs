@@ -38,7 +38,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             _config = config;
 
             _client = BuildClientForPlatform(_config);
-            _mtx = new System.Threading.Mutex();
+            _mtx = new Mutex();
 
             if (_config.CacheEnabled)
             {
@@ -46,11 +46,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }
         }
 
-        internal RpcResolver(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
+        internal RpcResolver(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null) : this(config)
         {
-            _mtx = new System.Threading.Mutex();
             _client = client;
-            _config = config;
             _cache = cache;
         }
 

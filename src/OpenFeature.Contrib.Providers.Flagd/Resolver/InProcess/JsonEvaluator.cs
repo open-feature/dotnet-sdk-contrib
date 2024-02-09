@@ -10,7 +10,7 @@ using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.Flagd
+namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 {
 
     internal class FlagConfiguration

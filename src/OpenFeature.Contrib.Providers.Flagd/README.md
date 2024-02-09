@@ -130,15 +130,17 @@ namespace OpenFeatureTestApp
     class Hello {
         static void Main(string[] args) {
 
-            // set the host and port for flagd-proxy
-            Environment.SetEnvironmentVariable("FLAGD_HOST", "localhost");
-            Environment.SetEnvironmentVariable("FLAGD_PORT", "8015");
-            // set the resolver type to 'IN_PROCESS'
-            Environment.SetEnvironmentVariable("FLAGD_RESOLVER_TYPE", "IN_PROCESS");
-            // provide the flag source selector, e.g. the name of a Flags custom resource which is watched by the flagd-proxy
-            Environment.SetEnvironmentVariable("FLAGD_SOURCE_SELECTOR", "core.openfeature.dev/flags/sample-flags");
+            var flagdConfig = new FlagdConfigBuilder()
+                // set the host and port for flagd-proxy
+                .WithHost("localhost")
+                .WithPort("8015")
+                // set the resolver type to 'IN_PROCESS'
+                .WithResolverType(ResolverType.IN_PROCESS)
+                // provide the flag source selector, e.g. the name of a Flags custom resource which is watched by the flagd-proxy
+                .WithSourceSelector("core.openfeature.dev/flags/sample-flags")
+                .Build();
 
-            var flagdProvider = new FlagdProvider();
+            var flagdProvider = new FlagdProvider(flagdConfig);
 
             // Set the flagdProvider as the provider for the OpenFeature SDK
             OpenFeature.Api.Instance.SetProvider(flagdProvider);

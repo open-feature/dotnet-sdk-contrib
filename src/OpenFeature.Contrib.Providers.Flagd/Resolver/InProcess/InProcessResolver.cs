@@ -13,9 +13,9 @@ using System.Threading;
 using Grpc.Core;
 using Value = OpenFeature.Model.Value;
 
-namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
+namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 {
-    internal class InProcessResolver : Resolver.Resolver
+    internal class InProcessResolver : Resolver
     {
         static readonly int EventStreamRetryBaseBackoff = 1;
         static readonly int MaxEventStreamRetryBackoff = 60;
@@ -39,12 +39,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess
             _evaluator = new JsonEvaluator(config.SourceSelector);
         }
 
-        internal InProcessResolver(FlagSyncService.FlagSyncServiceClient client, FlagdConfig config)
+        internal InProcessResolver(FlagSyncService.FlagSyncServiceClient client, FlagdConfig config) : this(config)
         {
-            _config = config;
             _client = client;
-            _mtx = new Mutex();
-            _evaluator = new JsonEvaluator(config.SourceSelector);
         }
 
 

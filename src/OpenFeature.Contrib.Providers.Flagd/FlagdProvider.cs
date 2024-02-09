@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
-using OpenFeature.Contrib.Providers.Flagd.RResolver.InProcess;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Model;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
