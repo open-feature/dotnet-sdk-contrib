@@ -42,7 +42,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Test
-      run: dotnet test --no-build --logger GitHubActions
+      run: E2E=true dotnet test --no-build --logger GitHubActions
 
   packaging:
     needs: build
