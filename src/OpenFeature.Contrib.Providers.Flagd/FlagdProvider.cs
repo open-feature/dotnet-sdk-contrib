@@ -5,6 +5,7 @@ using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Model;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
+using OpenFeature.Constant;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -15,7 +16,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
     {
         const string ProviderName = "flagd Provider";
         private readonly FlagdConfig _config;
-
+        private ProviderStatus _status;
         private readonly Metadata _providerMetadata = new Metadata(ProviderName);
 
         private readonly Resolver.Resolver _resolver;
@@ -74,7 +75,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 _resolver = new RpcResolver(config);
             }
-            _resolver.Init();
         }
 
         // just for testing, internal but visible in tests
@@ -82,6 +82,12 @@ namespace OpenFeature.Contrib.Providers.Flagd
         {
             _resolver = resolver;
             _resolver.Init();
+        }
+
+        /// <inheritdoc/>
+        public override ProviderStatus GetStatus()
+        {
+            return this._status;
         }
 
         // just for testing, internal but visible in tests
@@ -104,6 +110,21 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     Return the resolver of the provider
         /// </summary>
         internal Resolver.Resolver GetResolver() => _resolver;
+
+        /// <inheritdoc/>
+        public override Task Initialize(EvaluationContext context)
+        {
+            return Task.Run(() =>
+            {
+                this._resolver.Init();
+                this._status = ProviderStatus.Ready;
+
+            }).ContinueWith((t) =>
+            {
+                this._status = ProviderStatus.Error;
+                if (t.IsFaulted) throw t.Exception;
+            });
+        }
 
         /// <summary>
         ///     ResolveBooleanValue resolve the value for a Boolean Flag.

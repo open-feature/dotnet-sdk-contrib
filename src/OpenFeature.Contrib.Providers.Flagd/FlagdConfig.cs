@@ -1,4 +1,6 @@
 using System;
+using System.Numerics;
+using JsonLogic.Net;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 
@@ -36,8 +38,15 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
         internal const string EnvVarResolverType = "FLAGD_RESOLVER_TYPE";
         internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
-
         internal static int CacheSizeDefault = 10;
+
+        /// <summary>
+        /// Get a FlagdConfigBuilder instance.
+        /// </summary>
+        /// <returns>A new FlagdConfigBuilder.</returns>
+        public static FlagdConfigBuilder Builder() {
+            return new FlagdConfigBuilder();
+        }
 
         /// <summary>
         ///     The host for the provider to connect to.
@@ -51,7 +60,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <summary>
         ///     The port of the host to connect to.
         /// </summary>
-        public string Port
+        public int Port
         {
             get => _port;
             set => _port = value;
@@ -132,7 +141,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal bool UseCertificate => _cert.Length > 0;
 
         private string _host;
-        private string _port;
+        private int _port;
         private bool _useTLS;
         private string _cert;
         private string _socketPath;
@@ -145,7 +154,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal FlagdConfig()
         {
             _host = Environment.GetEnvironmentVariable(EnvVarHost) ?? "localhost";
-            _port = Environment.GetEnvironmentVariable(EnvVarPort) ?? "8013";
+            _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 8013;
             _useTLS = bool.Parse(Environment.GetEnvironmentVariable(EnvVarTLS) ?? "false");
             _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
             _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
@@ -171,7 +180,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
 
             _host = url.Host;
-            _port = url.Port.ToString();
+            _port = url.Port;
             _useTLS = string.Equals(url.Scheme, "https", StringComparison.OrdinalIgnoreCase);
             _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
             _socketPath = string.Equals(url.Scheme, "unix", StringComparison.OrdinalIgnoreCase) ? url.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "";
@@ -231,7 +240,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <summary>
         ///     The Port property of the config.
         /// </summary>
-        public FlagdConfigBuilder WithPort(string port)
+        public FlagdConfigBuilder WithPort(int port)
         {
             _config.Port = port;
             return this;

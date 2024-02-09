@@ -177,7 +177,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 .WithMaxCacheSize(1)
                 .WithCertificatePath("cert-path")
                 .WithHost("some-host")
-                .WithPort("8888")
+                .WithPort(8888)
                 .WithResolverType(ResolverType.IN_PROCESS)
                 .WithSocketPath("some-socket")
                 .WithTls(true)
@@ -190,7 +190,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal(1, config.MaxCacheSize);
             Assert.Equal("cert-path", config.CertificatePath);
             Assert.Equal("some-host", config.Host);
-            Assert.Equal("8888", config.Port);
+            Assert.Equal(8888, config.Port);
             Assert.Equal("some-socket", config.SocketPath);
             Assert.True(config.UseTls);
             Assert.True(config.UseCertificate);
