@@ -42,7 +42,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Test
-      run: E2E=false dotnet test --no-build --logger GitHubActions
+      run: dotnet test --no-build --logger GitHubActions
 
   e2e:
     runs-on: ubuntu-latest
