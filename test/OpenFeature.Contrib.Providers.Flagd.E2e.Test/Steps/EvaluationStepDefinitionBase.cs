@@ -44,7 +44,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         }
 
         [Given(@"a provider is registered")]
-        public void Givenaproviderisregisteredwithcachedisabled()
+        public void Givenaproviderisregistered()
         {
 
         }

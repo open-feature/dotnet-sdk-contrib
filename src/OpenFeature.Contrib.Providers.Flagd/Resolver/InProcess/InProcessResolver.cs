@@ -97,14 +97,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     // Read the response stream asynchronously
                     while (await call.ResponseStream.MoveNext(token))
                     {
+                        var response = call.ResponseStream.Current;
+                        _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
                         if (!latch.IsSet)
                         {
                             latch.Signal();
                         }
                         HandleProviderReadyEvent();
-                        var response = call.ResponseStream.Current;
-
-                        _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
                     }
                 }
                 catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
@@ -154,7 +153,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                             return chain.Build(cert);
                         };
 #elif NET462_OR_GREATER
-                        handler.ServerCertificateValidationCallback = (message, cert, chain, errors) => {
+                        handler.ServerCertificateValidationCallback = (message, cert, chain, errors) =>
+                        {
                             if (errors == SslPolicyErrors.None) { return true; }
 
                             chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
@@ -230,7 +230,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                             return chain.Build(cert);
                         };
 #elif NET462_OR_GREATER
-                        handler.ServerCertificateValidationCallback = (message, cert, chain, errors) => {
+                        handler.ServerCertificateValidationCallback = (message, cert, chain, errors) =>
+                        {
                             if (errors == SslPolicyErrors.None) { return true; }
 
                             chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
