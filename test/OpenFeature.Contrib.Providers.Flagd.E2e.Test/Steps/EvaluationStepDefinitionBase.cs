@@ -37,7 +37,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         private int typeErrorDefaultValue;
         private FlagEvaluationDetails<int> typeErrorDetails;
 
-        public EvaluationStepDefinitionsBase (ScenarioContext scenarioContext)
+        public EvaluationStepDefinitionsBase(ScenarioContext scenarioContext)
         {
             Skip.If(Environment.GetEnvironmentVariable("E2E") != "true");
             _scenarioContext = scenarioContext;
