@@ -42,7 +42,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Test
-      run: E2E=false dotnet test --logger GitHubActions
+      run: E2E=false dotnet test --no-build --logger GitHubActions
 
   e2e:
     runs-on: ubuntu-latest
@@ -80,7 +80,7 @@ jobs:
         cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/Features
 
     - name: Test
-      run: E2E=true dotnet test --no-build --logger GitHubActions
+      run: E2E=true dotnet test --logger GitHubActions
 
   packaging:
     needs: build
