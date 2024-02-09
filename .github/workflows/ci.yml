@@ -53,7 +53,9 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Copy Gherkin
-      run: E2E=true dotnet test --no-build --logger GitHubActions
+      run: |
+        cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest/Features
+        cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/Features
 
     - name: Test
       run: E2E=true dotnet test --no-build --logger GitHubActions
