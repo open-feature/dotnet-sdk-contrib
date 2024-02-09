@@ -17,6 +17,17 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
 
     runs-on: ${{ matrix.os }}
+    services:
+      # flagd-testbed for flagd RPC provider e2e tests
+      flagd:
+        image: ghcr.io/open-feature/flagd-testbed:v0.5.0
+        ports:
+          - 8013:8013
+      # sync-testbed for flagd in-process provider e2e tests
+      sync:
+        image: ghcr.io/open-feature/sync-testbed:v0.5.0
+        ports:
+          - 9090:9090
 
     steps:
     - name: Checkout
@@ -40,6 +51,11 @@ jobs:
 
     - name: Build
       run: dotnet build --no-restore
+
+    - name: Copy Gherkin
+      run: |
+        cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest/Features
+        cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/Features
 
     - name: Test
       run: E2E=true dotnet test --no-build --logger GitHubActions

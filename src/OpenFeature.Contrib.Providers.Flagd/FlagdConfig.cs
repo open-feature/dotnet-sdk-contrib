@@ -44,7 +44,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// Get a FlagdConfigBuilder instance.
         /// </summary>
         /// <returns>A new FlagdConfigBuilder.</returns>
-        public static FlagdConfigBuilder Builder() {
+        public static FlagdConfigBuilder Builder()
+        {
             return new FlagdConfigBuilder();
         }
 
