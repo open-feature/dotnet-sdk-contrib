@@ -87,7 +87,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <inheritdoc/>
         public override ProviderStatus GetStatus()
         {
-            return this._status;
+            return _status;
         }
 
         // just for testing, internal but visible in tests
@@ -114,14 +114,24 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <inheritdoc/>
         public override Task Initialize(EvaluationContext context)
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
-                this._resolver.Init();
-                this._status = ProviderStatus.Ready;
+                await _resolver.Init();
+                _status = ProviderStatus.Ready;
 
             }).ContinueWith((t) =>
             {
-                this._status = ProviderStatus.Error;
+                _status = ProviderStatus.Error;
+                if (t.IsFaulted) throw t.Exception;
+            });
+        }
+
+        /// <inheritdoc/>
+        public override Task Shutdown()
+        {
+            return _resolver.Shutdown().ContinueWith((t) =>
+            {
+                _status = ProviderStatus.NotReady;
                 if (t.IsFaulted) throw t.Exception;
             });
         }
@@ -135,7 +145,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveBooleanValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveBooleanValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -147,7 +157,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveStringValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveStringValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -160,7 +170,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
 
-            return await this._resolver.ResolveIntegerValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveIntegerValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -172,7 +182,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveDoubleValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveDoubleValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -184,7 +194,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            return await this._resolver.ResolveStructureValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveStructureValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
     }
 }

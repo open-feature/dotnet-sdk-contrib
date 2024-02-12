@@ -8,8 +8,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver
 {
     internal interface Resolver
     {
-        void Init();
-        void Shutdown();
+        Task Init();
+        Task Shutdown();
 
         Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue,
             EvaluationContext context = null);

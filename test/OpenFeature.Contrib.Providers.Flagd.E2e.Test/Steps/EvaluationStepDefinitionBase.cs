@@ -46,7 +46,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         [Given(@"a provider is registered")]
         public void Givenaproviderisregistered()
         {
-
+            // done in sub-classes
         }
 
         [When(@"a boolean flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
@@ -268,6 +268,5 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
             Assert.Equal(Reason.Error.ToString(), typeErrorDetails.Reason);
             Assert.Contains(errorCode, this.typeErrorDetails.ErrorMessage);
         }
-
     }
 }

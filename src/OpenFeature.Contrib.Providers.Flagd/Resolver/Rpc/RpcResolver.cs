@@ -12,7 +12,7 @@ using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc;
 using OpenFeature.Model;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Net.Sockets;
+using System.Net.Sockets; // need for unix sockets
 using System.Threading;
 using Value = OpenFeature.Model.Value;
 
@@ -21,12 +21,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
     internal class RpcResolver : Resolver
     {
         static int EventStreamRetryBaseBackoff = 1;
+        readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly FlagdConfig _config;
         private readonly ICache<string, object> _cache;
         private readonly Service.ServiceClient _client;
         private readonly System.Threading.Mutex _mtx;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+        private GrpcChannel _channel;
+        private Thread _handleEventsThread;
 
         internal RpcResolver(FlagdConfig config)
         {
@@ -52,18 +55,24 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             _cache = cache;
         }
 
-        public void Init()
+        public Task Init()
         {
             if (_config.CacheEnabled)
             {
-                var handleEvents = new Thread(HandleEvents);
-                handleEvents.Start();
+                _handleEventsThread = new Thread(HandleEvents);
+                _handleEventsThread.Start();
             }
+            return Task.CompletedTask; // TODO: an elegant way of testing the connection status before completing this task
         }
 
-        public void Shutdown()
+        public Task Shutdown()
         {
-            throw new System.NotImplementedException();
+            _cancellationTokenSource.Cancel();
+            return _channel?.ShutdownAsync().ContinueWith((t) =>
+            {
+                _channel.Dispose();
+                if (t.IsFaulted) throw t.Exception;
+            });
         }
 
         public async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
@@ -191,7 +200,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
 
         private async void HandleEvents()
         {
-            while (_eventStreamRetries < _config.MaxEventStreamRetries)
+            CancellationToken token = _cancellationTokenSource.Token;
+            while (_eventStreamRetries < _config.MaxEventStreamRetries && !token.IsCancellationRequested)
             {
                 var call = _client.EventStream(new EventStreamRequest());
                 try
@@ -214,7 +224,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
                         }
                     }
                 }
-                catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+                {
+                    // do nothing, we've been shutdown
+                }
+                catch (RpcException)
                 {
                     // Handle the dropped connection by reconnecting and retrying the stream
                     await HandleErrorEvent();
@@ -464,10 +478,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
                         throw new ArgumentException("Specified certificate cannot be found.");
                     }
                 }
-                return new Service.ServiceClient(GrpcChannel.ForAddress(config.GetUri(), new GrpcChannelOptions
+                _channel = GrpcChannel.ForAddress(config.GetUri(), new GrpcChannelOptions
                 {
                     HttpHandler = handler
-                }));
+                });
+                return new Service.ServiceClient(_channel);
             }
 
 #if NET5_0_OR_GREATER
@@ -478,12 +493,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
                 ConnectCallback = connectionFactory.ConnectAsync
             };
 
-// point to localhost and let the custom ConnectCallback handle the communication over the unix socket
-// see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
-return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
-{
-    HttpHandler = socketsHttpHandler,
-}));
+            // point to localhost and let the custom ConnectCallback handle the communication over the unix socket
+            // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
+            _channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+            {
+                HttpHandler = socketsHttpHandler,
+            });
+            return new Service.ServiceClient(_channel);
 #endif
             // unix socket support is not available in this dotnet version
             throw new Exception("unix sockets are not supported in this version.");
