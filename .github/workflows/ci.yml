@@ -44,6 +44,44 @@ jobs:
     - name: Test
       run: dotnet test --no-build --logger GitHubActions
 
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      # flagd-testbed for flagd RPC provider e2e tests
+      flagd:
+        image: ghcr.io/open-feature/flagd-testbed:v0.5.0
+        ports:
+          - 8013:8013
+      # sync-testbed for flagd in-process provider e2e tests
+      sync:
+        image: ghcr.io/open-feature/sync-testbed:v0.5.0
+        ports:
+          - 9090:9090
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: recursive
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        dotnet-version: |
+          6.0.x
+          7.0.x
+        source-url: https://nuget.pkg.github.com/open-feature/index.json
+
+    - name: Copy Gherkin
+      run: |
+        cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest/Features
+        cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/Features
+
+    - name: Test
+      run: E2E=true dotnet test --logger GitHubActions
+
   packaging:
     needs: build
 
