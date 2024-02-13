@@ -76,16 +76,18 @@ namespace OpenFeatureTestApp
 
 The URI of the flagd server to which the `flagd Provider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
 
-| Option name                  | Environment variable name      | Type    | Default   | Values        |
-|------------------------------|--------------------------------|---------|-----------| ------------- |
-| host                         | FLAGD_HOST                     | string  | localhost |               |
-| port                         | FLAGD_PORT                     | number  | 8013      |               |
-| tls                          | FLAGD_TLS                      | boolean | false     |               |
-| tls certPath                 | FLAGD_SERVER_CERT_PATH         | string  |           |               |
-| unix socket path             | FLAGD_SOCKET_PATH              | string  |           |               |
-| Caching                      | FLAGD_CACHE                    | string  |           |     LRU       |
-| Maximum cache size           | FLAGD_MAX_CACHE_SIZE           | number  | 10        |               |
-| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |               |
+| Option name                  | Environment variable name      | Type    | Default   | Values          |
+|------------------------------|--------------------------------|---------|-----------| --------------- |
+| host                         | FLAGD_HOST                     | string  | localhost |                 |
+| port                         | FLAGD_PORT                     | number  | 8013      |                 |
+| tls                          | FLAGD_TLS                      | boolean | false     |                 |
+| tls certPath                 | FLAGD_SERVER_CERT_PATH         | string  |           |                 |
+| unix socket path             | FLAGD_SOCKET_PATH              | string  |           |                 |
+| Caching                      | FLAGD_CACHE                    | string  |           |     LRU         |
+| Maximum cache size           | FLAGD_MAX_CACHE_SIZE           | number  | 10        |                 |
+| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |                 |
+| Resolver type                | FLAGD_RESOLVER_TYPE            | string  | RPC       | RPC, IN_PROCESS |
+| Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                 |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
 
@@ -105,5 +107,52 @@ var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
 
 // ... or use the unix:// prefix if the provider should communicate via a unix socket
 var unixFlagdProvider = new FlagdProvider(new Uri("unix://socket.tmp"));  
+```
+
+## In-process resolver type
+
+The flagd provider also supports the [in-process provider mode](https://flagd.dev/reference/specifications/in-process-providers/),
+which is activated by setting the `FLAGD_RESOLVER_TYPE` env var to `IN_PROCESS`.
+In this mode, the provider will connect to a service implementing the [flagd.sync.v1 interface](https://github.com/open-feature/flagd-schemas/blob/main/protobuf/flagd/sync/v1/sync.proto)
+and subscribe to a feature flag configuration determined by the `FLAGD_SOURCE_SELECTOR`.
+After an initial retrieval of the desired flag configuration, the in-process provider will keep the latest known state in memory,
+meaning that no requests need to be sent over the network for resolving flags that are part of the flag configuration.
+Updates to the flag configuration will be sent via the grpc event stream established between the in-process provider and
+the service implementing the `flagd.sync.v1` interface (e.g. [flagd-proxy](https://github.com/open-feature/flagd/tree/main/flagd-proxy)).
+
+Example of using the in-process provider mode:
+
+```csharp
+using OpenFeature.Contrib.Providers.Flagd;
+
+namespace OpenFeatureTestApp
+{
+    class Hello {
+        static void Main(string[] args) {
+
+            var flagdConfig = new FlagdConfigBuilder()
+                // set the host and port for flagd-proxy
+                .WithHost("localhost")
+                .WithPort("8015")
+                // set the resolver type to 'IN_PROCESS'
+                .WithResolverType(ResolverType.IN_PROCESS)
+                // provide the flag source selector, e.g. the name of a Flags custom resource which is watched by the flagd-proxy
+                .WithSourceSelector("core.openfeature.dev/flags/sample-flags")
+                .Build();
+
+            var flagdProvider = new FlagdProvider(flagdConfig);
+
+            // Set the flagdProvider as the provider for the OpenFeature SDK
+            OpenFeature.Api.Instance.SetProvider(flagdProvider);
+
+            var client = OpenFeature.Api.Instance.GetClient("my-app");
+
+            var val = client.GetBooleanValue("myBoolFlag", false, null);
+
+            // Print the value of the 'myBoolFlag' feature flag
+            System.Console.WriteLine(val.Result.ToString());
+        }
+    }
+}
 ```
 

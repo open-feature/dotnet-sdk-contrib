@@ -1,24 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Text;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-
-using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
-using Grpc.Net.Client;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Model;
-using OpenFeature.Error;
-
-using OpenFeature.Flagd.Grpc;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
-using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Net.Sockets;
-using System.Net.Http;
-using System.Collections.Generic;
+using OpenFeature.Constant;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -28,16 +15,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
     public sealed class FlagdProvider : FeatureProvider
     {
         const string ProviderName = "flagd Provider";
-        static int EventStreamRetryBaseBackoff = 1;
         private readonly FlagdConfig _config;
-        private readonly Service.ServiceClient _client;
+        private ProviderStatus _status;
         private readonly Metadata _providerMetadata = new Metadata(ProviderName);
 
-        private readonly ICache<string, object> _cache;
-        private int _eventStreamRetries;
-        private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-
-        private System.Threading.Mutex _mtx;
+        private readonly Resolver.Resolver _resolver;
 
         /// <summary>
         ///     Constructor of the provider. This constructor uses the value of the following
@@ -50,6 +32,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
         ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
         ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
+        ///     FLAGD_RESOLVER_TYPE            - The type of resolver (in-process or rpc) to be used for the provider
         /// </summary>
         public FlagdProvider() : this(new FlagdConfig())
         {
@@ -62,7 +45,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
         ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
         ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
-        ///     <param name="url">The URL of the flagD server</param>
+        ///     FLAGD_RESOLVER_TYPE            - The type of resolver (in-process or rpc) to be used for the provider
+        ///     <param name="url">The URL of the flagd server</param>
         ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
         /// </summary>
         public FlagdProvider(Uri url) : this(new FlagdConfig(url))
@@ -83,35 +67,27 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             _config = config;
 
-            _client = BuildClientForPlatform(_config.GetUri());
-
-            _mtx = new System.Threading.Mutex();
-
-            if (_config.CacheEnabled)
+            if (_config.ResolverType == ResolverType.IN_PROCESS)
             {
-                _cache = new LRUCache<string, object>(_config.MaxCacheSize);
-                Task.Run(async () =>
-                {
-                    await HandleEvents().ConfigureAwait(false);
-                });
+                _resolver = new InProcessResolver(_config);
+            }
+            else
+            {
+                _resolver = new RpcResolver(config);
             }
         }
 
         // just for testing, internal but visible in tests
-        internal FlagdProvider(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null)
+        internal FlagdProvider(Resolver.Resolver resolver)
         {
-            _mtx = new System.Threading.Mutex();
-            _client = client;
-            _config = config;
-            _cache = cache;
+            _resolver = resolver;
+            _resolver.Init();
+        }
 
-            if (_config.CacheEnabled)
-            {
-                Task.Run(async () =>
-                {
-                    await HandleEvents().ConfigureAwait(false);
-                });
-            }
+        /// <inheritdoc/>
+        public override ProviderStatus GetStatus()
+        {
+            return _status;
         }
 
         // just for testing, internal but visible in tests
@@ -131,9 +107,34 @@ namespace OpenFeature.Contrib.Providers.Flagd
         public override Metadata GetMetadata() => _providerMetadata;
 
         /// <summary>
-        ///     Return the Grpc client of the provider
+        ///     Return the resolver of the provider
         /// </summary>
-        public Service.ServiceClient GetClient() => _client;
+        internal Resolver.Resolver GetResolver() => _resolver;
+
+        /// <inheritdoc/>
+        public override Task Initialize(EvaluationContext context)
+        {
+            return Task.Run(async () =>
+            {
+                await _resolver.Init();
+                _status = ProviderStatus.Ready;
+
+            }).ContinueWith((t) =>
+            {
+                _status = ProviderStatus.Error;
+                if (t.IsFaulted) throw t.Exception;
+            });
+        }
+
+        /// <inheritdoc/>
+        public override Task Shutdown()
+        {
+            return _resolver.Shutdown().ContinueWith((t) =>
+            {
+                _status = ProviderStatus.NotReady;
+                if (t.IsFaulted) throw t.Exception;
+            });
+        }
 
         /// <summary>
         ///     ResolveBooleanValue resolve the value for a Boolean Flag.
@@ -144,21 +145,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(flagKey, async contextStruct =>
-            {
-                var resolveBooleanResponse = await _client.ResolveBooleanAsync(new ResolveBooleanRequest
-                {
-                    Context = contextStruct,
-                    FlagKey = flagKey
-                }).ConfigureAwait(false);
-
-                return new ResolutionDetails<bool>(
-                    flagKey: flagKey,
-                    value: (bool)resolveBooleanResponse.Value,
-                    reason: resolveBooleanResponse.Reason,
-                    variant: resolveBooleanResponse.Variant
-                );
-            }, context).ConfigureAwait(false);
+            return await _resolver.ResolveBooleanValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -170,21 +157,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(flagKey, async contextStruct =>
-            {
-                var resolveStringResponse = await _client.ResolveStringAsync(new ResolveStringRequest
-                {
-                    Context = contextStruct,
-                    FlagKey = flagKey
-                }).ConfigureAwait(false);
-
-                return new ResolutionDetails<string>(
-                    flagKey: flagKey,
-                    value: resolveStringResponse.Value,
-                    reason: resolveStringResponse.Reason,
-                    variant: resolveStringResponse.Variant
-                );
-            }, context).ConfigureAwait(false);
+            return await _resolver.ResolveStringValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -196,21 +169,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(flagKey, async contextStruct =>
-            {
-                var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
-                {
-                    Context = contextStruct,
-                    FlagKey = flagKey
-                }).ConfigureAwait(false);
 
-                return new ResolutionDetails<int>(
-                    flagKey: flagKey,
-                    value: (int)resolveIntResponse.Value,
-                    reason: resolveIntResponse.Reason,
-                    variant: resolveIntResponse.Variant
-                );
-            }, context).ConfigureAwait(false);
+            return await _resolver.ResolveIntegerValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -222,21 +182,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(flagKey, async contextStruct =>
-            {
-                var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
-                {
-                    Context = contextStruct,
-                    FlagKey = flagKey
-                }).ConfigureAwait(false);
-
-                return new ResolutionDetails<double>(
-                    flagKey: flagKey,
-                    value: resolveDoubleResponse.Value,
-                    reason: resolveDoubleResponse.Reason,
-                    variant: resolveDoubleResponse.Variant
-                );
-            }, context).ConfigureAwait(false);
+            return await _resolver.ResolveDoubleValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -248,346 +194,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         /// <returns>A ResolutionDetails object containing the value of your flag</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            return await ResolveValue(flagKey, async contextStruct =>
-            {
-                var resolveObjectResponse = await _client.ResolveObjectAsync(new ResolveObjectRequest
-                {
-                    Context = contextStruct,
-                    FlagKey = flagKey
-                }).ConfigureAwait(false);
-
-                return new ResolutionDetails<Value>(
-                    flagKey: flagKey,
-                    value: ConvertObjectToValue(resolveObjectResponse.Value),
-                    reason: resolveObjectResponse.Reason,
-                    variant: resolveObjectResponse.Variant
-                );
-            }, context).ConfigureAwait(false);
-        }
-
-        private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
-        {
-            try
-            {
-                if (_config.CacheEnabled)
-                {
-                    var value = _cache.TryGet(flagKey);
-
-                    if (value != null)
-                    {
-                        return (ResolutionDetails<T>)value;
-                    }
-                }
-                var result = await resolveDelegate.Invoke(ConvertToContext(context)).ConfigureAwait(false);
-
-                if (string.Equals(result.Reason, "STATIC", StringComparison.Ordinal) && _config.CacheEnabled)
-                {
-                    _cache.Add(flagKey, result);
-                }
-
-                return result;
-            }
-            catch (RpcException e)
-            {
-                throw GetOFException(e);
-            }
-        }
-
-        /// <summary>
-        ///     GetOFException returns a OpenFeature Exception containing an error code to describe the encountered error.
-        /// </summary>
-        /// <param name="e">The exception thrown by the Grpc client</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        private FeatureProviderException GetOFException(Grpc.Core.RpcException e)
-        {
-            switch (e.Status.StatusCode)
-            {
-                case Grpc.Core.StatusCode.NotFound:
-                    return new FeatureProviderException(Constant.ErrorType.FlagNotFound, e.Status.Detail, e);
-                case Grpc.Core.StatusCode.Unavailable:
-                    return new FeatureProviderException(Constant.ErrorType.ProviderNotReady, e.Status.Detail, e);
-                case Grpc.Core.StatusCode.InvalidArgument:
-                    return new FeatureProviderException(Constant.ErrorType.TypeMismatch, e.Status.Detail, e);
-                default:
-                    return new FeatureProviderException(Constant.ErrorType.General, e.Status.Detail, e);
-            }
-        }
-
-        private async Task HandleEvents()
-        {
-            while (_eventStreamRetries < _config.MaxEventStreamRetries)
-            {
-                var call = _client.EventStream(new Empty());
-                try
-                {
-                    // Read the response stream asynchronously
-                    while (await call.ResponseStream.MoveNext().ConfigureAwait(false))
-                    {
-                        var response = call.ResponseStream.Current;
-
-                        if (string.Equals(response.Type, "configuration_change", StringComparison.OrdinalIgnoreCase))
-                        {
-                            HandleConfigurationChangeEvent(response.Data);
-                        }
-                        else if (string.Equals(response.Type, "provider_ready", StringComparison.OrdinalIgnoreCase))
-                        {
-                            HandleProviderReadyEvent();
-                        }
-                    }
-                }
-                catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
-                {
-                    // Handle the dropped connection by reconnecting and retrying the stream
-                    await HandleErrorEvent().ConfigureAwait(false);
-                }
-            }
-        }
-
-        private void HandleConfigurationChangeEvent(Struct data)
-        {
-            // if we don't have a cache, we don't need to remove anything
-            if (!_config.CacheEnabled || !data.Fields.ContainsKey("flags"))
-            {
-                return;
-            }
-
-            try
-            {
-                if (data.Fields.TryGetValue("flags", out ProtoValue val))
-                {
-                    if (val.KindCase == ProtoValue.KindOneofCase.StructValue)
-                    {
-                        val.StructValue.Fields.ToList().ForEach(flag =>
-                        {
-                            _cache.Delete(flag.Key);
-                        });
-                    }
-                    var structVal = val.StructValue;
-                }
-            }
-            catch (Exception)
-            {
-                // purge the cache if we could not handle the configuration change event
-                _cache.Purge();
-            }
-
-        }
-
-        private void HandleProviderReadyEvent()
-        {
-            _mtx.WaitOne();
-            _eventStreamRetries = 0;
-            _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-            _mtx.ReleaseMutex();
-            _cache.Purge();
-        }
-
-        private async Task HandleErrorEvent()
-        {
-            _mtx.WaitOne();
-            _eventStreamRetries++;
-
-            if (_eventStreamRetries > _config.MaxEventStreamRetries)
-            {
-                return;
-            }
-            _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
-            _mtx.ReleaseMutex();
-            await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        ///     ConvertToContext converts the given EvaluationContext to a Struct.
-        /// </summary>
-        /// <param name="ctx">The evaluation context</param>
-        /// <returns>A Struct object containing the evaluation context</returns>
-        private static Struct ConvertToContext(EvaluationContext ctx)
-        {
-            if (ctx == null)
-            {
-                return new Struct();
-            }
-
-            var values = new Struct();
-            foreach (var entry in ctx)
-            {
-                values.Fields.Add(entry.Key, ConvertToProtoValue(entry.Value));
-            }
-
-            return values;
-        }
-
-        /// <summary>   
-        ///     ConvertToProtoValue converts the given Value to a ProtoValue.
-        /// </summary>
-        /// <param name="value">The value</param>
-        /// <returns>A ProtoValue object representing the given value</returns>
-        private static ProtoValue ConvertToProtoValue(Value value)
-        {
-            if (value.IsList)
-            {
-                return ProtoValue.ForList(value.AsList.Select(ConvertToProtoValue).ToArray());
-            }
-
-            if (value.IsStructure)
-            {
-                var values = new Struct();
-
-                foreach (var entry in value.AsStructure)
-                {
-                    values.Fields.Add(entry.Key, ConvertToProtoValue(entry.Value));
-                }
-
-                return ProtoValue.ForStruct(values);
-            }
-
-            if (value.IsBoolean)
-            {
-                return ProtoValue.ForBool(value.AsBoolean ?? false);
-            }
-
-            if (value.IsString)
-            {
-                return ProtoValue.ForString(value.AsString);
-            }
-
-            if (value.IsNumber)
-            {
-                return ProtoValue.ForNumber(value.AsDouble ?? 0.0);
-            }
-
-            return ProtoValue.ForNull();
-        }
-
-        /// <summary>   
-        ///     ConvertObjectToValue converts the given Struct to a Value.
-        /// </summary>
-        /// <param name="src">The struct</param>
-        /// <returns>A Value object representing the given struct</returns>
-        private static Value ConvertObjectToValue(Struct src) =>
-            new Value(new Structure(src.Fields
-                .ToDictionary(entry => entry.Key, entry => ConvertToValue(entry.Value))));
-
-        /// <summary>   
-        ///     ConvertToValue converts the given ProtoValue to a Value.
-        /// </summary>
-        /// <param name="src">The value, represented as ProtoValue</param>
-        /// <returns>A Value object representing the given value</returns>
-        private static Value ConvertToValue(ProtoValue src)
-        {
-            switch (src.KindCase)
-            {
-                case ProtoValue.KindOneofCase.ListValue:
-                    return new Value(src.ListValue.Values.Select(ConvertToValue).ToList());
-                case ProtoValue.KindOneofCase.StructValue:
-                    return new Value(ConvertObjectToValue(src.StructValue));
-                case ProtoValue.KindOneofCase.None:
-                case ProtoValue.KindOneofCase.NullValue:
-                case ProtoValue.KindOneofCase.NumberValue:
-                case ProtoValue.KindOneofCase.StringValue:
-                case ProtoValue.KindOneofCase.BoolValue:
-                default:
-                    return ConvertToPrimitiveValue(src);
-            }
-        }
-
-        /// <summary>   
-        ///     ConvertToPrimitiveValue converts the given ProtoValue to a Value.
-        /// </summary>
-        /// <param name="value">The value, represented as ProtoValue</param>
-        /// <returns>A Value object representing the given value as a primitive data type</returns>
-        private static Value ConvertToPrimitiveValue(ProtoValue value)
-        {
-            switch (value.KindCase)
-            {
-                case ProtoValue.KindOneofCase.BoolValue:
-                    return new Value(value.BoolValue);
-                case ProtoValue.KindOneofCase.StringValue:
-                    return new Value(value.StringValue);
-                case ProtoValue.KindOneofCase.NumberValue:
-                    return new Value(value.NumberValue);
-                case ProtoValue.KindOneofCase.NullValue:
-                case ProtoValue.KindOneofCase.StructValue:
-                case ProtoValue.KindOneofCase.ListValue:
-                case ProtoValue.KindOneofCase.None:
-                default:
-                    return new Value();
-            }
-        }
-
-        private Service.ServiceClient BuildClientForPlatform(Uri url)
-        {
-            var useUnixSocket = string.Equals(url.Scheme, "unix", StringComparison.Ordinal);
-
-            if (!useUnixSocket)
-            {
-#if NET462_OR_GREATER
-                var handler = new WinHttpHandler();
-#else
-                var handler = new HttpClientHandler();
-#endif
-                if (_config.UseCertificate)
-                {
-                    if (File.Exists(_config.CertificatePath))
-                    {
-                        X509Certificate2 certificate = new X509Certificate2(_config.CertificatePath);
-#if NET5_0_OR_GREATER
-                        handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
-                            // the the custom cert to the chain, Build returns a bool if valid.
-                            chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
-                            chain.ChainPolicy.CustomTrustStore.Add(certificate);
-                            return chain.Build(cert);
-                        };
-#elif NET462_OR_GREATER
-                        handler.ServerCertificateValidationCallback = (message, cert, chain, errors) => {
-                            if (errors == SslPolicyErrors.None) { return true; }
-
-                            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
-
-                            chain.ChainPolicy.ExtraStore.Add(certificate);
-
-                            var isChainValid = chain.Build(cert);
-
-                            if (!isChainValid) { return false; }
-
-                            var isValid = chain.ChainElements
-                                .Cast<X509ChainElement>()
-                                .Any(x => x.Certificate.RawData.SequenceEqual(certificate.GetRawCertData()));
-
-                            return isValid;
-                        };
-#else
-                        throw new ArgumentException("Custom Certificates are not supported on your platform");
-#endif
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Specified certificate cannot be found.");
-                    }
-                }
-                return new Service.ServiceClient(GrpcChannel.ForAddress(url, new GrpcChannelOptions
-                {
-                    HttpHandler = handler
-                }));
-            }
-
-#if NET5_0_OR_GREATER
-            var udsEndPoint = new UnixDomainSocketEndPoint(url.ToString().Substring("unix://".Length));
-            var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-            var socketsHttpHandler = new SocketsHttpHandler
-            {
-                ConnectCallback = connectionFactory.ConnectAsync
-            };
-            
-            // point to localhost and let the custom ConnectCallback handle the communication over the unix socket
-            // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
-            return new Service.ServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
-            {
-                HttpHandler = socketsHttpHandler,
-            }));
-#endif
-            // unix socket support is not available in this dotnet version
-            throw new Exception("unix sockets are not supported in this version.");
+            return await _resolver.ResolveStructureValue(flagKey, defaultValue, context).ConfigureAwait(false);
         }
     }
 }
