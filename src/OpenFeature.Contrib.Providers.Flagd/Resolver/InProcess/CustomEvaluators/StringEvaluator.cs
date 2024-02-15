@@ -10,7 +10,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
         {
             return p.Apply(args[0], data).ToString().StartsWith(p.Apply(args[1], data).ToString());
         }
-        
+
         internal object EndsWith(IProcessJsonLogic p, JToken[] args, object data)
         {
             return p.Apply(args[0], data).ToString().EndsWith(p.Apply(args[1], data).ToString());
