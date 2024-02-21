@@ -7,6 +7,7 @@ using JsonLogic.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 using OpenFeature.Error;
 using OpenFeature.Model;
 
@@ -58,6 +59,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
         internal JsonEvaluator(string selector)
         {
             _selector = selector;
+
+            var stringEvaluator = new StringEvaluator();
+
+            EvaluateOperators.Default.AddOperator("starts_with", stringEvaluator.StartsWith);
+            EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
         }
 
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
