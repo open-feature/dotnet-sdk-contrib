@@ -128,5 +128,57 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var result = evaluator.Apply(rule, data);
             Assert.False(result.IsTruthy());
         }
+
+        [Fact]
+        public void EndsWithNotEnoughArguments()
+        {
+            // Arrange
+            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+            var stringEvaluator = new StringEvaluator();
+            EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
+
+            var targetingString = @"{""ends_with"": [
+                        {
+                          ""var"": [
+                            ""color""
+                          ]
+                        }
+                      ]}";
+
+            // Parse json into hierarchical structure
+            var rule = JObject.Parse(targetingString);
+
+            var data = new Dictionary<string, int> { { "color", 5 } };
+
+            // Act & Assert
+            var result = evaluator.Apply(rule, data);
+            Assert.False(result.IsTruthy());
+        }
+
+        [Fact]
+        public void StartsWithNotEnoughArguments()
+        {
+            // Arrange
+            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+            var stringEvaluator = new StringEvaluator();
+            EvaluateOperators.Default.AddOperator("starts_with", stringEvaluator.EndsWith);
+
+            var targetingString = @"{""starts_with"": [
+                        {
+                          ""var"": [
+                            ""color""
+                          ]
+                        }
+                      ]}";
+
+            // Parse json into hierarchical structure
+            var rule = JObject.Parse(targetingString);
+
+            var data = new Dictionary<string, int> { { "color", 5 } };
+
+            // Act & Assert
+            var result = evaluator.Apply(rule, data);
+            Assert.False(result.IsTruthy());
+        }
     }
 }
