@@ -292,5 +292,60 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             result = evaluator.Apply(rule, data);
             Assert.False(result.IsTruthy());
         }
+
+        [Fact]
+        public void EvaluateVersionTooFewArguments()
+        {
+            // Arrange
+            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+            var semVerEvaluator = new SemVerEvaluator();
+            EvaluateOperators.Default.AddOperator("sem_ver", semVerEvaluator.Evaluate);
+
+            var targetingString = @"{""sem_ver"": [
+              {
+                ""var"": [
+                  ""version""
+                ]
+              },
+              ""~""
+            ]}";
+
+            // Parse json into hierarchical structure
+            var rule = JObject.Parse(targetingString);
+
+            var data = new Dictionary<string, string> { { "version", "1.3.3" } };
+
+            // Act & Assert
+            var result = evaluator.Apply(rule, data);
+            Assert.False(result.IsTruthy());
+        }
+
+        [Fact]
+        public void EvaluateVersionNotAValidVersion()
+        {
+            // Arrange
+            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+            var semVerEvaluator = new SemVerEvaluator();
+            EvaluateOperators.Default.AddOperator("sem_ver", semVerEvaluator.Evaluate);
+
+            var targetingString = @"{""sem_ver"": [
+              {
+                ""var"": [
+                  ""version""
+                ]
+              },
+              ""~"",
+              ""test""
+            ]}";
+
+            // Parse json into hierarchical structure
+            var rule = JObject.Parse(targetingString);
+
+            var data = new Dictionary<string, string> { { "version", "1.3.3" } };
+
+            // Act & Assert
+            var result = evaluator.Apply(rule, data);
+            Assert.False(result.IsTruthy());
+        }
     }
 }
