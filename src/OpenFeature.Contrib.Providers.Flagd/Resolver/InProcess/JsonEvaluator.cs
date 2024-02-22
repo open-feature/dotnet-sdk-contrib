@@ -61,9 +61,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             _selector = selector;
 
             var stringEvaluator = new StringEvaluator();
+            var semVerEvaluator = new SemVerEvaluator();
 
             EvaluateOperators.Default.AddOperator("starts_with", stringEvaluator.StartsWith);
             EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
+            EvaluateOperators.Default.AddOperator("sem_ver", semVerEvaluator.Evaluate);
         }
 
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)

@@ -23,6 +23,7 @@
     <!-- The schema.proto file referenced here will be used to automatically generate the Grpc client when executing 'dotnet build' -->
     <!-- The generated files will be placed in ./obj/Debug/netstandard2.0/Protos -->
     <PackageReference Include="JsonLogic.Net" Version="1.1.11" />
+    <PackageReference Include="Semver" Version="2.3.0" />
     <Protobuf Include="schemas\protobuf\schema\v1\schema.proto" GrpcServices="Client" />
     <Protobuf Include="schemas\protobuf\flagd\sync\v1\sync.proto" GrpcServices="Client" />
     <PackageReference Include="Google.Protobuf" Version="3.23.4" />
