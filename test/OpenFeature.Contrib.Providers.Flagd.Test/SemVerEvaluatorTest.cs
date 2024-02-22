@@ -42,7 +42,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             result = evaluator.Apply(rule, data);
             Assert.False(result.IsTruthy());
         }
-        
+
         [Fact]
         public void EvaluateVersionNotEqual()
         {
@@ -76,7 +76,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             result = evaluator.Apply(rule, data);
             Assert.True(result.IsTruthy());
         }
-        
+
         [Fact]
         public void EvaluateVersionLess()
         {
@@ -110,7 +110,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             result = evaluator.Apply(rule, data);
             Assert.False(result.IsTruthy());
         }
-        
+
         [Fact]
         public void EvaluateVersionLessOrEqual()
         {
@@ -143,14 +143,14 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             result = evaluator.Apply(rule, data);
             Assert.True(result.IsTruthy());
-            
+
             data.Clear();
             data.Add("version", "1.0.3");
 
             result = evaluator.Apply(rule, data);
             Assert.False(result.IsTruthy());
         }
-        
+
         [Fact]
         public void EvaluateVersionGreater()
         {
@@ -192,7 +192,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
             var semVerEvaluator = new SemVerEvaluator();
             EvaluateOperators.Default.AddOperator("sem_ver", semVerEvaluator.Evaluate);
-        
+
             var targetingString = @"{""sem_ver"": [
                       {
                         ""var"": [
@@ -202,29 +202,29 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                       "">="",
                       ""1.0.2""
                     ]}";
-        
+
             // Parse json into hierarchical structure
             var rule = JObject.Parse(targetingString);
-        
+
             var data = new Dictionary<string, string> { { "version", "1.0.2" } };
-        
+
             // Act & Assert
             var result = evaluator.Apply(rule, data);
             Assert.True(result.IsTruthy());
-        
+
             data.Clear();
             data.Add("version", "1.0.3");
-        
+
             result = evaluator.Apply(rule, data);
             Assert.True(result.IsTruthy());
-        
+
             data.Clear();
             data.Add("version", "1.0.1");
-            
+
             result = evaluator.Apply(rule, data);
             Assert.False(result.IsTruthy());
         }
-        
+
         [Fact]
         public void EvaluateVersionMatchMajor()
         {
@@ -258,7 +258,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             result = evaluator.Apply(rule, data);
             Assert.False(result.IsTruthy());
         }
-        
+
         [Fact]
         public void EvaluateVersionMatchMinor()
         {
