@@ -2,15 +2,16 @@ using System.Collections.Generic;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators
 {
-    internal class FlagdProperties {
-        
+    internal class FlagdProperties
+    {
+
         internal const string FlagdPropertiesKey = "$flagd";
         internal const string FlagKeyKey = "flagKey";
         internal const string TimestampKey = "timestamp";
-        
+
         internal string FlagKey { get; set; }
         internal long Timestamp { get; set; }
-        
+
         internal FlagdProperties(object from)
         {
             //object value;
