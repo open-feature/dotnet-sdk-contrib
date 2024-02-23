@@ -101,6 +101,30 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         ]
       }
     },
+    ""targetingBoolFlagUsingFlagdProperty"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""bool1"": true,
+        ""bool2"": false
+      },
+      ""defaultVariant"": ""bool2"",
+            ""targeting"": {
+        ""if"": [
+          {
+            ""=="": [
+              {
+                ""var"": [
+                  ""$flagd.flagKey""
+                ]
+              },
+              ""targetingBoolFlagUsingFlagdProperty""
+            ]
+          },
+          ""bool1"",
+          null
+        ]
+      }
+    },
         ""targetingStringFlag"": {
       ""state"": ""ENABLED"",
       ""variants"": {

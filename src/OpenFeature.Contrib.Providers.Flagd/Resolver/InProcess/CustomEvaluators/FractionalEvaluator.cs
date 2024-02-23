@@ -32,6 +32,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
 
             var propertyValue = p.Apply(args[0], data).ToString();
 
+            var flagdProperties = new FlagdProperties(data);
+
             var distributions = new List<FractionalEvaluationDistribution>();
 
             for (var i = 1; i < args.Length; i++)
@@ -63,14 +65,10 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
                 });
             }
 
+            var valueToDistribute = flagdProperties.FlagKey + propertyValue;
             var murmur32 = MurmurHash.Create32();
-            var hashBytes = murmur32.ComputeHash(Encoding.ASCII.GetBytes(propertyValue));
-            /*
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(hashBytes);
-            }
-            */
+            var bytes = Encoding.ASCII.GetBytes(valueToDistribute);
+            var hashBytes = murmur32.ComputeHash(bytes);
             var hash = BitConverter.ToInt32(hashBytes, 0);
 
             var bucketValue = (int)(Math.Abs((float)hash) / Int32.MaxValue * 100);
