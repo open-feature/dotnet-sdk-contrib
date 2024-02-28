@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Statsig\OpenFeature.Contrib.Providers.Statsig.csproj" />
+  </ItemGroup>
+
+</Project>
