@@ -51,17 +51,24 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
 
         /// <inheritdoc/>
         public override Metadata GetMetadata() => _providerMetadata;
-        
+
         /// <inheritdoc/>
         public override Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
 
-            if (GetStatus() ==  ProviderStatus.Ready)
+            if (GetStatus() != ProviderStatus.Ready)
+                return Task.FromResult(new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.ProviderNotReady));
+            var result = StatsigServer.CheckGateSync(context.AsStatsigUser(), flagKey);
+            //Workaround for fallback to true default value
+            if (result == false && defaultValue == true)
             {
-                var result = StatsigServer.CheckGateSync(context.AsStatsigUser(), flagKey);
-                return Task.FromResult(new ResolutionDetails<bool>(flagKey, result));
+                if (!StatsigServer.GetFeatureGateList().Exists(x => x == flagKey.ToLowerInvariant()))
+                {
+                    return Task.FromResult(new ResolutionDetails<bool>(flagKey, true));
+                }
             }
-            return Task.FromResult(new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.ProviderNotReady));
+
+            return Task.FromResult(new ResolutionDetails<bool>(flagKey, result));
         }
 
         public override Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
@@ -97,7 +104,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
                 await semaphore.WaitAsync();
                 try
                 {
-                    var initResult = await StatsigServer.Initialize("secret-C83HBXKmN4cYaTINdO80YFoc5ogOAExpjsTy9ZO7LO2", new StatsigServerOptions() { LocalMode = false });
+                    var initResult = await StatsigServer.Initialize("", new StatsigServerOptions() { LocalMode = false });
                     if (initResult == InitializeResult.Success || initResult == InitializeResult.AlreadyInitialized || initResult == InitializeResult.LocalMode)
                     {
                         initialized = true;
@@ -107,7 +114,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
                 }
                 finally
                 {
-                        semaphore.Release();
+                    semaphore.Release();
                 }
             }
 
