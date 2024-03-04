@@ -125,6 +125,30 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         ]
       }
     },
+    ""targetingBoolFlagUsingFlagdPropertyTimestamp"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""bool1"": true,
+        ""bool2"": false
+      },
+      ""defaultVariant"": ""bool2"",
+            ""targeting"": {
+        ""if"": [
+          {
+            "">"": [
+              {
+                ""var"": [
+                  ""$flagd.timestamp""
+                ]
+              },
+              ""0""
+            ]
+          },
+          ""bool1"",
+          null
+        ]
+      }
+    },
         ""targetingStringFlag"": {
       ""state"": ""ENABLED"",
       ""variants"": {

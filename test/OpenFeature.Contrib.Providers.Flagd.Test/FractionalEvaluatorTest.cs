@@ -17,6 +17,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             yield return new object[] { "ross@faas.com", "headerColor", "green" };
             yield return new object[] { "ross@faas.com", "footerColor", "red" };
         }
+
+        public static IEnumerable<object[]> FractionalEvaluationWithTargetingKeyContext()
+        {
+            yield return new object[] { "headerColor", "yellow" };
+            yield return new object[] { "footerColor", "yellow" };
+        }
     }
     public class FractionalEvaluatorTest
     {
@@ -43,6 +49,33 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var data = new Dictionary<string, object> {
             { "email", email },
+            {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
+            };
+
+            // Act & Assert
+            var result = evaluator.Apply(rule, data);
+            Assert.Equal(expected, result.ToString());
+
+        }
+
+        [Theory]
+        [MemberData(nameof(FractionalEvaluationTestData.FractionalEvaluationWithTargetingKeyContext), MemberType = typeof(FractionalEvaluationTestData))]
+        public void EvaluateUsingTargetingKey(string flagKey, string expected)
+        {
+            // Arrange
+            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+            var fractionalEvaluator = new FractionalEvaluator();
+            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+
+            var targetingString = @"{""fractional"": [
+              [""red"", 25], [""blue"", 25], [""green"", 25], [""yellow"", 25],
+            ]}";
+
+            // Parse json into hierarchical structure
+            var rule = JObject.Parse(targetingString);
+
+            var data = new Dictionary<string, object> {
+            { "targetingKey", "myKey" },
             {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
             };
 

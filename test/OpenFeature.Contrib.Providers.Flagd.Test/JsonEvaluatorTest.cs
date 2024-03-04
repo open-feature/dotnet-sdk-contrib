@@ -67,7 +67,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
-        public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdProperty()
+        public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdPropertyFlagKey()
         {
             var fixture = new Fixture();
 
@@ -81,6 +81,27 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var builder = EvaluationContext.Builder();
 
             var result = jsonEvaluator.ResolveBooleanValue("targetingBoolFlagUsingFlagdProperty", false, builder.Build());
+
+            Assert.True(result.Value);
+            Assert.Equal("bool1", result.Variant);
+            Assert.Equal(Reason.TargetingMatch, result.Reason);
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdPropertyTimestamp()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+            attributes.Add("color", new Value("yellow"));
+
+            var builder = EvaluationContext.Builder();
+
+            var result = jsonEvaluator.ResolveBooleanValue("targetingBoolFlagUsingFlagdPropertyTimestamp", false, builder.Build());
 
             Assert.True(result.Value);
             Assert.Equal("bool1", result.Variant);

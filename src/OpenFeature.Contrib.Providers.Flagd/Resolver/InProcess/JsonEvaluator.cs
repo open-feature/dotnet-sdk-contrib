@@ -140,7 +140,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 {
                     var flagdProperties = new Dictionary<string, Value>();
                     flagdProperties.Add(FlagdProperties.FlagKeyKey, new Value(flagKey));
-                    flagdProperties.Add(FlagdProperties.TimestampKey, new Value(DateTime.Now));
+                    flagdProperties.Add(FlagdProperties.TimestampKey, new Value(DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
 
                     if (context == null)
                     {

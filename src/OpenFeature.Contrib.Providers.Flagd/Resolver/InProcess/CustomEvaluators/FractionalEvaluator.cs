@@ -25,18 +25,28 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
             // 1. the property value
             // 2. the array containing the buckets
 
-            if (args.Length < 2)
+            if (args.Length == 0)
             {
                 return null;
             }
 
-            var propertyValue = p.Apply(args[0], data).ToString();
-
             var flagdProperties = new FlagdProperties(data);
+
+            // check if the first argument is a string (i.e. the property to base the distribution on
+            var propertyValue = flagdProperties.TargetingKey;
+            var bucketStartIndex = 0;
+
+            var arg0 = p.Apply(args[0], data);
+
+            if (arg0 is string stringValue)
+            {
+                propertyValue = stringValue;
+                bucketStartIndex = 1;
+            }
 
             var distributions = new List<FractionalEvaluationDistribution>();
 
-            for (var i = 1; i < args.Length; i++)
+            for (var i = bucketStartIndex; i < args.Length; i++)
             {
                 var bucket = p.Apply(args[i], data);
 

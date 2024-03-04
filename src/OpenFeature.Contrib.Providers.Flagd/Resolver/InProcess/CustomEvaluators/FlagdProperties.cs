@@ -8,15 +8,22 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
         internal const string FlagdPropertiesKey = "$flagd";
         internal const string FlagKeyKey = "flagKey";
         internal const string TimestampKey = "timestamp";
+        internal const string TargetingKeyKey = "targetingKey";
 
         internal string FlagKey { get; set; }
         internal long Timestamp { get; set; }
+        internal string TargetingKey { get; set; }
 
         internal FlagdProperties(object from)
         {
             //object value;
             if (from is Dictionary<string, object> dict)
             {
+                if (dict.TryGetValue(TargetingKeyKey, out object targetingKeyValue)
+                    && targetingKeyValue is string targetingKeyString)
+                {
+                    TargetingKey = targetingKeyString;
+                }
                 if (dict.TryGetValue(FlagdPropertiesKey, out object flagdPropertiesObj)
                     && flagdPropertiesObj is Dictionary<string, object> flagdProperties)
                 {
