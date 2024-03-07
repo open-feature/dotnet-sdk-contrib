@@ -28,9 +28,12 @@ public class StatsigProviderTest
     [InlineAutoData(false, false)]
     public async Task GetBooleanValue_ForFeatureWithContext(bool flagValue, bool expectedValue, string userId, string flagName)
     {
+        // Arrange
         await statsigProvider.Initialize(null);
         var ec = EvaluationContext.Builder().Set("UserID", userId).Build();
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue, userId);
+
+        // Act & Assert
         Assert.Equal(expectedValue, statsigProvider.ResolveBooleanValue(flagName, false, ec).Result.Value);
     }
 
@@ -39,8 +42,11 @@ public class StatsigProviderTest
     [InlineAutoData(false, false)]
     public async Task GetBooleanValue_ForFeatureWithNoContext_ReturnsFalse(bool flagValue, bool expectedValue, string flagName)
     {
+        // Arrange
         await statsigProvider.Initialize(null);
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue);
+
+        // Act & Assert
         Assert.Equal(expectedValue, statsigProvider.ResolveBooleanValue(flagName, false).Result.Value);
     }
 
@@ -48,18 +54,21 @@ public class StatsigProviderTest
     [AutoData]
     public async Task GetBooleanValue_ForFeatureWithDefaultTrue_ThrowsException(string flagName)
     {
+        // Arrange
         await statsigProvider.Initialize(null);
+
+        // Act & Assert
         Assert.ThrowsAny<FeatureProviderException>(() => statsigProvider.ResolveBooleanValue(flagName, true).Result.Value);
     }
 
     [Fact]
-    public async Task TestConcurrentOperation()
+    public async Task TestConcurrentInitilization_DoesntThrowException()
     {
         // Arrange
         var concurrencyTestClass = new StatsigProvider();
         const int numberOfThreads = 50;
 
-        // Act
+        // Act & Assert
         var tasks = new Task[numberOfThreads];
         for (int i = 0; i < numberOfThreads; i++)
         {
