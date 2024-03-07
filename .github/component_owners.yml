@@ -18,6 +18,8 @@ components:
   src/OpenFeature.Contrib.Providers.FeatureManagement:
     - ericpattison
     - toddbaert
+  src/OpenFeature.Contrib.Providers.Statsig:
+    - jenshenneberg
 
   # test/
   test/OpenFeature.Contrib.Hooks.Otel.Test:
@@ -37,6 +39,8 @@ components:
   test/OpenFeature.Contrib.Providers.FeatureManagement.Test:
     - ericpattison
     - toddbaert
+  test/src/OpenFeature.Contrib.Providers.Statsig.Test:
+    - jenshenneberg
 
 ignored-authors:
   - renovate-bot

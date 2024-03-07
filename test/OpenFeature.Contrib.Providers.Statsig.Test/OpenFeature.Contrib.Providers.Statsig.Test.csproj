@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoFixture.Xunit2" Version="4.17.0" />
+		<ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Statsig\OpenFeature.Contrib.Providers.Statsig.csproj" />
+	</ItemGroup>
+
+</Project>
