@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using JsonLogic.Net;
+using Microsoft.Extensions.Logging;
 using Murmur;
 using Newtonsoft.Json.Linq;
 using Semver;
@@ -12,6 +13,22 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
     /// <inheritdoc/>
     public class FractionalEvaluator
     {
+
+        internal ILogger Logger { get; set; }
+
+        internal FractionalEvaluator()
+        {
+            var loggerFactory = LoggerFactory.Create(
+                builder => builder
+                    // add console as logging target
+                    .AddConsole()
+                    // add debug output as logging target
+                    .AddDebug()
+                    // set minimum level to log
+                    .SetMinimumLevel(LogLevel.Debug)
+                );
+            Logger = loggerFactory.CreateLogger<FractionalEvaluator>();
+        }
 
         class FractionalEvaluationDistribution
         {
@@ -45,6 +62,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
             }
 
             var distributions = new List<FractionalEvaluationDistribution>();
+            var distributionSum = 0;
 
             for (var i = bucketStartIndex; i < args.Length; i++)
             {
@@ -68,11 +86,20 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
                 }
 
 
+                var percentage = Convert.ToInt32(bucketArr.ElementAt(1));
                 distributions.Add(new FractionalEvaluationDistribution
                 {
                     variant = bucketArr.ElementAt(0).ToString(),
-                    percentage = Convert.ToInt32(bucketArr.ElementAt(1))
+                    percentage = percentage
                 });
+
+                distributionSum += percentage;
+            }
+
+            if (distributionSum != 100)
+            {
+                Logger.LogDebug("Sum of distribution values is not eqyal to 100");
+                return null;
             }
 
             var valueToDistribute = flagdProperties.FlagKey + propertyValue;
@@ -94,6 +121,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
                 }
             }
 
+            Logger.LogDebug("No matching bucket found");
             return "";
         }
     }

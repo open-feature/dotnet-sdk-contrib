@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using JsonLogic.Net;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
@@ -56,16 +57,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 
         private readonly JsonLogicEvaluator _evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
 
+
         internal JsonEvaluator(string selector)
         {
             _selector = selector;
 
             var stringEvaluator = new StringEvaluator();
             var semVerEvaluator = new SemVerEvaluator();
+            var fractionalEvaluator = new FractionalEvaluator();
 
             EvaluateOperators.Default.AddOperator("starts_with", stringEvaluator.StartsWith);
             EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
             EvaluateOperators.Default.AddOperator("sem_ver", semVerEvaluator.Evaluate);
+            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
         }
 
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)

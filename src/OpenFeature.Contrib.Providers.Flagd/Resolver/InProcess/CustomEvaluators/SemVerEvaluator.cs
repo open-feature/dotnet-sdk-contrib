@@ -1,5 +1,7 @@
 using System;
 using JsonLogic.Net;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using Semver;
 
@@ -8,6 +10,23 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
     /// <inheritdoc/>
     public class SemVerEvaluator
     {
+        internal ILogger Logger { get; set; }
+
+        internal SemVerEvaluator()
+        {
+            var loggerFactory = LoggerFactory.Create(
+                builder => builder
+                    // add console as logging target
+                    .AddConsole()
+                    // add debug output as logging target
+                    .AddDebug()
+                    // set minimum level to log
+                    .SetMinimumLevel(LogLevel.Debug)
+                );
+            Logger = loggerFactory.CreateLogger<SemVerEvaluator>();
+        }
+
+
         const string OperatorEqual = "=";
         const string OperatorNotEqual = "!=";
         const string OperatorLess = "<";
@@ -61,8 +80,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
                         return false;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger?.LogDebug("Exception during SemVer evaluation: " + e.Message);
                 return false;
             }
         }
