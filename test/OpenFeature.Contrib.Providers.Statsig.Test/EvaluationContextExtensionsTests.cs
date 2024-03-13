@@ -12,7 +12,7 @@ namespace OpenFeature.Contrib.Providers.Statsig.Test
         public void AsStatsigUser_ShouldMapUserIdSuccessfully(string userId)
         {
             // Arrange
-            var evaluationContext = EvaluationContext.Builder().Set("UserID", userId).Build();
+            var evaluationContext = EvaluationContext.Builder().SetTargetingKey(userId).Build();
 
             // Act
             var statsigUser = evaluationContext.AsStatsigUser();
@@ -100,7 +100,7 @@ namespace OpenFeature.Contrib.Providers.Statsig.Test
         public void AsStatsigUser_ShouldHandleEmptyUserID()
         {
             // Arrange
-            var evaluationContext = EvaluationContext.Builder().Set("UserID", "").Build();
+            var evaluationContext = EvaluationContext.Builder().SetTargetingKey("").Build();
 
             // Act
             var statsigUser = evaluationContext.AsStatsigUser();

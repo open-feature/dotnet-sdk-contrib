@@ -20,49 +20,44 @@ namespace OpenFeature.Contrib.Providers.Statsig
             if (evaluationContext == null)
                 return null;
 
-            var user = new StatsigUser();
+            var user = new StatsigUser() { UserID = evaluationContext.TargetingKey };
             foreach (var item in evaluationContext)
             {
-                //TODO: Await release containing this https://github.com/open-feature/dotnet-sdk/pull/231 to use TargetingKey instead of UserId
-                if (item.Key.ToUpperInvariant() == "USERID")
-                    user.UserID = item.Value.AsString;
-
-                else
-                    switch (item.Key)
-                    {
-                        case CONTEXT_APP_VERSION:
-                            user.AppVersion = item.Value.AsString;
-                            break;
-                        case CONTEXT_COUNTRY:
-                            user.Country = item.Value.AsString;
-                            break;
-                        case CONTEXT_EMAIL:
-                            user.Email = item.Value.AsString;
-                            break;
-                        case CONTEXT_IP:
-                            user.IPAddress = item.Value.AsString;
-                            break;
-                        case CONTEXT_USER_AGENT:
-                            user.UserAgent = item.Value.AsString;
-                            break;
-                        case CONTEXT_LOCALE:
-                            user.Locale = item.Value.AsString;
-                            break;
-                        case CONTEXT_PRIVATE_ATTRIBUTES:
-                            if (item.Value.IsStructure)
+                switch (item.Key)
+                {
+                    case CONTEXT_APP_VERSION:
+                        user.AppVersion = item.Value.AsString;
+                        break;
+                    case CONTEXT_COUNTRY:
+                        user.Country = item.Value.AsString;
+                        break;
+                    case CONTEXT_EMAIL:
+                        user.Email = item.Value.AsString;
+                        break;
+                    case CONTEXT_IP:
+                        user.IPAddress = item.Value.AsString;
+                        break;
+                    case CONTEXT_USER_AGENT:
+                        user.UserAgent = item.Value.AsString;
+                        break;
+                    case CONTEXT_LOCALE:
+                        user.Locale = item.Value.AsString;
+                        break;
+                    case CONTEXT_PRIVATE_ATTRIBUTES:
+                        if (item.Value.IsStructure)
+                        {
+                            var privateAttributes = item.Value.AsStructure;
+                            foreach (var items in privateAttributes)
                             {
-                                var privateAttributes = item.Value.AsStructure;
-                                foreach (var items in privateAttributes)
-                                {
-                                    user.AddPrivateAttribute(items.Key, items.Value);
-                                }
+                                user.AddPrivateAttribute(items.Key, items.Value);
                             }
-                            break;
+                        }
+                        break;
 
-                        default:
-                            user.AddCustomProperty(item.Key, item.Value.AsObject);
-                            break;
-                    }
+                    default:
+                        user.AddCustomProperty(item.Key, item.Value.AsObject);
+                        break;
+                }
             }
             return user;
         }

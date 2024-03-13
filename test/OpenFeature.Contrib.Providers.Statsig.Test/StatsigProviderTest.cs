@@ -30,7 +30,7 @@ public class StatsigProviderTest
     {
         // Arrange
         await statsigProvider.Initialize(null);
-        var ec = EvaluationContext.Builder().Set("UserID", userId).Build();
+        var ec = EvaluationContext.Builder().SetTargetingKey(userId).Build();
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue, userId);
 
         // Act & Assert
