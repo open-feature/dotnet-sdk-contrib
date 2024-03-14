@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using JsonLogic.Net;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
@@ -56,14 +57,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 
         private readonly JsonLogicEvaluator _evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
 
+
         internal JsonEvaluator(string selector)
         {
             _selector = selector;
 
             var stringEvaluator = new StringEvaluator();
+            var semVerEvaluator = new SemVerEvaluator();
+            var fractionalEvaluator = new FractionalEvaluator();
 
             EvaluateOperators.Default.AddOperator("starts_with", stringEvaluator.StartsWith);
             EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
+            EvaluateOperators.Default.AddOperator("sem_ver", semVerEvaluator.Evaluate);
+            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
         }
 
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
@@ -136,6 +142,20 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 var variant = flagConfiguration.DefaultVariant;
                 if (flagConfiguration.Targeting != null && !String.IsNullOrEmpty(flagConfiguration.Targeting.ToString()) && flagConfiguration.Targeting.ToString() != "{}")
                 {
+                    var flagdProperties = new Dictionary<string, Value>();
+                    flagdProperties.Add(FlagdProperties.FlagKeyKey, new Value(flagKey));
+                    flagdProperties.Add(FlagdProperties.TimestampKey, new Value(DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
+
+                    if (context == null)
+                    {
+                        context = EvaluationContext.Builder().Build();
+                    }
+
+                    var targetingContext = context.AsDictionary().Add(
+                        FlagdProperties.FlagdPropertiesKey,
+                        new Value(new Structure(flagdProperties))
+                        );
+
                     reason = Reason.TargetingMatch;
                     var targetingString = flagConfiguration.Targeting.ToString();
                     // Parse json into hierarchical structure
@@ -143,9 +163,10 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     // the JsonLogic evaluator will return the variant for the value
 
                     // convert the EvaluationContext object into something the JsonLogic evaluator can work with
-                    dynamic contextObj = (object)ConvertToDynamicObject(context.AsDictionary());
+                    dynamic contextObj = (object)ConvertToDynamicObject(targetingContext);
 
                     variant = (string)_evaluator.Apply(rule, contextObj);
+
                 }
 
 
