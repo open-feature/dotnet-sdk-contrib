@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.9](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.1.8...OpenFeature.Contrib.Providers.Flagd-v0.1.9) (2024-03-27)
+
+
+### ✨ New Features
+
+* add custom JsonLogic evaluators ([#159](https://github.com/open-feature/dotnet-sdk-contrib/issues/159)) ([18aa151](https://github.com/open-feature/dotnet-sdk-contrib/commit/18aa15161975aeb5d334e79d9a57af5c0d2ee14a))
+* add custom jsonLogic string evaluators ([#158](https://github.com/open-feature/dotnet-sdk-contrib/issues/158)) ([728286c](https://github.com/open-feature/dotnet-sdk-contrib/commit/728286c3ad8677cb92ef378ae714cb1b5f2cfea4))
+* in-process provider ([#149](https://github.com/open-feature/dotnet-sdk-contrib/issues/149)) ([f7371dc](https://github.com/open-feature/dotnet-sdk-contrib/commit/f7371dc91a3b8a9a6036429aee31d1098aed958f))
+
+
+### 🧹 Chore
+
+* **deps:** update dependency grpc.tools to v2.62.0 ([#151](https://github.com/open-feature/dotnet-sdk-contrib/issues/151)) ([97b124f](https://github.com/open-feature/dotnet-sdk-contrib/commit/97b124fe3c047b8a1d1f08ca0d3619addddd94af))
+
 ## [0.1.8](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.1.7...OpenFeature.Contrib.Providers.Flagd-v0.1.8) (2024-01-24)
 
 
