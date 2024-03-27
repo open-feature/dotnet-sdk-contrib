@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.5...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.6) (2024-03-27)
+
+
+### 🧹 Chore
+
+* Add support for GitHub Packages ([#134](https://github.com/open-feature/dotnet-sdk-contrib/issues/134)) ([0def0da](https://github.com/open-feature/dotnet-sdk-contrib/commit/0def0da173e2f327b7381eba043b6e99ae8f26fe))
+* **deps:** update dependency system.text.json to v8.0.1 ([#128](https://github.com/open-feature/dotnet-sdk-contrib/issues/128)) ([d3aea9e](https://github.com/open-feature/dotnet-sdk-contrib/commit/d3aea9e6a957c3c0ecc4f318f10916801cffe945))
+
 ## [0.1.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.4...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.5) (2023-12-21)
 
 
