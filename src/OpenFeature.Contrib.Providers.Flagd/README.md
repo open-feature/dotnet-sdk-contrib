@@ -1,4 +1,4 @@
-# flagd Feature Flag .NET Provider
+# flagd .NET Provider
 
 The flagd Flag provider allows you to connect to your flagd instance.  
 
@@ -6,7 +6,7 @@ The flagd Flag provider allows you to connect to your flagd instance.
 
 ## Install dependencies
 
-The first things we will do is install the **Open Feature SDK** and the **GO Feature Flag provider**.
+We will first install the **OpenFeature SDK** and the **flagd provider**.
 
 ### .NET Cli
 ```shell
