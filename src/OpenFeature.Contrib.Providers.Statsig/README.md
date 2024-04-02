@@ -10,32 +10,32 @@ The first things we will do is install the **Open Feature SDK** and the **Statsi
 
 ### .NET Cli
 ```shell
-dotnet add package OpenFeature.Contrib.Providers.Statsig
+dotnet add package  OpenFeature.Contrib.Provider.Statsig
 ```
 ### Package Manager
 
 ```shell
-NuGet\Install-Package OpenFeature.Contrib.Providers.Statsig
+NuGet\Install-Package  OpenFeature.Contrib.Provider.Statsig
 ```
 ### Package Reference
 
 ```xml
-<PackageReference Include="OpenFeature.Contrib.Providers.Statsig" />
+<PackageReference Include=" OpenFeature.Contrib.Provider.Statsig" />
 ```
 ### Packet cli
 
 ```shell
-paket add OpenFeature.Contrib.Providers.Statsig
+paket add  OpenFeature.Contrib.Provider.Statsig
 ```
 
 ### Cake
 
 ```shell
-// Install OpenFeature.Contrib.Providers.Statsig as a Cake Addin
-#addin nuget:?package=OpenFeature.Contrib.Providers.Statsig
+// Install  OpenFeature.Contrib.Provider.Statsig as a Cake Addin
+#addin nuget:?package= OpenFeature.Contrib.Provider.Statsig
 
-// Install OpenFeature.Contrib.Providers.Statsig as a Cake Tool
-#tool nuget:?package=OpenFeature.Contrib.Providers.Statsig
+// Install  OpenFeature.Contrib.Provider.Statsig as a Cake Tool
+#tool nuget:?package= OpenFeature.Contrib.Provider.Statsig
 ```
 
 ## Using the Statsig Provider with the OpenFeature SDK
@@ -44,7 +44,7 @@ The following example shows how to use the Statsig provider with the OpenFeature
 
 ```csharp
 using OpenFeature;
-using OpenFeature.Contrib.Providers.Statsig;
+using  OpenFeature.Contrib.Provider.Statsig;
 using System;
 
 StatsigProvider statsigProvider = new StatsigProvider("#YOUR-SDK-KEY#");

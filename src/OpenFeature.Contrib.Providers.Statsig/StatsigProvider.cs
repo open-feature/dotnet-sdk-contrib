@@ -32,14 +32,12 @@ namespace OpenFeature.Contrib.Providers.Statsig
         /// </summary>
         /// <param name="sdkKey">SDK Key to access Statsig.</param>
         /// <param name="configurationAction">The action used to configure the client.</param>
-        public StatsigProvider(string sdkKey = null, Action<StatsigServerOptions> configurationAction = null)
+        public StatsigProvider(string sdkKey = null, StatsigServerOptions configurationAction = null)
         {
             if (sdkKey != null)
             {
                 _sdkKey = sdkKey;
             }
-            _options = new StatsigServerOptions();
-            configurationAction?.Invoke(_options);
             ServerDriver = new ServerDriver(_sdkKey, _options);
         }
 
