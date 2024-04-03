@@ -4,6 +4,7 @@ using OpenFeature.Error;
 using OpenFeature.Model;
 using System.Threading.Tasks;
 using Xunit;
+using Statsig;
 namespace OpenFeature.Contrib.Providers.Statsig.Test;
 
 public class StatsigProviderTest
@@ -12,7 +13,7 @@ public class StatsigProviderTest
 
     public StatsigProviderTest()
     {
-        statsigProvider = new StatsigProvider("secret-", x => x.LocalMode = true);
+        statsigProvider = new StatsigProvider("secret-", new StatsigServerOptions() { LocalMode = true });
     }
 
     [Fact]

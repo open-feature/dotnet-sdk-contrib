@@ -24,23 +24,20 @@ namespace OpenFeature.Contrib.Providers.Statsig
         volatile bool initialized = false;
         private readonly Metadata _providerMetadata = new Metadata("Statsig provider");
         private readonly string _sdkKey = "secret-"; //Dummy sdk key that works with local mode
-        private readonly StatsigServerOptions _options;
         internal readonly ServerDriver ServerDriver;
 
         /// <summary>
         /// Creates new instance of <see cref="StatsigProvider"/>
         /// </summary>
         /// <param name="sdkKey">SDK Key to access Statsig.</param>
-        /// <param name="configurationAction">The action used to configure the client.</param>
-        public StatsigProvider(string sdkKey = null, Action<StatsigServerOptions> configurationAction = null)
+        /// <param name="statsigServerOptions">The StatsigServerOptions to configure the provider.</param>
+        public StatsigProvider(string sdkKey = null, StatsigServerOptions statsigServerOptions = null)
         {
             if (sdkKey != null)
             {
                 _sdkKey = sdkKey;
             }
-            _options = new StatsigServerOptions();
-            configurationAction?.Invoke(_options);
-            ServerDriver = new ServerDriver(_sdkKey, _options);
+            ServerDriver = new ServerDriver(_sdkKey, statsigServerOptions);
         }
 
         /// <inheritdoc/>
