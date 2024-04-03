@@ -5,7 +5,7 @@ namespace OpenFeature.Contrib.Providers.Statsig
 {
     internal static class EvaluationContextExtensions
     {
-        //These keys match the keys of the statsiguser object as descibed here
+        //These keys match the keys of the statsiguser object as described here
         //https://docs.statsig.com/client/concepts/user
         internal const string CONTEXT_APP_VERSION = "appVersion";
         internal const string CONTEXT_COUNTRY = "country";
