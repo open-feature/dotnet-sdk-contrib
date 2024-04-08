@@ -10,32 +10,32 @@ The first things we will do is install the **Open Feature SDK** and the **Statsi
 
 ### .NET Cli
 ```shell
-dotnet add package OpenFeature.Contrib.Provider.Statsig
+dotnet add package OpenFeature.Contrib.Providers.Statsig
 ```
 ### Package Manager
 
 ```shell
-NuGet\Install-Package OpenFeature.Contrib.Provider.Statsig
+NuGet\Install-Package OpenFeature.Contrib.Providers.Statsig
 ```
 ### Package Reference
 
 ```xml
-<PackageReference Include=" OpenFeature.Contrib.Provider.Statsig" />
+<PackageReference Include=" OpenFeature.Contrib.Providers.Statsig" />
 ```
 ### Packet cli
 
 ```shell
-paket add OpenFeature.Contrib.Provider.Statsig
+paket add OpenFeature.Contrib.Providers.Statsig
 ```
 
 ### Cake
 
 ```shell
-// Install OpenFeature.Contrib.Provider.Statsig as a Cake Addin
-#addin nuget:?package= OpenFeature.Contrib.Provider.Statsig
+// Install OpenFeature.Contrib.Providers.Statsig as a Cake Addin
+#addin nuget:?package= OpenFeature.Contrib.Providers.Statsig
 
-// Install OpenFeature.Contrib.Provider.Statsig as a Cake Tool
-#tool nuget:?package= OpenFeature.Contrib.Provider.Statsig
+// Install OpenFeature.Contrib.Providers.Statsig as a Cake Tool
+#tool nuget:?package= OpenFeature.Contrib.Providers.Statsig
 ```
 
 ## Using the Statsig Provider with the OpenFeature SDK
@@ -44,7 +44,7 @@ The following example shows how to use the Statsig provider with the OpenFeature
 
 ```csharp
 using OpenFeature;
-using OpenFeature.Contrib.Provider.Statsig;
+using OpenFeature.Contrib.Providers.Statsig;
 using System;
 
 StatsigProvider statsigProvider = new StatsigProvider("#YOUR-SDK-KEY#");
@@ -52,7 +52,10 @@ StatsigProvider statsigProvider = new StatsigProvider("#YOUR-SDK-KEY#");
 // Set the statsigProvider as the provider for the OpenFeature SDK
 await Api.Instance.SetProviderAsync(statsigProvider);
 
-IFeatureClient client = OpenFeature.Api.Instance.GetClient();
+var eb = EvaluationContext.Builder();
+eb.SetTargetingKey("john@doe.acme");
+
+IFeatureClient client = Api.Instance.GetClient(context: eb.Build());
 
 bool isMyAwesomeFeatureEnabled = await client.GetBooleanValue("isMyAwesomeFeatureEnabled", false);
 
@@ -65,10 +68,10 @@ if (isMyAwesomeFeatureEnabled)
 
 ### Customizing the Statsig Provider
 
-The Statsig provider can be customized by passing a `Action<StatsigServerOptions>` object to the constructor.
+The Statsig provider can be customized by passing a `StatsigServerOptions` object to the constructor.
 
 ```csharp
-var statsigProvider = new StatsigProvider("#YOUR-SDK-KEY#", options => options.LocalMode = true);
+var statsigProvider = new StatsigProvider("#YOUR-SDK-KEY#", new StatsigServerOptions() { LocalMode = true });
 ```
 
 For a full list of options see the [Statsig documentation](https://docs.statsig.com/server/dotnetSDK#statsig-options).
