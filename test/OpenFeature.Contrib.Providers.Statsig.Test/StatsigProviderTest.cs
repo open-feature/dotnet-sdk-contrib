@@ -1,6 +1,5 @@
 using AutoFixture.Xunit2;
 using OpenFeature.Constant;
-using OpenFeature.Error;
 using OpenFeature.Model;
 using System.Threading.Tasks;
 using Xunit;
@@ -41,25 +40,32 @@ public class StatsigProviderTest
     [Theory]
     [InlineAutoData(true, false)]
     [InlineAutoData(false, false)]
-    public async Task GetBooleanValue_ForFeatureWithNoContext_ReturnsFalse(bool flagValue, bool expectedValue, string flagName)
+    public async Task GetBooleanValue_ForFeatureWithNoContext_ReturnsDefaultValue(bool flagValue, bool defaultValue, string flagName)
     {
         // Arrange
         await statsigProvider.Initialize(null);
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue);
 
         // Act & Assert
-        Assert.Equal(expectedValue, statsigProvider.ResolveBooleanValue(flagName, false).Result.Value);
+        Assert.Equal(defaultValue, statsigProvider.ResolveBooleanValue(flagName, defaultValue).Result.Value);
     }
 
     [Theory]
     [AutoData]
-    public async Task GetBooleanValue_ForFeatureWithDefaultTrue_ThrowsException(string flagName)
+    [InlineAutoData(false)]
+    [InlineAutoData(true)]
+    public async Task GetBooleanValue_ForFeatureWithDefault(bool defaultValue, string flagName, string userId)
     {
         // Arrange
         await statsigProvider.Initialize(null);
 
-        // Act & Assert
-        Assert.ThrowsAny<FeatureProviderException>(() => statsigProvider.ResolveBooleanValue(flagName, true).Result.Value);
+        var ec = EvaluationContext.Builder().SetTargetingKey(userId).Build();
+
+        // Act
+        var result = await statsigProvider.ResolveBooleanValue(flagName, defaultValue, ec);
+
+        //Assert
+        Assert.Equal(defaultValue, result.Value);
     }
 
     [Fact]
