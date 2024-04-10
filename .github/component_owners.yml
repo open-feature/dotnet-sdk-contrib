@@ -20,6 +20,8 @@ components:
     - toddbaert
   src/OpenFeature.Contrib.Providers.Statsig:
     - jenshenneberg
+  src/OpenFeature.Contrib.Providers.Flipt:
+    - dmitryrogov
 
   # test/
   test/OpenFeature.Contrib.Hooks.Otel.Test:
@@ -41,6 +43,8 @@ components:
     - toddbaert
   test/src/OpenFeature.Contrib.Providers.Statsig.Test:
     - jenshenneberg
+  test/src/OpenFeature.Contrib.Providers.Flipt.Test:
+    - dmitryrogov
 
 ignored-authors:
   - renovate-bot
