@@ -12,7 +12,7 @@ using Metadata = OpenFeature.Model.Metadata;
 namespace OpenFeature.Contrib.Providers.Flipt
 {
     /// <summary>
-    /// Flipt feature provider
+    /// Flipt feature provider.
     /// </summary>
     public sealed class FliptProvider : FeatureProvider
     {
@@ -61,14 +61,14 @@ namespace OpenFeature.Contrib.Providers.Flipt
         public override Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue,
             EvaluationContext context = null)
         {
-            return ResolveVariantAsync(flagKey, defaultValue, context, double.TryParse);
+            return ResolveVariantAsync(flagKey, defaultValue, context, AttachmentParser.TryParseDouble);
         }
 
         /// <inheritdoc />
         public override Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue,
             EvaluationContext context = null)
         {
-            return ResolveVariantAsync(flagKey, defaultValue, context, int.TryParse);
+            return ResolveVariantAsync(flagKey, defaultValue, context, AttachmentParser.TryParseInteger);
         }
 
         /// <inheritdoc />

@@ -42,6 +42,37 @@ namespace OpenFeature.Contrib.Providers.Flipt.Test
         }
 
         [Theory]
+        [InlineData("", 0, false)]
+        [InlineData("123.456", 123.456, true)]
+        [InlineData("-123.456", -123.456, true)]
+        [InlineData(".3", 0.3, true)]
+        [InlineData("1.2345E+2", 123.45, true)]
+        public void TryParseDouble_ShouldBeExpectedResult(string attachment, double expectedValue, bool expectedResult)
+        {
+            // Act
+            var result = AttachmentParser.TryParseDouble(attachment, out var value);
+
+            // Assert
+            result.Should().Be(expectedResult);
+            value.Should().Be(expectedValue);
+        }
+
+        [Theory]
+        [InlineData("", 0, false)]
+        [InlineData("-456", -456, true)]
+        [InlineData("-123", -123.456, true)]
+        [InlineData("0", 0, true)]
+        public void TryParseInteger_ShouldBeExpectedResult(string attachment, int expectedValue, bool expectedResult)
+        {
+            // Act
+            var result = AttachmentParser.TryParseInteger(attachment, out var value);
+
+            // Assert
+            result.Should().Be(expectedResult);
+            value.Should().Be(expectedValue);
+        }
+
+        [Theory]
         [MemberData(nameof(DateTimeData))]
         public void TryParseJsonValue_DateTimeValue_ShouldReturnTrue(string attachment, DateTime expectedValue)
         {
@@ -58,7 +89,7 @@ namespace OpenFeature.Contrib.Providers.Flipt.Test
         public void TryParseJsonValue_DoubleValue_ShouldReturnTrue()
         {
             // Arrange
-            var value = _fixture.Create<double>();
+            var value = 123.4;
             var attachment = JsonSerializer.Serialize(value);
 
             // Act

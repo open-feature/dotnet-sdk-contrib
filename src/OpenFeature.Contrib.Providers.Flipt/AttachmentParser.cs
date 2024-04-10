@@ -1,6 +1,8 @@
 ﻿using OpenFeature.Error;
 using OpenFeature.Model;
+using System.Buffers.Text;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.Json;
 
 namespace OpenFeature.Contrib.Providers.Flipt
@@ -8,16 +10,51 @@ namespace OpenFeature.Contrib.Providers.Flipt
     internal static class AttachmentParser
     {
         /// <summary>
-        /// Try parse string attachment
+        /// Converts the JSON string representation of a number to its double-precision 
+        /// floating-point number equivalent.
         /// </summary>
-        /// <param name="attachment">Attachment</param>
-        /// <param name="value">Result value</param>
-        /// <returns><c>true</c> if parsed successfully; otherwise <c>false</c>;</returns>
+        /// <param name="attachment">Attachment.</param>
+        /// <param name="value">Double-precision floating-point number result.</param>
+        /// <returns>true if attachment was converted successfully; otherwise false.</returns>
+        public static bool TryParseDouble(string attachment, out double value)
+        {
+            if (string.IsNullOrEmpty(attachment))
+            {
+                value = default;
+                return false;
+            }
+
+            return Utf8Parser.TryParse(Encoding.UTF8.GetBytes(attachment), out value, out int _); ;
+        }
+
+        /// <summary>
+        /// Converts the JSON string representation of a number to its 32-bit signed integer equivalent.
+        /// </summary>
+        /// <param name="attachment">Attachment.</param>
+        /// <param name="value">32-bit signed integer result.</param>
+        /// <returns>true if attachment was converted successfully; otherwise false.</returns>
+        public static bool TryParseInteger(string attachment, out int value)
+        {
+            if (string.IsNullOrEmpty(attachment))
+            {
+                value = default;
+                return false;
+            }
+
+            return Utf8Parser.TryParse(Encoding.UTF8.GetBytes(attachment), out value, out int _);
+        }
+
+        /// <summary>
+        /// Converts the JSON string.
+        /// </summary>
+        /// <param name="attachment">Attachment.</param>
+        /// <param name="value">String result.</param>
+        /// <returns>true if attachment was converted successfully; otherwise false.</returns>
         public static bool TryParseString(string attachment, out string value)
         {
             if (string.IsNullOrEmpty(attachment))
             {
-                value = null;
+                value = default;
                 return false;
             }
 
@@ -32,7 +69,7 @@ namespace OpenFeature.Contrib.Providers.Flipt
         /// </summary>
         /// <param name="attachment">JSON string attachment.</param>
         /// <param name="value">Value result.</param>
-        /// <returns></returns>
+        /// <returns>true if attachment was converted successfully; otherwise false.</returns>
         public static bool TryParseJsonValue(string attachment, out Value value)
         {
             value = null;
