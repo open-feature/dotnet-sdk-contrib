@@ -1,8 +1,8 @@
 ﻿using OpenFeature.Constant;
-using OpenFeature.Error;
 using OpenFeature.Model;
 using Statsig;
 using Statsig.Server;
+using Statsig.Server.Evaluation;
 using System;
 using System.Threading.Tasks;
 
@@ -46,13 +46,34 @@ namespace OpenFeature.Contrib.Providers.Statsig
         /// <inheritdoc/>
         public override Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            //TODO: defaultvalue = true not yet supported due to https://github.com/statsig-io/dotnet-sdk/issues/33
-            if (defaultValue == true)
-                throw new FeatureProviderException(ErrorType.General, "defaultvalue = true not supported (https://github.com/statsig-io/dotnet-sdk/issues/33)");
-            if (GetStatus() != ProviderStatus.Ready)
-                return Task.FromResult(new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.ProviderNotReady));
-            var result = ServerDriver.CheckGateSync(context.AsStatsigUser(), flagKey);
-            return Task.FromResult(new ResolutionDetails<bool>(flagKey, result));
+            var result = ServerDriver.GetFeatureGate(context.AsStatsigUser(), flagKey);
+            var gateFound = false;
+            var responseType = ErrorType.None;
+
+            switch (result.Reason)
+            {
+                case EvaluationReason.Network:
+                case EvaluationReason.LocalOverride:
+                case EvaluationReason.Bootstrap:
+                case EvaluationReason.DataAdapter:
+                    gateFound = true;
+                    break;
+                case EvaluationReason.Unrecognized:
+                    responseType = ErrorType.FlagNotFound;
+                    break;
+                case EvaluationReason.Uninitialized:
+                    responseType = ErrorType.ProviderNotReady;
+                    break;
+                case EvaluationReason.Unsupported:
+                    responseType = ErrorType.InvalidContext;
+                    break;
+                case EvaluationReason.Error:
+                    responseType = ErrorType.General;
+                    break;
+                case null:
+                    break;
+            }
+            return Task.FromResult(new ResolutionDetails<bool>(flagKey, gateFound ? result.Value : defaultValue, responseType));
         }
 
         /// <inheritdoc/>
