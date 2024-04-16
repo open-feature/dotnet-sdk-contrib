@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.3...OpenFeature.Contrib.Providers.Statsig-v0.0.4) (2024-04-16)
+
+
+### 🐛 Bug Fixes
+
+* Fix Statsig nuget package name ([#172](https://github.com/open-feature/dotnet-sdk-contrib/issues/172)) ([3d089f5](https://github.com/open-feature/dotnet-sdk-contrib/commit/3d089f5c48478d7151fcf5964aa545471a0afe5c))
+* Use new Statsig Api to return default value when flag is not defined ([#177](https://github.com/open-feature/dotnet-sdk-contrib/issues/177)) ([5efc8a6](https://github.com/open-feature/dotnet-sdk-contrib/commit/5efc8a603d1ad9d8887d75e38f95d5168a2319fa))
+
 ## [0.0.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.2...OpenFeature.Contrib.Providers.Statsig-v0.0.3) (2024-04-03)
 
 
