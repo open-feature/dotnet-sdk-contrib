@@ -6,6 +6,7 @@ using OpenFeature.Model;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using OpenFeature.Constant;
+using System.Diagnostics.Tracing;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -69,11 +70,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             if (_config.ResolverType == ResolverType.IN_PROCESS)
             {
-                _resolver = new InProcessResolver(_config);
+                _resolver = new InProcessResolver(_config, EventChannel, _providerMetadata);
             }
             else
             {
-                _resolver = new RpcResolver(config);
+                _resolver = new RpcResolver(config, EventChannel, _providerMetadata);
             }
         }
 

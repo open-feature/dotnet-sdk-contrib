@@ -1,6 +1,4 @@
-using System;
 using System.Threading.Tasks;
-using Google.Protobuf.WellKnownTypes;
 using OpenFeature.Model;
 using Value = OpenFeature.Model.Value;
 

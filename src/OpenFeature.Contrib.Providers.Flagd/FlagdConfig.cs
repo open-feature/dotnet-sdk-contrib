@@ -114,10 +114,18 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
         /// <summary>
         ///     Maximum number of times the connection to the event stream should be re-attempted
+        ///     0 = infinite
         /// </summary>
         public int MaxEventStreamRetries
         {
-            get => _maxEventStreamRetries;
+            get
+            {
+                if (_maxEventStreamRetries == 0)
+                {
+                    return int.MaxValue;
+                }
+                return _maxEventStreamRetries;
+            }
             set => _maxEventStreamRetries = value;
         }
 

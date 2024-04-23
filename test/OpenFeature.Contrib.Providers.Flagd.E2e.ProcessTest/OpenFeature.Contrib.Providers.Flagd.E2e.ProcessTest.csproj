@@ -1,6 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <None
+      Include="../../spec/specification/assets/gherkin/evaluation.feature"
+      Link="../../../Features/%(Filename)%(Extension)"
+      DestinationFolder="../../../Features/"
+      CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
+
+  <!-- TODO: add reconnect tests (remove exclusion) -->
+  <ItemGroup>
+    <None
+      Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/*.feature"
+      Exclude="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/flagd-reconnect.feature"   
+      Link="../../../Features/%(Filename)%(Extension)"
+      DestinationFolder="../../../Features/"
+      CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj" />
     <ProjectReference Include="..\OpenFeature.Contrib.Providers.Flagd.E2e.Test\OpenFeature.Contrib.Providers.Flagd.E2e.Test.csproj" />
   </ItemGroup>
