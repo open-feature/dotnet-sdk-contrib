@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NSubstitute.ReceivedExtensions;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
@@ -523,6 +524,28 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockCache.Received(1).TryGet(Arg.Is<string>(s => s == "my-key"));
             mockCache.Received(1).Add(Arg.Is<string>(s => s == "my-key"), Arg.Any<object>());
             mockGrpcClient.Received(Quantity.AtLeastOne()).EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task TestResolverInit_Success_Ready()
+        {
+            var mockResolver = Substitute.For<Resolver.Resolver>();
+            mockResolver.Init().Returns(Task.CompletedTask);
+            var provider = new FlagdProvider(resolver: mockResolver);
+            await provider.Initialize(EvaluationContext.Empty);
+
+            Assert.Equal(ProviderStatus.Ready, provider.GetStatus());
+        }
+
+        [Fact]
+        public async Task TestResolverInit_Failure_Error()
+        {
+            var mockResolver = Substitute.For<Resolver.Resolver>();
+            mockResolver.Init().ThrowsAsync(new Exception("fake exception"));
+            var provider = new FlagdProvider(resolver: mockResolver);
+            await Assert.ThrowsAsync<AggregateException>(() => provider.Initialize(EvaluationContext.Empty));
+
+            Assert.Equal(ProviderStatus.Error, provider.GetStatus());
         }
 
         [Fact]
