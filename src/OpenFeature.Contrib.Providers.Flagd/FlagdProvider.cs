@@ -16,7 +16,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
     {
         const string ProviderName = "flagd Provider";
         private readonly FlagdConfig _config;
-        private ProviderStatus _status;
+        private ProviderStatus _status = ProviderStatus.NotReady;
         private readonly Metadata _providerMetadata = new Metadata(ProviderName);
 
         private readonly Resolver.Resolver _resolver;
@@ -118,11 +118,13 @@ namespace OpenFeature.Contrib.Providers.Flagd
             {
                 await _resolver.Init();
                 _status = ProviderStatus.Ready;
-
             }).ContinueWith((t) =>
             {
-                _status = ProviderStatus.Error;
-                if (t.IsFaulted) throw t.Exception;
+                if (t.IsFaulted)
+                {
+                    _status = ProviderStatus.Error;
+                    throw t.Exception;
+                };
             });
         }
 
