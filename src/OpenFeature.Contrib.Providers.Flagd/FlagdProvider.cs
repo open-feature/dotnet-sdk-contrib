@@ -120,7 +120,8 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 _status = ProviderStatus.Ready;
             }).ContinueWith((t) =>
             {
-                if (t.IsFaulted) {
+                if (t.IsFaulted)
+                {
                     _status = ProviderStatus.Error;
                     throw t.Exception;
                 };
