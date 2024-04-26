@@ -37,7 +37,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         }
 
         [When(@"a PROVIDER_READY handler is added")]
-        public async Task WhenAPROVIDER_READYHandlerIsAddedAsync()
+        public void WhenAPROVIDER_READYHandlerIsAddedAsync()
         {
 
             var tcs = new TaskCompletionSource<bool>();
@@ -47,7 +47,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
                 tcs.SetResult(true);
             };
             client.AddHandler(ProviderEventTypes.ProviderReady, handler);
-            await tcs.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            tcs.Task.Wait(TimeSpan.FromSeconds(3));
         }
 
         [Then(@"the PROVIDER_READY handler must run")]
@@ -57,7 +57,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         }
 
         [When(@"a PROVIDER_CONFIGURATION_CHANGED handler is added")]
-        public async Task WhenAPROVIDER_CONFIGURATION_CHANGEDHandlerIsAddedAsync()
+        public void WhenAPROVIDER_CONFIGURATION_CHANGEDHandlerIsAddedAsync()
         {
             var tcs = new TaskCompletionSource<bool>();
             EventHandlerDelegate handler = (details) =>
@@ -66,7 +66,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
                 tcs.TrySetResult(true);
             };
             client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, handler);
-            await tcs.Task.WaitAsync(TimeSpan.FromSeconds(3));
+            tcs.Task.Wait(TimeSpan.FromSeconds(3));
         }
 
         [When(@"a flag with key ""(.*)"" is modified")]
