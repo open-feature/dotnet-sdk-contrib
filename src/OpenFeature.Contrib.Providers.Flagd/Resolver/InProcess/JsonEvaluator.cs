@@ -208,7 +208,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     {
                         throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' not found");
                     }
-                    var value = Whatever<T>(defaultVariantValue, flagKey);
+                    var value = ExtractFoundVariant<T>(defaultVariantValue, flagKey);
                     return new ResolutionDetails<T>(
                             flagKey: flagKey,
                             value,
@@ -219,7 +219,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 else if (flagConfiguration.Variants.TryGetValue(variant, out var foundVariantValue))
                 {
                     // if variant can be found, return it - this could be TARGETING_MATCH or STAIC. 
-                    var value = Whatever<T>(foundVariantValue, flagKey);
+                    var value = ExtractFoundVariant<T>(foundVariantValue, flagKey);
                     return new ResolutionDetails<T>(
                             flagKey: flagKey,
                             value,
@@ -231,7 +231,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' not found");
         }
 
-        static T Whatever<T>(object foundVariantValue, string flagKey)
+        static T ExtractFoundVariant<T>(object foundVariantValue, string flagKey)
         {
             if (foundVariantValue is long)
             {
