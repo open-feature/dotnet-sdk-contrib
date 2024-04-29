@@ -157,7 +157,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 {
                     throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' is disabled");
                 }
-                ;
                 var variant = flagConfiguration.DefaultVariant;
                 if (flagConfiguration.Targeting != null && !String.IsNullOrEmpty(flagConfiguration.Targeting.ToString()) && flagConfiguration.Targeting.ToString() != "{}")
                 {
