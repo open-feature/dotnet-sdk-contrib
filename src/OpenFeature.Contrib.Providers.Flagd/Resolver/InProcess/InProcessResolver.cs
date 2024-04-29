@@ -132,7 +132,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 catch (RpcException)
                 {
                     // Handle the dropped connection by reconnecting and retrying the stream
-                    _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderReady, ProviderName = _providerMetadata.Name });
                     await HandleErrorEvent();
                 }
             }
