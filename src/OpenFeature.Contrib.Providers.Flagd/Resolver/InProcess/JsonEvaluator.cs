@@ -205,7 +205,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     flagConfiguration.Variants.TryGetValue(flagConfiguration.DefaultVariant, out var defaultVariantValue);
                     if (defaultVariantValue == null)
                     {
-                        throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' not found");
+                        throw new FeatureProviderException(ErrorType.ParseError, "PARSE_ERROR: flag '" + flagKey + "' has missing or invalid defaultVariant.");
                     }
                     var value = ExtractFoundVariant<T>(defaultVariantValue, flagKey);
                     return new ResolutionDetails<T>(
