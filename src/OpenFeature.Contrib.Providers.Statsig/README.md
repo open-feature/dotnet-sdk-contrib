@@ -94,6 +94,3 @@ The following parameters are mapped to the corresponding Statsig pre-defined par
 
 ## Known issues and limitations
 - Only `ResolveBooleanValue` implemented for now
-
-- Gate BooleanEvaluation with default value true cannot fallback to true.
-  https://github.com/statsig-io/dotnet-sdk/issues/33

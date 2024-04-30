@@ -17,7 +17,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         private static FlagsmithConfiguration GetDefaultFlagsmithConfiguration() => new()
         {
             ApiUrl = "https://edge.api.flagsmith.com/api/v1/",
-            EnvironmentKey = string.Empty,
+            EnvironmentKey = "some-key",
             EnableClientSideEvaluation = false,
             EnvironmentRefreshIntervalSeconds = 60,
             EnableAnalytics = false,
