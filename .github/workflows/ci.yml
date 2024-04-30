@@ -50,12 +50,12 @@ jobs:
     services:
       # flagd-testbed for flagd RPC provider e2e tests
       flagd:
-        image: ghcr.io/open-feature/flagd-testbed:v0.5.0
+        image: ghcr.io/open-feature/flagd-testbed:v0.5.4
         ports:
           - 8013:8013
       # sync-testbed for flagd in-process provider e2e tests
       sync:
-        image: ghcr.io/open-feature/sync-testbed:v0.5.1
+        image: ghcr.io/open-feature/sync-testbed:v0.5.4
         ports:
           - 9090:9090
     steps:
@@ -76,13 +76,8 @@ jobs:
           8.0.x
         source-url: https://nuget.pkg.github.com/open-feature/index.json
 
-    - name: Copy Gherkin
-      run: |
-        cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest/Features
-        cp spec/specification/assets/gherkin/evaluation.feature test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/Features
-
     - name: Test
-      run: E2E=true dotnet test --logger GitHubActions
+      run: dotnet build && E2E=true dotnet test --logger GitHubActions
 
   packaging:
     needs: build

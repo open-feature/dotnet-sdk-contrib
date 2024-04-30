@@ -2,15 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading.Tasks;
 using JsonLogic.Net;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 using OpenFeature.Error;
 using OpenFeature.Model;
+using System.Text.RegularExpressions;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 {
@@ -33,6 +32,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
     {
         [JsonProperty("flags")]
         internal Dictionary<string, FlagConfiguration> Flags { get; set; }
+        [JsonProperty("$evaluators")]
+        internal Dictionary<string, object> Evaluators { get; set; }
     }
 
     internal class FlagConfigurationSync
@@ -72,9 +73,27 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
         }
 
+        internal FlagSyncData Parse(string flagConfigurations)
+        {
+            var parsed = JsonConvert.DeserializeObject<FlagSyncData>(flagConfigurations);
+            var transformed = JsonConvert.SerializeObject(parsed);
+            // replace evaluators
+            if (parsed.Evaluators != null && parsed.Evaluators.Count > 0)
+            {
+                parsed.Evaluators.Keys.ToList().ForEach(key =>
+                {
+                    var val = parsed.Evaluators[key];
+                    var evaluatorRegex = new Regex("{\"\\$ref\":\"" + key + "\"}");
+                    transformed = evaluatorRegex.Replace(transformed, Convert.ToString(val));
+                });
+            }
+
+            return JsonConvert.DeserializeObject<FlagSyncData>(transformed);
+        }
+
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
         {
-            var flagConfigsMap = JsonConvert.DeserializeObject<FlagSyncData>(flagConfigurations);
+            var flagConfigsMap = Parse(flagConfigurations);
 
             switch (updateType)
             {
@@ -131,17 +150,17 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
         private ResolutionDetails<T> ResolveValue<T>(string flagKey, T defaultValue, EvaluationContext context = null)
         {
             // check if we find the flag key
-            var reason = Reason.Default;
+            var reason = Reason.Static;
             if (_flags.TryGetValue(flagKey, out var flagConfiguration))
             {
                 if ("DISABLED" == flagConfiguration.State)
                 {
                     throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' is disabled");
                 }
-                reason = Reason.Static;
                 var variant = flagConfiguration.DefaultVariant;
                 if (flagConfiguration.Targeting != null && !String.IsNullOrEmpty(flagConfiguration.Targeting.ToString()) && flagConfiguration.Targeting.ToString() != "{}")
                 {
+                    reason = Reason.TargetingMatch;
                     var flagdProperties = new Dictionary<string, Value>();
                     flagdProperties.Add(FlagdProperties.FlagKeyKey, new Value(flagKey));
                     flagdProperties.Add(FlagdProperties.TimestampKey, new Value(DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
@@ -156,7 +175,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                         new Value(new Structure(flagdProperties))
                         );
 
-                    reason = Reason.TargetingMatch;
                     var targetingString = flagConfiguration.Targeting.ToString();
                     // Parse json into hierarchical structure
                     var rule = JObject.Parse(targetingString);
@@ -165,38 +183,72 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     // convert the EvaluationContext object into something the JsonLogic evaluator can work with
                     dynamic contextObj = (object)ConvertToDynamicObject(targetingContext);
 
-                    variant = (string)_evaluator.Apply(rule, contextObj);
-
+                    // convery whatever is returned to a sring to try to use is an a index to Variants
+                    var ruleResult = _evaluator.Apply(rule, contextObj);
+                    if (ruleResult is bool)
+                    {
+                        // if this was a bool, convert from "True" to "true" to match JSON
+                        variant = Convert.ToString(ruleResult).ToLower();
+                    }
+                    else
+                    {
+                        // convert whatever is returned to a string to support shorthand
+                        variant = Convert.ToString(ruleResult);
+                    }
                 }
 
-
                 // using the returned variant, go through the available variants and take the correct value if it exists
-                if (variant != null && flagConfiguration.Variants.TryGetValue(variant, out var foundVariantValue))
+                if (variant == null)
                 {
-                    if (foundVariantValue is Int64)
+                    // if variant is null, revert to default
+                    reason = Reason.Default;
+                    flagConfiguration.Variants.TryGetValue(flagConfiguration.DefaultVariant, out var defaultVariantValue);
+                    if (defaultVariantValue == null)
                     {
-                        checked
-                        {
-                            foundVariantValue = Convert.ToInt32(foundVariantValue);
-                        }
+                        throw new FeatureProviderException(ErrorType.ParseError, "PARSE_ERROR: flag '" + flagKey + "' has missing or invalid defaultVariant.");
                     }
-                    else if (foundVariantValue is JObject value)
-                    {
-                        foundVariantValue = ConvertJObjectToOpenFeatureValue(value);
-                    }
-                    if (foundVariantValue is T castValue)
-                    {
-                        return new ResolutionDetails<T>(
+                    var value = ExtractFoundVariant<T>(defaultVariantValue, flagKey);
+                    return new ResolutionDetails<T>(
                             flagKey: flagKey,
-                            value: castValue,
+                            value,
                             reason: reason,
                             variant: variant
                             );
-                    }
-                    throw new FeatureProviderException(ErrorType.TypeMismatch, "TYPE_MISMATCH: flag '" + flagKey + "' does not match the expected type");
+                }
+                else if (flagConfiguration.Variants.TryGetValue(variant, out var foundVariantValue))
+                {
+                    // if variant can be found, return it - this could be TARGETING_MATCH or STAIC. 
+                    var value = ExtractFoundVariant<T>(foundVariantValue, flagKey);
+                    return new ResolutionDetails<T>(
+                            flagKey: flagKey,
+                            value,
+                            reason: reason,
+                            variant: variant
+                            );
                 }
             }
             throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' not found");
+        }
+
+        static T ExtractFoundVariant<T>(object foundVariantValue, string flagKey)
+        {
+            if (foundVariantValue is long)
+            {
+                foundVariantValue = Convert.ToInt32(foundVariantValue);
+            }
+            if (typeof(T) == typeof(double))
+            {
+                foundVariantValue = Convert.ToDouble(foundVariantValue);
+            }
+            else if (foundVariantValue is JObject value)
+            {
+                foundVariantValue = ConvertJObjectToOpenFeatureValue(value);
+            }
+            if (foundVariantValue is T castValue)
+            {
+                return castValue;
+            }
+            throw new FeatureProviderException(ErrorType.TypeMismatch, "TYPE_MISMATCH: flag '" + flagKey + "' does not match the expected type");
         }
 
         static dynamic ConvertToDynamicObject(IImmutableDictionary<string, Value> dictionary)

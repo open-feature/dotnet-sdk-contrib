@@ -1,20 +1,18 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Security;
 using System.Threading.Tasks;
-using System.Security.Cryptography.X509Certificates;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
 using OpenFeature.Error;
-using OpenFeature.Flagd.Grpc;
+using OpenFeature.Flagd.Grpc.Evaluation;
 using OpenFeature.Model;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Net.Sockets; // need for unix sockets
 using System.Threading;
 using Value = OpenFeature.Model.Value;
+using System.Threading.Channels;
+using OpenFeature.Constant;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
 {
@@ -25,13 +23,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
         private readonly FlagdConfig _config;
         private readonly ICache<string, object> _cache;
         private readonly Service.ServiceClient _client;
-        private readonly System.Threading.Mutex _mtx;
+        private readonly Mutex _mtx;
         private int _eventStreamRetries;
         private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
         private GrpcChannel _channel;
+        private Channel<object> _eventChannel;
+        private Model.Metadata _providerMetadata;
         private Thread _handleEventsThread;
 
-        internal RpcResolver(FlagdConfig config)
+        internal RpcResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata)
         {
             if (config == null)
             {
@@ -39,7 +39,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }
 
             _config = config;
-
+            _eventChannel = eventChannel;
+            _providerMetadata = providerMetadata;
             _client = BuildClientForPlatform(_config);
             _mtx = new Mutex();
 
@@ -49,7 +50,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }
         }
 
-        internal RpcResolver(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache = null) : this(config)
+        internal RpcResolver(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache, Channel<object> eventChannel, Model.Metadata providerMetadata) : this(config, eventChannel, providerMetadata)
         {
             _client = client;
             _cache = cache;
@@ -57,11 +58,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
 
         public Task Init()
         {
-            if (_config.CacheEnabled)
-            {
-                _handleEventsThread = new Thread(HandleEvents);
-                _handleEventsThread.Start();
-            }
+            _handleEventsThread = new Thread(HandleEvents);
+            _handleEventsThread.Start();
             return Task.CompletedTask; // TODO: an elegant way of testing the connection status before completing this task
         }
 
@@ -201,13 +199,13 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
         private async void HandleEvents()
         {
             CancellationToken token = _cancellationTokenSource.Token;
-            while (_eventStreamRetries < _config.MaxEventStreamRetries && !token.IsCancellationRequested)
+            while (!token.IsCancellationRequested && _eventStreamRetries < _config.MaxEventStreamRetries)
             {
                 var call = _client.EventStream(new EventStreamRequest());
                 try
                 {
                     // Read the response stream asynchronously
-                    while (await call.ResponseStream.MoveNext())
+                    while (!token.IsCancellationRequested && call != null && await call.ResponseStream.MoveNext())
                     {
                         var response = call.ResponseStream.Current;
 
@@ -238,6 +236,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
 
         private void HandleConfigurationChangeEvent(Struct data)
         {
+            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderConfigurationChanged, ProviderName = _providerMetadata.Name });
             // if we don't have a cache, we don't need to remove anything
             if (!_config.CacheEnabled || !data.Fields.ContainsKey("flags"))
             {
@@ -260,10 +259,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }
             catch (Exception)
             {
-                // purge the cache if we could not handle the configuration change event
-                _cache.Purge();
+                if (_config.CacheEnabled)
+                {
+                    // purge the cache if we could not handle the configuration change event
+                    _cache.Purge();
+                }
             }
-
         }
 
         private void HandleProviderReadyEvent()
@@ -271,8 +272,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             _mtx.WaitOne();
             _eventStreamRetries = 0;
             _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderReady, ProviderName = _providerMetadata.Name });
             _mtx.ReleaseMutex();
-            _cache.Purge();
+            if (_config.CacheEnabled)
+            {
+                _cache.Purge();
+            }
         }
 
         private async Task HandleErrorEvent()
@@ -285,6 +290,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
                 return;
             }
             _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
+            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name });
             _mtx.ReleaseMutex();
             await Task.Delay(_eventStreamRetryBackoff * 1000);
         }
@@ -435,27 +441,27 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             if (!useUnixSocket)
             {
 #if NET462_OR_GREATER
-                var handler = new WinHttpHandler();
+                var handler = new System.Net.Http.WinHttpHandler();
 #else
-                var handler = new HttpClientHandler();
+                var handler = new System.Net.Http.HttpClientHandler();
 #endif
                 if (config.UseCertificate)
                 {
                     if (File.Exists(config.CertificatePath))
                     {
-                        X509Certificate2 certificate = new X509Certificate2(config.CertificatePath);
+                        System.Security.Cryptography.X509Certificates.X509Certificate2 certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(config.CertificatePath);
 #if NET5_0_OR_GREATER
                         handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
                             // the the custom cert to the chain, Build returns a bool if valid.
-                            chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+                            chain.ChainPolicy.TrustMode = System.Security.Cryptography.X509Certificates.X509ChainTrustMode.CustomRootTrust;
                             chain.ChainPolicy.CustomTrustStore.Add(certificate);
                             return chain.Build(cert);
                         };
 #elif NET462_OR_GREATER
                         handler.ServerCertificateValidationCallback = (message, cert, chain, errors) => {
-                            if (errors == SslPolicyErrors.None) { return true; }
+                            if (errors == System.Net.Security.SslPolicyErrors.None) { return true; }
 
-                            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
+                            chain.ChainPolicy.VerificationFlags = System.Security.Cryptography.X509Certificates.X509VerificationFlags.AllowUnknownCertificateAuthority;
 
                             chain.ChainPolicy.ExtraStore.Add(certificate);
 
@@ -464,7 +470,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
                             if (!isChainValid) { return false; }
 
                             var isValid = chain.ChainElements
-                                .Cast<X509ChainElement>()
+                                .Cast<System.Security.Cryptography.X509Certificates.X509ChainElement>()
                                 .Any(x => x.Certificate.RawData.SequenceEqual(certificate.GetRawCertData()));
 
                             return isValid;
@@ -486,9 +492,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }
 
 #if NET5_0_OR_GREATER
-            var udsEndPoint = new UnixDomainSocketEndPoint(config.GetUri().ToString().Substring("unix://".Length));
+            var udsEndPoint = new System.Net.Sockets.UnixDomainSocketEndPoint(config.GetUri().ToString().Substring("unix://".Length));
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-            var socketsHttpHandler = new SocketsHttpHandler
+            var socketsHttpHandler = new System.Net.Http.SocketsHttpHandler
             {
                 ConnectCallback = connectionFactory.ConnectAsync
             };
@@ -500,7 +506,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
                 HttpHandler = socketsHttpHandler,
             });
             return new Service.ServiceClient(_channel);
-#endif
+#endif            
             // unix socket support is not available in this dotnet version
             throw new Exception("unix sockets are not supported in this version.");
         }

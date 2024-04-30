@@ -4,14 +4,17 @@ using TechTalk.SpecFlow;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test.Process
 {
-    [Binding]
+    [Binding, Scope(Feature = "Flag evaluation")]
     public class EvaluationStepDefinitionsRpc : EvaluationStepDefinitionsBase
     {
-        public EvaluationStepDefinitionsRpc(ScenarioContext scenarioContext) : base(scenarioContext)
+        static EvaluationStepDefinitionsRpc()
         {
             var flagdProvider = new FlagdProvider();
-            Api.Instance.SetProviderAsync("rpc-test", flagdProvider).Wait(5000);
-            client = Api.Instance.GetClient("rpc-test");
+            Api.Instance.SetProviderAsync("rpc-test-evaluation", flagdProvider).Wait(5000);
+        }
+        public EvaluationStepDefinitionsRpc(ScenarioContext scenarioContext) : base(scenarioContext)
+        {
+            client = Api.Instance.GetClient("rpc-test-evaluation");
         }
     }
 }
