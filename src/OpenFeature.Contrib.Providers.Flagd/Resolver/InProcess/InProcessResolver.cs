@@ -12,35 +12,42 @@ using System.Net.Sockets; // needed for unix sockets
 using System.Threading;
 using Grpc.Core;
 using Value = OpenFeature.Model.Value;
+using System.Diagnostics.Tracing;
+using System.Threading.Channels;
+using OpenFeature.Constant;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 {
     internal class InProcessResolver : Resolver
     {
-        static readonly int EventStreamRetryBaseBackoff = 1;
+        static readonly int InitialEventStreamRetryBaseBackoff = 1;
         static readonly int MaxEventStreamRetryBackoff = 60;
         readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly FlagSyncService.FlagSyncServiceClient _client;
         private readonly JsonEvaluator _evaluator;
         private readonly Mutex _mtx;
-        private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+        private int _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
         private readonly FlagdConfig _config;
         private Thread _handleEventsThread;
         private GrpcChannel _channel;
+        private Channel<object> _eventChannel;
+        private Model.Metadata _providerMetadata;
+        private bool connected = false;
 
-        internal InProcessResolver(FlagdConfig config)
+        internal InProcessResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata)
         {
+            _eventChannel = eventChannel;
+            _providerMetadata = providerMetadata;
             _config = config;
             _client = BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
             _mtx = new Mutex();
             _evaluator = new JsonEvaluator(config.SourceSelector);
         }
 
-        internal InProcessResolver(FlagSyncService.FlagSyncServiceClient client, FlagdConfig config) : this(config)
+        internal InProcessResolver(FlagSyncService.FlagSyncServiceClient client, FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata) : this(config, eventChannel, providerMetadata)
         {
             _client = client;
         }
-
 
         public Task Init()
         {
@@ -53,9 +60,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 };
                 _handleEventsThread.Start();
                 latch.Wait();
-            }).ContinueWith((t) =>
+            }).ContinueWith((task) =>
             {
-                if (t.IsFaulted) throw t.Exception;
+                if (task.IsFaulted) throw task.Exception;
             });
         }
 
@@ -106,7 +113,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 try
                 {
                     // Read the response stream asynchronously
-                    while (await call.ResponseStream.MoveNext(token))
+                    while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token))
                     {
                         var response = call.ResponseStream.Current;
                         _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
@@ -115,6 +122,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                             latch.Signal();
                         }
                         HandleProviderReadyEvent();
+                        HandleProviderChangeEvent();
                     }
                 }
                 catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
@@ -132,7 +140,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
         private void HandleProviderReadyEvent()
         {
             _mtx.WaitOne();
-            _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+            _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
+            if (!connected)
+            {
+                connected = true;
+                _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderReady, ProviderName = _providerMetadata.Name });
+            }
             _mtx.ReleaseMutex();
         }
 
@@ -140,8 +153,23 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
         {
             _mtx.WaitOne();
             _eventStreamRetryBackoff = Math.Min(_eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
+            if (connected)
+            {
+                connected = false;
+                _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name });
+            }
             _mtx.ReleaseMutex();
             await Task.Delay(_eventStreamRetryBackoff * 1000);
+        }
+
+        private void HandleProviderChangeEvent()
+        {
+            _mtx.WaitOne();
+            if (connected)
+            {
+                _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderConfigurationChanged, ProviderName = _providerMetadata.Name });
+            }
+            _mtx.ReleaseMutex();
         }
 
         private T BuildClient<T>(FlagdConfig config, Func<GrpcChannel, T> constructorFunc)

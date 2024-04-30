@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -11,7 +12,7 @@ using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 using OpenFeature.Error;
-using OpenFeature.Flagd.Grpc;
+using OpenFeature.Flagd.Grpc.Evaluation;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
 using Xunit;
@@ -22,6 +23,17 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
     public class UnitTestFlagdProvider
     {
+
+        private Channel<object> MakeChannel()
+        {
+            return System.Threading.Channels.Channel.CreateBounded<object>(1);
+        }
+
+        private Model.Metadata MakeProviderMetadata()
+        {
+            return new Model.Metadata("test");
+        }
+
         [Fact]
         public void BuildClientForPlatform_Should_Throw_Exception_When_FlagdCertPath_Not_Exists()
         {
@@ -187,7 +199,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(substituteGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(substituteGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // resolve with default set to false to make sure we return what the grpc server gives us
@@ -214,7 +226,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveStringRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             var val = flagdProvider.ResolveStringValue("my-key", "");
@@ -241,7 +253,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             subGrpcClient.ResolveIntAsync(Arg.Any<ResolveIntRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             var val = flagdProvider.ResolveIntegerValue("my-key", 0);
@@ -268,7 +280,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockGrpcClient.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             var val = flagdProvider.ResolveDoubleValue("my-key", 0.0);
@@ -298,7 +310,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockGrpcClient.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             var val = flagdProvider.ResolveStructureValue("my-key", null);
@@ -322,7 +334,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             mockGrpcClient.ResolveBooleanAsync(
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None).Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
@@ -358,7 +370,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
@@ -394,7 +406,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
@@ -430,7 +442,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
                 .Returns(grpcResp);
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig());
+            var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
@@ -512,7 +524,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             config.CacheEnabled = true;
             config.MaxEventStreamRetries = 1;
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
             await flagdProvider.Initialize(EvaluationContext.Empty);
 
@@ -598,7 +610,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 MaxEventStreamRetries = 1
             };
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
             await flagdProvider.Initialize(EvaluationContext.Empty);
 
@@ -694,7 +706,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             config.CacheEnabled = true;
             config.MaxEventStreamRetries = 1;
 
-            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+            var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
             await flagdProvider.Initialize(EvaluationContext.Empty);
 
@@ -759,7 +771,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             config.MaxEventStreamRetries = 1;
             config.SourceSelector = "source-selector";
 
-            var rpcResolver = new InProcessResolver(mockGrpcClient, config);
+            var rpcResolver = new InProcessResolver(mockGrpcClient, config, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(rpcResolver);
             await flagdProvider.Initialize(EvaluationContext.Empty);
 
@@ -817,7 +829,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             config.MaxEventStreamRetries = 1;
             config.SourceSelector = "source-selector";
 
-            var inProcessResolver = new InProcessResolver(mockGrpcClient, config);
+            var inProcessResolver = new InProcessResolver(mockGrpcClient, config, MakeChannel(), MakeProviderMetadata());
             var flagdProvider = new FlagdProvider(inProcessResolver);
             await flagdProvider.Initialize(EvaluationContext.Empty);
 
