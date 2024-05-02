@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard20</TargetFrameworks>
     <PackageId>OpenFeature.Contrib.Providers.Flagsmith</PackageId>
     <VersionNumber>0.1.6</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
@@ -20,6 +19,9 @@
 
   <ItemGroup>
     <PackageReference Include="Flagsmith" Version="5.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Text.Json" Version="8.0.3" />
   </ItemGroup>
 
