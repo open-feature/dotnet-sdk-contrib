@@ -59,7 +59,8 @@
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
       "extra-files": [
-        "OpenFeature.Contrib.Providers.FeatureManagement.csproj"
+        "OpenFeature.Contrib.Providers.FeatureManagement.csproj",
+        "README.md"
       ]
     },
     "src/OpenFeature.Contrib.Providers.Statsig": {
