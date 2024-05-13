@@ -64,7 +64,7 @@ namespace OpenFeature.Contrib.ConfigCat
             var user = context?.BuildUser();
             var result = await Client.GetValueDetailsAsync(flagKey, defaultValue?.AsObject, user);
             var returnValue = result.IsDefaultValue ? defaultValue : new Value(result.Value);
-            var details = new ResolutionDetails<Value>(flagKey, returnValue, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
+            var details = new ResolutionDetails<Value>(flagKey, returnValue, TranslateErrorCode(result.ErrorCode), errorMessage: result.ErrorMessage, variant: result.VariationId);
             if (details.ErrorType == ErrorType.None)
             {
                 return details;
@@ -77,7 +77,7 @@ namespace OpenFeature.Contrib.ConfigCat
         {
             var user = context?.BuildUser();
             var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user);
-            var details = new ResolutionDetails<T>(flagKey, result.Value, ParseErrorType(result.ErrorMessage), errorMessage: result.ErrorMessage, variant: result.VariationId);
+            var details = new ResolutionDetails<T>(flagKey, result.Value, TranslateErrorCode(result.ErrorCode), errorMessage: result.ErrorMessage, variant: result.VariationId);
             if (details.ErrorType == ErrorType.None)
             {
                 return details;
@@ -86,25 +86,23 @@ namespace OpenFeature.Contrib.ConfigCat
             throw new FeatureProviderException(details.ErrorType, details.ErrorMessage);
         }
 
-        private static ErrorType ParseErrorType(string errorMessage)
+        private static ErrorType TranslateErrorCode(EvaluationErrorCode errorCode)
         {
-            if (string.IsNullOrEmpty(errorMessage))
+            switch (errorCode)
             {
-                return ErrorType.None;
+                case EvaluationErrorCode.None:
+                    return ErrorType.None;
+                case EvaluationErrorCode.InvalidConfigModel:
+                    return ErrorType.ParseError;
+                case EvaluationErrorCode.SettingValueTypeMismatch:
+                    return ErrorType.TypeMismatch;
+                case EvaluationErrorCode.ConfigJsonNotAvailable:
+                    return ErrorType.ProviderNotReady;
+                case EvaluationErrorCode.SettingKeyMissing:
+                    return ErrorType.FlagNotFound;
+                default:
+                    return ErrorType.General;
             }
-            if (errorMessage.Contains("Config JSON is not present"))
-            {
-                return ErrorType.ParseError;
-            }
-            if (errorMessage.Contains("the key was not found in config JSON"))
-            {
-                return ErrorType.FlagNotFound;
-            }
-            if (errorMessage.Contains("The type of a setting must match the type of the specified default value"))
-            {
-                return ErrorType.TypeMismatch;
-            }
-            return ErrorType.General;
         }
     }
 }
