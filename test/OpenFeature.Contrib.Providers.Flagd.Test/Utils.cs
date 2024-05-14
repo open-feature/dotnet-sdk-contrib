@@ -161,11 +161,44 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         ""bool2"": false
       },
       ""defaultVariant"": ""bool2"",
-            ""targeting"": {
+      ""targeting"": {
         ""if"": [{ $ref: ""emailWithFaas"" }, ""bool1""]
       }
     },
-        ""targetingStringFlag"": {
+  ""targetingBoolFlagUsingSharedEvaluatorReturningBoolType"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""true"": true,
+        ""false"": false
+      },
+      ""defaultVariant"": ""true"",
+      ""targeting"": {
+        ""if"": [{ $ref: ""emailWithFaas"" }, true]
+      }
+    },
+    ""targetingBoolFlagWithMissingDefaultVariant"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""bool1"": true,
+        ""bool2"": false
+      },
+      ""defaultVariant"": ""true"",
+      ""targeting"": {
+        ""if"": [{ $ref: ""emailWithFaas"" }, ""bool1""]
+      }
+    },
+    ""targetingBoolFlagWithUnexpectedVariantType"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""bool1"": 20,
+        ""bool2"": 30
+      },
+      ""defaultVariant"": ""true"",
+      ""targeting"": {
+        ""if"": [{ $ref: ""emailWithFaas"" }, ""bool1""]
+      }
+    },
+    ""targetingStringFlag"": {
       ""state"": ""ENABLED"",
       ""variants"": {
         ""str1"": ""my-string"",

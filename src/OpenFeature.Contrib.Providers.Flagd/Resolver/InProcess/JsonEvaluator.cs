@@ -217,7 +217,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 }
                 else if (flagConfiguration.Variants.TryGetValue(variant, out var foundVariantValue))
                 {
-                    // if variant can be found, return it - this could be TARGETING_MATCH or STAIC. 
+                    // if variant can be found, return it - this could be TARGETING_MATCH or STATIC. 
                     var value = ExtractFoundVariant<T>(foundVariantValue, flagKey);
                     return new ResolutionDetails<T>(
                             flagKey: flagKey,
