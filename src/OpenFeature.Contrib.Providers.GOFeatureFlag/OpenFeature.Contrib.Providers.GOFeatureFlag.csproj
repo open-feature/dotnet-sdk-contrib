@@ -10,8 +10,8 @@
     <Authors>Thomas Poignant</Authors>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="8.0.3" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
+	<PackageReference Include="System.Text.Json" Version="8.0.3" />
   </ItemGroup>
 
   <PropertyGroup>
