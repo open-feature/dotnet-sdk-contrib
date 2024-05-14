@@ -34,6 +34,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 }";
 
         public static string flags = @"{
+  ""$evaluators"":{
+    ""emailWithFaas"": {
+        ""ends_with"": [{""var"":""email""}, ""@faas.com""]
+      }
+    },
   ""flags"": {
     ""staticBoolFlag"": {
       ""state"": ""ENABLED"",
@@ -147,6 +152,17 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
           ""bool1"",
           null
         ]
+      }
+    },
+    ""targetingBoolFlagUsingSharedEvaluator"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""bool1"": true,
+        ""bool2"": false
+      },
+      ""defaultVariant"": ""bool2"",
+            ""targeting"": {
+        ""if"": [{ $ref: ""emailWithFaas"" }, ""bool1""]
       }
     },
         ""targetingStringFlag"": {

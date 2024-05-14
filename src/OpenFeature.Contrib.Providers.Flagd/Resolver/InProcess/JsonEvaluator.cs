@@ -183,7 +183,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     // convert the EvaluationContext object into something the JsonLogic evaluator can work with
                     dynamic contextObj = (object)ConvertToDynamicObject(targetingContext);
 
-                    // convery whatever is returned to a sring to try to use is an a index to Variants
+                    // convert whatever is returned to a string to try to use it as an index to Variants
                     var ruleResult = _evaluator.Apply(rule, contextObj);
                     if (ruleResult is bool)
                     {
