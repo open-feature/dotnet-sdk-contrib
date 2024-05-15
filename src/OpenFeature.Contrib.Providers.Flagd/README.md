@@ -77,16 +77,16 @@ namespace OpenFeatureTestApp
 The URI of the flagd server to which the `flagd Provider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
 
 | Option name                  | Environment variable name      | Type    | Default   | Values          |
-|------------------------------|--------------------------------|---------|-----------| --------------- |
+| ---------------------------- | ------------------------------ | ------- | --------- | --------------- |
 | host                         | FLAGD_HOST                     | string  | localhost |                 |
 | port                         | FLAGD_PORT                     | number  | 8013      |                 |
 | tls                          | FLAGD_TLS                      | boolean | false     |                 |
 | tls certPath                 | FLAGD_SERVER_CERT_PATH         | string  |           |                 |
 | unix socket path             | FLAGD_SOCKET_PATH              | string  |           |                 |
-| Caching                      | FLAGD_CACHE                    | string  |           |     LRU         |
+| Caching                      | FLAGD_CACHE                    | string  |           | lru             |
 | Maximum cache size           | FLAGD_MAX_CACHE_SIZE           | number  | 10        |                 |
 | Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |                 |
-| Resolver type                | FLAGD_RESOLVER_TYPE            | string  | RPC       | RPC, IN_PROCESS |
+| Resolver type                | FLAGD_RESOLVER                 | string  | rpc       | rpc, in-process |
 | Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                 |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
@@ -112,7 +112,7 @@ var unixFlagdProvider = new FlagdProvider(new Uri("unix://socket.tmp"));
 ## In-process resolver type
 
 The flagd provider also supports the [in-process provider mode](https://flagd.dev/reference/specifications/in-process-providers/),
-which is activated by setting the `FLAGD_RESOLVER_TYPE` env var to `IN_PROCESS`.
+which is activated by setting the `FLAGD_RESOLVER` env var to `IN_PROCESS`.
 In this mode, the provider will connect to a service implementing the [flagd.sync.v1 interface](https://github.com/open-feature/flagd-schemas/blob/main/protobuf/flagd/sync/v1/sync.proto)
 and subscribe to a feature flag configuration determined by the `FLAGD_SOURCE_SELECTOR`.
 After an initial retrieval of the desired flag configuration, the in-process provider will keep the latest known state in memory,
