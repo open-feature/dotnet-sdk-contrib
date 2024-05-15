@@ -41,7 +41,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestFlagdConfigEnabledCacheDefaultCacheSize()
         {
             Utils.CleanEnvVars();
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "lru");
 
             var config = new FlagdConfig();
 
@@ -159,7 +159,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestFlagdConfigResolverType()
         {
             Utils.CleanEnvVars();
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "IN_PROCESS");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "in-process");
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceSelector, "source-selector");
 
             var config = new FlagdConfig(new Uri("http://localhost:8013"));
