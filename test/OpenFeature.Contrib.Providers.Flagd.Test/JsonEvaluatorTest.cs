@@ -109,6 +109,70 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
+        public void TestJsonEvaluatorDynamicBoolEvaluationSharedEvaluator()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var builder = EvaluationContext.Builder().Set("email", "test@faas.com");
+
+            var result = jsonEvaluator.ResolveBooleanValue("targetingBoolFlagUsingSharedEvaluator", false, builder.Build());
+
+            Assert.True(result.Value);
+            Assert.Equal("bool1", result.Variant);
+            Assert.Equal(Reason.TargetingMatch, result.Reason);
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorDynamicBoolEvaluationSharedEvaluatorReturningBoolType()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var builder = EvaluationContext.Builder().Set("email", "test@faas.com");
+
+            var result = jsonEvaluator.ResolveBooleanValue("targetingBoolFlagUsingSharedEvaluatorReturningBoolType", false, builder.Build());
+
+            Assert.True(result.Value);
+            Assert.Equal("true", result.Variant);
+            Assert.Equal(Reason.TargetingMatch, result.Reason);
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorDynamicBoolEvaluationWithMissingDefaultVariant()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var builder = EvaluationContext.Builder();
+
+            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValue("targetingBoolFlagWithMissingDefaultVariant", false, builder.Build()));
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorDynamicBoolEvaluationWithUnexpectedVariantType()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var builder = EvaluationContext.Builder();
+
+            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValue("targetingBoolFlagWithUnexpectedVariantType", false, builder.Build()));
+        }
+
+        [Fact]
         public void TestJsonEvaluatorDynamicStringEvaluation()
         {
             var fixture = new Fixture();
