@@ -36,9 +36,11 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal const string EnvVarCache = "FLAGD_CACHE";
         internal const string EnvVarMaxCacheSize = "FLAGD_MAX_CACHE_SIZE";
         internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
-        internal const string EnvVarResolverType = "FLAGD_RESOLVER_TYPE";
+        internal const string EnvVarResolverType = "FLAGD_RESOLVER";
         internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
         internal static int CacheSizeDefault = 10;
+        internal static string InProcessResolverValue = "in-process";
+        internal static string LruCacheValue = "lru";
 
         /// <summary>
         /// Get a FlagdConfigBuilder instance.
@@ -170,7 +172,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
             var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
-            if (string.Equals(cacheStr, "LRU", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))
             {
                 _cache = true;
                 _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
@@ -178,7 +180,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
 
             var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
-            _resolverType = resolverTypeStr.ToUpper().Equals("IN_PROCESS") ? ResolverType.IN_PROCESS : ResolverType.RPC;
+            _resolverType = string.Equals(resolverTypeStr, InProcessResolverValue, StringComparison.OrdinalIgnoreCase) ? ResolverType.IN_PROCESS : ResolverType.RPC;
         }
 
         internal FlagdConfig(Uri url)
@@ -197,7 +199,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
 
             var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
-            if (string.Equals(cacheStr, "LRU", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))
             {
                 _cache = true;
                 _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
@@ -205,7 +207,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
             }
 
             var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
-            _resolverType = resolverTypeStr.ToUpper().Equals("IN_PROCESS") ? ResolverType.IN_PROCESS : ResolverType.RPC;
+            _resolverType = string.Equals(resolverTypeStr, InProcessResolverValue, StringComparison.OrdinalIgnoreCase) ? ResolverType.IN_PROCESS : ResolverType.RPC;
         }
 
         internal Uri GetUri()

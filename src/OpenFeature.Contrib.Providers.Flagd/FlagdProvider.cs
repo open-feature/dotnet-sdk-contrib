@@ -33,7 +33,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
         ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
         ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
-        ///     FLAGD_RESOLVER_TYPE            - The type of resolver (in-process or rpc) to be used for the provider
+        ///     FLAGD_RESOLVER                 - The type of resolver (in-process or rpc) to be used for the provider
         /// </summary>
         public FlagdProvider() : this(new FlagdConfig())
         {
@@ -46,7 +46,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
         ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
         ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
         ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
-        ///     FLAGD_RESOLVER_TYPE            - The type of resolver (in-process or rpc) to be used for the provider
+        ///     FLAGD_RESOLVER            - The type of resolver (in-process or rpc) to be used for the provider
         ///     <param name="url">The URL of the flagd server</param>
         ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
         /// </summary>
