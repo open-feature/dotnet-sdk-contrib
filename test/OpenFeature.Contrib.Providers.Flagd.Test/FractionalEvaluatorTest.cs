@@ -61,12 +61,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         [MemberData(nameof(FractionalEvaluationTestData.FractionalEvaluationContext), MemberType = typeof(FractionalEvaluationTestData))]
         public void EvaluateUsingRelativeWeights(string email, string flagKey, string expected)
         {
-                // Arrange
-                var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-                var fractionalEvaluator = new FractionalEvaluator();
-                EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+            // Arrange
+            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+            var fractionalEvaluator = new FractionalEvaluator();
+            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
 
-                var targetingString = @"{""fractional"": [
+            var targetingString = @"{""fractional"": [
                     {
                         ""var"": [
                             ""email""
@@ -75,17 +75,17 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     [""red"", 5], [""blue"", 5], [""green"", 5], [""yellow"", 5],
                 ]}";
 
-                // Parse json into hierarchical structure
-                var rule = JObject.Parse(targetingString);
+            // Parse json into hierarchical structure
+            var rule = JObject.Parse(targetingString);
 
-                var data = new Dictionary<string, object> {
+            var data = new Dictionary<string, object> {
                 { "email", email },
                 {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
                 };
 
-                // Act & Assert
-                var result = evaluator.Apply(rule, data);
-                Assert.Equal(expected, result.ToString());
+            // Act & Assert
+            var result = evaluator.Apply(rule, data);
+            Assert.Equal(expected, result.ToString());
         }
 
         [Theory]
