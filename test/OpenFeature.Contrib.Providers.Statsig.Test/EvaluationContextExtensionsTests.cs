@@ -1,6 +1,7 @@
 using AutoFixture.Xunit2;
 using OpenFeature.Model;
 using System.Collections.Generic;
+using System.Configuration.Provider;
 using System.Linq;
 using Xunit;
 
@@ -99,6 +100,17 @@ namespace OpenFeature.Contrib.Providers.Statsig.Test
             Assert.NotNull(statsigUser);
             var result = statsigUser.CustomIDs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             Assert.Equal(customIdKeyValues, result);
+        }
+
+        [Theory]
+        [AutoData]
+        public void AsStatsigUser_ShouldFailOnNonStringCustomId(Dictionary<string, int> customIdKeyValues)
+        {
+            // Arrange
+            var evaluationContext = EvaluationContext.Builder().Set(EvaluationContextExtensions.CONTEXT_CUSTOM_IDS, new Structure(customIdKeyValues.ToDictionary(kvp => kvp.Key, kvp => new Value(kvp.Value)))).Build();
+
+            // Act and Assert
+            Assert.Throws<ProviderException>(evaluationContext.AsStatsigUser);
         }
 
         [Fact]
