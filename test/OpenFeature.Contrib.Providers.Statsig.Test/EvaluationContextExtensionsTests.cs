@@ -91,7 +91,8 @@ namespace OpenFeature.Contrib.Providers.Statsig.Test
         {
 
             // Arrange
-            var evaluationContext = EvaluationContext.Builder().Set(EvaluationContextExtensions.CONTEXT_CUSTOM_IDS, new Structure(customIdKeyValues.ToDictionary(kvp => kvp.Key, kvp => new Value(kvp.Value)))).Build();
+            var customIdStructure = new Structure(customIdKeyValues.ToDictionary(kvp => kvp.Key, kvp => new Value(kvp.Value)));
+            var evaluationContext = EvaluationContext.Builder().Set(EvaluationContextExtensions.CONTEXT_CUSTOM_IDS, customIdStructure).Build();
 
             // Act
             var statsigUser = evaluationContext.AsStatsigUser();
@@ -107,7 +108,8 @@ namespace OpenFeature.Contrib.Providers.Statsig.Test
         public void AsStatsigUser_ShouldFailOnNonStringCustomId(Dictionary<string, int> customIdKeyValues)
         {
             // Arrange
-            var evaluationContext = EvaluationContext.Builder().Set(EvaluationContextExtensions.CONTEXT_CUSTOM_IDS, new Structure(customIdKeyValues.ToDictionary(kvp => kvp.Key, kvp => new Value(kvp.Value)))).Build();
+            var customIdStructure = new Structure(customIdKeyValues.ToDictionary(kvp => kvp.Key, kvp => new Value(kvp.Value)));
+            var evaluationContext = EvaluationContext.Builder().Set(EvaluationContextExtensions.CONTEXT_CUSTOM_IDS, customIdStructure).Build();
 
             // Act and Assert
             Assert.Throws<ProviderException>(evaluationContext.AsStatsigUser);
