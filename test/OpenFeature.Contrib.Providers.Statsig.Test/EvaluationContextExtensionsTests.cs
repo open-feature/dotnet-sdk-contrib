@@ -1,7 +1,7 @@
 using AutoFixture.Xunit2;
+using OpenFeature.Error;
 using OpenFeature.Model;
 using System.Collections.Generic;
-using System.Configuration.Provider;
 using System.Linq;
 using Xunit;
 
@@ -112,7 +112,7 @@ namespace OpenFeature.Contrib.Providers.Statsig.Test
             var evaluationContext = EvaluationContext.Builder().Set(EvaluationContextExtensions.CONTEXT_CUSTOM_IDS, customIdStructure).Build();
 
             // Act and Assert
-            Assert.Throws<ProviderException>(evaluationContext.AsStatsigUser);
+            Assert.Throws<FeatureProviderException>(evaluationContext.AsStatsigUser);
         }
 
         [Fact]
