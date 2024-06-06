@@ -59,10 +59,10 @@ namespace OpenFeature.Contrib.Providers.Statsig
                         if (item.Value.IsStructure)
                         {
                             var customIds = item.Value.AsStructure;
-                            foreach (var items in customIds)
+                            foreach (var customId in customIds)
                             {
-                                if (item.Value.IsString)
-                                    user.AddCustomID(items.Key, items.Value.AsString);
+                                if (customId.Value.IsString)
+                                    user.AddCustomID(customId.Key, customId.Value.AsString);
                                 else throw new FeatureProviderException(Constant.ErrorType.TypeMismatch, "Only string values are supported for CustomIDs");
                             }
                         }
