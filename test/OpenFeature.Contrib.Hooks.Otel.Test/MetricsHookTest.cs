@@ -21,7 +21,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
             meterProvider = Sdk.CreateMeterProviderBuilder()
                 .AddMeter("*")
                 .ConfigureResource(r => r.AddService("openfeature"))
-                .AddInMemoryExporter(exportedItems, option => option.PeriodicExportingMetricReaderOptions = new PeriodicExportingMetricReaderOptions { ExportIntervalMilliseconds = 100 })
+                .AddInMemoryExporter(exportedItems)
                 .Build();
         }
 
