@@ -1,4 +1,5 @@
-﻿using OpenFeature.Model;
+﻿using OpenFeature.Error;
+using OpenFeature.Model;
 using Statsig;
 
 namespace OpenFeature.Contrib.Providers.Statsig
@@ -14,6 +15,7 @@ namespace OpenFeature.Contrib.Providers.Statsig
         internal const string CONTEXT_LOCALE = "locale";
         internal const string CONTEXT_USER_AGENT = "userAgent";
         internal const string CONTEXT_PRIVATE_ATTRIBUTES = "privateAttributes";
+        internal const string CONTEXT_CUSTOM_IDS = "customIDs";
 
         public static StatsigUser AsStatsigUser(this EvaluationContext evaluationContext)
         {
@@ -49,7 +51,19 @@ namespace OpenFeature.Contrib.Providers.Statsig
                             var privateAttributes = item.Value.AsStructure;
                             foreach (var items in privateAttributes)
                             {
-                                user.AddPrivateAttribute(items.Key, items.Value);
+                                user.AddPrivateAttribute(items.Key, items.Value.AsObject);
+                            }
+                        }
+                        break;
+                    case CONTEXT_CUSTOM_IDS:
+                        if (item.Value.IsStructure)
+                        {
+                            var customIds = item.Value.AsStructure;
+                            foreach (var customId in customIds)
+                            {
+                                if (customId.Value.IsString)
+                                    user.AddCustomID(customId.Key, customId.Value.AsString);
+                                else throw new FeatureProviderException(Constant.ErrorType.TypeMismatch, "Only string values are supported for CustomIDs");
                             }
                         }
                         break;

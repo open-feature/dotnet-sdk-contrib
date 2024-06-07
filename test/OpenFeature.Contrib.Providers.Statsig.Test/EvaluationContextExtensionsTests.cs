@@ -1,6 +1,8 @@
 using AutoFixture.Xunit2;
+using OpenFeature.Error;
 using OpenFeature.Model;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Statsig.Test
@@ -80,7 +82,37 @@ namespace OpenFeature.Contrib.Providers.Statsig.Test
             // Assert
             Assert.NotNull(statsigUser);
             Assert.True(statsigUser.PrivateAttributes.TryGetValue(key, out var mappedValue));
-            Assert.Equal(value, (mappedValue as Value)?.AsString);
+            Assert.Equal(value, mappedValue);
+        }
+
+        [Theory]
+        [AutoData]
+        public void AsStatsigUser_ShouldMapCustomIds(Dictionary<string, string> customIdKeyValues)
+        {
+
+            // Arrange
+            var customIdStructure = new Structure(customIdKeyValues.ToDictionary(kvp => kvp.Key, kvp => new Value(kvp.Value)));
+            var evaluationContext = EvaluationContext.Builder().Set(EvaluationContextExtensions.CONTEXT_CUSTOM_IDS, customIdStructure).Build();
+
+            // Act
+            var statsigUser = evaluationContext.AsStatsigUser();
+
+            // Assert
+            Assert.NotNull(statsigUser);
+            var result = statsigUser.CustomIDs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            Assert.Equal(customIdKeyValues, result);
+        }
+
+        [Theory]
+        [AutoData]
+        public void AsStatsigUser_ShouldFailOnNonStringCustomId(Dictionary<string, int> customIdKeyValues)
+        {
+            // Arrange
+            var customIdStructure = new Structure(customIdKeyValues.ToDictionary(kvp => kvp.Key, kvp => new Value(kvp.Value)));
+            var evaluationContext = EvaluationContext.Builder().Set(EvaluationContextExtensions.CONTEXT_CUSTOM_IDS, customIdStructure).Build();
+
+            // Act and Assert
+            Assert.Throws<FeatureProviderException>(evaluationContext.AsStatsigUser);
         }
 
         [Fact]
