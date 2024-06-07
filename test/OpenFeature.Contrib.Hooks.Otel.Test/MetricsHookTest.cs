@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using OpenFeature.Model;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -12,30 +11,32 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 {
     public class MetricsHookTest
     {
-        [Fact]
-        public void After_Test()
+        readonly List<Metric> exportedItems;
+        readonly MeterProvider meterProvider;
+        HookContext<string> hookContext = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), EvaluationContext.Empty);
+
+        public MetricsHookTest()
         {
-            // Arrange metrics collector
-            var exportedItems = new List<Metric>();
-            Sdk.CreateMeterProviderBuilder()
+            exportedItems = new List<Metric>();
+            meterProvider = Sdk.CreateMeterProviderBuilder()
                 .AddMeter("*")
                 .ConfigureResource(r => r.AddService("openfeature"))
                 .AddInMemoryExporter(exportedItems, option => option.PeriodicExportingMetricReaderOptions = new PeriodicExportingMetricReaderOptions { ExportIntervalMilliseconds = 100 })
                 .Build();
+        }
 
+        [Fact]
+        public async void After_Test()
+        {
             // Arrange
             const string metricName = "feature_flag.evaluation_success_total";
             var otelHook = new MetricsHook();
-            var evaluationContext = EvaluationContext.Empty;
-            var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
             // Act
-            var hookTask = otelHook.After(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
-            // Wait for the metrics to be exported
-            Thread.Sleep(150);
+            await otelHook.After(hookContext, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
 
-            // Assert
-            Assert.True(hookTask.IsCompleted);
+            // Flush metrics
+            meterProvider.ForceFlush();
 
             // Assert metrics
             Assert.NotEmpty(exportedItems);
@@ -49,29 +50,17 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
         }
 
         [Fact]
-        public void Error_Test()
+        public async void Error_Test()
         {
-            // Arrange metrics collector
-            var exportedItems = new List<Metric>();
-            Sdk.CreateMeterProviderBuilder()
-                .AddMeter("*")
-                .ConfigureResource(r => r.AddService("openfeature"))
-                .AddInMemoryExporter(exportedItems, option => option.PeriodicExportingMetricReaderOptions = new PeriodicExportingMetricReaderOptions { ExportIntervalMilliseconds = 100 })
-                .Build();
-
             // Arrange
             const string metricName = "feature_flag.evaluation_error_total";
             var otelHook = new MetricsHook();
-            var evaluationContext = EvaluationContext.Empty;
-            var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
             // Act
-            var hookTask = otelHook.Error(ctx, new Exception(), new Dictionary<string, object>());
-            // Wait for the metrics to be exported
-            Thread.Sleep(150);
+            await otelHook.Error(hookContext, new Exception(), new Dictionary<string, object>());
 
-            // Assert
-            Assert.True(hookTask.IsCompleted);
+            // Flush metrics
+            meterProvider.ForceFlush();
 
             // Assert metrics
             Assert.NotEmpty(exportedItems);
@@ -85,29 +74,17 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
         }
 
         [Fact]
-        public void Finally_Test()
+        public async void Finally_Test()
         {
-            // Arrange metrics collector
-            var exportedItems = new List<Metric>();
-            Sdk.CreateMeterProviderBuilder()
-                .AddMeter("*")
-                .ConfigureResource(r => r.AddService("openfeature"))
-                .AddInMemoryExporter(exportedItems, option => option.PeriodicExportingMetricReaderOptions = new PeriodicExportingMetricReaderOptions { ExportIntervalMilliseconds = 100 })
-                .Build();
-
             // Arrange
             const string metricName = "feature_flag.evaluation_active_count";
             var otelHook = new MetricsHook();
-            var evaluationContext = EvaluationContext.Empty;
-            var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
             // Act
-            var hookTask = otelHook.Finally(ctx, new Dictionary<string, object>());
-            // Wait for the metrics to be exported
-            Thread.Sleep(150);
+            await otelHook.Finally(hookContext, new Dictionary<string, object>());
 
-            // Assert
-            Assert.True(hookTask.IsCompleted);
+            // Flush metrics
+            meterProvider.ForceFlush();
 
             // Assert metrics
             Assert.NotEmpty(exportedItems);
@@ -121,30 +98,19 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
         }
 
         [Fact]
-        public void Before_Test()
+        public async void Before_Test()
         {
-            // Arrange metrics collector
-            var exportedItems = new List<Metric>();
-            Sdk.CreateMeterProviderBuilder()
-                .AddMeter("*")
-                .ConfigureResource(r => r.AddService("openfeature"))
-                .AddInMemoryExporter(exportedItems, option => option.PeriodicExportingMetricReaderOptions = new PeriodicExportingMetricReaderOptions { ExportIntervalMilliseconds = 100 })
-                .Build();
 
             // Arrange
             const string metricName1 = "feature_flag.evaluation_active_count";
             const string metricName2 = "feature_flag.evaluation_requests_total";
             var otelHook = new MetricsHook();
-            var evaluationContext = EvaluationContext.Empty;
-            var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
             // Act
-            var hookTask = otelHook.Before(ctx, new Dictionary<string, object>());
-            // Wait for the metrics to be exported
-            Thread.Sleep(150);
+            await otelHook.Before(hookContext, new Dictionary<string, object>());
 
-            // Assert
-            Assert.True(hookTask.IsCompleted);
+            // Flush metrics
+            meterProvider.ForceFlush();
 
             // Assert metrics
             Assert.NotEmpty(exportedItems);
