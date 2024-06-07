@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.5...OpenFeature.Contrib.Providers.Statsig-v0.0.6) (2024-06-07)
+
+
+### ✨ New Features
+
+* map to Statsig CustomIDs ([#210](https://github.com/open-feature/dotnet-sdk-contrib/issues/210)) ([c745edc](https://github.com/open-feature/dotnet-sdk-contrib/commit/c745edc1a2d1141b2ef41b7b661fdd68b764c57d))
+
 ## [0.0.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.4...OpenFeature.Contrib.Providers.Statsig-v0.0.5) (2024-05-08)
 
 
