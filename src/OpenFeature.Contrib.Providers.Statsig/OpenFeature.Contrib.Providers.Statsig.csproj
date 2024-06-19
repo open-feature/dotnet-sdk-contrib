@@ -18,7 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Statsig" Version="1.25.0" />
+		<PackageReference Include="Statsig" Version="1.26.0" />
 	</ItemGroup>
 
 	<ItemGroup>
