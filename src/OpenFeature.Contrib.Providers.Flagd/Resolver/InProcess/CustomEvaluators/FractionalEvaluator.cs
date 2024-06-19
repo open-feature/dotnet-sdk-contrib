@@ -62,7 +62,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
             }
 
             var distributions = new List<FractionalEvaluationDistribution>();
-            var distributionSum = 0;
 
             for (var i = bucketStartIndex; i < args.Length; i++)
             {
@@ -92,14 +91,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
                     variant = bucketArr.ElementAt(0).ToString(),
                     percentage = percentage
                 });
-
-                distributionSum += percentage;
-            }
-
-            if (distributionSum != 100)
-            {
-                Logger.LogDebug("Sum of distribution values is not eqyal to 100");
-                return null;
             }
 
             var valueToDistribute = flagdProperties.FlagKey + propertyValue;
