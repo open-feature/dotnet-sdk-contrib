@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.6...OpenFeature.Contrib.Providers.Statsig-v0.0.7) (2024-06-19)
+
+
+### 🧹 Chore
+
+* **deps:** update dependency statsig to v1.26.0 ([#214](https://github.com/open-feature/dotnet-sdk-contrib/issues/214)) ([34015fa](https://github.com/open-feature/dotnet-sdk-contrib/commit/34015fa816fce09c44cc7acc802097053ab98d9a))
+
 ## [0.0.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.5...OpenFeature.Contrib.Providers.Statsig-v0.0.6) (2024-06-07)
 
 
