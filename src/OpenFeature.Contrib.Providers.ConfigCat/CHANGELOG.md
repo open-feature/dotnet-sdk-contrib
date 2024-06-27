@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.0.2...OpenFeature.Contrib.Providers.ConfigCat-v0.0.3) (2024-06-27)
+
+
+### 🧹 Chore
+
+* Add support for GitHub Packages ([#134](https://github.com/open-feature/dotnet-sdk-contrib/issues/134)) ([0def0da](https://github.com/open-feature/dotnet-sdk-contrib/commit/0def0da173e2f327b7381eba043b6e99ae8f26fe))
+
+
+### 🔄 Refactoring
+
+* Use the newly introduced ConfigCat error codes to determine error type ([#201](https://github.com/open-feature/dotnet-sdk-contrib/issues/201)) ([a9eef05](https://github.com/open-feature/dotnet-sdk-contrib/commit/a9eef0559d2eb2ab53249c585ddae5ad74c98328))
+
 ## [0.0.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.0.1...OpenFeature.Contrib.Providers.ConfigCat-v0.0.2) (2024-01-16)
 
 
