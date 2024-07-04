@@ -37,8 +37,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var targetingString = @"{""fractional"": [
               {
-                ""var"": [
-                  ""email""
+                ""cat"": [
+                    { ""var"":""$flagd.flagKey"" },
+                    { ""var"":""email"" }
                 ]
               },
               [""red"", 25], [""blue"", 25], [""green"", 25], [""yellow"", 25], 
@@ -55,7 +56,70 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             // Act & Assert
             var result = evaluator.Apply(rule, data);
             Assert.Equal(expected, result.ToString());
+        }
 
+        [Theory]
+        [MemberData(nameof(FractionalEvaluationTestData.FractionalEvaluationContext), MemberType = typeof(FractionalEvaluationTestData))]
+        public void EvaluateUsingRelativeWeights(string email, string flagKey, string expected)
+        {
+            // Arrange
+            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+            var fractionalEvaluator = new FractionalEvaluator();
+            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+
+            var targetingString = @"{""fractional"": [
+                    {
+                        ""cat"": [
+                            { ""var"":""$flagd.flagKey"" },
+                            { ""var"":""email"" }
+                        ]
+                    },
+                    [""red"", 5], [""blue"", 5], [""green"", 5], [""yellow"", 5],
+                ]}";
+
+            // Parse json into hierarchical structure
+            var rule = JObject.Parse(targetingString);
+
+            var data = new Dictionary<string, object> {
+                { "email", email },
+                {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
+                };
+
+            // Act & Assert
+            var result = evaluator.Apply(rule, data);
+            Assert.Equal(expected, result.ToString());
+        }
+
+        [Theory]
+        [MemberData(nameof(FractionalEvaluationTestData.FractionalEvaluationContext), MemberType = typeof(FractionalEvaluationTestData))]
+        public void EvaluateUsingDefaultWeights(string email, string flagKey, string expected)
+        {
+            // Arrange
+            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+            var fractionalEvaluator = new FractionalEvaluator();
+            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+
+            var targetingString = @"{""fractional"": [
+            {
+                ""cat"": [
+                    { ""var"":""$flagd.flagKey"" },
+                    { ""var"":""email"" }
+                ]
+            },
+            [""red""], [""blue""], [""green""], [""yellow""],
+            ]}";
+
+            // Parse json into hierarchical structure
+            var rule = JObject.Parse(targetingString);
+
+            var data = new Dictionary<string, object> {
+            { "email", email },
+            {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
+            };
+
+            // Act & Assert
+            var result = evaluator.Apply(rule, data);
+            Assert.Equal(expected, result.ToString());
         }
 
         [Theory]
