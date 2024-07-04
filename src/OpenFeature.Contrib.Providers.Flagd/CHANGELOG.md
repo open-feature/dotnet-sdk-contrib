@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.2.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.1.9...OpenFeature.Contrib.Providers.Flagd-v0.2.0) (2024-07-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* in-process var name/value (FLAGD_RESOLVER="in-process") ([#206](https://github.com/open-feature/dotnet-sdk-contrib/issues/206))
+
+### 🐛 Bug Fixes
+
+* in-process var name/value (FLAGD_RESOLVER="in-process") ([#206](https://github.com/open-feature/dotnet-sdk-contrib/issues/206)) ([1e580d7](https://github.com/open-feature/dotnet-sdk-contrib/commit/1e580d75a06f3d9f4683578e692247dbfc8aa7ea))
+
+
+### ✨ New Features
+
+* relative weights in fractional, fix injected props ([#208](https://github.com/open-feature/dotnet-sdk-contrib/issues/208)) ([7cccc8d](https://github.com/open-feature/dotnet-sdk-contrib/commit/7cccc8df0de6d9607e045fa62f070f35f20d6a0a))
+
+
+### 🧹 Chore
+
+* additional unit tests for flagd provider ([#203](https://github.com/open-feature/dotnet-sdk-contrib/issues/203)) ([38a59f0](https://github.com/open-feature/dotnet-sdk-contrib/commit/38a59f01b4c740ddcfb69b68c8b79fb169e06ad4))
+* **deps:** update dependency google.protobuf to v3.27.1 ([#75](https://github.com/open-feature/dotnet-sdk-contrib/issues/75)) ([0db8692](https://github.com/open-feature/dotnet-sdk-contrib/commit/0db86920eddaf16fa4685843e5e6b6308893d012))
+* **deps:** update dependency grpc.net.client to v2.63.0 ([#209](https://github.com/open-feature/dotnet-sdk-contrib/issues/209)) ([ce14c23](https://github.com/open-feature/dotnet-sdk-contrib/commit/ce14c2389c3602aa211d877b4122b7a7d03835b9))
+* **deps:** update dependency grpc.tools to v2.63.0 ([#193](https://github.com/open-feature/dotnet-sdk-contrib/issues/193)) ([75e4eb7](https://github.com/open-feature/dotnet-sdk-contrib/commit/75e4eb7c379e6680545fb6dc638ec0345114877b))
+* **deps:** update dependency grpc.tools to v2.64.0 ([#207](https://github.com/open-feature/dotnet-sdk-contrib/issues/207)) ([eafdc3c](https://github.com/open-feature/dotnet-sdk-contrib/commit/eafdc3c206f010a9d363dc4cd70b2308d6b5fab1))
+
 ## [0.1.9](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.1.8...OpenFeature.Contrib.Providers.Flagd-v0.1.9) (2024-04-30)
 
 
