@@ -33,7 +33,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
         class FractionalEvaluationDistribution
         {
             public string variant;
-            public int percentage;
+            public int weight;
         }
 
         internal object Evaluate(IProcessJsonLogic p, JToken[] args, object data)
@@ -49,16 +49,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
 
             var flagdProperties = new FlagdProperties(data);
 
-            // check if the first argument is a string (i.e. the property to base the distribution on
-            var propertyValue = flagdProperties.TargetingKey;
             var bucketStartIndex = 0;
 
             var arg0 = p.Apply(args[0], data);
 
+            string propertyValue;
             if (arg0 is string stringValue)
             {
                 propertyValue = stringValue;
                 bucketStartIndex = 1;
+            }
+            else
+            {
+                propertyValue = flagdProperties.FlagKey + flagdProperties.TargetingKey;
             }
 
             var distributions = new List<FractionalEvaluationDistribution>();
@@ -75,34 +78,28 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
 
                 var bucketArr = bucket.MakeEnumerable().ToArray();
 
-                if (bucketArr.Count() < 2)
+                if (!bucketArr.Any())
                 {
                     continue;
                 }
 
-                if (!bucketArr.ElementAt(1).IsNumeric())
+                var weight = 1;
+
+                if (bucketArr.Length >= 2 && bucketArr.ElementAt(1).IsNumeric())
                 {
-                    continue;
+                    weight = Convert.ToInt32(bucketArr.ElementAt(1));
                 }
 
-
-                var percentage = Convert.ToInt32(bucketArr.ElementAt(1));
                 distributions.Add(new FractionalEvaluationDistribution
                 {
                     variant = bucketArr.ElementAt(0).ToString(),
-                    percentage = percentage
+                    weight = weight
                 });
 
-                distributionSum += percentage;
+                distributionSum += weight;
             }
 
-            if (distributionSum != 100)
-            {
-                Logger.LogDebug("Sum of distribution values is not eqyal to 100");
-                return null;
-            }
-
-            var valueToDistribute = flagdProperties.FlagKey + propertyValue;
+            var valueToDistribute = propertyValue;
             var murmur32 = MurmurHash.Create32();
             var bytes = Encoding.ASCII.GetBytes(valueToDistribute);
             var hashBytes = murmur32.ComputeHash(bytes);
@@ -110,11 +107,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
 
             var bucketValue = (int)(Math.Abs((float)hash) / Int32.MaxValue * 100);
 
-            var rangeEnd = 0;
+            var rangeEnd = 0.0;
 
             foreach (var dist in distributions)
             {
-                rangeEnd += dist.percentage;
+                rangeEnd += 100 * (dist.weight / (float)distributionSum);
                 if (bucketValue < rangeEnd)
                 {
                     return dist.variant;

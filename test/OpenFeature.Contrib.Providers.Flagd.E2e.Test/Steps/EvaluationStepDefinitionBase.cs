@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
+using System.ComponentModel;
+using System.Reflection;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Model;
@@ -245,7 +244,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         public void Giventhereasonshouldindicateanerrorandtheerrorcodeshouldindicateamissingflagwith(string errorCode)
         {
             Assert.Equal(Reason.Error.ToString(), notFoundDetails.Reason);
-            Assert.Contains(errorCode, notFoundDetails.ErrorMessage);
+            Assert.Contains(errorCode, GetErrorTypeDescription(notFoundDetails.ErrorType));
         }
 
         [When(@"a string flag with key ""(.*)"" is evaluated as an integer, with details and a default value (.*)")]
@@ -266,7 +265,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         public void Giventhereasonshouldindicateanerrorandtheerrorcodeshouldindicateatypemismatchwith(string errorCode)
         {
             Assert.Equal(Reason.Error.ToString(), typeErrorDetails.Reason);
-            Assert.Contains(errorCode, this.typeErrorDetails.ErrorMessage);
+            Assert.Contains(errorCode, GetErrorTypeDescription(typeErrorDetails.ErrorType));
+        }
+
+        // convenience method to get the enum description.
+        private string GetErrorTypeDescription(Enum value)
+        {
+            FieldInfo info = value.GetType().GetField(value.ToString());
+            DescriptionAttribute[] attributes = (DescriptionAttribute[])info.GetCustomAttributes(typeof(DescriptionAttribute));
+            return attributes[0].Description;
         }
     }
 }
