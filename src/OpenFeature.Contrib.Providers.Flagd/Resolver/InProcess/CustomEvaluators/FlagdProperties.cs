@@ -17,7 +17,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
         internal FlagdProperties(object from)
         {
             //object value;
-            if (from is Dictionary<string, object> dict)
+            if (from is IDictionary<string, object> dict)
             {
                 if (dict.TryGetValue(TargetingKeyKey, out object targetingKeyValue)
                     && targetingKeyValue is string targetingKeyString)
@@ -25,7 +25,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
                     TargetingKey = targetingKeyString;
                 }
                 if (dict.TryGetValue(FlagdPropertiesKey, out object flagdPropertiesObj)
-                    && flagdPropertiesObj is Dictionary<string, object> flagdProperties)
+                    && flagdPropertiesObj is IDictionary<string, object> flagdProperties)
                 {
                     if (flagdProperties.TryGetValue(FlagKeyKey, out object flagKeyObj)
                         && flagKeyObj is string flagKey)

@@ -37,8 +37,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var targetingString = @"{""fractional"": [
               {
-                ""var"": [
-                  ""email""
+                ""cat"": [
+                    { ""var"":""$flagd.flagKey"" },
+                    { ""var"":""email"" }
                 ]
               },
               [""red"", 25], [""blue"", 25], [""green"", 25], [""yellow"", 25], 
@@ -68,8 +69,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var targetingString = @"{""fractional"": [
                     {
-                        ""var"": [
-                            ""email""
+                        ""cat"": [
+                            { ""var"":""$flagd.flagKey"" },
+                            { ""var"":""email"" }
                         ]
                     },
                     [""red"", 5], [""blue"", 5], [""green"", 5], [""yellow"", 5],
@@ -99,8 +101,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var targetingString = @"{""fractional"": [
             {
-                ""var"": [
-                ""email""
+                ""cat"": [
+                    { ""var"":""$flagd.flagKey"" },
+                    { ""var"":""email"" }
                 ]
             },
             [""red""], [""blue""], [""green""], [""yellow""],

@@ -49,16 +49,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
 
             var flagdProperties = new FlagdProperties(data);
 
-            // check if the first argument is a string (i.e. the property to base the distribution on
-            var propertyValue = flagdProperties.TargetingKey;
             var bucketStartIndex = 0;
 
             var arg0 = p.Apply(args[0], data);
 
+            string propertyValue;
             if (arg0 is string stringValue)
             {
                 propertyValue = stringValue;
                 bucketStartIndex = 1;
+            }
+            else
+            {
+                propertyValue = flagdProperties.FlagKey + flagdProperties.TargetingKey;
             }
 
             var distributions = new List<FractionalEvaluationDistribution>();
@@ -96,7 +99,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
                 distributionSum += weight;
             }
 
-            var valueToDistribute = flagdProperties.FlagKey + propertyValue;
+            var valueToDistribute = propertyValue;
             var murmur32 = MurmurHash.Create32();
             var bytes = Encoding.ASCII.GetBytes(valueToDistribute);
             var hashBytes = murmur32.ComputeHash(bytes);
