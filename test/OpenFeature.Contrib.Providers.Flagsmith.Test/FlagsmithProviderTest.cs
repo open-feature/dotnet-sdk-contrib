@@ -77,7 +77,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
                 .Set("key4", date)
                 .Set("key5", Structure.Empty)
                 .Set("key6", 1.0)
-                .Set(FlagsmithProviderConfiguration.DefaultTargetingKey, "233");
+                .SetTargetingKey("233");
             // Act
             var result = await flagsmithProvider.ResolveBooleanValue("example-feature", false, contextBuilder.Build());
 
@@ -448,30 +448,6 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
 
             // Act and Assert
             await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveStructureValue("example-feature", defaultObject));
-        }
-
-        [Theory]
-        [InlineData("property", "attribute", "property")]
-        [InlineData(null, "attribute", "attribute")]
-        [InlineData("", "attribute", "attribute")]
-        [InlineData("property", null, "property")]
-        [InlineData("property", "", "property")]
-        public async Task GetValue_WithTargetingKey_UsesPropertyOverAttribute(string property, string attribute, string expected)
-        {
-            // Arrange
-            var flagsmithClient = Substitute.For<IFlagsmithClient>();
-            var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
-            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
-
-            var contextBuilder = EvaluationContext.Builder()
-                .SetTargetingKey(property)
-                .Set(FlagsmithProviderConfiguration.DefaultTargetingKey, attribute);
-
-            // Act
-            await flagsmithProvider.ResolveBooleanValue("example-feature", false, contextBuilder.Build());
-
-            // Assert
-            await flagsmithClient.Received().GetIdentityFlags(expected, Arg.Any<List<ITrait>>());
         }
     }
 }
