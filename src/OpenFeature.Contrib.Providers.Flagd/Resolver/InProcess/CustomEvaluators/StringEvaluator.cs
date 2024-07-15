@@ -1,8 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
 using JsonLogic.Net;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Error;
 using OpenFeature.Model;
@@ -11,20 +9,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
 {
     internal class StringEvaluator
     {
-        internal ILogger Logger { get; set; }
-
         internal StringEvaluator()
         {
-            var loggerFactory = LoggerFactory.Create(
-                builder => builder
-                    // add console as logging target
-                    .AddConsole()
-                    // add debug output as logging target
-                    .AddDebug()
-                    // set minimum level to log
-                    .SetMinimumLevel(LogLevel.Debug)
-                );
-            Logger = loggerFactory.CreateLogger<StringEvaluator>();
         }
 
         internal object StartsWith(IProcessJsonLogic p, JToken[] args, object data)
