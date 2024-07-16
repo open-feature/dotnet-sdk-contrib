@@ -1,7 +1,5 @@
 using System;
 using JsonLogic.Net;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using Semver;
 
@@ -10,22 +8,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
     /// <inheritdoc/>
     public class SemVerEvaluator
     {
-        internal ILogger Logger { get; set; }
-
         internal SemVerEvaluator()
         {
-            var loggerFactory = LoggerFactory.Create(
-                builder => builder
-                    // add console as logging target
-                    .AddConsole()
-                    // add debug output as logging target
-                    .AddDebug()
-                    // set minimum level to log
-                    .SetMinimumLevel(LogLevel.Debug)
-                );
-            Logger = loggerFactory.CreateLogger<SemVerEvaluator>();
         }
-
 
         const string OperatorEqual = "=";
         const string OperatorNotEqual = "!=";
@@ -53,37 +38,32 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
             var targetVersionString = p.Apply(args[2], data).ToString();
 
             //convert to semantic versions
-            try
+            if (!SemVersion.TryParse(versionString, SemVersionStyles.Strict, out var version) ||
+                !SemVersion.TryParse(targetVersionString, SemVersionStyles.Strict, out var targetVersion))
             {
-                var version = SemVersion.Parse(versionString, SemVersionStyles.Strict);
-                var targetVersion = SemVersion.Parse(targetVersionString, SemVersionStyles.Strict);
-
-                switch (semVerOperator)
-                {
-                    case OperatorEqual:
-                        return version.CompareSortOrderTo(targetVersion) == 0;
-                    case OperatorNotEqual:
-                        return version.CompareSortOrderTo(targetVersion) != 0;
-                    case OperatorLess:
-                        return version.CompareSortOrderTo(targetVersion) < 0;
-                    case OperatorLessOrEqual:
-                        return version.CompareSortOrderTo(targetVersion) <= 0;
-                    case OperatorGreater:
-                        return version.CompareSortOrderTo(targetVersion) > 0;
-                    case OperatorGreaterOrEqual:
-                        return version.CompareSortOrderTo(targetVersion) >= 0;
-                    case OperatorMatchMajor:
-                        return version.Major == targetVersion.Major;
-                    case OperatorMatchMinor:
-                        return version.Major == targetVersion.Major && version.Minor == targetVersion.Minor;
-                    default:
-                        return false;
-                }
-            }
-            catch (Exception e)
-            {
-                Logger?.LogDebug("Exception during SemVer evaluation: " + e.Message);
                 return false;
+            }
+
+            switch (semVerOperator)
+            {
+                case OperatorEqual:
+                    return version.CompareSortOrderTo(targetVersion) == 0;
+                case OperatorNotEqual:
+                    return version.CompareSortOrderTo(targetVersion) != 0;
+                case OperatorLess:
+                    return version.CompareSortOrderTo(targetVersion) < 0;
+                case OperatorLessOrEqual:
+                    return version.CompareSortOrderTo(targetVersion) <= 0;
+                case OperatorGreater:
+                    return version.CompareSortOrderTo(targetVersion) > 0;
+                case OperatorGreaterOrEqual:
+                    return version.CompareSortOrderTo(targetVersion) >= 0;
+                case OperatorMatchMajor:
+                    return version.Major == targetVersion.Major;
+                case OperatorMatchMinor:
+                    return version.Major == targetVersion.Major && version.Minor == targetVersion.Minor;
+                default:
+                    return false;
             }
         }
     }

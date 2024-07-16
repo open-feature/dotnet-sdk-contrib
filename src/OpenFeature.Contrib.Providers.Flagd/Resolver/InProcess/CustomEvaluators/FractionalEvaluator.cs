@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using JsonLogic.Net;
-using Microsoft.Extensions.Logging;
 using Murmur;
 using Newtonsoft.Json.Linq;
 using Semver;
@@ -13,21 +12,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
     /// <inheritdoc/>
     public class FractionalEvaluator
     {
-
-        internal ILogger Logger { get; set; }
-
         internal FractionalEvaluator()
         {
-            var loggerFactory = LoggerFactory.Create(
-                builder => builder
-                    // add console as logging target
-                    .AddConsole()
-                    // add debug output as logging target
-                    .AddDebug()
-                    // set minimum level to log
-                    .SetMinimumLevel(LogLevel.Debug)
-                );
-            Logger = loggerFactory.CreateLogger<FractionalEvaluator>();
         }
 
         class FractionalEvaluationDistribution
@@ -118,7 +104,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
                 }
             }
 
-            Logger.LogDebug("No matching bucket found");
             return "";
         }
     }
