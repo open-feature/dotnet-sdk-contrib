@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.0...OpenFeature.Contrib.Providers.Flagd-v0.2.1) (2024-07-16)
+
+
+### 🐛 Bug Fixes
+
+* remove Microsoft.Extensions.Logging from flagd provider ([#233](https://github.com/open-feature/dotnet-sdk-contrib/issues/233)) ([7385735](https://github.com/open-feature/dotnet-sdk-contrib/commit/7385735aee328e60be323fba037291bf4fd3d1c9))
+
 ## [0.2.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.1.9...OpenFeature.Contrib.Providers.Flagd-v0.2.0) (2024-07-04)
 
 
