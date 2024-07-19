@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Hooks.Otel-v0.1.4...OpenFeature.Contrib.Hooks.Otel-v0.1.5) (2024-07-19)
+
+
+### 🧹 Chore
+
+* **deps:** update dependency opentelemetry.api to v1.7.0 ([#65](https://github.com/open-feature/dotnet-sdk-contrib/issues/65)) ([533dfa6](https://github.com/open-feature/dotnet-sdk-contrib/commit/533dfa652011b645d48c5d17dbdfe39b64a8eadf))
+
 ## [0.1.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Hooks.Otel-v0.1.3...OpenFeature.Contrib.Hooks.Otel-v0.1.4) (2024-01-25)
 
 
