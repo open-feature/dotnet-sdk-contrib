@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.6...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.7) (2024-07-23)
+
+
+### 🧹 Chore
+
+* **deps:** [#194](https://github.com/open-feature/dotnet-sdk-contrib/issues/194) make STJ conditional ([#196](https://github.com/open-feature/dotnet-sdk-contrib/issues/196)) ([5987a5b](https://github.com/open-feature/dotnet-sdk-contrib/commit/5987a5b309f188501b08cc4cc7c50575e888493c))
+* **deps:** update dotnet monorepo ([#141](https://github.com/open-feature/dotnet-sdk-contrib/issues/141)) ([5ff0e5f](https://github.com/open-feature/dotnet-sdk-contrib/commit/5ff0e5f4c5939e9a584809e623b1306f7546c5b1))
+
 ## [0.1.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.5...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.6) (2024-03-27)
 
 
