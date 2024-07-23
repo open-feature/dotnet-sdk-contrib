@@ -77,7 +77,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
                 .Set("key4", date)
                 .Set("key5", Structure.Empty)
                 .Set("key6", 1.0)
-                .Set(FlagsmithProviderConfiguration.DefaultTargetingKey, "233");
+                .SetTargetingKey("233");
             // Act
             var result = await flagsmithProvider.ResolveBooleanValue("example-feature", false, contextBuilder.Build());
 
