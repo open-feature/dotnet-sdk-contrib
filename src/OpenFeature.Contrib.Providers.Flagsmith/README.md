@@ -43,40 +43,42 @@ packet add OpenFeature.Contrib.Providers.Flagsmith
 To create a Flagmith provider you should define provider and Flagsmith settings.
 
 ```csharp
-using OpenFeature.Contrib.Providers.Flagd;
+using Flagsmith;
+using OpenFeature.Contrib.Providers.Flagsmith;
+using OpenFeature.Model;
 
-namespace OpenFeatureTestApp
+// Additional configs for provider
+var providerConfig = new FlagsmithProviderConfiguration();
+
+// Flagsmith client configuration
+var flagsmithConfig = new FlagsmithConfiguration
 {
-    class Hello {
-        static void Main(string[] args) {
+    ApiUrl = "https://edge.api.flagsmith.com/api/v1/",
+    EnvironmentKey = "",
+    EnableClientSideEvaluation = false,
+    EnvironmentRefreshIntervalSeconds = 60,
+    EnableAnalytics = false,
+    Retries = 1,
+};
+var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithConfig);
 
-            // Additional configs for provider
-            var providerConfig = new FlagsmithProviderConfiguration();
+// Set the flagsmithProvider as the provider for the OpenFeature SDK
+await OpenFeature.Api.Instance.SetProviderAsync(flagsmithProvider);
 
-            //Flagsmith client configuration
-            var flagsmithConfig = new FlagsmithConfiguration
-            {
-                ApiUrl = "https://edge.api.flagsmith.com/api/v1/",
-                EnvironmentKey = string.Empty,
-                EnableClientSideEvaluation = false,
-                EnvironmentRefreshIntervalSeconds = 60,
-                EnableAnalytics = false,
-                Retries = 1
-            };
-            var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithConfig);\
+// Get an OpenFeature client
+var client = OpenFeature.Api.Instance.GetClient("my-app");
 
-            // Set the flagsmithProvider as the provider for the OpenFeature SDK
-            OpenFeature.Api.Instance.SetProvider(flagsmithProvider);
+// Optional: set a targeting key and traits to use segment and/or identity overrides
+var context = EvaluationContext.Builder()
+    .SetTargetingKey("my-flagsmith-identity-ID")
+    .Set("my-trait-key", "my-trait-value")
+    .Build();
 
-            var client = OpenFeature.Api.Instance.GetClient("my-app");
+// Evaluate a flag
+var val = await client.GetBooleanValue("myBoolFlag", false, context);
 
-            var val = client.GetBooleanValue("myBoolFlag", false, null);
-
-            // Print the value of the 'myBoolFlag' feature flag
-            System.Console.WriteLine(val.Result.ToString());
-        }
-    }
-}
+// Print the value of the 'myBoolFlag' feature flag
+Console.WriteLine(val);
 ```
 
 You also can create Flagsmith provider using ```HttpClient``` or precreated ```FlagsmithClient```
