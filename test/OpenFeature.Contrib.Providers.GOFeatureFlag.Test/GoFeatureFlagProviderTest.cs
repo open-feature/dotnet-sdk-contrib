@@ -29,7 +29,7 @@ public class GoFeatureFlagProviderTest
         mockHttp.When($"{prefixEval}invalid_api_key{suffixEval}").Respond(HttpStatusCode.Unauthorized);
         mockHttp.When($"{prefixEval}flag_not_found{suffixEval}").Respond(HttpStatusCode.NotFound);
         mockHttp.When($"{prefixEval}bool_targeting_match{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":true}");
+            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"value\":true}");
         mockHttp.When($"{prefixEval}disabled{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":true}");
         mockHttp.When($"{prefixEval}disabled_double{suffixEval}").Respond(mediaType,
