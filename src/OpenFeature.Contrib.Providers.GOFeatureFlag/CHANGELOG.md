@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.7...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.8) (2024-08-02)
+
+
+### 🧹 Chore
+
+* **deps:** update dependency system.text.json to v8.0.4 [security] ([#230](https://github.com/open-feature/dotnet-sdk-contrib/issues/230)) ([fadc184](https://github.com/open-feature/dotnet-sdk-contrib/commit/fadc184592348ee54e4cc87236c4823605f03970))
+
 ## [0.1.7](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.6...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.7) (2024-07-23)
 
 
