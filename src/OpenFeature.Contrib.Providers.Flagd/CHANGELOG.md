@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.1...OpenFeature.Contrib.Providers.Flagd-v0.2.2) (2024-08-03)
+
+
+### 🧹 Chore
+
+* **deps:** update dependency google.protobuf to v3.27.2 ([#220](https://github.com/open-feature/dotnet-sdk-contrib/issues/220)) ([316e159](https://github.com/open-feature/dotnet-sdk-contrib/commit/316e159a417e5b4268482551fec8e7eb34436648))
+* **deps:** update dependency grpc.net.client to v2.64.0 ([#239](https://github.com/open-feature/dotnet-sdk-contrib/issues/239)) ([3d3ed02](https://github.com/open-feature/dotnet-sdk-contrib/commit/3d3ed02e3bdf979336e0dad8e3d5ed6886345a2d))
+
 ## [0.2.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.0...OpenFeature.Contrib.Providers.Flagd-v0.2.1) (2024-07-16)
 
 
