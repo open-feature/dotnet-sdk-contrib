@@ -15,6 +15,7 @@ components:
     - matthewelwell
   src/OpenFeature.Contrib.Providers.ConfigCat:
     - luizbon
+    - adams85
   src/OpenFeature.Contrib.Providers.FeatureManagement:
     - ericpattison
     - toddbaert
@@ -37,6 +38,7 @@ components:
     - matthewelwell
   test/OpenFeature.Contrib.Providers.ConfigCat.Test:
     - luizbon
+    - adams85
   test/OpenFeature.Contrib.Providers.FeatureManagement.Test:
     - ericpattison
     - toddbaert
