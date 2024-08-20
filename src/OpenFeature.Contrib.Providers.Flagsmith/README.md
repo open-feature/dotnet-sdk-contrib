@@ -4,6 +4,10 @@ The Flagsmith provider allows you to connect to your Flagsmith instance through 
 
 # .Net SDK usage
 
+## Requirements
+
+- open-feature/dotnet-sdk v1.5 > v2.0
+
 ## Install dependencies
 
 The first things we will do is install the **Open Feature SDK** and the **Flagsmith Feature Flag provider**.

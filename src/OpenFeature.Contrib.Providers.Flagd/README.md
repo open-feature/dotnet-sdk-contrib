@@ -4,6 +4,10 @@ The flagd Flag provider allows you to connect to your flagd instance.
 
 # .Net SDK usage
 
+## Requirements
+
+- open-feature/dotnet-sdk v1.5 > v2.0
+
 ## Install dependencies
 
 We will first install the **OpenFeature SDK** and the **flagd provider**.
