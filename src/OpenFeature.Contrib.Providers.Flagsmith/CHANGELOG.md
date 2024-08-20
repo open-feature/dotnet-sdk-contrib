@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.8](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.1.7...OpenFeature.Contrib.Providers.Flagsmith-v0.1.8) (2024-08-20)
+
+
+### 🐛 Bug Fixes
+
+* use the TargetingKey property in the Flagsmith provider ([#227](https://github.com/open-feature/dotnet-sdk-contrib/issues/227)) ([5e175c8](https://github.com/open-feature/dotnet-sdk-contrib/commit/5e175c8695b90bfb285eb2b4e2aeacae2e533ce4))
+
+
+### 🧹 Chore
+
+* **deps:** update dependency flagsmith to v5.3.1 ([#236](https://github.com/open-feature/dotnet-sdk-contrib/issues/236)) ([d9a5110](https://github.com/open-feature/dotnet-sdk-contrib/commit/d9a51101f7344aed88fa52ef9497fb24b170fa16))
+* **deps:** update dependency system.text.json to v8.0.4 [security] ([#230](https://github.com/open-feature/dotnet-sdk-contrib/issues/230)) ([fadc184](https://github.com/open-feature/dotnet-sdk-contrib/commit/fadc184592348ee54e4cc87236c4823605f03970))
+* update OpenFeature version compatiblity ([#249](https://github.com/open-feature/dotnet-sdk-contrib/issues/249)) ([232e948](https://github.com/open-feature/dotnet-sdk-contrib/commit/232e948a0916ca10612f85343e2eecebca107090))
+
 ## [0.1.7](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.1.6...OpenFeature.Contrib.Providers.Flagsmith-v0.1.7) (2024-07-16)
 
 
