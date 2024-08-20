@@ -9,6 +9,10 @@ This is a complete feature flagging solution with the possibility to target only
 
 # .Net SDK usage
 
+## Requirements
+
+- open-feature/dotnet-sdk v1.5 > v2.0
+
 ## Install dependencies
 
 The first things we will do is install the **Open Feature SDK** and the **GO Feature Flag provider**.

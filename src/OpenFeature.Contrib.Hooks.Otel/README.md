@@ -1,8 +1,8 @@
 # OpenFeature OpenTelemetry hook for .NET
 
-### Requirements
+## Requirements
 
-- open-feature/dotnet-sdk >= v1.0
+- open-feature/dotnet-sdk v1.5 > v2.0
 
 ## Usage - Traces
 
