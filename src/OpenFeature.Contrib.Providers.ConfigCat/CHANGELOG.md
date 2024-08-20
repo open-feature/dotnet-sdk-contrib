@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.0.3...OpenFeature.Contrib.Providers.ConfigCat-v0.0.4) (2024-08-20)
+
+
+### 🧹 Chore
+
+* update OpenFeature version compatiblity ([#249](https://github.com/open-feature/dotnet-sdk-contrib/issues/249)) ([232e948](https://github.com/open-feature/dotnet-sdk-contrib/commit/232e948a0916ca10612f85343e2eecebca107090))
+
 ## [0.0.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.0.2...OpenFeature.Contrib.Providers.ConfigCat-v0.0.3) (2024-06-27)
 
 
