@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.1...OpenFeature.Contrib.Providers.Flagd-v0.2.2) (2024-08-20)
+
+
+### 🧹 Chore
+
+* **deps:** update dependency google.protobuf to v3.27.2 ([#220](https://github.com/open-feature/dotnet-sdk-contrib/issues/220)) ([316e159](https://github.com/open-feature/dotnet-sdk-contrib/commit/316e159a417e5b4268482551fec8e7eb34436648))
+* **deps:** update dependency google.protobuf to v3.27.3 ([#244](https://github.com/open-feature/dotnet-sdk-contrib/issues/244)) ([204fdda](https://github.com/open-feature/dotnet-sdk-contrib/commit/204fddad9f2b5f1601e1eaf913654e190020d15e))
+* **deps:** update dependency grpc.net.client to v2.64.0 ([#239](https://github.com/open-feature/dotnet-sdk-contrib/issues/239)) ([3d3ed02](https://github.com/open-feature/dotnet-sdk-contrib/commit/3d3ed02e3bdf979336e0dad8e3d5ed6886345a2d))
+* **deps:** update dependency grpc.tools to v2.65.0 ([#234](https://github.com/open-feature/dotnet-sdk-contrib/issues/234)) ([b5ea7bf](https://github.com/open-feature/dotnet-sdk-contrib/commit/b5ea7bf6be6b37a2461d0d3192445901df2e1cdc))
+* **deps:** update dotnet monorepo ([#229](https://github.com/open-feature/dotnet-sdk-contrib/issues/229)) ([0ee1e5b](https://github.com/open-feature/dotnet-sdk-contrib/commit/0ee1e5b4e3a002e2f56c78ee5d5665576190cbba))
+* update OpenFeature version compatiblity ([#249](https://github.com/open-feature/dotnet-sdk-contrib/issues/249)) ([232e948](https://github.com/open-feature/dotnet-sdk-contrib/commit/232e948a0916ca10612f85343e2eecebca107090))
+
 ## [0.2.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.0...OpenFeature.Contrib.Providers.Flagd-v0.2.1) (2024-07-16)
 
 
