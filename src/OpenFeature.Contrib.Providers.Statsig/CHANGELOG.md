@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.7...OpenFeature.Contrib.Providers.Statsig-v0.0.8) (2024-08-20)
+
+
+### 🧹 Chore
+
+* update OpenFeature version compatiblity ([#249](https://github.com/open-feature/dotnet-sdk-contrib/issues/249)) ([232e948](https://github.com/open-feature/dotnet-sdk-contrib/commit/232e948a0916ca10612f85343e2eecebca107090))
+
 ## [0.0.7](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.6...OpenFeature.Contrib.Providers.Statsig-v0.0.7) (2024-06-19)
 
 
