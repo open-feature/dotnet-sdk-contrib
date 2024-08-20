@@ -4,6 +4,10 @@
 
 The FeatureManagement Provider allows you to use the FeatureManagement system as an OpenFeature Provider.
 
+## Requirements
+
+- open-feature/dotnet-sdk v1.5 > v2.0
+
 ## .NET SDK Usage
 
 ### Install dependencies
