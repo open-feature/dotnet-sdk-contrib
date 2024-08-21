@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.0.4...OpenFeature.Contrib.Providers.ConfigCat-v0.0.5) (2024-08-21)
+
+
+### 🐛 Bug Fixes
+
+* version expression ([cad2cd1](https://github.com/open-feature/dotnet-sdk-contrib/commit/cad2cd166d0c25753b37189f044c3a585cda0fad))
+
 ## [0.0.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.0.3...OpenFeature.Contrib.Providers.ConfigCat-v0.0.4) (2024-08-20)
 
 
