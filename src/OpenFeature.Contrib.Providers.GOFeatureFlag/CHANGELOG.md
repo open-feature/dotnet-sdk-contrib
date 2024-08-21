@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.10](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.9...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.10) (2024-08-21)
+
+
+### 🐛 Bug Fixes
+
+* version expression ([cad2cd1](https://github.com/open-feature/dotnet-sdk-contrib/commit/cad2cd166d0c25753b37189f044c3a585cda0fad))
+
 ## [0.1.9](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.8...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.1.9) (2024-08-20)
 
 
