@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.2...OpenFeature.Contrib.Providers.Flagd-v0.2.3) (2024-08-21)
+
+
+### 🐛 Bug Fixes
+
+* version expression ([cad2cd1](https://github.com/open-feature/dotnet-sdk-contrib/commit/cad2cd166d0c25753b37189f044c3a585cda0fad))
+
+
+### 🧹 Chore
+
+* **deps:** update dependency grpc.net.client to v2.65.0 ([#242](https://github.com/open-feature/dotnet-sdk-contrib/issues/242)) ([d20431c](https://github.com/open-feature/dotnet-sdk-contrib/commit/d20431cc9793edad3e08517a5c3a64a0103a48f3))
+
 ## [0.2.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.1...OpenFeature.Contrib.Providers.Flagd-v0.2.2) (2024-08-20)
 
 
