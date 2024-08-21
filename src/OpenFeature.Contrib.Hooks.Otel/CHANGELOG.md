@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Hooks.Otel-v0.1.7...OpenFeature.Contrib.Hooks.Otel-v0.1.8) (2024-08-21)
+
+
+### 🐛 Bug Fixes
+
+* version expression ([cad2cd1](https://github.com/open-feature/dotnet-sdk-contrib/commit/cad2cd166d0c25753b37189f044c3a585cda0fad))
+
 ## [0.1.7](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Hooks.Otel-v0.1.6...OpenFeature.Contrib.Hooks.Otel-v0.1.7) (2024-08-20)
 
 
