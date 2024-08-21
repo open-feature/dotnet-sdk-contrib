@@ -6,7 +6,7 @@ The Statsig Flag provider allows you to connect to Statsig. Please note this is 
 
 ## Requirements
 
-- open-feature/dotnet-sdk v1.5 > v2.0
+- open-feature/dotnet-sdk v1.5.0 > v2.0.0
 
 ## Install dependencies
 

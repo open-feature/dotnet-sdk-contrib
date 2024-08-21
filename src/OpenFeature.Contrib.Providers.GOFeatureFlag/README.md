@@ -11,7 +11,7 @@ This is a complete feature flagging solution with the possibility to target only
 
 ## Requirements
 
-- open-feature/dotnet-sdk v1.5 > v2.0
+- open-feature/dotnet-sdk v1.5.0 > v2.0.0
 
 ## Install dependencies
 
