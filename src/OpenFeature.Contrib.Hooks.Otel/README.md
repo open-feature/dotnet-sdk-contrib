@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- open-feature/dotnet-sdk v1.5 > v2.0
+- open-feature/dotnet-sdk v1.5.0 > v2.0.0
 
 ## Usage - Traces
 
