@@ -16,34 +16,34 @@ The FeatureManagement Provider allows you to use the FeatureManagement system as
 #### .NET Cli
 
 ```shell
-dotnet add package OpenFeature.Contrib.Provider.FeatureManagement --version 0.0.3
+dotnet add package OpenFeature.Contrib.Provider.FeatureManagement --version 0.0.4
 ```
 
 #### Package Manager
 
 ```shell
-NuGet\Install-Package OpenFeature.Contrib.Provider.FeatureManagement -Version 0.0.3
+NuGet\Install-Package OpenFeature.Contrib.Provider.FeatureManagement -Version 0.0.4
 ```
 
 #### Package Reference
 
 ```xml
-<PackageReference Include="OpenFeature.Contrib.Provider.FeatureManagement" Version="0.0.3" />
+<PackageReference Include="OpenFeature.Contrib.Provider.FeatureManagement" Version="0.0.4" />
 ```
 
 #### Paket CLI
 ```shell
-paket add OpenFeature.Contrib.Provider.FeatureManagement --version 0.0.3
+paket add OpenFeature.Contrib.Provider.FeatureManagement --version 0.0.4
 ```
 
 #### Cake
 
 ```shell
 // Install OpenFeature.Contrib.Provider.FeatureManagement as a Cake Addin
-#addin nuget:?package=OpenFeature.Contrib.Provider.FeatureManagement&version=0.0.3&prerelease
+#addin nuget:?package=OpenFeature.Contrib.Provider.FeatureManagement&version=0.0.4&prerelease
 
 // Install OpenFeature.Contrib.Provider.FeatureManagement as a Cake Tool
-#tool nuget:?package=OpenFeature.Contrib.Provider.FeatureManagement&version=0.0.3&prerelease
+#tool nuget:?package=OpenFeature.Contrib.Provider.FeatureManagement&version=0.0.4&prerelease
 ```
 <!--- {x-release-please-end} -->
 
