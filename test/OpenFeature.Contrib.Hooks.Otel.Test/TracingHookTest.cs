@@ -38,7 +38,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-            var hookTask = otelHook.After<string>(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
+            var hookTask = otelHook.AfterAsync<string>(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
 
             Assert.True(hookTask.IsCompleted);
 
@@ -99,7 +99,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-            var hookTask = otelHook.After<string>(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
+            var hookTask = otelHook.AfterAsync<string>(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
 
             Assert.True(hookTask.IsCompleted);
 
@@ -132,7 +132,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-            var hookTask = otelHook.Error<string>(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
+            var hookTask = otelHook.ErrorAsync<string>(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
 
             Assert.True(hookTask.IsCompleted);
 
@@ -181,7 +181,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
 
             var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-            var hookTask = otelHook.Error<string>(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
+            var hookTask = otelHook.ErrorAsync<string>(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
 
             Assert.True(hookTask.IsCompleted);
 

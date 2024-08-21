@@ -65,7 +65,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var date = DateTime.Now;
             flags.GetFeatureValue("example-feature").Returns("true");
             flags.IsFeatureEnabled("example-feature").Returns(true);
-            flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count == 6 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
+            flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count > 6 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
 
             var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
@@ -79,7 +79,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
                 .Set("key6", 1.0)
                 .SetTargetingKey("233");
             // Act
-            var result = await flagsmithProvider.ResolveBooleanValue("example-feature", false, contextBuilder.Build());
+            var result = await flagsmithProvider.ResolveBooleanValueAsync("example-feature", false, contextBuilder.Build());
 
             // Assert
             Assert.True(result.Value);
@@ -107,7 +107,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         [InlineData(false, true, "false", false, "DISABLED", false)]
         [InlineData(true, false, "false", false, null, false)]
         [InlineData(false, false, "false", false, null, false)]
-        public async Task GetBooleanValue_ForEnabledFeatureWithValidFormatAndSettedConfigValue_ReturnExpectedResult(
+        public async Task GetBooleanValueAsync_ForEnabledFeatureWithValidFormatAndSettedConfigValue_ReturnExpectedResult(
             bool defaultValue,
             bool enabledValueConfig,
             string settedValue,
@@ -127,7 +127,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
-            var result = await flagsmithProvider.ResolveBooleanValue("example-feature", defaultValue);
+            var result = await flagsmithProvider.ResolveBooleanValueAsync("example-feature", defaultValue);
 
             // Assert
             Assert.Equal(expectedResult, result.Value);
@@ -137,7 +137,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public async Task GetBooleanValue_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
+        public async Task GetBooleanValueAsync_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -152,12 +152,12 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
-            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveBooleanValue("example-feature", true));
+            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveBooleanValueAsync("example-feature", true));
         }
 
 
         [Fact]
-        public async Task GetDoubleValue_ForEnabledFeatureWithValidFormat_ReturnCorrectValue()
+        public async Task GetDoubleValueAsync_ForEnabledFeatureWithValidFormat_ReturnCorrectValue()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -171,7 +171,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
-            var result = await flagsmithProvider.ResolveDoubleValue("example-feature", 32.22);
+            var result = await flagsmithProvider.ResolveDoubleValueAsync("example-feature", 32.22);
 
             // Assert
             Assert.Equal(32.334, result.Value);
@@ -182,7 +182,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
 
 
         [Fact]
-        public async Task GetDoubleValue_ForDisabledFeatureWithValidFormat_ReturnDefaultValue()
+        public async Task GetDoubleValueAsync_ForDisabledFeatureWithValidFormat_ReturnDefaultValue()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -195,7 +195,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
-            var result = await flagsmithProvider.ResolveDoubleValue("example-feature", -32.22);
+            var result = await flagsmithProvider.ResolveDoubleValueAsync("example-feature", -32.22);
 
             // Assert
             Assert.Equal(-32.22, result.Value);
@@ -205,7 +205,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public async Task GetDoubleValue_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
+        public async Task GetDoubleValueAsync_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -218,13 +218,13 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
-            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveDoubleValue("example-feature", 2222.22133));
+            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveDoubleValueAsync("example-feature", 2222.22133));
         }
 
 
 
         [Fact]
-        public async Task GetStringValue_ForEnabledFeatureWithValidFormat_ReturnCorrectValue()
+        public async Task GetStringValueAsync_ForEnabledFeatureWithValidFormat_ReturnCorrectValue()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -237,7 +237,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
-            var result = await flagsmithProvider.ResolveStringValue("example-feature", "example");
+            var result = await flagsmithProvider.ResolveStringValueAsync("example-feature", "example");
 
             // Assert
             Assert.Equal("example", result.Value);
@@ -248,7 +248,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
 
 
         [Fact]
-        public async Task GetStringValue_ForDisabledFeatureWithValidFormat_ReturnDefaultValue()
+        public async Task GetStringValueAsync_ForDisabledFeatureWithValidFormat_ReturnDefaultValue()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -261,7 +261,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
-            var result = await flagsmithProvider.ResolveStringValue("example-feature", "3333a");
+            var result = await flagsmithProvider.ResolveStringValueAsync("example-feature", "3333a");
 
             // Assert
             Assert.Equal("3333a", result.Value);
@@ -285,7 +285,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
-            var result = await flagsmithProvider.ResolveIntegerValue("example-feature", 32);
+            var result = await flagsmithProvider.ResolveIntegerValueAsync("example-feature", 32);
 
             // Assert
             Assert.Equal(232, result.Value);
@@ -308,7 +308,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
-            var result = await flagsmithProvider.ResolveIntegerValue("example-feature", -32);
+            var result = await flagsmithProvider.ResolveIntegerValueAsync("example-feature", -32);
 
             // Assert
             Assert.Equal(-32, result.Value);
@@ -331,11 +331,11 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
-            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveIntegerValue("example-feature", 2222));
+            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveIntegerValueAsync("example-feature", 2222));
         }
 
         [Fact]
-        public async Task GetStructureValue_ForEnabledFeatureWithValidFormat_ReturnCorrectValue()
+        public async Task GetStructureValueAsync_ForEnabledFeatureWithValidFormat_ReturnCorrectValue()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -382,7 +382,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             // Act
             var defaultObject = new Value(Structure.Empty);
 
-            var result = await flagsmithProvider.ResolveStructureValue("example-feature", defaultObject);
+            var result = await flagsmithProvider.ResolveStructureValueAsync("example-feature", defaultObject);
 
             // Assert
             var glossary = result.Value.AsStructure.GetValue("glossary");
@@ -409,7 +409,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public async Task GetStructureValue_ForDisabledFeatureWithValidFormat_ReturnDefaultValue()
+        public async Task GetStructureValueAsync_ForDisabledFeatureWithValidFormat_ReturnDefaultValue()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -423,7 +423,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act
-            var result = await flagsmithProvider.ResolveStructureValue("example-feature", defaultObject);
+            var result = await flagsmithProvider.ResolveStructureValueAsync("example-feature", defaultObject);
 
             // Assert
             Assert.Equal(defaultObject, result.Value);
@@ -433,7 +433,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
         }
 
         [Fact]
-        public async Task GetStructureValue_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
+        public async Task GetStructureValueAsync_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
         {
             // Arrange
             var flagsmithClient = Substitute.For<IFlagsmithClient>();
@@ -447,7 +447,7 @@ namespace OpenFeature.Contrib.Providers.Flagsmith.Test
             var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
 
             // Act and Assert
-            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveStructureValue("example-feature", defaultObject));
+            await Assert.ThrowsAsync<TypeMismatchException>(() => flagsmithProvider.ResolveStructureValueAsync("example-feature", defaultObject));
         }
     }
 }

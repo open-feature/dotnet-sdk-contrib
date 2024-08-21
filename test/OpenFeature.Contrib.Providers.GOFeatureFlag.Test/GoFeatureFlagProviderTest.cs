@@ -145,7 +145,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetBooleanDetails("fail_500", false, _defaultEvaluationCtx);
+        var res = client.GetBooleanDetailsAsync("fail_500", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.False(res.Result.Value);
         Assert.Equal(ErrorType.General, res.Result.ErrorType);
@@ -163,7 +163,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetBooleanDetails("api_key_missing", false, _defaultEvaluationCtx);
+        var res = client.GetBooleanDetailsAsync("api_key_missing", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.False(res.Result.Value);
         Assert.Equal(Reason.Error, res.Result.Reason);
@@ -182,7 +182,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetBooleanDetails("invalid_api_key", false, _defaultEvaluationCtx);
+        var res = client.GetBooleanDetailsAsync("invalid_api_key", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.False(res.Result.Value);
         Assert.Equal(Reason.Error, res.Result.Reason);
@@ -200,7 +200,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetBooleanDetails("flag_not_found", false, _defaultEvaluationCtx);
+        var res = client.GetBooleanDetailsAsync("flag_not_found", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.False(res.Result.Value);
         Assert.Equal(ErrorType.FlagNotFound, res.Result.ErrorType);
@@ -218,7 +218,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetBooleanDetails("string_key", false, _defaultEvaluationCtx);
+        var res = client.GetBooleanDetailsAsync("string_key", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.False(res.Result.Value);
         Assert.Equal(ErrorType.TypeMismatch, res.Result.ErrorType);
@@ -236,7 +236,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetBooleanDetails("bool_targeting_match", false, _defaultEvaluationCtx);
+        var res = client.GetBooleanDetailsAsync("bool_targeting_match", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.True(res.Result.Value);
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
@@ -255,7 +255,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetBooleanDetails("unknown_reason", false, _defaultEvaluationCtx);
+        var res = client.GetBooleanDetailsAsync("unknown_reason", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.True(res.Result.Value);
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
@@ -274,7 +274,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetBooleanDetails("disabled", false, _defaultEvaluationCtx);
+        var res = client.GetBooleanDetailsAsync("disabled", false, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.False(res.Result.Value);
         Assert.Equal(Reason.Disabled, res.Result.Reason);
@@ -291,7 +291,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetStringDetails("bool_targeting_match", "default", _defaultEvaluationCtx);
+        var res = client.GetStringDetailsAsync("bool_targeting_match", "default", _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal("default", res.Result.Value);
         Assert.Equal(ErrorType.TypeMismatch, res.Result.ErrorType);
@@ -309,7 +309,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetStringDetails("string_key", "defaultValue", _defaultEvaluationCtx);
+        var res = client.GetStringDetailsAsync("string_key", "defaultValue", _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal("CC0000", res.Result.Value);
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
@@ -328,7 +328,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetStringDetails("disabled_string", "defaultValue", _defaultEvaluationCtx);
+        var res = client.GetStringDetailsAsync("disabled_string", "defaultValue", _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal("defaultValue", res.Result.Value);
         Assert.Equal(Reason.Disabled, res.Result.Reason);
@@ -345,7 +345,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetIntegerDetails("string_key", 200, _defaultEvaluationCtx);
+        var res = client.GetIntegerDetailsAsync("string_key", 200, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(200, res.Result.Value);
         Assert.Equal(ErrorType.TypeMismatch, res.Result.ErrorType);
@@ -363,7 +363,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetIntegerDetails("integer_key", 1200, _defaultEvaluationCtx);
+        var res = client.GetIntegerDetailsAsync("integer_key", 1200, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(100, res.Result.Value);
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
@@ -382,7 +382,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetIntegerDetails("disabled_integer", 1225, _defaultEvaluationCtx);
+        var res = client.GetIntegerDetailsAsync("disabled_integer", 1225, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(1225, res.Result.Value);
         Assert.Equal(Reason.Disabled, res.Result.Reason);
@@ -399,7 +399,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetIntegerDetails("double_key", 200, _defaultEvaluationCtx);
+        var res = client.GetIntegerDetailsAsync("double_key", 200, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(200, res.Result.Value);
         Assert.Equal(ErrorType.TypeMismatch, res.Result.ErrorType);
@@ -417,7 +417,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetDoubleDetails("double_key", 1200.25, _defaultEvaluationCtx);
+        var res = client.GetDoubleDetailsAsync("double_key", 1200.25, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(100.25, res.Result.Value);
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
@@ -436,7 +436,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetDoubleDetails("disabled_double", 1225.34, _defaultEvaluationCtx);
+        var res = client.GetDoubleDetailsAsync("disabled_double", 1225.34, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(1225.34, res.Result.Value);
         Assert.Equal(Reason.Disabled, res.Result.Reason);
@@ -453,7 +453,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetObjectDetails("object_key", null, _defaultEvaluationCtx);
+        var res = client.GetObjectDetailsAsync("object_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         var want = JsonSerializer.Serialize(new Value(new Structure(new Dictionary<string, Value>
         {
@@ -477,7 +477,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetObjectDetails("string_key", null, _defaultEvaluationCtx);
+        var res = client.GetObjectDetailsAsync("string_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(new Value("CC0000").AsString, res.Result.Value.AsString);
         Assert.Equal(ErrorType.None, res.Result.ErrorType);
@@ -496,7 +496,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetObjectDetails("disabled_object", new Value("default"), _defaultEvaluationCtx);
+        var res = client.GetObjectDetailsAsync("disabled_object", new Value("default"), _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(new Value("default").AsString, res.Result.Value.AsString);
         Assert.Equal(Reason.Disabled, res.Result.Reason);
@@ -514,7 +514,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetStringDetails("list_key", "empty", EvaluationContext.Empty);
+        var res = client.GetStringDetailsAsync("list_key", "empty", EvaluationContext.Empty);
         Assert.NotNull(res.Result);
         Assert.Equal("empty", res.Result.Value);
         Assert.Equal(ErrorType.InvalidContext, res.Result.ErrorType);
@@ -532,7 +532,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetObjectDetails("list_key", null, _defaultEvaluationCtx);
+        var res = client.GetObjectDetailsAsync("list_key", null, _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         var want = JsonSerializer.Serialize(new Value(new List<Value>
             { new("test"), new("test1"), new("test2"), new("false"), new("test3") }));
@@ -553,7 +553,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetObjectDetails("does_not_exists", new Value("default"), _defaultEvaluationCtx);
+        var res = client.GetObjectDetailsAsync("does_not_exists", new Value("default"), _defaultEvaluationCtx);
         Assert.NotNull(res.Result);
         Assert.Equal(new Value("default").AsString, res.Result.Value.AsString);
         Assert.Equal(Reason.Error, res.Result.Reason);

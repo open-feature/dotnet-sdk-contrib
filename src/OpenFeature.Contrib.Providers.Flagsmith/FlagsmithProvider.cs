@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Trait = Flagsmith.Trait;
 using OpenFeature.Error;
 using System.Globalization;
+using System.Threading;
 
 namespace OpenFeature.Contrib.Providers.Flagsmith
 {
@@ -108,27 +109,27 @@ namespace OpenFeature.Contrib.Providers.Flagsmith
 
         /// <inheritdoc/>
 
-        public override Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
             => Configuration.UsingBooleanConfigValue
             ? ResolveValue(flagKey, defaultValue, bool.TryParse, context)
             : IsFeatureEnabled(flagKey, context);
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
             => ResolveValue(flagKey, defaultValue, int.TryParse, context);
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
             => ResolveValue(flagKey, defaultValue, (string x, out double y) => double.TryParse(x, NumberStyles.Any, CultureInfo.InvariantCulture, out y), context);
 
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
             => ResolveValue(flagKey, defaultValue, (string x, out string y) => { y = x; return true; }, context);
 
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
             => ResolveValue(flagKey, defaultValue, TryParseValue, context);
 
         private bool TryParseValue(string stringValue, out Value result)

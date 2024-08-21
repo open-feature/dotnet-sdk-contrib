@@ -1,6 +1,6 @@
 # Statsig Feature Flag .NET Provider
 
-The Statsig Flag provider allows you to connect to Statsig. Please note this is a minimal implementation - only `ResolveBooleanValue` is implemented.
+The Statsig Flag provider allows you to connect to Statsig. Please note this is a minimal implementation - only `ResolveBooleanValueAsync` is implemented.
 
 # .Net SDK usage
 
@@ -61,7 +61,7 @@ eb.SetTargetingKey("john@doe.acme");
 
 IFeatureClient client = Api.Instance.GetClient(context: eb.Build());
 
-bool isMyAwesomeFeatureEnabled = await client.GetBooleanValue("isMyAwesomeFeatureEnabled", false);
+bool isMyAwesomeFeatureEnabled = await client.GetBooleanValueAsync("isMyAwesomeFeatureEnabled", false);
 
 if (isMyAwesomeFeatureEnabled)
 {
@@ -97,4 +97,4 @@ The following parameters are mapped to the corresponding Statsig pre-defined par
 | `privateAttributes`   | `PrivateAttributes`       |
 
 ## Known issues and limitations
-- Only `ResolveBooleanValue` implemented for now
+- Only `ResolveBooleanValueAsync` implemented for now

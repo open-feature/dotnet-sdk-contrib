@@ -88,7 +88,7 @@ var userContext = EvaluationContext.Builder()
     .Set("anonymous", false)
     .Build();
 
-var adminFlag = await client.GetBooleanValue("flag-only-for-admin", false, userContext);
+var adminFlag = await client.GetBooleanValueAsync("flag-only-for-admin", false, userContext);
 if (adminFlag) {
    // flag "flag-only-for-admin" is true for the user
 } else {

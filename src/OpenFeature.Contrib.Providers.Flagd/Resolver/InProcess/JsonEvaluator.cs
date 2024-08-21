@@ -122,27 +122,27 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             }
         }
 
-        public ResolutionDetails<bool> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<bool> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        public ResolutionDetails<string> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<string> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        public ResolutionDetails<int> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<int> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        public ResolutionDetails<double> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<double> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        public ResolutionDetails<Value> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<Value> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }

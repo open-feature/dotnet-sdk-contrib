@@ -7,6 +7,7 @@ using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
 using OpenFeature.Constant;
 using System.Diagnostics.Tracing;
+using System.Threading;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 {
@@ -17,9 +18,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
     {
         const string ProviderName = "flagd Provider";
         private readonly FlagdConfig _config;
-        private ProviderStatus _status = ProviderStatus.NotReady;
         private readonly Metadata _providerMetadata = new Metadata(ProviderName);
-
         private readonly Resolver.Resolver _resolver;
 
         /// <summary>
@@ -85,12 +84,6 @@ namespace OpenFeature.Contrib.Providers.Flagd
             _resolver.Init();
         }
 
-        /// <inheritdoc/>
-        public override ProviderStatus GetStatus()
-        {
-            return _status;
-        }
-
         // just for testing, internal but visible in tests
         internal FlagdConfig GetConfig() => _config;
 
@@ -113,91 +106,58 @@ namespace OpenFeature.Contrib.Providers.Flagd
         internal Resolver.Resolver GetResolver() => _resolver;
 
         /// <inheritdoc/>
-        public override Task Initialize(EvaluationContext context)
+        public override Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)
         {
             return Task.Run(async () =>
             {
                 await _resolver.Init();
-                _status = ProviderStatus.Ready;
             }).ContinueWith((t) =>
             {
                 if (t.IsFaulted)
                 {
-                    _status = ProviderStatus.Error;
                     throw t.Exception;
                 };
             });
         }
 
         /// <inheritdoc/>
-        public override Task Shutdown()
+        public override Task ShutdownAsync(CancellationToken cancellationToken = default)
         {
             return _resolver.Shutdown().ContinueWith((t) =>
             {
-                _status = ProviderStatus.NotReady;
                 if (t.IsFaulted) throw t.Exception;
             });
         }
 
-        /// <summary>
-        ///     ResolveBooleanValue resolve the value for a Boolean Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
+        /// <inheritdoc/>
+        public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            return await _resolver.ResolveBooleanValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveBooleanValueAsync(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
-        /// <summary>
-        ///     ResolveStringValue resolve the value for a string Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
+        /// <inheritdoc/>
+        public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            return await _resolver.ResolveStringValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveStringValueAsync(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
-        /// <summary>
-        ///     ResolveIntegerValue resolve the value for an int Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
+        /// <inheritdoc/>
+        public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
 
-            return await _resolver.ResolveIntegerValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveIntegerValueAsync(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
-        /// <summary>
-        ///     ResolveDoubleValue resolve the value for a double Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
+        /// <inheritdoc/>
+        public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            return await _resolver.ResolveDoubleValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveDoubleValueAsync(flagKey, defaultValue, context).ConfigureAwait(false);
         }
 
-        /// <summary>
-        ///     ResolveStructureValue resolve the value for a Boolean Flag.
-        /// </summary>
-        /// <param name="flagKey">Name of the flag</param>
-        /// <param name="defaultValue">Default value used in case of error.</param>
-        /// <param name="context">Context about the user</param>
-        /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-        public override async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        /// <inheritdoc/>
+        public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            return await _resolver.ResolveStructureValue(flagKey, defaultValue, context).ConfigureAwait(false);
+            return await _resolver.ResolveStructureValueAsync(flagKey, defaultValue, context).ConfigureAwait(false);
         }
     }
 }

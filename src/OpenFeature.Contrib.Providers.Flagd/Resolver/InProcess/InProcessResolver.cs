@@ -76,29 +76,29 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             });
         }
 
-        public Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
+        public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
-            return Task.FromResult(_evaluator.ResolveBooleanValue(flagKey, defaultValue, context));
+            return Task.FromResult(_evaluator.ResolveBooleanValueAsync(flagKey, defaultValue, context));
         }
 
-        public Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
+        public Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
         {
-            return Task.FromResult(_evaluator.ResolveStringValue(flagKey, defaultValue, context));
+            return Task.FromResult(_evaluator.ResolveStringValueAsync(flagKey, defaultValue, context));
         }
 
-        public Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
+        public Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
         {
-            return Task.FromResult(_evaluator.ResolveIntegerValue(flagKey, defaultValue, context));
+            return Task.FromResult(_evaluator.ResolveIntegerValueAsync(flagKey, defaultValue, context));
         }
 
-        public Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
+        public Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
         {
-            return Task.FromResult(_evaluator.ResolveDoubleValue(flagKey, defaultValue, context));
+            return Task.FromResult(_evaluator.ResolveDoubleValueAsync(flagKey, defaultValue, context));
         }
 
-        public Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
-            return Task.FromResult(_evaluator.ResolveStructureValue(flagKey, defaultValue, context));
+            return Task.FromResult(_evaluator.ResolveStructureValueAsync(flagKey, defaultValue, context));
         }
 
         private async void HandleEvents(CountdownEvent latch)

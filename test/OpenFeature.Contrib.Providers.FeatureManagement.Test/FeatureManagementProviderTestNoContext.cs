@@ -19,7 +19,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Invert the expected value to ensure that the value is being read from the configuration
-            var result = await provider.ResolveBooleanValue(key, defaultValue);
+            var result = await provider.ResolveBooleanValueAsync(key, defaultValue);
 
             // Assert
             Assert.Equal(expectedValue, result.Value);
@@ -37,7 +37,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0.0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveDoubleValue(key, defaultValue);
+            var result = await provider.ResolveDoubleValueAsync(key, defaultValue);
 
             // Assert
             Assert.Equal(expectedValue, result.Value);
@@ -55,7 +55,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveIntegerValue(key, defaultValue);
+            var result = await provider.ResolveIntegerValueAsync(key, defaultValue);
 
             // Assert
             Assert.Equal(expectedValue, result.Value);
@@ -73,7 +73,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveStringValue(key, defaultValue);
+            var result = await provider.ResolveStringValueAsync(key, defaultValue);
 
             // Assert
             Assert.Equal(expectedValue, result.Value);
@@ -91,7 +91,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveStructureValue(key, null);
+            var result = await provider.ResolveStructureValueAsync(key, null);
 
             // Assert
             Assert.NotNull(result);

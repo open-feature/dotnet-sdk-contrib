@@ -9,19 +9,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver
         Task Init();
         Task Shutdown();
 
-        Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue,
+        Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
             EvaluationContext context = null);
 
-        Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue,
+        Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
             EvaluationContext context = null);
 
-        Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue,
+        Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue,
             EvaluationContext context = null);
 
-        Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue,
+        Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
             EvaluationContext context = null);
 
-        Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue,
+        Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
             EvaluationContext context = null);
     }
 }

@@ -79,7 +79,7 @@ var context = EvaluationContext.Builder()
     .Build();
 
 // Evaluate a flag
-var val = await client.GetBooleanValue("myBoolFlag", false, context);
+var val = await client.GetBooleanValueAsync("myBoolFlag", false, context);
 
 // Print the value of the 'myBoolFlag' feature flag
 Console.WriteLine(val);
