@@ -38,32 +38,32 @@ namespace OpenFeature.Contrib.ConfigCat
         /// <inheritdoc/>
         public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            return ResolveFlag(flagKey, context, defaultValue);
+            return ResolveFlag(flagKey, context, defaultValue, cancellationToken);
         }
 
         /// <inheritdoc/>
         public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            return ResolveFlag(flagKey, context, defaultValue);
+            return ResolveFlag(flagKey, context, defaultValue, cancellationToken);
         }
 
         /// <inheritdoc/>
         public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            return ResolveFlag(flagKey, context, defaultValue);
+            return ResolveFlag(flagKey, context, defaultValue, cancellationToken);
         }
 
         /// <inheritdoc/>
         public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            return ResolveFlag(flagKey, context, defaultValue);
+            return ResolveFlag(flagKey, context, defaultValue, cancellationToken);
         }
 
         /// <inheritdoc/>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             var user = context?.BuildUser();
-            var result = await Client.GetValueDetailsAsync(flagKey, defaultValue?.AsObject, user);
+            var result = await Client.GetValueDetailsAsync(flagKey, defaultValue?.AsObject, user, cancellationToken);
             var returnValue = result.IsDefaultValue ? defaultValue : new Value(result.Value);
             var details = new ResolutionDetails<Value>(flagKey, returnValue, TranslateErrorCode(result.ErrorCode), errorMessage: result.ErrorMessage, variant: result.VariationId);
             if (details.ErrorType == ErrorType.None)
@@ -74,10 +74,10 @@ namespace OpenFeature.Contrib.ConfigCat
             throw new FeatureProviderException(details.ErrorType, details.ErrorMessage);
         }
 
-        private async Task<ResolutionDetails<T>> ResolveFlag<T>(string flagKey, EvaluationContext context, T defaultValue)
+        private async Task<ResolutionDetails<T>> ResolveFlag<T>(string flagKey, EvaluationContext context, T defaultValue, CancellationToken cancellationToken)
         {
             var user = context?.BuildUser();
-            var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user);
+            var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user, cancellationToken);
             var details = new ResolutionDetails<T>(flagKey, result.Value, TranslateErrorCode(result.ErrorCode), errorMessage: result.ErrorMessage, variant: result.VariationId);
             if (details.ErrorType == ErrorType.None)
             {
