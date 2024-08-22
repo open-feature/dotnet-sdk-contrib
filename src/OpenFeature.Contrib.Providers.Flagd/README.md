@@ -67,7 +67,7 @@ namespace OpenFeatureTestApp
 
             var client = OpenFeature.Api.Instance.GetClient("my-app");
 
-            var val = client.GetBooleanValue("myBoolFlag", false, null);
+            var val = client.GetBooleanValueAsync("myBoolFlag", false, null);
 
             // Print the value of the 'myBoolFlag' feature flag
             System.Console.WriteLine(val.Result.ToString());
@@ -151,7 +151,7 @@ namespace OpenFeatureTestApp
 
             var client = OpenFeature.Api.Instance.GetClient("my-app");
 
-            var val = client.GetBooleanValue("myBoolFlag", false, null);
+            var val = client.GetBooleanValueAsync("myBoolFlag", false, null);
 
             // Print the value of the 'myBoolFlag' feature flag
             System.Console.WriteLine(val.Result.ToString());

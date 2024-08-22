@@ -38,7 +38,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
             var provider = new FeatureManagementProvider(configuration);
 
             // Act
-            var result = await provider.ResolveBooleanValue("MissingFlagKey", defaultValue, evaluationContext);
+            var result = await provider.ResolveBooleanValueAsync("MissingFlagKey", defaultValue, evaluationContext);
 
             // Assert
             Assert.Equal(defaultValue, result.Value);
@@ -57,7 +57,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
             var provider = new FeatureManagementProvider(configuration);
 
             // Act
-            var result = await provider.ResolveBooleanValue(key, defaultValue, evaluationContext);
+            var result = await provider.ResolveBooleanValueAsync(key, defaultValue, evaluationContext);
 
             // Assert
             Assert.Equal(expectedValue, result.Value);
@@ -76,7 +76,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0.0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveDoubleValue(key, defaultValue, evaluationContext);
+            var result = await provider.ResolveDoubleValueAsync(key, defaultValue, evaluationContext);
 
             // Assert
             Assert.Equal(expectedValue, result.Value);
@@ -95,7 +95,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveIntegerValue(key, defaultValue, evaluationContext);
+            var result = await provider.ResolveIntegerValueAsync(key, defaultValue, evaluationContext);
 
             // Assert
             Assert.Equal(expectedValue, result.Value);
@@ -114,7 +114,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 
             // Act
             // Using 0 for the default to verify the value is being read from the configuration
-            var result = await provider.ResolveStringValue(key, defaultValue, evaluationContext);
+            var result = await provider.ResolveStringValueAsync(key, defaultValue, evaluationContext);
 
             // Assert
             Assert.Equal(expectedValue, result.Value);
@@ -132,7 +132,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
             var provider = new FeatureManagementProvider(configuration);
 
             // Act
-            var result = await provider.ResolveStructureValue(key, null, evaluationContext);
+            var result = await provider.ResolveStructureValueAsync(key, null, evaluationContext);
 
             // Assert
             Assert.NotNull(result);
@@ -153,7 +153,7 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
             var provider = new FeatureManagementProvider(configuration);
 
             // Act
-            var result = await provider.ResolveStructureValue(key, null, evaluationContext);
+            var result = await provider.ResolveStructureValueAsync(key, null, evaluationContext);
 
             // Assert
             Assert.NotNull(result);

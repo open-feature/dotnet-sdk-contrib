@@ -33,7 +33,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
             var otelHook = new MetricsHook();
 
             // Act
-            await otelHook.After(hookContext, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
+            await otelHook.AfterAsync(hookContext, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
 
             // Flush metrics
             meterProvider.ForceFlush();
@@ -57,7 +57,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
             var otelHook = new MetricsHook();
 
             // Act
-            await otelHook.Error(hookContext, new Exception(), new Dictionary<string, object>());
+            await otelHook.ErrorAsync(hookContext, new Exception(), new Dictionary<string, object>());
 
             // Flush metrics
             meterProvider.ForceFlush();
@@ -81,7 +81,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
             var otelHook = new MetricsHook();
 
             // Act
-            await otelHook.Finally(hookContext, new Dictionary<string, object>());
+            await otelHook.FinallyAsync(hookContext, new Dictionary<string, object>());
 
             // Flush metrics
             meterProvider.ForceFlush();
@@ -107,7 +107,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
             var otelHook = new MetricsHook();
 
             // Act
-            await otelHook.Before(hookContext, new Dictionary<string, object>());
+            await otelHook.BeforeAsync(hookContext, new Dictionary<string, object>());
 
             // Flush metrics
             meterProvider.ForceFlush();

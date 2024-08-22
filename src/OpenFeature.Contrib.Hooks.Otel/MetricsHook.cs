@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
 
@@ -36,17 +37,8 @@ namespace OpenFeature.Contrib.Hooks.Otel
             _evaluationErrorCounter = meter.CreateCounter<long>(MetricsConstants.ErrorTotalName, description: MetricsConstants.ErrorDescription);
         }
 
-        /// <summary>
-        /// Executes before the flag evaluation and captures metrics related to the evaluation.
-        /// The metrics are captured in the following order:
-        /// 1. The active count is incremented. (feature_flag.evaluation_active_count)
-        /// 2. The request count is incremented. (feature_flag.evaluation_requests_total)
-        /// </summary>
-        /// <typeparam name="T">The type of the flag value.</typeparam>
-        /// <param name="context">The hook context.</param>
-        /// <param name="hints">The optional hints.</param>
-        /// <returns>The evaluation context.</returns>
-        public override Task<EvaluationContext> Before<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null)
+        /// <inheritdoc/>
+        public override ValueTask<EvaluationContext> BeforeAsync<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
         {
             var tagList = new TagList
             {
@@ -57,21 +49,12 @@ namespace OpenFeature.Contrib.Hooks.Otel
             _evaluationActiveUpDownCounter.Add(1, tagList);
             _evaluationRequestCounter.Add(1, tagList);
 
-            return base.Before(context, hints);
+            return base.BeforeAsync(context, hints);
         }
 
 
-        /// <summary>
-        /// Executes after the flag evaluation and captures metrics related to the evaluation.
-        /// The metrics are captured in the following order:
-        /// 1. The success count is incremented. (feature_flag.evaluation_success_total)
-        /// </summary>
-        /// <typeparam name="T">The type of the flag value.</typeparam>
-        /// <param name="context">The hook context.</param>
-        /// <param name="details">The flag evaluation details.</param>
-        /// <param name="hints">The optional hints.</param>
-        /// <returns>The evaluation context.</returns>
-        public override Task After<T>(HookContext<T> context, FlagEvaluationDetails<T> details, IReadOnlyDictionary<string, object> hints = null)
+        /// <inheritdoc/>
+        public override ValueTask AfterAsync<T>(HookContext<T> context, FlagEvaluationDetails<T> details, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
         {
             var tagList = new TagList
             {
@@ -83,20 +66,11 @@ namespace OpenFeature.Contrib.Hooks.Otel
 
             _evaluationSuccessCounter.Add(1, tagList);
 
-            return base.After(context, details, hints);
+            return base.AfterAsync(context, details, hints);
         }
 
-        /// <summary>
-        /// Executes when an error occurs during flag evaluation and captures metrics related to the error.
-        /// The metrics are captured in the following order:
-        /// 1. The error count is incremented. (feature_flag.evaluation_error_total)
-        /// </summary>
-        /// <typeparam name="T">The type of the flag value.</typeparam>
-        /// <param name="context">The hook context.</param>
-        /// <param name="error">The exception that occurred.</param>
-        /// <param name="hints">The optional hints.</param>
-        /// <returns>The evaluation context.</returns>
-        public override Task Error<T>(HookContext<T> context, Exception error, IReadOnlyDictionary<string, object> hints = null)
+        /// <inheritdoc/>
+        public override ValueTask ErrorAsync<T>(HookContext<T> context, Exception error, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
         {
             var tagList = new TagList
             {
@@ -107,18 +81,11 @@ namespace OpenFeature.Contrib.Hooks.Otel
 
             _evaluationErrorCounter.Add(1, tagList);
 
-            return base.Error(context, error, hints);
+            return base.ErrorAsync(context, error, hints);
         }
 
-        /// <summary>
-        /// Executes after the flag evaluation is complete and captures metrics related to the evaluation.
-        /// The active count is decremented. (feature_flag.evaluation_active_count)
-        /// </summary>
-        /// <typeparam name="T">The type of the flag value.</typeparam>
-        /// <param name="context">The hook context.</param>
-        /// <param name="hints">The optional hints.</param>
-        /// <returns>The evaluation context.</returns>
-        public override Task Finally<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null)
+        /// <inheritdoc/>
+        public override ValueTask FinallyAsync<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
         {
             var tagList = new TagList
             {
@@ -128,7 +95,7 @@ namespace OpenFeature.Contrib.Hooks.Otel
 
             _evaluationActiveUpDownCounter.Add(-1, tagList);
 
-            return base.Finally(context, hints);
+            return base.FinallyAsync(context, hints);
         }
     }
 }

@@ -60,7 +60,7 @@ namespace OpenFeatureTestApp
 
             var client = OpenFeature.Api.Instance.GetClient();
 
-            var val = client.GetBooleanValue("isMyAwesomeFeatureEnabled", false);
+            var val = client.GetBooleanValueAsync("isMyAwesomeFeatureEnabled", false);
 
             if(isMyAwesomeFeatureEnabled)
             {

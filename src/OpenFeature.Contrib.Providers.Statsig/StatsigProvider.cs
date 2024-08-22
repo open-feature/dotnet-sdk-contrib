@@ -4,6 +4,7 @@ using Statsig;
 using Statsig.Server;
 using Statsig.Server.Evaluation;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenFeature.Contrib.Providers.Statsig
@@ -21,7 +22,6 @@ namespace OpenFeature.Contrib.Providers.Statsig
     /// </example>
     public sealed class StatsigProvider : FeatureProvider
     {
-        volatile bool initialized = false;
         private readonly Metadata _providerMetadata = new Metadata("Statsig provider");
         private readonly string _sdkKey = "secret-"; //Dummy sdk key that works with local mode
         internal readonly ServerDriver ServerDriver;
@@ -44,7 +44,7 @@ namespace OpenFeature.Contrib.Providers.Statsig
         public override Metadata GetMetadata() => _providerMetadata;
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             var result = ServerDriver.GetFeatureGate(context.AsStatsigUser(), flagKey);
             var gateFound = false;
@@ -77,47 +77,37 @@ namespace OpenFeature.Contrib.Providers.Statsig
         }
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public override Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public override Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public override ProviderStatus GetStatus()
+        public override async Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)
         {
-            return initialized ? ProviderStatus.Ready : ProviderStatus.NotReady;
+            await ServerDriver.Initialize();
         }
 
         /// <inheritdoc/>
-        public override async Task Initialize(EvaluationContext context)
-        {
-            var initResult = await ServerDriver.Initialize();
-            if (initResult == InitializeResult.Success || initResult == InitializeResult.LocalMode || initResult == InitializeResult.AlreadyInitialized)
-            {
-                initialized = true;
-            }
-        }
-
-        /// <inheritdoc/>
-        public override Task Shutdown()
+        public override Task ShutdownAsync(CancellationToken cancellationToken = default)
         {
             return ServerDriver.Shutdown();
         }

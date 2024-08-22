@@ -90,7 +90,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         [When(@"a zero-value boolean flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
         public void WhenAZero_ValueBooleanFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
         {
-            booleanZeroValue = client.GetBooleanValue(flagKey, bool.Parse(defaultValueString));
+            booleanZeroValue = client.GetBooleanValueAsync(flagKey, bool.Parse(defaultValueString));
         }
 
         [Then(@"the resolved boolean zero-value should be ""(.*)""")]
@@ -102,7 +102,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         [When(@"a zero-value string flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
         public void WhenAZero_ValueStringFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
         {
-            stringZeroValue = client.GetStringValue(flagKey, defaultValueString);
+            stringZeroValue = client.GetStringValueAsync(flagKey, defaultValueString);
         }
 
         [Then(@"the resolved string zero-value should be ""(.*)""")]
@@ -114,7 +114,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         [When(@"a zero-value integer flag with key ""(.*)"" is evaluated with default value (.*)")]
         public void WhenAZero_ValueIntegerFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
         {
-            intZeroFlagValue = client.GetIntegerValue(flagKey, int.Parse(defaultValueString));
+            intZeroFlagValue = client.GetIntegerValueAsync(flagKey, int.Parse(defaultValueString));
         }
 
         [Then(@"the resolved integer zero-value should be (.*)")]
@@ -126,7 +126,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         [When(@"a zero-value float flag with key ""(.*)"" is evaluated with default value (.*)")]
         public void WhenAZero_ValueFloatFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, decimal defaultValue)
         {
-            doubleZeroFlagValue = client.GetDoubleValue(flagKey, decimal.ToDouble(defaultValue));
+            doubleZeroFlagValue = client.GetDoubleValueAsync(flagKey, decimal.ToDouble(defaultValue));
         }
 
         [Then(@"the resolved float zero-value should be (.*)")]
@@ -185,21 +185,21 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         [Then(@"the returned value should be ""(.*)""")]
         public async void ThenTheReturnedValueShouldBe(string expectedValue)
         {
-            var details = await client.GetStringDetails(stringFlagKey, stringDefaultValue, evaluationContext);
+            var details = await client.GetStringDetailsAsync(stringFlagKey, stringDefaultValue, evaluationContext);
             Assert.Equal(expectedValue, details.Value);
         }
 
         [Then(@"the returned value should be (.*)")]
         public async Task ThenTheReturnedValueShouldBeAsync(long expectedValue)
         {
-            var details = await client.GetIntegerDetails(intFlagKey, intDefaultValue, evaluationContext);
+            var details = await client.GetIntegerDetailsAsync(intFlagKey, intDefaultValue, evaluationContext);
             Assert.Equal(expectedValue, details.Value);
         }
 
         [Then(@"the returned reason should be ""(.*)""")]
         public async Task ThenTheReturnedReasonShouldBeAsync(string expectedReason)
         {
-            var details = await client.GetStringDetails(stringFlagKey, stringDefaultValue, evaluationContext);
+            var details = await client.GetStringDetailsAsync(stringFlagKey, stringDefaultValue, evaluationContext);
             Assert.Equal(expectedReason, details.Reason);
         }
 

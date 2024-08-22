@@ -73,7 +73,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             });
         }
 
-        public async Task<ResolutionDetails<bool>> ResolveBooleanValue(string flagKey, bool defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -92,7 +92,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }, context);
         }
 
-        public async Task<ResolutionDetails<string>> ResolveStringValue(string flagKey, string defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -111,7 +111,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }, context);
         }
 
-        public async Task<ResolutionDetails<int>> ResolveIntegerValue(string flagKey, int defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -130,7 +130,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }, context);
         }
 
-        public async Task<ResolutionDetails<double>> ResolveDoubleValue(string flagKey, double defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
@@ -149,7 +149,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc
             }, context);
         }
 
-        public async Task<ResolutionDetails<Value>> ResolveStructureValue(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
         {
             return await ResolveValue(flagKey, async contextStruct =>
             {
