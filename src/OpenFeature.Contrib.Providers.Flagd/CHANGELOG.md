@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.3...OpenFeature.Contrib.Providers.Flagd-v0.3.0) (2024-08-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* use (and require) OpenFeature SDK v2 ([#262](https://github.com/open-feature/dotnet-sdk-contrib/issues/262))
+
+### ✨ New Features
+
+* use (and require) OpenFeature SDK v2 ([#262](https://github.com/open-feature/dotnet-sdk-contrib/issues/262)) ([f845134](https://github.com/open-feature/dotnet-sdk-contrib/commit/f84513438586457087ac47fd40629912f2ec473a))
+
 ## [0.2.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.2...OpenFeature.Contrib.Providers.Flagd-v0.2.3) (2024-08-21)
 
 
