@@ -70,7 +70,7 @@ namespace OpenFeatureTestApp
 
             var client = OpenFeature.Api.Instance.GetClient();
 
-            var val = await client.GetBooleanValue("myBoolFlag", false, null);
+            var val = await client.GetBooleanValueAsync("myBoolFlag", false, null);
 
             System.Console.WriteLine(val.ToString());
         }

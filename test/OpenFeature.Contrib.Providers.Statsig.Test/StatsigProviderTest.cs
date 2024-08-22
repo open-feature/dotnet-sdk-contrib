@@ -15,54 +15,46 @@ public class StatsigProviderTest
         statsigProvider = new StatsigProvider("secret-", new StatsigServerOptions() { LocalMode = true });
     }
 
-    [Fact]
-    public async Task StatsigProvider_Initialized_HasCorrectStatusAsync()
-    {
-        Assert.Equal(ProviderStatus.NotReady, statsigProvider.GetStatus());
-        await statsigProvider.Initialize(null);
-        Assert.Equal(ProviderStatus.Ready, statsigProvider.GetStatus());
-    }
-
     [Theory]
     [InlineAutoData(true, true)]
     [InlineAutoData(false, false)]
-    public async Task GetBooleanValue_ForFeatureWithContext(bool flagValue, bool expectedValue, string userId, string flagName)
+    public async Task GetBooleanValueAsync_ForFeatureWithContext(bool flagValue, bool expectedValue, string userId, string flagName)
     {
         // Arrange
-        await statsigProvider.Initialize(null);
+        await statsigProvider.InitializeAsync(null);
         var ec = EvaluationContext.Builder().SetTargetingKey(userId).Build();
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue, userId);
 
         // Act & Assert
-        Assert.Equal(expectedValue, statsigProvider.ResolveBooleanValue(flagName, false, ec).Result.Value);
+        Assert.Equal(expectedValue, statsigProvider.ResolveBooleanValueAsync(flagName, false, ec).Result.Value);
     }
 
     [Theory]
     [InlineAutoData(true, false)]
     [InlineAutoData(false, false)]
-    public async Task GetBooleanValue_ForFeatureWithNoContext_ReturnsDefaultValue(bool flagValue, bool defaultValue, string flagName)
+    public async Task GetBooleanValueAsync_ForFeatureWithNoContext_ReturnsDefaultValue(bool flagValue, bool defaultValue, string flagName)
     {
         // Arrange
-        await statsigProvider.Initialize(null);
+        await statsigProvider.InitializeAsync(null);
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue);
 
         // Act & Assert
-        Assert.Equal(defaultValue, statsigProvider.ResolveBooleanValue(flagName, defaultValue).Result.Value);
+        Assert.Equal(defaultValue, statsigProvider.ResolveBooleanValueAsync(flagName, defaultValue).Result.Value);
     }
 
     [Theory]
     [AutoData]
     [InlineAutoData(false)]
     [InlineAutoData(true)]
-    public async Task GetBooleanValue_ForFeatureWithDefault(bool defaultValue, string flagName, string userId)
+    public async Task GetBooleanValueAsync_ForFeatureWithDefault(bool defaultValue, string flagName, string userId)
     {
         // Arrange
-        await statsigProvider.Initialize(null);
+        await statsigProvider.InitializeAsync(null);
 
         var ec = EvaluationContext.Builder().SetTargetingKey(userId).Build();
 
         // Act
-        var result = await statsigProvider.ResolveBooleanValue(flagName, defaultValue, ec);
+        var result = await statsigProvider.ResolveBooleanValueAsync(flagName, defaultValue, ec);
 
         //Assert
         Assert.Equal(defaultValue, result.Value);
@@ -79,7 +71,7 @@ public class StatsigProviderTest
         var tasks = new Task[numberOfThreads];
         for (int i = 0; i < numberOfThreads; i++)
         {
-            tasks[i] = concurrencyTestClass.Initialize(null);
+            tasks[i] = concurrencyTestClass.InitializeAsync(null);
         }
 
         await Task.WhenAll(tasks);

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Diagnostics;
 using OpenTelemetry.Trace;
+using System.Threading;
 
 namespace OpenFeature.Contrib.Hooks.Otel
 
@@ -13,15 +14,9 @@ namespace OpenFeature.Contrib.Hooks.Otel
     public class TracingHook : Hook
     {
 
-        /// <summary>
-        ///     After is executed after a feature flag has been evaluated.
-        /// </summary>
-        /// <param name="context">The hook context</param>
-        /// <param name="details">The result of the feature flag evaluation</param>
-        /// <param name="hints">Hints for the feature flag evaluation</param>
-        /// <returns>An awaitable Task object</returns>
-        public override Task After<T>(HookContext<T> context, FlagEvaluationDetails<T> details,
-            IReadOnlyDictionary<string, object> hints = null)
+        /// <inheritdoc/>
+        public override ValueTask AfterAsync<T>(HookContext<T> context, FlagEvaluationDetails<T> details,
+            IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
         {
             Activity.Current?
                 .SetTag("feature_flag.key", details.FlagKey)
@@ -34,22 +29,16 @@ namespace OpenFeature.Contrib.Hooks.Otel
                     ["feature_flag.provider_name"] = context.ProviderMetadata.Name
                 }));
 
-            return Task.CompletedTask;
+            return default;
         }
 
-        /// <summary>
-        ///     Error is executed when an error during a feature flag evaluation occured.
-        /// </summary>
-        /// <param name="context">The hook context</param>
-        /// <param name="error">The exception thrown by feature flag provider</param>
-        /// <param name="hints">Hints for the feature flag evaluation</param>
-        /// <returns>An awaitable Task object</returns>
-        public override Task Error<T>(HookContext<T> context, System.Exception error,
-            IReadOnlyDictionary<string, object> hints = null)
+        /// <inheritdoc/>
+        public override ValueTask ErrorAsync<T>(HookContext<T> context, System.Exception error,
+            IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
         {
             Activity.Current?.RecordException(error);
 
-            return Task.CompletedTask;
+            return default;
         }
 
     }

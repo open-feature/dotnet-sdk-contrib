@@ -23,8 +23,8 @@
       Please sort alphabetically.
       Refer to https://docs.microsoft.com/nuget/concepts/package-versioning for semver syntax.
     -->
-    <!-- 1.5-1.9999 -->
-    <OpenFeatureVer>[1.5,2.0)</OpenFeatureVer>
+    <!-- 2.0-2.9999 -->
+    <OpenFeatureVer>[2.0,3.0)</OpenFeatureVer>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Unix'">
