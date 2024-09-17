@@ -2,7 +2,7 @@
 
 The ConfigCat Flag provider allows you to connect to your ConfigCat instance.
 
-# .Net SDK usage
+# .NET SDK usage
 
 ## Requirements
 
@@ -47,68 +47,72 @@ paket add OpenFeature.Contrib.Providers.ConfigCat
 The following example shows how to use the ConfigCat provider with the OpenFeature SDK.
 
 ```csharp
-using OpenFeature.Contrib.Providers.ConfigCat;
+using System;
+using ConfigCat.Client;
+using OpenFeature.Contrib.ConfigCat;
 
-namespace OpenFeatureTestApp
+var configCatProvider = new ConfigCatProvider("#YOUR-SDK-KEY#");
+
+// Set the configCatProvider as the provider for the OpenFeature SDK
+await OpenFeature.Api.Instance.SetProviderAsync(configCatProvider);
+
+var client = OpenFeature.Api.Instance.GetClient();
+
+var isAwesomeFeatureEnabled = await client.GetBooleanValueAsync("isAwesomeFeatureEnabled", false);
+if (isAwesomeFeatureEnabled)
 {
-    class Hello {
-        static void Main(string[] args) {
-            var configCatProvider = new ConfigCatProvider("#YOUR-SDK-KEY#");
-
-            // Set the configCatProvider as the provider for the OpenFeature SDK
-            OpenFeature.Api.Instance.SetProvider(configCatProvider);
-
-            var client = OpenFeature.Api.Instance.GetClient();
-
-            var val = client.GetBooleanValueAsync("isMyAwesomeFeatureEnabled", false);
-
-            if(isMyAwesomeFeatureEnabled)
-            {
-                doTheNewThing();
-            }
-            else
-            {
-                doTheOldThing();
-            }
-        }
-    }
+    doTheNewThing();
+}
+else
+{
+    doTheOldThing();
 }
 ```
 
 ### Customizing the ConfigCat Provider
 
-The ConfigCat provider can be customized by passing a `ConfigCatClientOptions` object to the constructor.
+The ConfigCat provider can be customized by passing a callback setting up a `ConfigCatClientOptions` object to the constructor.
 
 ```csharp
-var configCatOptions = new ConfigCatClientOptions
+Action<ConfigCat.Client.Configuration.ConfigCatClientOptions> configureConfigCatOptions = (options) =>
 {
-    PollingMode = PollingModes.ManualPoll;
-    Logger = new ConsoleLogger(LogLevel.Info);
+    options.PollingMode = PollingModes.LazyLoad(cacheTimeToLive: TimeSpan.FromSeconds(10));
+    options.Logger = new ConsoleLogger(LogLevel.Info);
+    // ...
 };
 
-var configCatProvider = new ConfigCatProvider("#YOUR-SDK-KEY#", configCatOptions);
+var configCatProvider = new ConfigCatProvider("#YOUR-SDK-KEY#", configureConfigCatOptions);
 ```
 
 For a full list of options see the [ConfigCat documentation](https://configcat.com/docs/sdk-reference/dotnet/).
 
-## EvaluationContext and ConfigCat User relationship
+### Cleaning up
 
-ConfigCat has the concept of Users where you can evaluate a flag based on properties. The OpenFeature SDK has the concept of an EvaluationContext which is a dictionary of string keys and values. The ConfigCat provider will map the EvaluationContext to a ConfigCat User.
+On application shutdown, clean up the OpenFeature provider and the underlying ConfigCat client.
 
-The ConfigCat User has a few pre-defined parameters that can be used to evaluate a flag. These are:
+```csharp
+await OpenFeature.Api.Instance.ShutdownAsync();
+```
 
-| Parameter | Description                                                                                                                     |
-|-----------|---------------------------------------------------------------------------------------------------------------------------------|
-| `Id`      | *REQUIRED*. Unique identifier of a user in your application. Can be any `string` value, even an email address.                  |
-| `Email`   | Optional parameter for easier targeting rule definitions.                                                                       |
-| `Country` | Optional parameter for easier targeting rule definitions.                                                                       |
-| `Custom`  | Optional dictionary for custom attributes of a user for advanced targeting rule definitions. E.g. User role, Subscription type. |
+## EvaluationContext and ConfigCat User Object relationship
 
-Since EvaluationContext is a simple dictionary, the provider will try to match the keys to the ConfigCat User parameters following the table below in a case-insensitive manner.
+An <a href="https://openfeature.dev/docs/reference/concepts/evaluation-context" target="_blank">evaluation context</a> in the OpenFeature specification is a container for arbitrary contextual data that can be used as a basis for feature flag evaluation.
+The ConfigCat provider translates these evaluation contexts to ConfigCat [User Objects](https://configcat.com/docs/targeting/user-object/).
 
-| EvaluationContext Key | ConfigCat User Parameter |
+The ConfigCat User Object has a few pre-defined attributes that can be used to evaluate a flag. These are:
+
+| Attribute    | Description                                                                                                    |
+|--------------|----------------------------------------------------------------------------------------------------------------|
+| `Identifier` | *REQUIRED*. Unique identifier of a user in your application. Can be any `string` value, even an email address. |
+| `Email`      | The email address of the user.                                                                                 |
+| `Country`    | The country of the user.                                                                                       |
+
+Since `EvaluationContext` is a simple dictionary, the provider will try to match the keys to ConfigCat user attributes following the table below in a case-insensitive manner.
+
+| EvaluationContext Key | ConfigCat User Attribute |
 |-----------------------|--------------------------|
-| `id`                  | `Id`                     |
-| `identifier`          | `Id`                     |
+| `id`                  | `Identifier`             |
+| `identifier`          | `Identifier`             |
 | `email`               | `Email`                  |
 | `country`             | `Country`                |
+| Any other             | `Custom`                 |
