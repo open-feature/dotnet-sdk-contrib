@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using ConfigCat.Client;
@@ -12,14 +14,58 @@ namespace OpenFeature.Contrib.ConfigCat.Test
 {
     public class ConfigCatProviderTest
     {
+        const string TestConfigJson =
+@"
+{
+  ""f"": {
+    ""isAwesomeFeatureEnabled"": {
+      ""t"": 0,
+      ""v"": {
+        ""b"": true
+      }
+    },
+    ""isPOCFeatureEnabled"": {
+      ""t"": 0,
+      ""r"": [
+        {
+          ""c"": [
+            {
+              ""u"": {
+                ""a"": ""Email"",
+                ""c"": 2,
+                ""l"": [
+                  ""@example.com""
+                ]
+              }
+            }
+          ],
+          ""s"": {
+            ""v"": {
+              ""b"": true
+            }
+          }
+        }
+      ],
+      ""v"": {
+        ""b"": false
+      }
+    }
+  }
+}
+";
+
         [Theory]
         [AutoData]
-        public void CreateConfigCatProvider_WithSdkKey_CreatesProviderInstanceSuccessfully(string sdkKey)
+        public async void CreateConfigCatProvider_WithSdkKey_CreatesProviderInstanceSuccessfully(string sdkKey)
         {
             var configCatProvider =
                 new ConfigCatProvider(sdkKey, options => { options.FlagOverrides = BuildFlagOverrides(); });
 
+            await configCatProvider.InitializeAsync(EvaluationContext.Empty);
+
             Assert.NotNull(configCatProvider.Client);
+
+            await configCatProvider.ShutdownAsync();
         }
 
         [Theory]
@@ -93,11 +139,40 @@ namespace OpenFeature.Contrib.ConfigCat.Test
             var configCatProvider = new ConfigCatProvider(sdkKey,
                 options => { options.FlagOverrides = BuildFlagOverrides(("example-feature", defaultValue.AsString)); });
 
+            await configCatProvider.InitializeAsync(EvaluationContext.Empty);
+
             var result = await configCatProvider.ResolveStructureValueAsync("example-feature", defaultValue);
 
             Assert.Equal(defaultValue.AsString, result.Value.AsString);
             Assert.Equal("example-feature", result.FlagKey);
             Assert.Equal(ErrorType.None, result.ErrorType);
+
+            await configCatProvider.ShutdownAsync();
+        }
+
+        [Theory]
+        [InlineAutoData("alice@configcat.com", false)]
+        [InlineAutoData("bob@example.com", true)]
+        public async Task OpenFeatureAPI_EndToEnd_Test(string email, bool expectedValue)
+        {
+            var configCatProvider = new ConfigCatProvider("fake-67890123456789012/1234567890123456789012", options =>
+                { options.ConfigFetcher = new FakeConfigFetcher(TestConfigJson); });
+
+            await OpenFeature.Api.Instance.SetProviderAsync(configCatProvider);
+
+            var client = OpenFeature.Api.Instance.GetClient();
+
+            var evaluationContext = EvaluationContext.Builder()
+                .Set("email", email)
+                .Build();
+
+            var result = await client.GetBooleanDetailsAsync("isPOCFeatureEnabled", false, evaluationContext);
+
+            Assert.Equal(expectedValue, result.Value);
+            Assert.Equal("isPOCFeatureEnabled", result.FlagKey);
+            Assert.Equal(ErrorType.None, result.ErrorType);
+
+            await OpenFeature.Api.Instance.ShutdownAsync();
         }
 
         private static async Task ExecuteResolveTest<T>(object value, T defaultValue, T expectedValue, string sdkKey, Func<ConfigCatProvider, string, T, Task<ResolutionDetails<T>>> resolveFunc)
@@ -105,11 +180,15 @@ namespace OpenFeature.Contrib.ConfigCat.Test
             var configCatProvider = new ConfigCatProvider(sdkKey,
                 options => { options.FlagOverrides = BuildFlagOverrides(("example-feature", value)); });
 
+            await configCatProvider.InitializeAsync(EvaluationContext.Empty);
+
             var result = await resolveFunc(configCatProvider, "example-feature", defaultValue);
 
             Assert.Equal(expectedValue, result.Value);
             Assert.Equal("example-feature", result.FlagKey);
             Assert.Equal(ErrorType.None, result.ErrorType);
+
+            await configCatProvider.ShutdownAsync();
         }
 
         private static async Task ExecuteResolveErrorTest<T>(object value, T defaultValue, ErrorType expectedErrorType, string sdkKey, Func<ConfigCatProvider, string, T, Task<ResolutionDetails<T>>> resolveFunc)
@@ -117,9 +196,13 @@ namespace OpenFeature.Contrib.ConfigCat.Test
             var configCatProvider = new ConfigCatProvider(sdkKey,
                 options => { options.FlagOverrides = BuildFlagOverrides(("example-feature", value)); });
 
+            await configCatProvider.InitializeAsync(EvaluationContext.Empty);
+
             var exception = await Assert.ThrowsAsync<FeatureProviderException>(() => resolveFunc(configCatProvider, "example-feature", defaultValue));
 
             Assert.Equal(expectedErrorType, exception.ErrorType);
+
+            await configCatProvider.ShutdownAsync();
         }
 
         private static FlagOverrides BuildFlagOverrides(params (string key, object value)[] values)
@@ -131,6 +214,23 @@ namespace OpenFeature.Contrib.ConfigCat.Test
             }
 
             return FlagOverrides.LocalDictionary(dictionary, OverrideBehaviour.LocalOnly);
+        }
+
+        private sealed class FakeConfigFetcher : IConfigCatConfigFetcher
+        {
+            private readonly string configJson;
+
+            public FakeConfigFetcher(string configJson)
+            {
+                this.configJson = configJson;
+            }
+
+            public void Dispose() { }
+
+            public Task<FetchResponse> FetchAsync(FetchRequest request, CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new FetchResponse(HttpStatusCode.OK, reasonPhrase: null, headers: Array.Empty<KeyValuePair<string, string>>(), this.configJson));
+            }
         }
     }
 }
