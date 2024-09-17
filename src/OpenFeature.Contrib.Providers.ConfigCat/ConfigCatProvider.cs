@@ -30,6 +30,19 @@ namespace OpenFeature.Contrib.ConfigCat
         }
 
         /// <inheritdoc/>
+        public override Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)
+        {
+            return Client.WaitForReadyAsync(cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public override Task ShutdownAsync(CancellationToken cancellationToken = default)
+        {
+            Client.Dispose();
+            return Task.CompletedTask;
+        }
+
+        /// <inheritdoc/>
         public override Metadata GetMetadata()
         {
             return new Metadata(Name);
