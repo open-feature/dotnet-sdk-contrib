@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using ConfigCat.Client;
 using OpenFeature.Model;
@@ -17,35 +16,32 @@ namespace OpenFeature.Contrib.ConfigCat
                 return null;
             }
 
-            var user = context.TryGetValuesInsensitive(PossibleUserIds, out var pair)
-                ? new User(pair.Value.AsString)
-                : new User(Guid.NewGuid().ToString());
+            var user = new User(context.GetUserId());
 
             foreach (var value in context)
             {
-                switch (value.Key.ToUpperInvariant())
+                if (StringComparer.OrdinalIgnoreCase.Equals("EMAIL", value.Key))
                 {
-                    case "EMAIL":
-                        user.Email = value.Value.AsString;
-                        continue;
-                    case "COUNTRY":
-                        user.Country = value.Value.AsString;
-                        continue;
-                    default:
-                        user.Custom.Add(value.Key, value.Value.AsString);
-                        continue;
+                    user.Email = value.Value.AsString;
+                }
+                else if (StringComparer.OrdinalIgnoreCase.Equals("COUNTRY", value.Key))
+                {
+                    user.Country = value.Value.AsString;
+                }
+                else
+                {
+                    user.Custom.Add(value.Key, value.Value.AsString);
                 }
             }
 
             return user;
         }
 
-        private static bool TryGetValuesInsensitive(this EvaluationContext context, string[] keys,
-            out KeyValuePair<string, Value> pair)
+        private static string GetUserId(this EvaluationContext context)
         {
-            pair = context.AsDictionary().FirstOrDefault(x => keys.Contains(x.Key.ToUpperInvariant()));
+            var pair = context.AsDictionary().FirstOrDefault(x => PossibleUserIds.Contains(x.Key, StringComparer.OrdinalIgnoreCase));
 
-            return pair.Key != null;
+            return pair.Key != null ? pair.Value.AsString : "<n/a>";
         }
     }
 }
