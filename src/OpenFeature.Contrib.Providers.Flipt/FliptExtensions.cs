@@ -18,16 +18,10 @@ public static class FliptExtensions
     /// <returns></returns>
     public static Dictionary<string, string> ToStringDictionary(this EvaluationContext evaluationContext)
     {
-        var serializeOptions = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Converters =
-            {
-                new OpenFeatureValueConverter(),
-                new StructureConverter()
-            }
-        };
         return evaluationContext?.AsDictionary()
-            .ToDictionary(k => k.Key, v => JsonSerializer.Serialize(v.Value.AsObject, serializeOptions)) ?? [];
+                   .ToDictionary(k => k.Key,
+                       v => JsonSerializer.Serialize(v.Value.AsObject,
+                           JsonConverterExtensions.DefaultSerializerSettings)) ??
+               [];
     }
 }

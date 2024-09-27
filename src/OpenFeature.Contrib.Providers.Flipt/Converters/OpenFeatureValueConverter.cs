@@ -1,12 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Converters;
 
+/// <summary>
+///     OpenFeature Value type converter
+/// </summary>
 public class OpenFeatureValueConverter : JsonConverter<Value>
 {
+    /// <inheritdoc />
     public override Value Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = new Value();
@@ -23,41 +28,50 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
                 if (reader.TryGetInt32(out var intValue)) return new Value(intValue);
                 if (reader.TryGetDouble(out var dblValue)) return new Value(dblValue);
                 break;
-            case JsonTokenType.Null:
-            case JsonTokenType.None:
-            case JsonTokenType.StartObject:
-            case JsonTokenType.EndObject:
             case JsonTokenType.StartArray:
-            case JsonTokenType.EndArray:
-            case JsonTokenType.PropertyName:
-            case JsonTokenType.Comment:
-            default:
-                break;
+                return new Value(GenerateValueArray(ref reader, typeToConvert, options));
         }
 
         return value;
     }
 
+    private IList<Value> GenerateValueArray(ref Utf8JsonReader reader, Type typeToConvert,
+        JsonSerializerOptions options)
+    {
+        var valuesArray = new List<Value>();
+        var val = new Value();
+        var startDepth = reader.CurrentDepth;
+
+        while (reader.Read())
+            switch (reader.TokenType)
+            {
+                case JsonTokenType.EndArray when reader.CurrentDepth == startDepth:
+                    return valuesArray;
+                case JsonTokenType.StartObject:
+                    val = new Value();
+                    break;
+                case JsonTokenType.EndObject:
+                    valuesArray.Add(val);
+                    break;
+                default:
+                    valuesArray.Add(Read(ref reader, typeToConvert, options));
+                    break;
+            }
+
+        return valuesArray;
+    }
+
     public override void Write(Utf8JsonWriter writer, Value value, JsonSerializerOptions options)
     {
-        writer.WriteRawValue(JsonSerializer.Serialize(value.AsObject));
-    }
-}
-
-public class StructureConverter : JsonConverter<Structure>
-{
-    public override Structure Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void Write(Utf8JsonWriter writer, Structure value, JsonSerializerOptions options)
-    {
-        var serializeOptions = new JsonSerializerOptions
+        if (value.IsList)
         {
-            WriteIndented = true,
-            Converters = { new OpenFeatureValueConverter() }
-        };
-        writer.WriteRawValue(JsonSerializer.Serialize(value.AsDictionary(), serializeOptions));
+            writer.WriteStartArray();
+            foreach (var val in value.AsList!) writer.WriteRawValue(JsonSerializer.Serialize(val.AsObject));
+            writer.WriteEndArray();
+        }
+        else
+        {
+            writer.WriteRawValue(JsonSerializer.Serialize(value.AsObject));
+        }
     }
 }
