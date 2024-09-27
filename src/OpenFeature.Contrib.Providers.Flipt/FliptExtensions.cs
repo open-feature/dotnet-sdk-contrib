@@ -1,10 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.Flipt;
 
+/// <summary>
+///     Extension helper methods
+/// </summary>
 public static class FliptExtensions
 {
     /// <summary>
@@ -14,6 +18,16 @@ public static class FliptExtensions
     /// <returns></returns>
     public static Dictionary<string, string> ToStringDictionary(this EvaluationContext evaluationContext)
     {
-        return evaluationContext?.AsDictionary().ToDictionary(k => k.Key, v => JsonSerializer.Serialize(v.Value)) ?? [];
+        var serializeOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Converters =
+            {
+                new OpenFeatureValueConverter(),
+                new StructureConverter()
+            }
+        };
+        return evaluationContext?.AsDictionary()
+            .ToDictionary(k => k.Key, v => JsonSerializer.Serialize(v.Value.AsObject, serializeOptions)) ?? [];
     }
 }
