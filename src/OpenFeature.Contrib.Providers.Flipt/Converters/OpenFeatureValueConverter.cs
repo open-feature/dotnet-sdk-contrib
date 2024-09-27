@@ -30,10 +30,33 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
                 break;
             case JsonTokenType.StartArray:
                 return new Value(GenerateValueArray(ref reader, typeToConvert, options));
+            case JsonTokenType.StartObject:
+                return new Value(GetStructure(ref reader, typeToConvert, options));
         }
 
         return value;
     }
+
+    private Structure GetStructure(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var startDepth = reader.CurrentDepth;
+        var structureDictionary = new Dictionary<string, Value>();
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.PropertyName)
+            {
+                var key = reader.GetString();
+                reader.Read();
+                var val = Read(ref reader, typeToConvert, options);
+                structureDictionary[key ?? string.Empty] = val;
+            }
+
+            if (reader.TokenType == JsonTokenType.EndObject && reader.CurrentDepth == startDepth) break;
+        }
+
+        return new Structure(structureDictionary);
+    }
+
 
     private IList<Value> GenerateValueArray(ref Utf8JsonReader reader, Type typeToConvert,
         JsonSerializerOptions options)
@@ -47,12 +70,6 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
             {
                 case JsonTokenType.EndArray when reader.CurrentDepth == startDepth:
                     return valuesArray;
-                case JsonTokenType.StartObject:
-                    val = new Value();
-                    break;
-                case JsonTokenType.EndObject:
-                    valuesArray.Add(val);
-                    break;
                 default:
                     valuesArray.Add(Read(ref reader, typeToConvert, options));
                     break;
@@ -73,7 +90,8 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
         }
         else
         {
-            writer.WriteRawValue(JsonSerializer.Serialize(value.AsObject));
+            writer.WriteRawValue(JsonSerializer.Serialize(value.AsObject,
+                JsonConverterExtensions.DefaultSerializerSettings));
         }
     }
 }

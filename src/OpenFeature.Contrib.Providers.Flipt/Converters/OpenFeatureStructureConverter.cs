@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OpenFeature.Model;
@@ -13,6 +14,7 @@ public class OpenFeatureStructureConverter : JsonConverter<Structure>
     /// <inheritdoc />
     public override Structure Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        var structure = new Structure(new Dictionary<string, Value>());
         throw new NotImplementedException();
     }
 
