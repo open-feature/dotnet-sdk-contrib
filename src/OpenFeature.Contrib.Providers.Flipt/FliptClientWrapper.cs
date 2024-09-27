@@ -13,6 +13,9 @@ using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.Flipt;
 
+/// <summary>
+///     A wrapper of fliptClient to handle data casting and error mappings to OpenFeature models
+/// </summary>
 public class FliptClientWrapper : IFliptClientWrapper
 {
     private readonly Evaluation _fliptEvaluationClient;
@@ -44,14 +47,26 @@ public class FliptClientWrapper : IFliptClientWrapper
         {
             var evaluationResponse = await _fliptEvaluationClient.EvaluateVariantAsync(evaluationRequest);
             if (!(evaluationResponse?.Match ?? false))
-                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.General);
+                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
+                    evaluationResponse?.Reason.ToString());
 
             try
             {
+                var convertedValue = (T)Convert.ChangeType(evaluationResponse.VariantKey, typeof(T));
                 return new ResolutionDetails<T>(flagKey,
-                    (T)Convert.ChangeType(evaluationResponse.VariantKey, typeof(T)));
+                    convertedValue, ErrorType.None,
+                    evaluationResponse.Reason.ToString());
             }
-            catch (InvalidCastException ex)
+            catch (InvalidCastException)
+            {
+                // cannot change type if of type Value
+                if (typeof(T) == typeof(Value))
+                    return new ResolutionDetails<T>(flagKey,
+                        (T)Convert.ChangeType(new Value(evaluationResponse.VariantAttachment), typeof(T)),
+                        ErrorType.None, evaluationResponse.Reason.ToString());
+                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch);
+            }
+            catch (FormatException)
             {
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch);
             }
@@ -74,7 +89,8 @@ public class FliptClientWrapper : IFliptClientWrapper
         try
         {
             var boolEvaluationResponse = await _fliptEvaluationClient.EvaluateBooleanAsync(evaluationRequest);
-            return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse?.Enabled ?? defaultValue);
+            return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse?.Enabled ?? defaultValue, ErrorType.None,
+                boolEvaluationResponse?.Reason.ToString());
         }
         catch (HttpRequestException e)
         {
