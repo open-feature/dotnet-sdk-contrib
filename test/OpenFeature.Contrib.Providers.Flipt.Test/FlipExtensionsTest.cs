@@ -66,7 +66,7 @@ public class FlipExtensionsTest
         result.Keys.Should().Contain("config");
 
         JsonSerializer
-            .Deserialize<IDictionary<string, Value>>(result["config"],
+            .Deserialize<Structure>(result["config"],
                 JsonConverterExtensions.DefaultSerializerSettings).Should()
             .BeEquivalentTo(testStructure);
     }
@@ -91,7 +91,7 @@ public class FlipExtensionsTest
         result.Should().NotBeEmpty();
         result.Keys.Should().Contain("config");
 
-        var deserialized = JsonSerializer.Deserialize<IDictionary<string, Value>>(result["config"],
+        var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
             JsonConverterExtensions.DefaultSerializerSettings);
         deserialized.Should().BeEquivalentTo(testStructure);
     }
@@ -121,7 +121,7 @@ public class FlipExtensionsTest
         result.Should().NotBeEmpty();
         result.Keys.Should().Contain("config");
 
-        var deserialized = JsonSerializer.Deserialize<IDictionary<string, Value>>(result["config"],
+        var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
             JsonConverterExtensions.DefaultSerializerSettings);
         deserialized.Should().BeEquivalentTo(testStructure);
     }
@@ -150,7 +150,7 @@ public class FlipExtensionsTest
         result.Should().NotBeEmpty();
         result.Keys.Should().Contain("config");
 
-        var deserialized = JsonSerializer.Deserialize<IDictionary<string, Value>>(result["config"],
+        var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
             JsonConverterExtensions.DefaultSerializerSettings);
         deserialized.Should().BeEquivalentTo(testStructure);
     }

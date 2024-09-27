@@ -14,8 +14,10 @@ public class OpenFeatureStructureConverter : JsonConverter<Structure>
     /// <inheritdoc />
     public override Structure Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var structure = new Structure(new Dictionary<string, Value>());
-        throw new NotImplementedException();
+        using var jsonDocument = JsonDocument.ParseValue(ref reader);
+        var jsonText = jsonDocument.RootElement.GetRawText();
+        return new Structure(JsonSerializer.Deserialize<Dictionary<string, Value>>(jsonText,
+            JsonConverterExtensions.DefaultSerializerSettings));
     }
 
     /// <inheritdoc />
