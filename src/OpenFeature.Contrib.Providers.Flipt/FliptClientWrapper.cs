@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Flipt.Authentication;
 using Flipt.Clients;
@@ -41,7 +39,7 @@ public class FliptClientWrapper : IFliptClientWrapper
     public async Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue, EvaluationContext context)
     {
         var evaluationRequest = new EvaluationRequest(_namespaceKey, flagKey, context?.TargetingKey ?? "",
-            context?.AsDictionary().ToDictionary(k => k.Key, v => JsonSerializer.Serialize(v.Value)) ?? []);
+            context.ToStringDictionary());
 
         try
         {
@@ -73,9 +71,7 @@ public class FliptClientWrapper : IFliptClientWrapper
         }
         catch (HttpRequestException e)
         {
-            return e.StatusCode == HttpStatusCode.NotFound
-                ? new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.FlagNotFound)
-                : new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.General);
+            return HandleRequestException(e, flagKey, defaultValue);
         }
     }
 
@@ -84,7 +80,7 @@ public class FliptClientWrapper : IFliptClientWrapper
         EvaluationContext context)
     {
         var evaluationRequest = new EvaluationRequest(_namespaceKey, flagKey, context?.TargetingKey ?? "",
-            context?.AsDictionary().ToDictionary(k => k.Key, v => JsonSerializer.Serialize(v.Value)) ?? []);
+            context.ToStringDictionary());
 
         try
         {
@@ -94,10 +90,19 @@ public class FliptClientWrapper : IFliptClientWrapper
         }
         catch (HttpRequestException e)
         {
-            return e.StatusCode == HttpStatusCode.NotFound
-                ? new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound)
-                : new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General);
+            return HandleRequestException(e, flagKey, defaultValue);
         }
+    }
+
+    private ResolutionDetails<T> HandleRequestException<T>(HttpRequestException e, string flagKey, T defaultValue)
+    {
+        var error = e.StatusCode switch
+        {
+            HttpStatusCode.NotFound => ErrorType.FlagNotFound,
+            HttpStatusCode.BadRequest => ErrorType.TypeMismatch,
+            _ => ErrorType.General
+        };
+        return new ResolutionDetails<T>(flagKey, defaultValue, error, errorMessage: e.Message);
     }
 
     private static FliptClient BuildClient(string fliptUrl, string clientToken, int timeoutInSeconds = 30)
