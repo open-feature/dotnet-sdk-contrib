@@ -66,7 +66,9 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
         if (value.IsList)
         {
             writer.WriteStartArray();
-            foreach (var val in value.AsList!) writer.WriteRawValue(JsonSerializer.Serialize(val.AsObject));
+            foreach (var val in value.AsList!)
+                writer.WriteRawValue(JsonSerializer.Serialize(val.AsObject,
+                    JsonConverterExtensions.DefaultSerializerSettings));
             writer.WriteEndArray();
         }
         else

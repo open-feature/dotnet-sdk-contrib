@@ -97,7 +97,7 @@ public class FlipExtensionsTest
     }
 
     [Fact]
-    public void ToStringDictionary_WithContextAndWithList_ShouldReturnADictionaryWithSerializedValues()
+    public void ToStringDictionary_WithContextWithListAndNestedList_ShouldReturnADictionaryWithSerializedValues()
     {
         var testStructure = new Structure(new Dictionary<string, Value>
         {
@@ -107,7 +107,13 @@ public class FlipExtensionsTest
             //         { "nested1", new Value(1) }
             //     }))
             // },
-            { "config2", new Value([new Value("element1"), new Value("element2"), new Value("element3")]) },
+            {
+                "config2",
+                new Value([
+                    new Value([new Value("element1-1"), new Value("element1-2")]), new Value("element2"),
+                    new Value("element3")
+                ])
+            },
             { "config3", new Value(DateTime.Now) }
         });
 
