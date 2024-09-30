@@ -31,7 +31,7 @@ public class FliptProviderTest
     [InlineData(HttpStatusCode.BadRequest, ErrorType.TypeMismatch, false)]
     [InlineData(HttpStatusCode.InternalServerError, ErrorType.ProviderNotReady, false)]
     [InlineData(HttpStatusCode.Forbidden, ErrorType.ProviderNotReady, false)]
-    public async Task ResolveBooleanValueAsync_GivenWrongURl_ShouldHandleHttpRequestException(
+    public async Task ResolveBooleanValueAsync_GivenHttpRequestException_ShouldHandleHttpRequestException(
         HttpStatusCode thrownStatusCode, ErrorType expectedOpenFeatureErrorType, bool fallbackValue)
     {
         var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();

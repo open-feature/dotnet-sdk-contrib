@@ -52,12 +52,14 @@ public class FliptClientWrapper : IFliptClientWrapper
 public interface IFliptClientWrapper
 {
     /// <summary>
+    ///     Wrapper to Flipt.io/EvaluateVariantAsync method
     /// </summary>
     /// <param name="evaluationRequest"></param>
     /// <returns></returns>
     Task<VariantEvaluationResponse> EvaluateVariantAsync(EvaluationRequest evaluationRequest);
 
     /// <summary>
+    ///     Wrapper to Flipt.io/EvaluateBooleanAsync method
     /// </summary>
     /// <param name="evaluationRequest"></param>
     /// <returns></returns>

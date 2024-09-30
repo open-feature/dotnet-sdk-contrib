@@ -41,8 +41,6 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
             if (!(evaluationResponse?.Match ?? false))
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
                     evaluationResponse?.Reason.ToString());
-            // Todo Andrei:
-            // Create another layer that just converts errors and responses to OpenFeature compliant models and responses
             try
             {
                 var convertedValue = (T)Convert.ChangeType(evaluationResponse.VariantKey, typeof(T));
