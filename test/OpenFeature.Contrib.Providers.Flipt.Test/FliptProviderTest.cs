@@ -1,5 +1,4 @@
 using System.Net;
-using Flipt.Clients;
 using Flipt.DTOs;
 using FluentAssertions;
 using Moq;
@@ -28,23 +27,22 @@ public class FliptProviderTest
     }
 
     [Theory]
-    [InlineData(HttpStatusCode.NotFound, ErrorType.FlagNotFound)]
-    [InlineData(HttpStatusCode.BadRequest, ErrorType.TypeMismatch)]
-    [InlineData(HttpStatusCode.InternalServerError, ErrorType.ProviderNotReady)]
-    [InlineData(HttpStatusCode.Forbidden, ErrorType.ProviderNotReady)]
+    [InlineData(HttpStatusCode.NotFound, ErrorType.FlagNotFound, false)]
+    [InlineData(HttpStatusCode.BadRequest, ErrorType.TypeMismatch, false)]
+    [InlineData(HttpStatusCode.InternalServerError, ErrorType.ProviderNotReady, false)]
+    [InlineData(HttpStatusCode.Forbidden, ErrorType.ProviderNotReady, false)]
     public async Task ResolveBooleanValueAsync_GivenWrongURl_ShouldHandleHttpRequestException(
-        HttpStatusCode thrownStatusCode, ErrorType expectedOpenFeatureErrorType)
+        HttpStatusCode thrownStatusCode, ErrorType expectedOpenFeatureErrorType, bool fallbackValue)
     {
-        var evaluationClient = new Mock<Evaluation>();
-        evaluationClient.Setup(ev =>
-                ev.EvaluateBooleanAsync(new EvaluationRequest("", "", Guid.NewGuid().ToString(),
-                    new Dictionary<string, string>())))
+        var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
+        mockFliptClientWrapper.Setup(ev =>
+                ev.EvaluateBooleanAsync(It.IsAny<EvaluationRequest>()))
             .ThrowsAsync(new HttpRequestException("", null, thrownStatusCode));
 
 
-        var fliptProvider = new FliptProvider(new FliptToOpenFeatureConverter(evaluationClient.Object));
-        var resolution = await fliptProvider.ResolveBooleanValueAsync("flagKey", false);
-        resolution.Should().Be(false);
+        var fliptProvider = new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object));
+        var resolution = await fliptProvider.ResolveBooleanValueAsync("flagKey", fallbackValue);
+        resolution.Value.Should().Be(fallbackValue);
         resolution.ErrorType.Should().Be(expectedOpenFeatureErrorType);
     }
 }

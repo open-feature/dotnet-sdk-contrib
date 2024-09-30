@@ -2,10 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Flipt.Authentication;
-using Flipt.Clients;
 using Flipt.DTOs;
-using Flipt.Utilities;
 using OpenFeature.Constant;
 using OpenFeature.Model;
 
@@ -14,7 +11,7 @@ namespace OpenFeature.Contrib.Providers.Flipt;
 /// <summary>
 ///     A wrapper of fliptClient to handle data casting and error mappings to OpenFeature models
 /// </summary>
-public class FliptToOpenFeatureConverter(Evaluation fliptEvaluationClient, string namespaceKey = "default")
+public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper, string namespaceKey = "default")
     : IFliptToOpenFeatureConverter
 {
     /// <summary>
@@ -27,7 +24,8 @@ public class FliptToOpenFeatureConverter(Evaluation fliptEvaluationClient, strin
     public FliptToOpenFeatureConverter(string fliptUrl,
         string namespaceKey = "default",
         string clientToken = "",
-        int timeoutInSeconds = 30) : this(BuildClient(fliptUrl, clientToken, timeoutInSeconds).Evaluation, namespaceKey)
+        int timeoutInSeconds = 30) : this(new FliptClientWrapper(fliptUrl, clientToken, timeoutInSeconds),
+        namespaceKey)
     {
     }
 
@@ -37,12 +35,9 @@ public class FliptToOpenFeatureConverter(Evaluation fliptEvaluationClient, strin
         var evaluationRequest = new EvaluationRequest(namespaceKey, flagKey, context?.TargetingKey ?? "",
             context.ToStringDictionary());
 
-        if (fliptEvaluationClient == null)
-            return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.ProviderNotReady);
-
         try
         {
-            var evaluationResponse = await fliptEvaluationClient.EvaluateVariantAsync(evaluationRequest);
+            var evaluationResponse = await fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
             if (!(evaluationResponse?.Match ?? false))
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
                     evaluationResponse?.Reason.ToString());
@@ -79,14 +74,12 @@ public class FliptToOpenFeatureConverter(Evaluation fliptEvaluationClient, strin
     public async Task<ResolutionDetails<bool>> EvaluateBooleanAsync(string flagKey, bool defaultValue,
         EvaluationContext context)
     {
-        if (fliptEvaluationClient == null)
-            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.ProviderNotReady);
         try
         {
             var evaluationRequest = new EvaluationRequest(namespaceKey, flagKey, context?.TargetingKey ?? "",
                 context.ToStringDictionary());
 
-            var boolEvaluationResponse = await fliptEvaluationClient.EvaluateBooleanAsync(evaluationRequest);
+            var boolEvaluationResponse = await fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
             return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse?.Enabled ?? defaultValue, ErrorType.None,
                 boolEvaluationResponse?.Reason.ToString());
         }
@@ -103,19 +96,11 @@ public class FliptToOpenFeatureConverter(Evaluation fliptEvaluationClient, strin
         {
             HttpStatusCode.NotFound => ErrorType.FlagNotFound,
             HttpStatusCode.BadRequest => ErrorType.TypeMismatch,
+            HttpStatusCode.Forbidden => ErrorType.ProviderNotReady,
             HttpStatusCode.InternalServerError => ErrorType.ProviderNotReady,
             _ => ErrorType.General
         };
         return new ResolutionDetails<T>(flagKey, defaultValue, error, errorMessage: e.Message);
-    }
-
-    private static FliptClient BuildClient(string fliptUrl, string clientToken, int timeoutInSeconds = 30)
-    {
-        return FliptClient.Builder()
-            .WithUrl(fliptUrl)
-            .WithAuthentication(new ClientTokenAuthenticationStrategy(clientToken))
-            .WithTimeout(timeoutInSeconds)
-            .Build();
     }
 }
 
