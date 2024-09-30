@@ -13,16 +13,25 @@ namespace OpenFeature.Contrib.Providers.Flipt;
 /// <param name="namespaceKey">Namespace used for querying flags</param>
 /// <param name="clientToken">Authentication access token</param>
 /// <param name="timeoutInSeconds">Timeout when calling flipt endpoints in seconds</param>
-public class FliptProvider(
-    string fliptUrl,
-    string namespaceKey = "default",
-    string clientToken = "",
-    int timeoutInSeconds = 30) : FeatureProvider
+/// <remarks>
+///     Accepts an instantiated IFliptClientWrapper instance
+/// </remarks>
+/// <param name="fliptToOpenFeatureConverter"></param>
+public class FliptProvider(IFliptToOpenFeatureConverter fliptToOpenFeatureConverter) : FeatureProvider
 {
     private static readonly Metadata Metadata = new("Flipt Provider");
 
-    private readonly IFliptClientWrapper _fliptClientWrapper =
-        new FliptClientWrapper(fliptUrl, namespaceKey, clientToken, timeoutInSeconds);
+    /// <summary>
+    ///     Instantiate a FliptProvider using configuration params
+    /// </summary>
+    /// <param name="fliptUrl">Url of flipt instance</param>
+    /// <param name="namespaceKey">Namespace used for querying flags</param>
+    /// <param name="clientToken">Authentication access token</param>
+    /// <param name="timeoutInSeconds">Timeout when calling flipt endpoints in seconds</param>
+    public FliptProvider(string fliptUrl, string namespaceKey = "default", string clientToken = "",
+        int timeoutInSeconds = 30) : this(new FliptToOpenFeatureConverter(fliptUrl, namespaceKey, clientToken, timeoutInSeconds))
+    {
+    }
 
     /// <inheritdoc />
     public override Metadata GetMetadata()
@@ -35,7 +44,7 @@ public class FliptProvider(
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptClientWrapper.EvaluateBooleanAsync(flagKey, defaultValue, context);
+        return await fliptToOpenFeatureConverter.EvaluateBooleanAsync(flagKey, defaultValue, context);
     }
 
     /// <inheritdoc />
@@ -43,7 +52,7 @@ public class FliptProvider(
         string defaultValue, EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptClientWrapper.EvaluateAsync(flagKey, defaultValue, context);
+        return await fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context);
     }
 
     /// <inheritdoc />
@@ -51,7 +60,7 @@ public class FliptProvider(
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptClientWrapper.EvaluateAsync(flagKey, defaultValue, context);
+        return await fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context);
     }
 
     /// <inheritdoc />
@@ -59,7 +68,7 @@ public class FliptProvider(
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptClientWrapper.EvaluateAsync(flagKey, defaultValue, context);
+        return await fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context);
     }
 
     /// <inheritdoc />
@@ -67,6 +76,6 @@ public class FliptProvider(
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptClientWrapper.EvaluateAsync(flagKey, defaultValue, context);
+        return await fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context);
     }
 }

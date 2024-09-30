@@ -62,7 +62,6 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
         JsonSerializerOptions options)
     {
         var valuesArray = new List<Value>();
-        var val = new Value();
         var startDepth = reader.CurrentDepth;
 
         while (reader.Read())
@@ -78,6 +77,7 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
         return valuesArray;
     }
 
+    /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, Value value, JsonSerializerOptions options)
     {
         if (value.IsList)
