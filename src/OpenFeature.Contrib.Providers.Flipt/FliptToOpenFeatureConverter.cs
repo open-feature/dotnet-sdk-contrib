@@ -30,7 +30,8 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
     }
 
     /// <inheritdoc />
-    public async Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue, EvaluationContext context)
+    public async Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue,
+        EvaluationContext context = null)
     {
         var evaluationRequest = new EvaluationRequest(namespaceKey, flagKey, context?.TargetingKey ?? "",
             context.ToStringDictionary());
@@ -70,7 +71,7 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
 
     /// <inheritdoc />
     public async Task<ResolutionDetails<bool>> EvaluateBooleanAsync(string flagKey, bool defaultValue,
-        EvaluationContext context)
+        EvaluationContext context = null)
     {
         try
         {
@@ -115,7 +116,7 @@ public interface IFliptToOpenFeatureConverter
     /// <param name="context"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns>OpenFeature ResolutionDetails object</returns>
-    Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue, EvaluationContext context);
+    Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue, EvaluationContext context = null);
 
     /// <summary>
     ///     Used for evaluating boolean flags
@@ -124,5 +125,6 @@ public interface IFliptToOpenFeatureConverter
     /// <param name="defaultValue"></param>
     /// <param name="context"></param>
     /// <returns>OpenFeature ResolutionDetails object</returns>
-    Task<ResolutionDetails<bool>> EvaluateBooleanAsync(string flagKey, bool defaultValue, EvaluationContext context);
+    Task<ResolutionDetails<bool>> EvaluateBooleanAsync(string flagKey, bool defaultValue,
+        EvaluationContext context = null);
 }
