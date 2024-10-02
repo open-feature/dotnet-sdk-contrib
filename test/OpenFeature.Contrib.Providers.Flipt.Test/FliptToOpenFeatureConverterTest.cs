@@ -1,10 +1,10 @@
 using System.Net;
-using Flipt.DTOs;
+using Flipt.Rest;
 using FluentAssertions;
 using Moq;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 using OpenFeature.Model;
-using Reason = Flipt.Models.Reason;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
@@ -110,7 +110,7 @@ public class FliptToOpenFeatureConverterTest
                 SegmentKeys = ["segment1"],
                 VariantAttachment = variantAttachment,
                 Match = true,
-                Reason = Reason.MatchEvaluationReason
+                Reason = EvaluationReason.MATCH_EVALUATION_REASON
             });
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
@@ -147,7 +147,7 @@ public class FliptToOpenFeatureConverterTest
                 SegmentKeys = ["segment1"],
                 VariantAttachment = valueFromSrc,
                 Match = true,
-                Reason = Reason.MatchEvaluationReason
+                Reason = EvaluationReason.MATCH_EVALUATION_REASON
             });
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);

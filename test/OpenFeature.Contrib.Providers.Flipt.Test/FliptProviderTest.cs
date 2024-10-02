@@ -1,9 +1,9 @@
-using Flipt.DTOs;
+using Flipt.Rest;
 using FluentAssertions;
 using Moq;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 using OpenFeature.Model;
-using Reason = Flipt.Models.Reason;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
@@ -23,8 +23,7 @@ public class FliptProviderTest
     public void CreateFliptProvider_GivenEmptyUrl_ShouldThrowInvalidOperationException()
     {
         var act = void () => new FliptProvider("");
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("BaseURL must be provided.");
+        act.Should().Throw<UriFormatException>();
     }
 
 
@@ -44,7 +43,7 @@ public class FliptProviderTest
                 SegmentKeys = ["segment1"],
                 VariantAttachment = "",
                 Match = true,
-                Reason = Reason.MatchEvaluationReason
+                Reason = EvaluationReason.MATCH_EVALUATION_REASON
             });
 
         var provider = new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object));

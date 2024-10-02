@@ -3,11 +3,11 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Flipt.DTOs;
+using Flipt.Rest;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
-using Reason = Flipt.Models.Reason;
 
 namespace OpenFeature.Contrib.Providers.Flipt;
 
@@ -36,14 +36,19 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
     public async Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue,
         EvaluationContext context = null)
     {
-        var evaluationRequest = new EvaluationRequest(namespaceKey, flagKey, context?.TargetingKey ?? "",
-            context.ToStringDictionary());
+        var evaluationRequest = new EvaluationRequest
+        {
+            NamespaceKey = namespaceKey,
+            FlagKey = flagKey,
+            EntityId = context?.TargetingKey ?? "",
+            Context = context.ToStringDictionary()
+        };
 
         try
         {
             var evaluationResponse = await fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
 
-            if (evaluationResponse.Reason == Reason.FlagDisabledEvaluationReason)
+            if (evaluationResponse.Reason == EvaluationReason.FLAG_DISABLED_EVALUATION_REASON)
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
                     evaluationResponse.Reason.ToString());
 
@@ -87,9 +92,13 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
     {
         try
         {
-            var evaluationRequest = new EvaluationRequest(namespaceKey, flagKey, context?.TargetingKey ?? "",
-                context.ToStringDictionary());
-
+            var evaluationRequest = new EvaluationRequest
+            {
+                NamespaceKey = namespaceKey,
+                FlagKey = flagKey,
+                EntityId = context?.TargetingKey ?? "",
+                Context = context.ToStringDictionary()
+            };
             var boolEvaluationResponse = await fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
             return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse.Enabled, ErrorType.None,
                 boolEvaluationResponse.Reason.ToString());

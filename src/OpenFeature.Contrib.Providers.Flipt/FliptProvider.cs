@@ -8,12 +8,6 @@ namespace OpenFeature.Contrib.Providers.Flipt;
 ///     FliptProvider is the .NET provider implementation for Flipt.io
 /// </summary>
 /// <remarks>
-/// </remarks>
-/// <param name="fliptUrl">Url of flipt instance</param>
-/// <param name="namespaceKey">Namespace used for querying flags</param>
-/// <param name="clientToken">Authentication access token</param>
-/// <param name="timeoutInSeconds">Timeout when calling flipt endpoints in seconds</param>
-/// <remarks>
 ///     Accepts an instantiated IFliptClientWrapper instance
 /// </remarks>
 /// <param name="fliptToOpenFeatureConverter"></param>
@@ -29,7 +23,8 @@ public class FliptProvider(IFliptToOpenFeatureConverter fliptToOpenFeatureConver
     /// <param name="clientToken">Authentication access token</param>
     /// <param name="timeoutInSeconds">Timeout when calling flipt endpoints in seconds</param>
     public FliptProvider(string fliptUrl, string namespaceKey = "default", string clientToken = "",
-        int timeoutInSeconds = 30) : this(new FliptToOpenFeatureConverter(fliptUrl, namespaceKey, clientToken, timeoutInSeconds))
+        int timeoutInSeconds = 30) : this(new FliptToOpenFeatureConverter(fliptUrl, namespaceKey, clientToken,
+        timeoutInSeconds))
     {
     }
 

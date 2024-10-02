@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Flipt" Version="0.0.2"/>
+        <PackageReference Include="NSwag.Core" Version="14.1.0"/>
     </ItemGroup>
 
 </Project>
