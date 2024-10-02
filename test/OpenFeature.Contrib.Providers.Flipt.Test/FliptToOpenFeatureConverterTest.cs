@@ -8,7 +8,7 @@ using Reason = Flipt.Models.Reason;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
-public class FlipToOpenFeatureConverterTest
+public class FliptToOpenFeatureConverterTest
 {
     // EvaluateBooleanAsync Tests
     [Theory]
@@ -157,6 +157,48 @@ public class FlipToOpenFeatureConverterTest
         resolution.Variant.Should().Be(variantKey);
         resolution.Value.Should().BeEquivalentTo(expectedValue);
     }
+
+
+    [Fact]
+    public async Task
+        EvaluateVariantAsync_GivenNonExistentFlagWithNonNestedFallback_ShouldReturnDefaultValueWithFlagNotFoundError()
+    {
+        var fallbackValue = new Value(new Structure(new Dictionary<string, Value>
+        {
+            { "name", new Value("Mr. Robinson") }, { "age", new Value(12) }
+        }));
+        var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
+        mockFliptClientWrapper.Setup(fcw => fcw.EvaluateVariantAsync(It.IsAny<EvaluationRequest>()))
+            .ThrowsAsync(new HttpRequestException("", null, HttpStatusCode.NotFound));
+
+        var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
+        var resolution = await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue);
+
+        resolution.FlagKey.Should().Be("non-existent-flag");
+        resolution.Variant.Should().BeNull();
+        resolution.Value.Should().BeEquivalentTo(fallbackValue);
+        resolution.ErrorType.Should().Be(ErrorType.FlagNotFound);
+    }
+
+
+    [Fact]
+    public async Task
+        EvaluateVariantAsync_GivenNonExistentFlagWithNestedFallback_ShouldReturnDefaultValueWithFlagNotFoundError()
+    {
+        var fallbackValue = new Value("");
+        var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
+        mockFliptClientWrapper.Setup(fcw => fcw.EvaluateVariantAsync(It.IsAny<EvaluationRequest>()))
+            .ThrowsAsync(new HttpRequestException("", null, HttpStatusCode.NotFound));
+
+        var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
+        var resolution = await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue);
+
+        resolution.FlagKey.Should().Be("non-existent-flag");
+        resolution.Variant.Should().BeNull();
+        resolution.Value.Should().BeEquivalentTo(fallbackValue);
+        resolution.ErrorType.Should().Be(ErrorType.FlagNotFound);
+    }
+
     /* Todo Andrei: Mga kulang pa na unit test
      - Successful na flag
        - Boolean
