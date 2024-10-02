@@ -1,12 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>default</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <PackageId>OpenFeature.Contrib.Providers.Flipt</PackageId>
+        <VersionNumber>0.1.0</VersionNumber> <!--x-release-please-version -->
+        <VersionPrefix>$(VersionNumber)</VersionPrefix>
+        <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
+        <FileVersion>$(VersionNumber)</FileVersion>
+        <Description>Flipt provider for .NET</Description>
+        <Authors>Jean Andrei de la Cruz Austria</Authors>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Flipt" Version="0.0.2" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Flipt" Version="0.0.2"/>
+    </ItemGroup>
 
 </Project>
