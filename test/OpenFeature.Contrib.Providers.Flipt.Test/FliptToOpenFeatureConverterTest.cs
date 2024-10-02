@@ -23,7 +23,7 @@ public class FliptToOpenFeatureConverterTest
         var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
         mockFliptClientWrapper.Setup(fcw =>
                 fcw.EvaluateBooleanAsync(It.IsAny<EvaluationRequest>()))
-            .ThrowsAsync(new HttpRequestException("", null, thrownStatusCode));
+            .ThrowsAsync(new FliptException("", (int)thrownStatusCode, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
         var resolution = await fliptToOpenFeature.EvaluateBooleanAsync("flagKey", fallbackValue);
@@ -61,7 +61,7 @@ public class FliptToOpenFeatureConverterTest
     {
         var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
         mockFliptClientWrapper.Setup(fcw => fcw.EvaluateBooleanAsync(It.IsAny<EvaluationRequest>()))
-            .ThrowsAsync(new HttpRequestException("", null, HttpStatusCode.NotFound));
+            .ThrowsAsync(new FliptException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
         var resolution = await fliptToOpenFeature.EvaluateBooleanAsync("show-feature", fallBackValue);
@@ -85,7 +85,7 @@ public class FliptToOpenFeatureConverterTest
         var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
         mockFliptClientWrapper.Setup(fcw =>
                 fcw.EvaluateVariantAsync(It.IsAny<EvaluationRequest>()))
-            .ThrowsAsync(new HttpRequestException("", null, thrownStatusCode));
+            .ThrowsAsync(new FliptException("", (int)thrownStatusCode, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
         var resolution = await fliptToOpenFeature.EvaluateAsync("flagKey", fallbackValue);
@@ -169,7 +169,7 @@ public class FliptToOpenFeatureConverterTest
         }));
         var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
         mockFliptClientWrapper.Setup(fcw => fcw.EvaluateVariantAsync(It.IsAny<EvaluationRequest>()))
-            .ThrowsAsync(new HttpRequestException("", null, HttpStatusCode.NotFound));
+            .ThrowsAsync(new FliptException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
         var resolution = await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue);
@@ -188,7 +188,7 @@ public class FliptToOpenFeatureConverterTest
         var fallbackValue = new Value("");
         var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
         mockFliptClientWrapper.Setup(fcw => fcw.EvaluateVariantAsync(It.IsAny<EvaluationRequest>()))
-            .ThrowsAsync(new HttpRequestException("", null, HttpStatusCode.NotFound));
+            .ThrowsAsync(new FliptException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
         var resolution = await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue);
