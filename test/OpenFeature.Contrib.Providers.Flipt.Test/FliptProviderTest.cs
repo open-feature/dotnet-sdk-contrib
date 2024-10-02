@@ -1,4 +1,9 @@
+using Flipt.DTOs;
 using FluentAssertions;
+using Moq;
+using OpenFeature.Constant;
+using OpenFeature.Model;
+using Reason = Flipt.Models.Reason;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
@@ -20,5 +25,43 @@ public class FliptProviderTest
         var act = void () => new FliptProvider("");
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("BaseURL must be provided.");
+    }
+
+
+    [Fact]
+    public async Task
+        ResolveNonBooleansAsync_GivenFlagThatHasATypeMismatch_ShouldReturnDefaultValueWithTypeMismatchError()
+    {
+        var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
+        const string flagKey = "iamnotadouble";
+        mockFliptClientWrapper.Setup(fcw => fcw.EvaluateVariantAsync(It.IsAny<EvaluationRequest>()))
+            .ReturnsAsync(new VariantEvaluationResponse
+            {
+                FlagKey = flagKey,
+                VariantKey = "iamastring",
+                RequestId = Guid.NewGuid()
+                    .ToString(),
+                SegmentKeys = ["segment1"],
+                VariantAttachment = "",
+                Match = true,
+                Reason = Reason.MatchEvaluationReason
+            });
+
+        var provider = new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object));
+
+        var doubleResolution = await provider.ResolveDoubleValueAsync(flagKey, 0.0);
+        doubleResolution.FlagKey.Should().Be(flagKey);
+        doubleResolution.Value.Should().Be(0.0);
+        doubleResolution.ErrorType.Should().Be(ErrorType.TypeMismatch);
+
+        var integerResolution = await provider.ResolveIntegerValueAsync(flagKey, 0);
+        integerResolution.FlagKey.Should().Be(flagKey);
+        integerResolution.Value.Should().Be(0);
+        integerResolution.ErrorType.Should().Be(ErrorType.TypeMismatch);
+
+        var valueResolution = await provider.ResolveStructureValueAsync(flagKey, new Value());
+        valueResolution.FlagKey.Should().Be(flagKey);
+        valueResolution.Value.Should().BeEquivalentTo(new Value());
+        valueResolution.ErrorType.Should().Be(ErrorType.TypeMismatch);
     }
 }

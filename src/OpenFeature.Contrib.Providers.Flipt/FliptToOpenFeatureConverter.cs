@@ -1,10 +1,13 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Flipt.DTOs;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
+using Reason = Flipt.Models.Reason;
 
 namespace OpenFeature.Contrib.Providers.Flipt;
 
@@ -39,34 +42,43 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
         try
         {
             var evaluationResponse = await fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
-            if (!(evaluationResponse?.Match ?? false))
+
+            if (evaluationResponse.Reason == Reason.FlagDisabledEvaluationReason)
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
-                    evaluationResponse?.Reason.ToString());
+                    evaluationResponse.Reason.ToString());
+
+            if (!evaluationResponse.Match)
+                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
+                    evaluationResponse.Reason.ToString());
             try
             {
-                var convertedValue = (T)Convert.ChangeType(evaluationResponse.VariantKey, typeof(T));
-                return new ResolutionDetails<T>(flagKey,
-                    convertedValue, ErrorType.None,
-                    evaluationResponse.Reason.ToString());
-            }
-            catch (InvalidCastException)
-            {
-                // handle differently if type is Value
-                if (typeof(T) == typeof(Value))
+                if (string.IsNullOrEmpty(evaluationResponse.VariantAttachment))
+                {
+                    var convertedValue = (T)Convert.ChangeType(evaluationResponse.VariantKey, typeof(T));
                     return new ResolutionDetails<T>(flagKey,
-                        (T)Convert.ChangeType(new Value(evaluationResponse.VariantAttachment), typeof(T)),
-                        ErrorType.None, evaluationResponse.Reason.ToString());
-                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch);
+                        convertedValue, ErrorType.None,
+                        evaluationResponse.Reason.ToString(), evaluationResponse.VariantKey);
+                }
+
+                var deserializedValueObj = JsonSerializer.Deserialize<Value>(evaluationResponse.VariantAttachment,
+                    JsonConverterExtensions.DefaultSerializerSettings);
+
+                return new ResolutionDetails<T>(flagKey,
+                    (T)Convert.ChangeType(deserializedValueObj, typeof(T)),
+                    ErrorType.None, evaluationResponse.Reason.ToString(), evaluationResponse.VariantKey);
             }
-            catch (FormatException)
+            catch (Exception ex)
             {
-                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch);
+                if (ex is InvalidCastException or FormatException)
+                    return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch);
             }
         }
         catch (HttpRequestException ex)
         {
             return ResolutionDetailFromHttpException(ex, flagKey, defaultValue);
         }
+
+        return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.General);
     }
 
     /// <inheritdoc />
@@ -79,8 +91,8 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
                 context.ToStringDictionary());
 
             var boolEvaluationResponse = await fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
-            return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse?.Enabled ?? defaultValue, ErrorType.None,
-                boolEvaluationResponse?.Reason.ToString());
+            return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse.Enabled, ErrorType.None,
+                boolEvaluationResponse.Reason.ToString());
         }
         catch (HttpRequestException ex)
         {
