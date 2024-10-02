@@ -50,11 +50,11 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
 
             if (evaluationResponse.Reason == EvaluationReason.FLAG_DISABLED_EVALUATION_REASON)
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
-                    evaluationResponse.Reason.ToString());
+                    Reason.Disabled);
 
             if (!evaluationResponse.Match)
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
-                    evaluationResponse.Reason.ToString());
+                    Reason.Default);
             try
             {
                 if (string.IsNullOrEmpty(evaluationResponse.VariantAttachment))
@@ -62,7 +62,7 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
                     var convertedValue = (T)Convert.ChangeType(evaluationResponse.VariantKey, typeof(T));
                     return new ResolutionDetails<T>(flagKey,
                         convertedValue, ErrorType.None,
-                        evaluationResponse.Reason.ToString(), evaluationResponse.VariantKey);
+                        Reason.TargetingMatch, evaluationResponse.VariantKey);
                 }
 
                 var deserializedValueObj = JsonSerializer.Deserialize<Value>(evaluationResponse.VariantAttachment,
@@ -70,12 +70,12 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
 
                 return new ResolutionDetails<T>(flagKey,
                     (T)Convert.ChangeType(deserializedValueObj, typeof(T)),
-                    ErrorType.None, evaluationResponse.Reason.ToString(), evaluationResponse.VariantKey);
+                    ErrorType.None, Reason.TargetingMatch, evaluationResponse.VariantKey);
             }
             catch (Exception ex)
             {
                 if (ex is InvalidCastException or FormatException)
-                    return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch);
+                    return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error);
             }
         }
         catch (FliptException ex)
@@ -83,7 +83,7 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
             return ResolutionDetailFromFliptException(ex, flagKey, defaultValue);
         }
 
-        return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.General);
+        return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.General, Reason.Unknown);
     }
 
     /// <inheritdoc />
@@ -101,7 +101,7 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
             };
             var boolEvaluationResponse = await fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
             return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse.Enabled, ErrorType.None,
-                boolEvaluationResponse.Reason.ToString());
+                Reason.TargetingMatch);
         }
         catch (FliptException ex)
         {
@@ -134,7 +134,7 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
             HttpStatusCode.InternalServerError => ErrorType.ProviderNotReady,
             _ => ErrorType.General
         };
-        return new ResolutionDetails<T>(flagKey, defaultValue, error, errorMessage: e.Message);
+        return new ResolutionDetails<T>(flagKey, defaultValue, error, errorMessage: e.Message, reason: Reason.Error);
     }
 }
 

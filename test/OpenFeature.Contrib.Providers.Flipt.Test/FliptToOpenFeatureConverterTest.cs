@@ -29,6 +29,7 @@ public class FliptToOpenFeatureConverterTest
         var resolution = await fliptToOpenFeature.EvaluateBooleanAsync("flagKey", fallbackValue);
         resolution.Value.Should().Be(fallbackValue);
         resolution.ErrorType.Should().Be(expectedOpenFeatureErrorType);
+        resolution.Reason.Should().Be(Reason.Error);
     }
 
     [Theory]
@@ -51,6 +52,8 @@ public class FliptToOpenFeatureConverterTest
 
         resolution.FlagKey.Should().Be(flagKey);
         resolution.Value.Should().Be(valueFromSrc);
+        resolution.Reason.Should().Be(Reason.TargetingMatch);
+        
     }
 
     [Theory]
@@ -69,6 +72,7 @@ public class FliptToOpenFeatureConverterTest
         resolution.FlagKey.Should().Be(flagKey);
         resolution.Value.Should().Be(fallBackValue);
         resolution.ErrorType.Should().Be(ErrorType.FlagNotFound);
+        resolution.Reason.Should().Be(Reason.Error);
     }
 
     // EvaluateAsync Tests
@@ -91,6 +95,7 @@ public class FliptToOpenFeatureConverterTest
         var resolution = await fliptToOpenFeature.EvaluateAsync("flagKey", fallbackValue);
         resolution.Value.Should().Be(fallbackValue);
         resolution.ErrorType.Should().Be(expectedOpenFeatureErrorType);
+        resolution.Reason.Should().Be(Reason.Error);
     }
 
     [Theory]
@@ -119,6 +124,7 @@ public class FliptToOpenFeatureConverterTest
         resolution.FlagKey.Should().Be(flagKey);
         resolution.Variant.Should().Be(valueFromSrc.ToString() ?? string.Empty);
         resolution.Value.Should().BeEquivalentTo(expectedValue?.ToString());
+        resolution.Reason.Should().Be(Reason.TargetingMatch);
     }
 
     [Fact]
