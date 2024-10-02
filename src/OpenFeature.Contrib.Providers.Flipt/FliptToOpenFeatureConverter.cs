@@ -78,9 +78,9 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
                     return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch);
             }
         }
-        catch (HttpRequestException ex)
+        catch (FliptException ex)
         {
-            return ResolutionDetailFromHttpException(ex, flagKey, defaultValue);
+            return ResolutionDetailFromFliptException(ex, flagKey, defaultValue);
         }
 
         return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.General);
@@ -103,9 +103,9 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
             return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse.Enabled, ErrorType.None,
                 boolEvaluationResponse.Reason.ToString());
         }
-        catch (HttpRequestException ex)
+        catch (FliptException ex)
         {
-            return ResolutionDetailFromHttpException(ex, flagKey, defaultValue);
+            return ResolutionDetailFromFliptException(ex, flagKey, defaultValue);
         }
     }
 
@@ -113,6 +113,20 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
         T defaultValue)
     {
         var error = e.StatusCode switch
+        {
+            HttpStatusCode.NotFound => ErrorType.FlagNotFound,
+            HttpStatusCode.BadRequest => ErrorType.TypeMismatch,
+            HttpStatusCode.Forbidden => ErrorType.ProviderNotReady,
+            HttpStatusCode.InternalServerError => ErrorType.ProviderNotReady,
+            _ => ErrorType.General
+        };
+        return new ResolutionDetails<T>(flagKey, defaultValue, error, errorMessage: e.Message);
+    }
+
+    private static ResolutionDetails<T> ResolutionDetailFromFliptException<T>(FliptException e, string flagKey,
+        T defaultValue)
+    {
+        var error = (HttpStatusCode)e.StatusCode switch
         {
             HttpStatusCode.NotFound => ErrorType.FlagNotFound,
             HttpStatusCode.BadRequest => ErrorType.TypeMismatch,
