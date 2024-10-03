@@ -122,8 +122,8 @@ nswag openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:"
 
 ## Know issues and limitations
 
--
-In https://github.com/open-feature/dotnet-sdk-contrib/blob/204144f6df0dacf46e6d52d34dd6b5a223a853f4/src/OpenFeature.Contrib.Providers.Flipt/ClientWrapper/FliptClientWrapper.cs#L41-L47
+-In `BuildClient()` method
+from https://github.com/open-feature/dotnet-sdk-contrib/blob/204144f6df0dacf46e6d52d34dd6b5a223a853f4/src/OpenFeature.Contrib.Providers.Flipt/ClientWrapper/FliptClientWrapper.cs#L41-L47
 a new `HttpClient` is created. In the future it would be better to allow passing of `HttpConnectionFactory` to avoid
 problems regarding socket starvation
 

@@ -204,17 +204,4 @@ public class FliptToOpenFeatureConverterTest
         resolution.Value.Should().BeEquivalentTo(fallbackValue);
         resolution.ErrorType.Should().Be(ErrorType.FlagNotFound);
     }
-
-    /* Todo Andrei: Mga kulang pa na unit test
-     - Successful na flag
-       - Boolean
-       - Variant and other types
-     - Wrong flag name
-       - Boolean
-       - Variant
-     - Type mismatch call
-
-     Strategy:
-     1. I-mock lang return type ni Flipt
-    */
 }

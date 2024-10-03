@@ -38,7 +38,7 @@ public class FliptProviderTest
             .ReturnsAsync(new VariantEvaluationResponse
             {
                 FlagKey = flagKey,
-                VariantKey = "iamastring",
+                VariantKey = "variant-key",
                 RequestId = Guid.NewGuid()
                     .ToString(),
                 SegmentKeys = ["segment1"],
@@ -65,5 +65,83 @@ public class FliptProviderTest
         valueResolution.ErrorType.Should().Be(ErrorType.TypeMismatch);
     }
 
-    // Todo Andrei: Add tests to make sure that the wrapper was called
+    [Fact]
+    public async Task ResolveStringValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
+    {
+        const string flagKey = "feature-flag-key";
+        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        await provider.ResolveStringValueAsync(flagKey, "");
+        mockFliptClientWrapper.Verify(
+            fcw => fcw.EvaluateVariantAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResolveDoubleValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
+    {
+        const string flagKey = "feature-flag-key";
+        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        await provider.ResolveDoubleValueAsync(flagKey, 0.0);
+        mockFliptClientWrapper.Verify(
+            fcw => fcw.EvaluateVariantAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResolveIntegerValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
+    {
+        const string flagKey = "feature-flag-key";
+        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        await provider.ResolveIntegerValueAsync(flagKey, 0);
+        mockFliptClientWrapper.Verify(
+            fcw => fcw.EvaluateVariantAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResolveStructureValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
+    {
+        const string flagKey = "feature-flag-key";
+        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        await provider.ResolveStructureValueAsync(flagKey, new Value());
+        mockFliptClientWrapper.Verify(
+            fcw => fcw.EvaluateVariantAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResolveBooleanValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
+    {
+        const string flagKey = "feature-flag-key";
+        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        await provider.ResolveBooleanValueAsync(flagKey, false);
+        mockFliptClientWrapper.Verify(
+            fcw => fcw.EvaluateBooleanAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
+    }
+
+    private (FliptProvider, Mock<IFliptClientWrapper>) GenerateFliptProviderWithMockedDependencies(string flagKey)
+    {
+        var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
+        mockFliptClientWrapper.Setup(fcw => fcw.EvaluateVariantAsync(It.IsAny<EvaluationRequest>()))
+            .ReturnsAsync(new VariantEvaluationResponse
+            {
+                FlagKey = flagKey,
+                VariantKey = "variant-key",
+                RequestId = Guid.NewGuid()
+                    .ToString(),
+                SegmentKeys = ["segment1"],
+                VariantAttachment = "",
+                Match = true,
+                Reason = EvaluationReason.MATCH_EVALUATION_REASON
+            });
+
+        mockFliptClientWrapper.Setup(fcw => fcw.EvaluateBooleanAsync(It.IsAny<EvaluationRequest>()))
+            .ReturnsAsync(new BooleanEvaluationResponse
+            {
+                FlagKey = flagKey,
+                RequestId = Guid.NewGuid()
+                    .ToString(),
+                Enabled = true,
+                Reason = EvaluationReason.MATCH_EVALUATION_REASON
+            });
+
+        return (new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object)),
+            mockFliptClientWrapper);
+    }
 }
