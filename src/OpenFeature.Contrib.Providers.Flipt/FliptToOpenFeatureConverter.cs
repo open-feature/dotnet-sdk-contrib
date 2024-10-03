@@ -28,12 +28,68 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
         string clientToken = "",
         int timeoutInSeconds = 30) : this(new FliptClientWrapper(fliptUrl, clientToken, timeoutInSeconds),
         namespaceKey)
+{
+}
+
+/// <inheritdoc />
+public async Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue,
+    EvaluationContext context = null)
+{
+    var evaluationRequest = new EvaluationRequest
     {
+        NamespaceKey = namespaceKey,
+        FlagKey = flagKey,
+        EntityId = context?.TargetingKey ?? "",
+        Context = context.ToStringDictionary()
+    };
+
+    try
+    {
+        var evaluationResponse = await fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
+
+        if (evaluationResponse.Reason == EvaluationReason.FLAG_DISABLED_EVALUATION_REASON)
+            return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
+                Reason.Disabled);
+
+        if (!evaluationResponse.Match)
+            return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
+                Reason.Default);
+        try
+        {
+            if (string.IsNullOrEmpty(evaluationResponse.VariantAttachment))
+            {
+                var convertedValue = (T)Convert.ChangeType(evaluationResponse.VariantKey, typeof(T));
+                return new ResolutionDetails<T>(flagKey,
+                    convertedValue, ErrorType.None,
+                    Reason.TargetingMatch, evaluationResponse.VariantKey);
+            }
+
+            var deserializedValueObj = JsonSerializer.Deserialize<Value>(evaluationResponse.VariantAttachment,
+                JsonConverterExtensions.DefaultSerializerSettings);
+
+            return new ResolutionDetails<T>(flagKey,
+                (T)Convert.ChangeType(deserializedValueObj, typeof(T)),
+                ErrorType.None, Reason.TargetingMatch, evaluationResponse.VariantKey);
+        }
+        catch (Exception ex)
+        {
+            if (ex is InvalidCastException or FormatException)
+                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error);
+        }
+    }
+    catch (FliptRestException ex)
+    {
+        return ResolutionDetailFromFliptRestException(ex, flagKey, defaultValue);
     }
 
-    /// <inheritdoc />
-    public async Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue,
-        EvaluationContext context = null)
+    return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.General, Reason.Unknown);
+}
+
+/// <inheritdoc />
+public async Task<ResolutionDetails<bool>> EvaluateBooleanAsync(string flagKey, bool defaultValue,
+    EvaluationContext context = null)
+{
+    try
     {
         var evaluationRequest = new EvaluationRequest
         {
@@ -42,85 +98,29 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
             EntityId = context?.TargetingKey ?? "",
             Context = context.ToStringDictionary()
         };
-
-        try
-        {
-            var evaluationResponse = await fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
-
-            if (evaluationResponse.Reason == EvaluationReason.FLAG_DISABLED_EVALUATION_REASON)
-                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
-                    Reason.Disabled);
-
-            if (!evaluationResponse.Match)
-                return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
-                    Reason.Default);
-            try
-            {
-                if (string.IsNullOrEmpty(evaluationResponse.VariantAttachment))
-                {
-                    var convertedValue = (T)Convert.ChangeType(evaluationResponse.VariantKey, typeof(T));
-                    return new ResolutionDetails<T>(flagKey,
-                        convertedValue, ErrorType.None,
-                        Reason.TargetingMatch, evaluationResponse.VariantKey);
-                }
-
-                var deserializedValueObj = JsonSerializer.Deserialize<Value>(evaluationResponse.VariantAttachment,
-                    JsonConverterExtensions.DefaultSerializerSettings);
-
-                return new ResolutionDetails<T>(flagKey,
-                    (T)Convert.ChangeType(deserializedValueObj, typeof(T)),
-                    ErrorType.None, Reason.TargetingMatch, evaluationResponse.VariantKey);
-            }
-            catch (Exception ex)
-            {
-                if (ex is InvalidCastException or FormatException)
-                    return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error);
-            }
-        }
-        catch (FliptRestException ex)
-        {
-            return ResolutionDetailFromFliptRestException(ex, flagKey, defaultValue);
-        }
-
-        return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.General, Reason.Unknown);
+        var boolEvaluationResponse = await fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
+        return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse.Enabled, ErrorType.None,
+            Reason.TargetingMatch);
     }
-
-    /// <inheritdoc />
-    public async Task<ResolutionDetails<bool>> EvaluateBooleanAsync(string flagKey, bool defaultValue,
-        EvaluationContext context = null)
+    catch (FliptRestException ex)
     {
-        try
-        {
-            var evaluationRequest = new EvaluationRequest
-            {
-                NamespaceKey = namespaceKey,
-                FlagKey = flagKey,
-                EntityId = context?.TargetingKey ?? "",
-                Context = context.ToStringDictionary()
-            };
-            var boolEvaluationResponse = await fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
-            return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse.Enabled, ErrorType.None,
-                Reason.TargetingMatch);
-        }
-        catch (FliptRestException ex)
-        {
-            return ResolutionDetailFromFliptRestException(ex, flagKey, defaultValue);
-        }
+        return ResolutionDetailFromFliptRestException(ex, flagKey, defaultValue);
     }
+}
 
-    private static ResolutionDetails<T> ResolutionDetailFromFliptRestException<T>(FliptRestException e, string flagKey,
-        T defaultValue)
+private static ResolutionDetails<T> ResolutionDetailFromFliptRestException<T>(FliptRestException e, string flagKey,
+    T defaultValue)
+{
+    var error = (HttpStatusCode)e.StatusCode switch
     {
-        var error = (HttpStatusCode)e.StatusCode switch
-        {
-            HttpStatusCode.NotFound => ErrorType.FlagNotFound,
-            HttpStatusCode.BadRequest => ErrorType.TypeMismatch,
-            HttpStatusCode.Forbidden => ErrorType.ProviderNotReady,
-            HttpStatusCode.InternalServerError => ErrorType.ProviderNotReady,
-            _ => ErrorType.General
-        };
-        return new ResolutionDetails<T>(flagKey, defaultValue, error, errorMessage: e.Message, reason: Reason.Error);
-    }
+        HttpStatusCode.NotFound => ErrorType.FlagNotFound,
+        HttpStatusCode.BadRequest => ErrorType.TypeMismatch,
+        HttpStatusCode.Forbidden => ErrorType.ProviderNotReady,
+        HttpStatusCode.InternalServerError => ErrorType.ProviderNotReady,
+        _ => ErrorType.General
+    };
+    return new ResolutionDetails<T>(flagKey, defaultValue, error, errorMessage: e.Message, reason: Reason.Error);
+}
 }
 
 /// <summary>

@@ -23,7 +23,7 @@ public class FliptProviderTest
     [Fact]
     public void CreateFliptProvider_GivenEmptyUrl_ShouldThrowInvalidOperationException()
     {
-        var act = void () => new FliptProvider("");
+        var act = void() => new FliptProvider("");
         act.Should().Throw<UriFormatException>();
     }
 

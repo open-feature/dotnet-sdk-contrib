@@ -110,27 +110,27 @@ public class FlipExtensionsTest
                 ])
             },
             { "config3", new Value(DateTime.Now) }
-        });
+});
 
-        var evaluationContext = EvaluationContext.Builder()
-            .SetTargetingKey(Guid.NewGuid().ToString())
-            .Set("config", testStructure)
-            .Build();
-        var result = evaluationContext.ToStringDictionary();
+var evaluationContext = EvaluationContext.Builder()
+    .SetTargetingKey(Guid.NewGuid().ToString())
+    .Set("config", testStructure)
+    .Build();
+var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Keys.Should().Contain("config");
+result.Should().NotBeNull();
+result.Should().NotBeEmpty();
+result.Keys.Should().Contain("config");
 
-        var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
-            JsonConverterExtensions.DefaultSerializerSettings);
-        deserialized.Should().BeEquivalentTo(testStructure);
+var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
+    JsonConverterExtensions.DefaultSerializerSettings);
+deserialized.Should().BeEquivalentTo(testStructure);
     }
 
     [Fact]
-    public void ToStringDictionary_WithContextWithNestedStructure_ShouldReturnADictionaryWithSerializedValues()
-    {
-        var testStructure = new Structure(new Dictionary<string, Value>
+public void ToStringDictionary_WithContextWithNestedStructure_ShouldReturnADictionaryWithSerializedValues()
+{
+    var testStructure = new Structure(new Dictionary<string, Value>
         {
             {
                 "config-value-struct", new Value(new Structure(new Dictionary<string, Value>
@@ -141,18 +141,18 @@ public class FlipExtensionsTest
             { "config-value-value", new Value(new Value(DateTime.Now)) }
         });
 
-        var evaluationContext = EvaluationContext.Builder()
-            .SetTargetingKey(Guid.NewGuid().ToString())
-            .Set("config", testStructure)
-            .Build();
-        var result = evaluationContext.ToStringDictionary();
+    var evaluationContext = EvaluationContext.Builder()
+        .SetTargetingKey(Guid.NewGuid().ToString())
+        .Set("config", testStructure)
+        .Build();
+    var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Keys.Should().Contain("config");
+    result.Should().NotBeNull();
+    result.Should().NotBeEmpty();
+    result.Keys.Should().Contain("config");
 
-        var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
-            JsonConverterExtensions.DefaultSerializerSettings);
-        deserialized.Should().BeEquivalentTo(testStructure);
-    }
+    var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
+        JsonConverterExtensions.DefaultSerializerSettings);
+    deserialized.Should().BeEquivalentTo(testStructure);
+}
 }
