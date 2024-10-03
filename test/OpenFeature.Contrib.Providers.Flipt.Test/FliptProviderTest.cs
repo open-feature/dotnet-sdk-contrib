@@ -4,6 +4,7 @@ using Moq;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 using OpenFeature.Model;
+using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
@@ -63,4 +64,6 @@ public class FliptProviderTest
         valueResolution.Value.Should().BeEquivalentTo(new Value());
         valueResolution.ErrorType.Should().Be(ErrorType.TypeMismatch);
     }
+
+    // Todo Andrei: Add tests to make sure that the wrapper was called
 }

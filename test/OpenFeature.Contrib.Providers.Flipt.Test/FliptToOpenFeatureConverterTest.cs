@@ -5,6 +5,7 @@ using Moq;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 using OpenFeature.Model;
+using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
@@ -53,7 +54,6 @@ public class FliptToOpenFeatureConverterTest
         resolution.FlagKey.Should().Be(flagKey);
         resolution.Value.Should().Be(valueFromSrc);
         resolution.Reason.Should().Be(Reason.TargetingMatch);
-        
     }
 
     [Theory]

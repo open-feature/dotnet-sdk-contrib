@@ -17,14 +17,6 @@
         <PackageReference Include="xunit" Version="2.5.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>
         <PackageReference Update="FluentAssertions" Version="6.12.1"/>
-        <PackageReference Remove="NSubstitute"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Using Include="Xunit"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Flipt\OpenFeature.Contrib.Providers.Flipt.csproj"/>
     </ItemGroup>
 

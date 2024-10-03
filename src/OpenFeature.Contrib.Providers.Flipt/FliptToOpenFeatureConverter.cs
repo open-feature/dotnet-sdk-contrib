@@ -1,6 +1,5 @@
 using System;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Flipt.Rest;
@@ -109,20 +108,6 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
         }
     }
 
-    private static ResolutionDetails<T> ResolutionDetailFromHttpException<T>(HttpRequestException e, string flagKey,
-        T defaultValue)
-    {
-        var error = e.StatusCode switch
-        {
-            HttpStatusCode.NotFound => ErrorType.FlagNotFound,
-            HttpStatusCode.BadRequest => ErrorType.TypeMismatch,
-            HttpStatusCode.Forbidden => ErrorType.ProviderNotReady,
-            HttpStatusCode.InternalServerError => ErrorType.ProviderNotReady,
-            _ => ErrorType.General
-        };
-        return new ResolutionDetails<T>(flagKey, defaultValue, error, errorMessage: e.Message);
-    }
-
     private static ResolutionDetails<T> ResolutionDetailFromFliptException<T>(FliptException e, string flagKey,
         T defaultValue)
     {
@@ -146,19 +131,19 @@ public interface IFliptToOpenFeatureConverter
     /// <summary>
     ///     Used for evaluating non-boolean flags. Flipt handles datatypes which is not boolean as variants
     /// </summary>
-    /// <param name="flagKey"></param>
-    /// <param name="defaultValue"></param>
-    /// <param name="context"></param>
-    /// <typeparam name="T"></typeparam>
+    /// <param name="flagKey">Key of the flag to evaluate</param>
+    /// <param name="defaultValue">Fallback value in case of error, or flag not present or disabled, or no match</param>
+    /// <param name="context">Additional data to use to filter and segment requests</param>
+    /// <typeparam name="T">Type to evaluate. For boolean use EvaluateBoolean</typeparam>
     /// <returns>OpenFeature ResolutionDetails object</returns>
     Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue, EvaluationContext context = null);
 
     /// <summary>
     ///     Used for evaluating boolean flags
     /// </summary>
-    /// <param name="flagKey"></param>
-    /// <param name="defaultValue"></param>
-    /// <param name="context"></param>
+    /// <param name="flagKey">Key of the flag to evaluate</param>
+    /// <param name="defaultValue">Fallback value in case of error, or flag not present, or no match</param>
+    /// <param name="context">Additional data to use to filter and segment requests</param>
     /// <returns>OpenFeature ResolutionDetails object</returns>
     Task<ResolutionDetails<bool>> EvaluateBooleanAsync(string flagKey, bool defaultValue,
         EvaluationContext context = null);
