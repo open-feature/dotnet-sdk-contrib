@@ -17,7 +17,7 @@ public class FliptToOpenFeatureConverterTest
     [InlineData(HttpStatusCode.BadRequest, ErrorType.TypeMismatch, false)]
     [InlineData(HttpStatusCode.InternalServerError, ErrorType.ProviderNotReady, false)]
     [InlineData(HttpStatusCode.Forbidden, ErrorType.ProviderNotReady, false)]
-    [InlineData(HttpStatusCode.TooManyRequests, ErrorType.General, false)]
+    [InlineData(HttpStatusCode.Ambiguous, ErrorType.General, false)]
     public async Task EvaluateBooleanAsync_GivenHttpRequestException_ShouldHandleHttpRequestException(
         HttpStatusCode thrownStatusCode, ErrorType expectedOpenFeatureErrorType, bool fallbackValue)
     {
@@ -82,7 +82,7 @@ public class FliptToOpenFeatureConverterTest
     [InlineData(HttpStatusCode.BadRequest, ErrorType.TypeMismatch, 0.0)]
     [InlineData(HttpStatusCode.InternalServerError, ErrorType.ProviderNotReady, 0.0)]
     [InlineData(HttpStatusCode.Forbidden, ErrorType.ProviderNotReady, 0.0)]
-    [InlineData(HttpStatusCode.TooManyRequests, ErrorType.General, 0.0)]
+    [InlineData(HttpStatusCode.Ambiguous, ErrorType.General, 0.0)]
     public async Task EvaluateAsync_GivenHttpRequestException_ShouldHandleHttpRequestException(
         HttpStatusCode thrownStatusCode, ErrorType expectedOpenFeatureErrorType, double fallbackValue)
     {
