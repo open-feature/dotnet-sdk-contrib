@@ -47,7 +47,7 @@ public async Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defau
     {
         var evaluationResponse = await fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
 
-        if (evaluationResponse.Reason == EvaluationReason.FLAG_DISABLED_EVALUATION_REASON)
+        if (evaluationResponse.Reason == VariantEvaluationResponseReason.FLAG_DISABLED_EVALUATION_REASON)
             return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
                 Reason.Disabled);
 

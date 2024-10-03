@@ -23,7 +23,7 @@ public class FliptProviderTest
     [Fact]
     public void CreateFliptProvider_GivenEmptyUrl_ShouldThrowInvalidOperationException()
     {
-        var act = void() => new FliptProvider("");
+        var act = void () => new FliptProvider("");
         act.Should().Throw<UriFormatException>();
     }
 
@@ -44,7 +44,7 @@ public class FliptProviderTest
                 SegmentKeys = ["segment1"],
                 VariantAttachment = "",
                 Match = true,
-                Reason = EvaluationReason.MATCH_EVALUATION_REASON
+                Reason = VariantEvaluationResponseReason.MATCH_EVALUATION_REASON
             });
 
         var provider = new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object));
@@ -128,7 +128,7 @@ public class FliptProviderTest
                 SegmentKeys = ["segment1"],
                 VariantAttachment = "",
                 Match = true,
-                Reason = EvaluationReason.MATCH_EVALUATION_REASON
+                Reason = VariantEvaluationResponseReason.MATCH_EVALUATION_REASON
             });
 
         mockFliptClientWrapper.Setup(fcw => fcw.EvaluateBooleanAsync(It.IsAny<EvaluationRequest>()))
@@ -138,7 +138,7 @@ public class FliptProviderTest
                 RequestId = Guid.NewGuid()
                     .ToString(),
                 Enabled = true,
-                Reason = EvaluationReason.MATCH_EVALUATION_REASON
+                Reason = BooleanEvaluationResponseReason.MATCH_EVALUATION_REASON
             });
 
         return (new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object)),

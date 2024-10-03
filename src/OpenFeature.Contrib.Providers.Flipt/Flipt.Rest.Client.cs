@@ -27,204 +27,268 @@ namespace Flipt.Rest
     {
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BooleanEvaluationResponse> EvaluateV1BooleanAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<VariantEvaluationResponse> EvaluateV1VariantAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BatchEvaluationResponse> EvaluateV1BatchAsync(BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AuthenticationToken> AuthV1MethodKubernetesServiceaccountAsync(Body body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AuthMethodOIDCAuthorizeURLResponse> AuthV1MethodOidcAuthorizeAsync(string provider, string state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AuthMethodOIDCCallbackResponse> AuthV1MethodOidcCallbackAsync(string provider, string code, string state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AuthenticationToken> AuthV1MethodTokenAsync(Body2 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AuthenticationList> AuthV1TokensGetAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Authentication> AuthV1TokensGetAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AuthV1TokensDeleteAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Authentication> AuthV1SelfAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AuthV1SelfExpireAsync(Body3 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Constraint> ApiV1NamespacesSegmentsConstraintsPostAsync(string namespaceKey, string segmentKey, ConstraintCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsDeleteAsync(string namespaceKey, string segmentKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsPutAsync(string namespaceKey, string segmentKey, string id, ConstraintUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPostAsync(string namespaceKey, string flagKey, string ruleId, DistributionCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDistributionsDeleteAsync(string namespaceKey, string flagKey, string ruleId, string id, string variantId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPutAsync(string namespaceKey, string flagKey, string ruleId, string id, DistributionUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<EvaluationResponse> ApiV1NamespacesEvaluateAsync(string namespaceKey, EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BatchEvaluationResponse> ApiV1NamespacesBatchEvaluateAsync(string namespaceKey, BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FlagList> ApiV1NamespacesFlagsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPostAsync(string namespaceKey, FlagCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesFlagsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPutAsync(string namespaceKey, string key, FlagUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<NamespaceList> ApiV1NamespacesGetAsync(int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPostAsync(NamespaceCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPostAsync(CreateNamespaceRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Namespace> ApiV1NamespacesGetAsync(string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPutAsync(string key, UpdateNamespaceRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesDeleteAsync(string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPutAsync(string key, NamespaceUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<FlagList> ApiV1NamespacesFlagsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RolloutList> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPostAsync(string namespaceKey, CreateFlagRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsPostAsync(string namespaceKey, string flagKey, RolloutCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<RolloutList> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, int? limit = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsOrderAsync(string namespaceKey, string flagKey, RolloutOrderRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsPostAsync(string namespaceKey, string flagKey, CreateRolloutRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsOrderAsync(string namespaceKey, string flagKey, OrderRolloutsRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, string id, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsPutAsync(string namespaceKey, string flagKey, string id, UpdateRolloutRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsPutAsync(string namespaceKey, string flagKey, string id, RolloutUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<RuleList> ApiV1NamespacesFlagsRulesGetAsync(string namespaceKey, string flagKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesPostAsync(string namespaceKey, string flagKey, RuleCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesPostAsync(string namespaceKey, string flagKey, CreateRuleRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesOrderAsync(string namespaceKey, string flagKey, RuleOrderRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesOrderAsync(string namespaceKey, string flagKey, OrderRulesRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesGetAsync(string namespaceKey, string flagKey, string id, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesPutAsync(string namespaceKey, string flagKey, string id, UpdateRuleRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesPutAsync(string namespaceKey, string flagKey, string id, RuleUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPostAsync(string namespaceKey, string flagKey, string ruleId, CreateDistributionRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SegmentList> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPutAsync(string namespaceKey, string flagKey, string ruleId, string id, UpdateDistributionRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPostAsync(string namespaceKey, SegmentCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDistributionsDeleteAsync(string namespaceKey, string flagKey, string ruleId, string id, string variantId = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPostAsync(string namespaceKey, string flagKey, CreateVariantRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ApiV1NamespacesSegmentsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPutAsync(string namespaceKey, string flagKey, string id, UpdateVariantRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPutAsync(string namespaceKey, string key, SegmentUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPostAsync(string namespaceKey, string flagKey, VariantCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsVariantsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPutAsync(string namespaceKey, string flagKey, string id, VariantUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPutAsync(string namespaceKey, string key, UpdateFlagRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ApiV1NamespacesFlagsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<SegmentList> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPostAsync(string namespaceKey, CreateSegmentRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPutAsync(string namespaceKey, string key, UpdateSegmentRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ApiV1NamespacesSegmentsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Constraint> ApiV1NamespacesSegmentsConstraintsPostAsync(string namespaceKey, string segmentKey, CreateConstraintRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Constraint> ApiV1NamespacesSegmentsConstraintsPutAsync(string namespaceKey, string segmentKey, string id, UpdateConstraintRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsDeleteAsync(string namespaceKey, string segmentKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<VerifyServiceAccountResponse> AuthV1MethodKubernetesServiceaccountAsync(VerifyServiceAccountRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<AuthorizeURLResponse> AuthV1MethodOidcAuthorizeAsync(string provider, string state = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<CallbackResponse> AuthV1MethodOidcCallbackAsync(string provider, string code = null, string state = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<CreateTokenResponse> AuthV1MethodTokenAsync(CreateTokenRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Authentication> AuthV1SelfAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task AuthV1SelfExpireAsync(System.DateTimeOffset? expiresAt = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ListAuthenticationsResponse> AuthV1TokensGetAsync(Method? method = null, int? limit = null, string pageToken = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Authentication> AuthV1TokensGetAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task AuthV1TokensDeleteAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<BatchEvaluationResponse> EvaluateV1BatchAsync(BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<BooleanEvaluationResponse> EvaluateV1BooleanAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<VariantEvaluationResponse> EvaluateV1VariantAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <remarks>
+        /// OFREP provider configuration
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<GetProviderConfigurationResponse> OfrepV1ConfigurationAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <remarks>
+        /// OFREP bulk flag evaluation
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<BulkEvaluationResponse> OfrepV1EvaluateFlagsPostAsync(EvaluateBulkRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <remarks>
+        /// OFREP single flag evaluation
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<EvaluatedFlag> OfrepV1EvaluateFlagsPostAsync(string key, EvaluateFlagRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -261,323 +325,10 @@ namespace Flipt.Rest
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<BooleanEvaluationResponse> EvaluateV1BooleanAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<NamespaceList> ApiV1NamespacesGetAsync(int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "evaluate/v1/boolean"
-                    urlBuilder_.Append("evaluate/v1/boolean");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<BooleanEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<VariantEvaluationResponse> EvaluateV1VariantAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "evaluate/v1/variant"
-                    urlBuilder_.Append("evaluate/v1/variant");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<VariantEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<BatchEvaluationResponse> EvaluateV1BatchAsync(BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "evaluate/v1/batch"
-                    urlBuilder_.Append("evaluate/v1/batch");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<BatchEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AuthenticationToken> AuthV1MethodKubernetesServiceaccountAsync(Body body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "auth/v1/method/kubernetes/serviceaccount"
-                    urlBuilder_.Append("auth/v1/method/kubernetes/serviceaccount");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<AuthenticationToken>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AuthMethodOIDCAuthorizeURLResponse> AuthV1MethodOidcAuthorizeAsync(string provider, string state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (provider == null)
-                throw new System.ArgumentNullException("provider");
-
-            if (state == null)
-                throw new System.ArgumentNullException("state");
-
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -589,12 +340,25 @@ namespace Flipt.Rest
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "auth/v1/method/oidc/{provider}/authorize"
-                    urlBuilder_.Append("auth/v1/method/oidc/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(provider, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/authorize");
+                    // Operation Path: "api/v1/namespaces"
+                    urlBuilder_.Append("api/v1/namespaces");
                     urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("state")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(state, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    if (limit != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("limit")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(limit, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (offset != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("offset")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(offset, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (pageToken != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("pageToken")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageToken, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (reference != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("reference")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(reference, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
                     urlBuilder_.Length--;
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -622,7 +386,7 @@ namespace Flipt.Rest
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<AuthMethodOIDCAuthorizeURLResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<NamespaceList>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -650,17 +414,90 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AuthMethodOIDCCallbackResponse> AuthV1MethodOidcCallbackAsync(string provider, string code, string state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPostAsync(CreateNamespaceRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            if (provider == null)
-                throw new System.ArgumentNullException("provider");
+            if (body == null)
+                throw new System.ArgumentNullException("body");
 
-            if (code == null)
-                throw new System.ArgumentNullException("code");
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
-            if (state == null)
-                throw new System.ArgumentNullException("state");
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces"
+                    urlBuilder_.Append("api/v1/namespaces");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesGetAsync(string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (key == null)
+                throw new System.ArgumentNullException("key");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -673,13 +510,14 @@ namespace Flipt.Rest
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "auth/v1/method/oidc/{provider}/callback"
-                    urlBuilder_.Append("auth/v1/method/oidc/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(provider, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/callback");
+                    // Operation Path: "api/v1/namespaces/{key}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
                     urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("code")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(code, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("state")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(state, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    if (reference != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("reference")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(reference, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
                     urlBuilder_.Length--;
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -707,7 +545,7 @@ namespace Flipt.Rest
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<AuthMethodOIDCCallbackResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -735,881 +573,12 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AuthenticationToken> AuthV1MethodTokenAsync(Body2 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPutAsync(string key, UpdateNamespaceRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "auth/v1/method/token"
-                    urlBuilder_.Append("auth/v1/method/token");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<AuthenticationToken>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AuthenticationList> AuthV1TokensGetAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "auth/v1/tokens"
-                    urlBuilder_.Append("auth/v1/tokens");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<AuthenticationList>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Authentication> AuthV1TokensGetAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "auth/v1/tokens/{id}"
-                    urlBuilder_.Append("auth/v1/tokens/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Authentication>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AuthV1TokensDeleteAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "auth/v1/tokens/{id}"
-                    urlBuilder_.Append("auth/v1/tokens/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Authentication> AuthV1SelfAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "auth/v1/self"
-                    urlBuilder_.Append("auth/v1/self");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Authentication>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AuthV1SelfExpireAsync(Body3 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "auth/v1/self/expire"
-                    urlBuilder_.Append("auth/v1/self/expire");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Constraint> ApiV1NamespacesSegmentsConstraintsPostAsync(string namespaceKey, string segmentKey, ConstraintCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (segmentKey == null)
-                throw new System.ArgumentNullException("segmentKey");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/segments/{segmentKey}/constraints"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/segments/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(segmentKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/constraints");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Constraint>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsDeleteAsync(string namespaceKey, string segmentKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (segmentKey == null)
-                throw new System.ArgumentNullException("segmentKey");
-
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/segments/{segmentKey}/constraints/{id}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/segments/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(segmentKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/constraints/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsPutAsync(string namespaceKey, string segmentKey, string id, ConstraintUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (segmentKey == null)
-                throw new System.ArgumentNullException("segmentKey");
-
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/segments/{segmentKey}/constraints/{id}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/segments/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(segmentKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/constraints/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPostAsync(string namespaceKey, string flagKey, string ruleId, DistributionCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (flagKey == null)
-                throw new System.ArgumentNullException("flagKey");
-
-            if (ruleId == null)
-                throw new System.ArgumentNullException("ruleId");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rules/{ruleId}/distributions"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/rules/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(ruleId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/distributions");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Distribution>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDistributionsDeleteAsync(string namespaceKey, string flagKey, string ruleId, string id, string variantId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (flagKey == null)
-                throw new System.ArgumentNullException("flagKey");
-
-            if (ruleId == null)
-                throw new System.ArgumentNullException("ruleId");
-
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (variantId == null)
-                throw new System.ArgumentNullException("variantId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rules/{ruleId}/distributions/{id}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/rules/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(ruleId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/distributions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("variantId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(variantId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPutAsync(string namespaceKey, string flagKey, string ruleId, string id, DistributionUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (flagKey == null)
-                throw new System.ArgumentNullException("flagKey");
-
-            if (ruleId == null)
-                throw new System.ArgumentNullException("ruleId");
-
-            if (id == null)
-                throw new System.ArgumentNullException("id");
+            if (key == null)
+                throw new System.ArgumentNullException("key");
 
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -1629,15 +598,9 @@ namespace Flipt.Rest
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rules/{ruleId}/distributions/{id}"
+                    // Operation Path: "api/v1/namespaces/{key}"
                     urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/rules/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(ruleId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/distributions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1664,7 +627,7 @@ namespace Flipt.Rest
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Distribution>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -1692,14 +655,12 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<EvaluationResponse> ApiV1NamespacesEvaluateAsync(string namespaceKey, EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task ApiV1NamespacesDeleteAsync(string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
+            if (key == null)
+                throw new System.ArgumentNullException("key");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1707,19 +668,13 @@ namespace Flipt.Rest
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/evaluate"
+                    // Operation Path: "api/v1/namespaces/{key}"
                     urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/evaluate");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1746,12 +701,7 @@ namespace Flipt.Rest
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<EvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
+                            return;
                         }
                         else
                         {
@@ -1774,88 +724,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<BatchEvaluationResponse> ApiV1NamespacesBatchEvaluateAsync(string namespaceKey, BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/batch-evaluate"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/batch-evaluate");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<BatchEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<FlagList> ApiV1NamespacesFlagsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
@@ -1949,8 +818,9 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPostAsync(string namespaceKey, FlagCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPostAsync(string namespaceKey, CreateFlagRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
@@ -2031,646 +901,9 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (key == null)
-                throw new System.ArgumentNullException("key");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{key}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append('?');
-                    if (reference != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("reference")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(reference, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Flag>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (key == null)
-                throw new System.ArgumentNullException("key");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{key}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPutAsync(string namespaceKey, string key, FlagUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (key == null)
-                throw new System.ArgumentNullException("key");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{key}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Flag>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<NamespaceList> ApiV1NamespacesGetAsync(int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces"
-                    urlBuilder_.Append("api/v1/namespaces");
-                    urlBuilder_.Append('?');
-                    if (limit != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("limit")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(limit, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (offset != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("offset")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(offset, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (pageToken != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("pageToken")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageToken, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (reference != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("reference")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(reference, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<NamespaceList>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPostAsync(NamespaceCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces"
-                    urlBuilder_.Append("api/v1/namespaces");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesGetAsync(string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (key == null)
-                throw new System.ArgumentNullException("key");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{key}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append('?');
-                    if (reference != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("reference")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(reference, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesDeleteAsync(string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (key == null)
-                throw new System.ArgumentNullException("key");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{key}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPutAsync(string key, NamespaceUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (key == null)
-                throw new System.ArgumentNullException("key");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{key}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<RolloutList> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<RolloutList> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, int? limit = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
@@ -2699,10 +932,6 @@ namespace Flipt.Rest
                     if (limit != null)
                     {
                         urlBuilder_.Append(System.Uri.EscapeDataString("limit")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(limit, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (offset != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("offset")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(offset, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     }
                     if (pageToken != null)
                     {
@@ -2767,8 +996,9 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsPostAsync(string namespaceKey, string flagKey, RolloutCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsPostAsync(string namespaceKey, string flagKey, CreateRolloutRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
@@ -2854,8 +1084,9 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsOrderAsync(string namespaceKey, string flagKey, RolloutOrderRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsOrderAsync(string namespaceKey, string flagKey, OrderRolloutsRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
@@ -2910,7 +1141,7 @@ namespace Flipt.Rest
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
+                        if (status_ == 200)
                         {
                             return;
                         }
@@ -2935,6 +1166,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, string id, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
@@ -3025,6 +1257,99 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsPutAsync(string namespaceKey, string flagKey, string id, UpdateRolloutRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (flagKey == null)
+                throw new System.ArgumentNullException("flagKey");
+
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rollouts/{id}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/rollouts/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Rollout>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
@@ -3078,7 +1403,7 @@ namespace Flipt.Rest
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
+                        if (status_ == 200)
                         {
                             return;
                         }
@@ -3103,91 +1428,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsPutAsync(string namespaceKey, string flagKey, string id, RolloutUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (flagKey == null)
-                throw new System.ArgumentNullException("flagKey");
-
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rollouts/{id}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/rollouts/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<RuleList> ApiV1NamespacesFlagsRulesGetAsync(string namespaceKey, string flagKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
@@ -3286,8 +1527,9 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesPostAsync(string namespaceKey, string flagKey, RuleCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesPostAsync(string namespaceKey, string flagKey, CreateRuleRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
@@ -3373,8 +1615,9 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesOrderAsync(string namespaceKey, string flagKey, RuleOrderRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesOrderAsync(string namespaceKey, string flagKey, OrderRulesRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
@@ -3429,7 +1672,7 @@ namespace Flipt.Rest
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
+                        if (status_ == 200)
                         {
                             return;
                         }
@@ -3454,6 +1697,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesGetAsync(string namespaceKey, string flagKey, string id, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
@@ -3544,6 +1788,99 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesPutAsync(string namespaceKey, string flagKey, string id, UpdateRuleRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (flagKey == null)
+                throw new System.ArgumentNullException("flagKey");
+
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rules/{id}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/rules/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Rule>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
@@ -3597,7 +1934,7 @@ namespace Flipt.Rest
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
+                        if (status_ == 200)
                         {
                             return;
                         }
@@ -3622,14 +1959,111 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesPutAsync(string namespaceKey, string flagKey, string id, RuleUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPostAsync(string namespaceKey, string flagKey, string ruleId, CreateDistributionRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
 
             if (flagKey == null)
                 throw new System.ArgumentNullException("flagKey");
+
+            if (ruleId == null)
+                throw new System.ArgumentNullException("ruleId");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rules/{ruleId}/distributions"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/rules/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(ruleId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/distributions");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Distribution>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPutAsync(string namespaceKey, string flagKey, string ruleId, string id, UpdateDistributionRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (flagKey == null)
+                throw new System.ArgumentNullException("flagKey");
+
+            if (ruleId == null)
+                throw new System.ArgumentNullException("ruleId");
 
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -3648,15 +2082,18 @@ namespace Flipt.Rest
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rules/{id}"
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rules/{ruleId}/distributions/{id}"
                     urlBuilder_.Append("api/v1/namespaces/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
                     urlBuilder_.Append("/flags/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
                     urlBuilder_.Append("/rules/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(ruleId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/distributions/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -3682,7 +2119,102 @@ namespace Flipt.Rest
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Distribution>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDistributionsDeleteAsync(string namespaceKey, string flagKey, string ruleId, string id, string variantId = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (flagKey == null)
+                throw new System.ArgumentNullException("flagKey");
+
+            if (ruleId == null)
+                throw new System.ArgumentNullException("ruleId");
+
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/rules/{ruleId}/distributions/{id}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/rules/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(ruleId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/distributions/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append('?');
+                    if (variantId != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("variantId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(variantId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
                         {
                             return;
                         }
@@ -3707,6 +2239,513 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPostAsync(string namespaceKey, string flagKey, CreateVariantRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (flagKey == null)
+                throw new System.ArgumentNullException("flagKey");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/variants"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/variants");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Variant>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPutAsync(string namespaceKey, string flagKey, string id, UpdateVariantRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (flagKey == null)
+                throw new System.ArgumentNullException("flagKey");
+
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/variants/{id}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/variants/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Variant>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsVariantsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (flagKey == null)
+                throw new System.ArgumentNullException("flagKey");
+
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/variants/{id}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/variants/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (key == null)
+                throw new System.ArgumentNullException("key");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{key}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append('?');
+                    if (reference != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("reference")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(reference, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Flag>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPutAsync(string namespaceKey, string key, UpdateFlagRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (key == null)
+                throw new System.ArgumentNullException("key");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{key}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Flag>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (key == null)
+                throw new System.ArgumentNullException("key");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{key}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SegmentList> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
@@ -3800,8 +2839,9 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPostAsync(string namespaceKey, SegmentCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPostAsync(string namespaceKey, CreateSegmentRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
@@ -3882,6 +2922,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
@@ -3967,81 +3008,9 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesSegmentsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (key == null)
-                throw new System.ArgumentNullException("key");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/segments/{key}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/segments/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPutAsync(string namespaceKey, string key, SegmentUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPutAsync(string namespaceKey, string key, UpdateSegmentRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
@@ -4126,17 +3095,15 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPostAsync(string namespaceKey, string flagKey, VariantCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task ApiV1NamespacesSegmentsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
 
-            if (flagKey == null)
-                throw new System.ArgumentNullException("flagKey");
-
-            if (body == null)
-                throw new System.ArgumentNullException("body");
+            if (key == null)
+                throw new System.ArgumentNullException("key");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4144,21 +3111,15 @@ namespace Flipt.Rest
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/variants"
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/segments/{key}"
                     urlBuilder_.Append("api/v1/namespaces/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/variants");
+                    urlBuilder_.Append("/segments/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -4185,7 +3146,90 @@ namespace Flipt.Rest
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Variant>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Constraint> ApiV1NamespacesSegmentsConstraintsPostAsync(string namespaceKey, string segmentKey, CreateConstraintRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (segmentKey == null)
+                throw new System.ArgumentNullException("segmentKey");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/segments/{segmentKey}/constraints"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/segments/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(segmentKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/constraints");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Constraint>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -4213,92 +3257,15 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
         /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsVariantsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Constraint> ApiV1NamespacesSegmentsConstraintsPutAsync(string namespaceKey, string segmentKey, string id, UpdateConstraintRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
                 throw new System.ArgumentNullException("namespaceKey");
 
-            if (flagKey == null)
-                throw new System.ArgumentNullException("flagKey");
-
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/variants/{id}"
-                    urlBuilder_.Append("api/v1/namespaces/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/variants/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptRestException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPutAsync(string namespaceKey, string flagKey, string id, VariantUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (namespaceKey == null)
-                throw new System.ArgumentNullException("namespaceKey");
-
-            if (flagKey == null)
-                throw new System.ArgumentNullException("flagKey");
+            if (segmentKey == null)
+                throw new System.ArgumentNullException("segmentKey");
 
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4321,12 +3288,12 @@ namespace Flipt.Rest
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/v1/namespaces/{namespaceKey}/flags/{flagKey}/variants/{id}"
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/segments/{segmentKey}/constraints/{id}"
                     urlBuilder_.Append("api/v1/namespaces/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/flags/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(flagKey, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/variants/");
+                    urlBuilder_.Append("/segments/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(segmentKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/constraints/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -4354,7 +3321,1256 @@ namespace Flipt.Rest
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Variant>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Constraint>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsDeleteAsync(string namespaceKey, string segmentKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (namespaceKey == null)
+                throw new System.ArgumentNullException("namespaceKey");
+
+            if (segmentKey == null)
+                throw new System.ArgumentNullException("segmentKey");
+
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/namespaces/{namespaceKey}/segments/{segmentKey}/constraints/{id}"
+                    urlBuilder_.Append("api/v1/namespaces/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(namespaceKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/segments/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(segmentKey, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/constraints/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<VerifyServiceAccountResponse> AuthV1MethodKubernetesServiceaccountAsync(VerifyServiceAccountRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/method/kubernetes/serviceaccount"
+                    urlBuilder_.Append("auth/v1/method/kubernetes/serviceaccount");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<VerifyServiceAccountResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<AuthorizeURLResponse> AuthV1MethodOidcAuthorizeAsync(string provider, string state = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (provider == null)
+                throw new System.ArgumentNullException("provider");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/method/oidc/{provider}/authorize"
+                    urlBuilder_.Append("auth/v1/method/oidc/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(provider, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/authorize");
+                    urlBuilder_.Append('?');
+                    if (state != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("state")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(state, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<AuthorizeURLResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<CallbackResponse> AuthV1MethodOidcCallbackAsync(string provider, string code = null, string state = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (provider == null)
+                throw new System.ArgumentNullException("provider");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/method/oidc/{provider}/callback"
+                    urlBuilder_.Append("auth/v1/method/oidc/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(provider, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/callback");
+                    urlBuilder_.Append('?');
+                    if (code != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("code")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(code, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (state != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("state")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(state, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<CallbackResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<CreateTokenResponse> AuthV1MethodTokenAsync(CreateTokenRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/method/token"
+                    urlBuilder_.Append("auth/v1/method/token");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<CreateTokenResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Authentication> AuthV1SelfAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/self"
+                    urlBuilder_.Append("auth/v1/self");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Authentication>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task AuthV1SelfExpireAsync(System.DateTimeOffset? expiresAt = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/self/expire"
+                    urlBuilder_.Append("auth/v1/self/expire");
+                    urlBuilder_.Append('?');
+                    if (expiresAt != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("expiresAt")).Append('=').Append(System.Uri.EscapeDataString(expiresAt.Value.ToString("s", System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<ListAuthenticationsResponse> AuthV1TokensGetAsync(Method? method = null, int? limit = null, string pageToken = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/tokens"
+                    urlBuilder_.Append("auth/v1/tokens");
+                    urlBuilder_.Append('?');
+                    if (method != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("method")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(method, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (limit != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("limit")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(limit, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (pageToken != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("pageToken")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageToken, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ListAuthenticationsResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Authentication> AuthV1TokensGetAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/tokens/{id}"
+                    urlBuilder_.Append("auth/v1/tokens/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Authentication>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task AuthV1TokensDeleteAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "auth/v1/tokens/{id}"
+                    urlBuilder_.Append("auth/v1/tokens/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<BatchEvaluationResponse> EvaluateV1BatchAsync(BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "evaluate/v1/batch"
+                    urlBuilder_.Append("evaluate/v1/batch");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<BatchEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<BooleanEvaluationResponse> EvaluateV1BooleanAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "evaluate/v1/boolean"
+                    urlBuilder_.Append("evaluate/v1/boolean");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<BooleanEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<VariantEvaluationResponse> EvaluateV1VariantAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "evaluate/v1/variant"
+                    urlBuilder_.Append("evaluate/v1/variant");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<VariantEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <remarks>
+        /// OFREP provider configuration
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<GetProviderConfigurationResponse> OfrepV1ConfigurationAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "ofrep/v1/configuration"
+                    urlBuilder_.Append("ofrep/v1/configuration");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<GetProviderConfigurationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <remarks>
+        /// OFREP bulk flag evaluation
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<BulkEvaluationResponse> OfrepV1EvaluateFlagsPostAsync(EvaluateBulkRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "ofrep/v1/evaluate/flags"
+                    urlBuilder_.Append("ofrep/v1/evaluate/flags");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<BulkEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <remarks>
+        /// OFREP single flag evaluation
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<EvaluatedFlag> OfrepV1EvaluateFlagsPostAsync(string key, EvaluateFlagRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (key == null)
+                throw new System.ArgumentNullException("key");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "ofrep/v1/evaluate/flags/{key}"
+                    urlBuilder_.Append("ofrep/v1/evaluate/flags/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(key, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<EvaluatedFlag>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -4491,6 +4707,717 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record Authentication
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("method")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public AuthenticationMethod Method { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("expiresAt")]
+        public System.DateTimeOffset ExpiresAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
+        public System.DateTimeOffset CreatedAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
+        public System.DateTimeOffset UpdatedAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
+        public System.Collections.Generic.IDictionary<string, string> Metadata { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record AuthorizeURLResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("authorizeUrl")]
+        public string AuthorizeUrl { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record BatchEvaluationRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("requestId")]
+        public string RequestId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("requests")]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Collections.Generic.ICollection<EvaluationRequest> Requests { get; set; } = new System.Collections.ObjectModel.Collection<EvaluationRequest>();
+
+        [System.Text.Json.Serialization.JsonPropertyName("reference")]
+        public string Reference { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record BatchEvaluationResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("requestId")]
+        public string RequestId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("responses")]
+        public System.Collections.Generic.ICollection<EvaluationResponse> Responses { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("requestDurationMillis")]
+        public double RequestDurationMillis { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record BooleanEvaluationResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("enabled")]
+        public bool Enabled { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("reason")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public BooleanEvaluationResponseReason Reason { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("requestId")]
+        public string RequestId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("requestDurationMillis")]
+        public double RequestDurationMillis { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
+        public System.DateTimeOffset Timestamp { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record BulkEvaluationResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("flags")]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Collections.Generic.ICollection<EvaluatedFlag> Flags { get; set; } = new System.Collections.ObjectModel.Collection<EvaluatedFlag>();
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CacheInvalidation
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("polling")]
+        public Polling Polling { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CallbackResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("clientToken")]
+        public string ClientToken { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("authentication")]
+        public Authentication Authentication { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record Capabilities
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("cacheInvalidation")]
+        public CacheInvalidation CacheInvalidation { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagEvaluation")]
+        public FlagEvaluation FlagEvaluation { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record Constraint
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
+        public string SegmentKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public ConstraintType Type { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("property")]
+        public string Property { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("operator")]
+        public string Operator { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        public string Value { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
+        public System.DateTimeOffset CreatedAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
+        public System.DateTimeOffset UpdatedAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateConstraintRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
+        public string SegmentKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("type")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public CreateConstraintRequestType Type { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("property")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Property { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("operator")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Operator { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        public string Value { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateDistributionRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ruleId")]
+        public string RuleId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("variantId")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string VariantId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("rollout")]
+        public float Rollout { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateFlagRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("enabled")]
+        public bool Enabled { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("type")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public CreateFlagRequestType Type { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
+        public object Metadata { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateNamespaceRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateRolloutRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("rank")]
+        public int Rank { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segment")]
+        public RolloutSegment Segment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("threshold")]
+        public RolloutThreshold Threshold { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateRuleRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
+        public string SegmentKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("rank")]
+        public int Rank { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
+        public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentOperator")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public CreateRuleRequestSegmentOperator SegmentOperator { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateSegmentRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("matchType")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public CreateSegmentRequestMatchType MatchType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateTokenRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("expiresAt")]
+        public System.DateTimeOffset ExpiresAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
+        public System.Collections.Generic.IDictionary<string, string> Metadata { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateTokenResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("clientToken")]
+        public string ClientToken { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("authentication")]
+        public Authentication Authentication { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record CreateVariantRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("attachment")]
+        public string Attachment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record Distribution
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ruleId")]
+        public string RuleId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("variantId")]
+        public string VariantId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("rollout")]
+        public float Rollout { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
+        public System.DateTimeOffset CreatedAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
+        public System.DateTimeOffset UpdatedAt { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record ErrorEvaluationResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("reason")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public ErrorEvaluationResponseReason Reason { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record EvaluateBulkRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("context")]
+        public System.Collections.Generic.IDictionary<string, string> Context { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record EvaluateFlagRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("context")]
+        public System.Collections.Generic.IDictionary<string, string> Context { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record EvaluatedFlag
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("reason")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EvaluatedFlagReason Reason { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("variant")]
+        public string Variant { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
+        public object Metadata { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        public GoogleProtobufValue Value { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial record EvaluationRequest
     {
 
@@ -4528,26 +5455,10 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum EvaluationResponseType
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"VARIANT_EVALUATION_RESPONSE_TYPE")]
-        VARIANT_EVALUATION_RESPONSE_TYPE = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_EVALUATION_RESPONSE_TYPE")]
-        BOOLEAN_EVALUATION_RESPONSE_TYPE = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"ERROR_EVALUATION_RESPONSE_TYPE")]
-        ERROR_EVALUATION_RESPONSE_TYPE = 2,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial record EvaluationResponse
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("type")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public EvaluationResponseType Type { get; set; }
 
@@ -4572,438 +5483,42 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ErrorEvaluationResponse
+    public partial record Flag
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string FlagKey { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string Key { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string NamespaceKey { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("reason")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ErrorEvaluationReason Reason { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record BooleanEvaluationResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("requestId")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string RequestId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string FlagKey { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset Timestamp { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("requestDurationMillis")]
-        public double RequestDurationMillis { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("reason")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public EvaluationReason Reason { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record VariantEvaluationResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("requestId")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string RequestId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("match")]
-        public bool Match { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string FlagKey { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; } = new System.Collections.ObjectModel.Collection<string>();
-
-        [System.Text.Json.Serialization.JsonPropertyName("variantKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string VariantKey { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("variantAttachment")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string VariantAttachment { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset Timestamp { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("requestDurationMillis")]
-        public double RequestDurationMillis { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("reason")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public EvaluationReason Reason { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum EvaluationReason
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_EVALUATION_REASON")]
-        UNKNOWN_EVALUATION_REASON = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"FLAG_DISABLED_EVALUATION_REASON")]
-        FLAG_DISABLED_EVALUATION_REASON = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"MATCH_EVALUATION_REASON")]
-        MATCH_EVALUATION_REASON = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DEFAULT_EVALUATION_REASON")]
-        DEFAULT_EVALUATION_REASON = 3,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ErrorEvaluationReason
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_ERROR_EVALUATION_REASON")]
-        UNKNOWN_ERROR_EVALUATION_REASON = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"NOT_FOUND_ERROR_EVALUATION_REASON")]
-        NOT_FOUND_ERROR_EVALUATION_REASON = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record BatchEvaluationRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("requestId")]
-        public string RequestId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("requests")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<EvaluationRequest> Requests { get; set; } = new System.Collections.ObjectModel.Collection<EvaluationRequest>();
-
-        [System.Text.Json.Serialization.JsonPropertyName("reference")]
-        public string Reference { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record BatchEvaluationResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("requestId")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string RequestId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("responses")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<EvaluationResponse> Responses { get; set; } = new System.Collections.ObjectModel.Collection<EvaluationResponse>();
-
-        [System.Text.Json.Serialization.JsonPropertyName("requestDurationMillis")]
-        public double RequestDurationMillis { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record AuthMethodOIDCAuthorizeURLResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("authorizeUrl")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string AuthorizeUrl { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record AuthMethodOIDCCallbackResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("authentication")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public Authentication Authentication { get; set; } = new Authentication();
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    /// <summary>
-    /// The default is METHOD_NONE
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum AuthenticationMethod
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_NONE")]
-        METHOD_NONE = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_TOKEN")]
-        METHOD_TOKEN = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_OIDC")]
-        METHOD_OIDC = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_KUBERNETES")]
-        METHOD_KUBERNETES = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_JWT")]
-        METHOD_JWT = 4,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Authentication
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("method")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public AuthenticationMethod Method { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset CreatedAt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset UpdatedAt { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("expiresAt")]
-        public System.DateTimeOffset ExpiresAt { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.IDictionary<string, string> Metadata { get; set; } = new System.Collections.Generic.Dictionary<string, string>();
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record AuthenticationList
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("authentications")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Authentication> Authentications { get; set; } = new System.Collections.ObjectModel.Collection<Authentication>();
-
-        [System.Text.Json.Serialization.JsonPropertyName("nextPageToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string NextPageToken { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record AuthenticationToken
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("clientToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string ClientToken { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("authentication")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public Authentication Authentication { get; set; } = new Authentication();
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record CommonsPageable
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("nextPageToken")]
-        public string NextPageToken { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
-        public int TotalCount { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    /// <summary>
-    /// The default is UNKNOWN_COMPARISON_TYPE
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ConstraintComparisonType
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_COMPARISON_TYPE")]
-        UNKNOWN_COMPARISON_TYPE = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"STRING_COMPARISON_TYPE")]
-        STRING_COMPARISON_TYPE = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"NUMBER_COMPARISON_TYPE")]
-        NUMBER_COMPARISON_TYPE = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_COMPARISON_TYPE")]
-        BOOLEAN_COMPARISON_TYPE = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DATETIME_COMPARISON_TYPE")]
-        DATETIME_COMPARISON_TYPE = 4,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Constraint
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Id { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("variants")]
+        public System.Collections.Generic.ICollection<Variant> Variants { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string NamespaceKey { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string SegmentKey { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("type")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ConstraintComparisonType Type { get; set; }
+        public FlagType Type { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("property")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Property { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("defaultVariant")]
+        public Variant DefaultVariant { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("operator")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Operator { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Value { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset CreatedAt { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset UpdatedAt { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
+        public object Metadata { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -5017,143 +5532,11 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ConstraintCreateRequest
+    public partial record FlagEvaluation
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ConstraintComparisonType Type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("property")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Property { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("operator")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Operator { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public string Value { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ConstraintUpdateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ConstraintComparisonType Type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("property")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Property { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("operator")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Operator { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public string Value { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Distribution
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ruleId")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string RuleId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("variantId")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string VariantId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("rollout")]
-        public double Rollout { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset CreatedAt { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset UpdatedAt { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record DistributionCreateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("variantId")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string VariantId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("rollout")]
-        public double Rollout { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record DistributionUpdateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("variantId")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string VariantId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("rollout")]
-        public double Rollout { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("supportedTypes")]
+        public System.Collections.Generic.ICollection<string> SupportedTypes { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -5171,11 +5554,9 @@ namespace Flipt.Rest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("flags")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Flag> Flags { get; set; } = new System.Collections.ObjectModel.Collection<Flag>();
+        public System.Collections.Generic.ICollection<Flag> Flags { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("nextPageToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string NextPageToken { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
@@ -5193,47 +5574,32 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Flag
+    public partial record GetProviderConfigurationResponse
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string NamespaceKey { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Key { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Description { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("capabilities")]
+        public Capabilities Capabilities { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("enabled")]
-        public bool Enabled { get; set; }
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset CreatedAt { get; set; }
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
 
-        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset UpdatedAt { get; set; }
+    }
 
-        [System.Text.Json.Serialization.JsonPropertyName("variants")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Variant> Variants { get; set; } = new System.Collections.ObjectModel.Collection<Variant>();
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public FlagType Type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("defaultVariant")]
-        public Variant DefaultVariant { get; set; }
+    /// <summary>
+    /// Represents a dynamically typed value which can be either null, a number, a string, a boolean, a recursive struct value, or a list of values.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record GoogleProtobufValue
+    {
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -5247,93 +5613,14 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum FlagType
+    public partial record ListAuthenticationsResponse
     {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"VARIANT_FLAG_TYPE")]
-        VARIANT_FLAG_TYPE = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_FLAG_TYPE")]
-        BOOLEAN_FLAG_TYPE = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record FlagCreateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Key { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("enabled")]
-        public bool Enabled { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public FlagType Type { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record FlagUpdateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("enabled")]
-        public bool Enabled { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("defaultVariantId")]
-        public string DefaultVariantId { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record NamespaceList
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("namespaces")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Namespace> Namespaces { get; set; } = new System.Collections.ObjectModel.Collection<Namespace>();
+        [System.Text.Json.Serialization.JsonPropertyName("authentications")]
+        public System.Collections.Generic.ICollection<Authentication> Authentications { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("nextPageToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string NextPageToken { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
-        public int TotalCount { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -5351,26 +5638,21 @@ namespace Flipt.Rest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Key { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Description { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("protected")]
         public bool Protected { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset CreatedAt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset UpdatedAt { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
@@ -5385,63 +5667,13 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record NamespaceCreateRequest
+    public partial record NamespaceList
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Key { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record NamespaceUpdateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RolloutList
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("rollouts")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Rollout> Rollouts { get; set; } = new System.Collections.ObjectModel.Collection<Rollout>();
+        [System.Text.Json.Serialization.JsonPropertyName("namespaces")]
+        public System.Collections.Generic.ICollection<Namespace> Namespaces { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("nextPageToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string NextPageToken { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
@@ -5459,189 +5691,14 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Rollout
+    public partial record OrderRolloutsRequest
     {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string NamespaceKey { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string FlagKey { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public RolloutType Type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("rank")]
-        public int Rank { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset CreatedAt { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset UpdatedAt { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segment")]
-        public RolloutSegment Segment { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("threshold")]
-        public RolloutThreshold Threshold { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum RolloutSegmentOperator
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"OR_SEGMENT_OPERATOR")]
-        OR_SEGMENT_OPERATOR = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"AND_SEGMENT_OPERATOR")]
-        AND_SEGMENT_OPERATOR = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum RolloutType
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_ROLLOUT_TYPE")]
-        UNKNOWN_ROLLOUT_TYPE = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"SEGMENT_ROLLOUT_TYPE")]
-        SEGMENT_ROLLOUT_TYPE = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"THRESHOLD_ROLLOUT_TYPE")]
-        THRESHOLD_ROLLOUT_TYPE = 2,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RolloutSegment
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string SegmentKey { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
-        public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentOperator")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public RolloutSegmentOperator SegmentOperator { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public bool Value { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RolloutThreshold
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("percentage")]
-        public double Percentage { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public bool Value { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RolloutCreateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("rank")]
-        public int Rank { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segment")]
-        public RolloutSegment Segment { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("threshold")]
-        public RolloutThreshold Threshold { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RolloutUpdateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segment")]
-        public RolloutSegment Segment { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("threshold")]
-        public RolloutThreshold Threshold { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RolloutOrderRequest
-    {
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("rolloutIds")]
         [System.ComponentModel.DataAnnotations.Required]
@@ -5659,15 +5716,105 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RuleList
+    public partial record OrderRulesRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ruleIds")]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Collections.Generic.ICollection<string> RuleIds { get; set; } = new System.Collections.ObjectModel.Collection<string>();
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record Polling
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("enabled")]
+        public bool Enabled { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("minPollingIntervalMs")]
+        public int MinPollingIntervalMs { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record Rollout
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RolloutType Type { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("rank")]
+        public int Rank { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
+        public System.DateTimeOffset CreatedAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
+        public System.DateTimeOffset UpdatedAt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segment")]
+        public RolloutSegment Segment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("threshold")]
+        public RolloutThreshold Threshold { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record RolloutList
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("rules")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Rule> Rules { get; set; } = new System.Collections.ObjectModel.Collection<Rule>();
+        public System.Collections.Generic.ICollection<Rollout> Rules { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("nextPageToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string NextPageToken { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
@@ -5685,14 +5832,51 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum RuleSegmentOperator
+    public partial record RolloutSegment
     {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"OR_SEGMENT_OPERATOR")]
-        OR_SEGMENT_OPERATOR = 0,
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
+        public string SegmentKey { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AND_SEGMENT_OPERATOR")]
-        AND_SEGMENT_OPERATOR = 1,
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        public bool Value { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
+        public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentOperator")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RolloutSegmentSegmentOperator SegmentOperator { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record RolloutThreshold
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("percentage")]
+        public float Percentage { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        public bool Value { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
 
     }
 
@@ -5701,110 +5885,28 @@ namespace Flipt.Rest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string NamespaceKey { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string FlagKey { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string SegmentKey { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
-        public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentOperator")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public RuleSegmentOperator SegmentOperator { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("distributions")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Distribution> Distributions { get; set; } = new System.Collections.ObjectModel.Collection<Distribution>();
+        public System.Collections.Generic.ICollection<Distribution> Distributions { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("rank")]
         public int Rank { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset CreatedAt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset UpdatedAt { get; set; }
 
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RuleCreateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string SegmentKey { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
-        public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentOperator")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public RuleSegmentOperator SegmentOperator { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("rank")]
-        public int Rank { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RuleOrderRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("ruleIds")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<string> RuleIds { get; set; } = new System.Collections.ObjectModel.Collection<string>();
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RuleUpdateRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string SegmentKey { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
         public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; }
@@ -5825,15 +5927,13 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record SegmentList
+    public partial record RuleList
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("segments")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Segment> Segments { get; set; } = new System.Collections.ObjectModel.Collection<Segment>();
+        [System.Text.Json.Serialization.JsonPropertyName("rules")]
+        public System.Collections.Generic.ICollection<Rule> Rules { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("nextPageToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string NextPageToken { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
@@ -5854,38 +5954,30 @@ namespace Flipt.Rest
     public partial record Segment
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string NamespaceKey { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Key { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Description { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset CreatedAt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset UpdatedAt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("constraints")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Constraint> Constraints { get; set; } = new System.Collections.ObjectModel.Collection<Constraint>();
+        public System.Collections.Generic.ICollection<Constraint> Constraints { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("matchType")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public SegmentMatchType MatchType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -5899,23 +5991,111 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum SegmentMatchType
+    public partial record SegmentList
     {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"ALL_MATCH_TYPE")]
-        ALL_MATCH_TYPE = 0,
+        [System.Text.Json.Serialization.JsonPropertyName("segments")]
+        public System.Collections.Generic.ICollection<Segment> Segments { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"ANY_MATCH_TYPE")]
-        ANY_MATCH_TYPE = 1,
+        [System.Text.Json.Serialization.JsonPropertyName("nextPageToken")]
+        public string NextPageToken { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
+        public int TotalCount { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record SegmentCreateRequest
+    public partial record UpdateConstraintRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
+        public string SegmentKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("type")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public UpdateConstraintRequestType Type { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("property")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Property { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("operator")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Operator { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        public string Value { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record UpdateDistributionRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ruleId")]
+        public string RuleId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("variantId")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string VariantId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("rollout")]
+        public float Rollout { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record UpdateFlagRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Key { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
@@ -5923,13 +6103,19 @@ namespace Flipt.Rest
         public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Description { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("matchType")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public SegmentMatchType MatchType { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("enabled")]
+        public bool Enabled { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("defaultVariantId")]
+        public string DefaultVariantId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
+        public object Metadata { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -5943,21 +6129,155 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record SegmentUpdateRequest
+    public partial record UpdateNamespaceRequest
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string Key { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record UpdateRolloutRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segment")]
+        public RolloutSegment Segment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("threshold")]
+        public RolloutThreshold Threshold { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record UpdateRuleRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKey")]
+        public string SegmentKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
+        public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("segmentOperator")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public UpdateRuleRequestSegmentOperator SegmentOperator { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record UpdateSegmentRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
         public string Description { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("matchType")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public SegmentMatchType MatchType { get; set; }
+        public UpdateSegmentRequestMatchType MatchType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record UpdateVariantRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("attachment")]
+        public string Attachment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -5975,40 +6295,31 @@ namespace Flipt.Rest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string NamespaceKey { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string FlagKey { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Key { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Description { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset CreatedAt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset UpdatedAt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("attachment")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Attachment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
+        public string NamespaceKey { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -6022,49 +6333,36 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record VariantCreateRequest
+    public partial record VariantEvaluationResponse
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Key { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("match")]
+        public bool Match { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("segmentKeys")]
+        public System.Collections.Generic.ICollection<string> SegmentKeys { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("reason")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public VariantEvaluationResponseReason Reason { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("attachment")]
-        public string Attachment { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("variantKey")]
+        public string VariantKey { get; set; }
 
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+        [System.Text.Json.Serialization.JsonPropertyName("variantAttachment")]
+        public string VariantAttachment { get; set; }
 
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
+        [System.Text.Json.Serialization.JsonPropertyName("requestId")]
+        public string RequestId { get; set; }
 
-    }
+        [System.Text.Json.Serialization.JsonPropertyName("requestDurationMillis")]
+        public double RequestDurationMillis { get; set; }
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record VariantUpdateRequest
-    {
+        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
+        public System.DateTimeOffset Timestamp { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("key")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Key { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("attachment")]
-        public string Attachment { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("flagKey")]
+        public string FlagKey { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -6078,11 +6376,10 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Body
+    public partial record VerifyServiceAccountRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("serviceAccountToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string ServiceAccountToken { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
@@ -6097,22 +6394,14 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Body2
+    public partial record VerifyServiceAccountResponse
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Name { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("clientToken")]
+        public string ClientToken { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("namespaceKey")]
-        public string NamespaceKey { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("expiresAt")]
-        public System.DateTimeOffset ExpiresAt { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("authentication")]
+        public Authentication Authentication { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -6126,20 +6415,332 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Body3
+    public enum Method
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("expiresAt")]
-        public System.DateTimeOffset ExpiresAt { get; set; }
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_NONE")]
+        METHOD_NONE = 0,
 
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_TOKEN")]
+        METHOD_TOKEN = 1,
 
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_OIDC")]
+        METHOD_OIDC = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_KUBERNETES")]
+        METHOD_KUBERNETES = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_GITHUB")]
+        METHOD_GITHUB = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_JWT")]
+        METHOD_JWT = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_CLOUD")]
+        METHOD_CLOUD = 6,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum AuthenticationMethod
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_NONE")]
+        METHOD_NONE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_TOKEN")]
+        METHOD_TOKEN = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_OIDC")]
+        METHOD_OIDC = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_KUBERNETES")]
+        METHOD_KUBERNETES = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_GITHUB")]
+        METHOD_GITHUB = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_JWT")]
+        METHOD_JWT = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"METHOD_CLOUD")]
+        METHOD_CLOUD = 6,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum BooleanEvaluationResponseReason
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_EVALUATION_REASON")]
+        UNKNOWN_EVALUATION_REASON = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"FLAG_DISABLED_EVALUATION_REASON")]
+        FLAG_DISABLED_EVALUATION_REASON = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"MATCH_EVALUATION_REASON")]
+        MATCH_EVALUATION_REASON = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DEFAULT_EVALUATION_REASON")]
+        DEFAULT_EVALUATION_REASON = 3,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum ConstraintType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_COMPARISON_TYPE")]
+        UNKNOWN_COMPARISON_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"STRING_COMPARISON_TYPE")]
+        STRING_COMPARISON_TYPE = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"NUMBER_COMPARISON_TYPE")]
+        NUMBER_COMPARISON_TYPE = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_COMPARISON_TYPE")]
+        BOOLEAN_COMPARISON_TYPE = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DATETIME_COMPARISON_TYPE")]
+        DATETIME_COMPARISON_TYPE = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ENTITY_ID_COMPARISON_TYPE")]
+        ENTITY_ID_COMPARISON_TYPE = 5,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum CreateConstraintRequestType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_COMPARISON_TYPE")]
+        UNKNOWN_COMPARISON_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"STRING_COMPARISON_TYPE")]
+        STRING_COMPARISON_TYPE = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"NUMBER_COMPARISON_TYPE")]
+        NUMBER_COMPARISON_TYPE = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_COMPARISON_TYPE")]
+        BOOLEAN_COMPARISON_TYPE = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DATETIME_COMPARISON_TYPE")]
+        DATETIME_COMPARISON_TYPE = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ENTITY_ID_COMPARISON_TYPE")]
+        ENTITY_ID_COMPARISON_TYPE = 5,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum CreateFlagRequestType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"VARIANT_FLAG_TYPE")]
+        VARIANT_FLAG_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_FLAG_TYPE")]
+        BOOLEAN_FLAG_TYPE = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum CreateRuleRequestSegmentOperator
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OR_SEGMENT_OPERATOR")]
+        OR_SEGMENT_OPERATOR = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AND_SEGMENT_OPERATOR")]
+        AND_SEGMENT_OPERATOR = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum CreateSegmentRequestMatchType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ALL_MATCH_TYPE")]
+        ALL_MATCH_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ANY_MATCH_TYPE")]
+        ANY_MATCH_TYPE = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum ErrorEvaluationResponseReason
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_ERROR_EVALUATION_REASON")]
+        UNKNOWN_ERROR_EVALUATION_REASON = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"NOT_FOUND_ERROR_EVALUATION_REASON")]
+        NOT_FOUND_ERROR_EVALUATION_REASON = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum EvaluatedFlagReason
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN")]
+        UNKNOWN = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DISABLED")]
+        DISABLED = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"TARGETING_MATCH")]
+        TARGETING_MATCH = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DEFAULT")]
+        DEFAULT = 3,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum EvaluationResponseType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"VARIANT_EVALUATION_RESPONSE_TYPE")]
+        VARIANT_EVALUATION_RESPONSE_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_EVALUATION_RESPONSE_TYPE")]
+        BOOLEAN_EVALUATION_RESPONSE_TYPE = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ERROR_EVALUATION_RESPONSE_TYPE")]
+        ERROR_EVALUATION_RESPONSE_TYPE = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum FlagType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"VARIANT_FLAG_TYPE")]
+        VARIANT_FLAG_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_FLAG_TYPE")]
+        BOOLEAN_FLAG_TYPE = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RolloutType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_ROLLOUT_TYPE")]
+        UNKNOWN_ROLLOUT_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"SEGMENT_ROLLOUT_TYPE")]
+        SEGMENT_ROLLOUT_TYPE = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"THRESHOLD_ROLLOUT_TYPE")]
+        THRESHOLD_ROLLOUT_TYPE = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RolloutSegmentSegmentOperator
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OR_SEGMENT_OPERATOR")]
+        OR_SEGMENT_OPERATOR = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AND_SEGMENT_OPERATOR")]
+        AND_SEGMENT_OPERATOR = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RuleSegmentOperator
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OR_SEGMENT_OPERATOR")]
+        OR_SEGMENT_OPERATOR = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AND_SEGMENT_OPERATOR")]
+        AND_SEGMENT_OPERATOR = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum SegmentMatchType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ALL_MATCH_TYPE")]
+        ALL_MATCH_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ANY_MATCH_TYPE")]
+        ANY_MATCH_TYPE = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum UpdateConstraintRequestType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_COMPARISON_TYPE")]
+        UNKNOWN_COMPARISON_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"STRING_COMPARISON_TYPE")]
+        STRING_COMPARISON_TYPE = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"NUMBER_COMPARISON_TYPE")]
+        NUMBER_COMPARISON_TYPE = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BOOLEAN_COMPARISON_TYPE")]
+        BOOLEAN_COMPARISON_TYPE = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DATETIME_COMPARISON_TYPE")]
+        DATETIME_COMPARISON_TYPE = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ENTITY_ID_COMPARISON_TYPE")]
+        ENTITY_ID_COMPARISON_TYPE = 5,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum UpdateRuleRequestSegmentOperator
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OR_SEGMENT_OPERATOR")]
+        OR_SEGMENT_OPERATOR = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AND_SEGMENT_OPERATOR")]
+        AND_SEGMENT_OPERATOR = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum UpdateSegmentRequestMatchType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ALL_MATCH_TYPE")]
+        ALL_MATCH_TYPE = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ANY_MATCH_TYPE")]
+        ANY_MATCH_TYPE = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum VariantEvaluationResponseReason
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN_EVALUATION_REASON")]
+        UNKNOWN_EVALUATION_REASON = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"FLAG_DISABLED_EVALUATION_REASON")]
+        FLAG_DISABLED_EVALUATION_REASON = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"MATCH_EVALUATION_REASON")]
+        MATCH_EVALUATION_REASON = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DEFAULT_EVALUATION_REASON")]
+        DEFAULT_EVALUATION_REASON = 3,
 
     }
 

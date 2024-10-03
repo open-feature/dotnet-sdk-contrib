@@ -48,13 +48,14 @@ packet add OpenFeature.Contrib.Providers.Flipt
 
 ## Using the Flipt Provider with the OpenFeature SDK
 
-To create a Flagmith provider you should define provider and Flipt settings.
+To create a Flipt provider you should define provider and pass in as parameters.
 
 ```csharp
 using OpenFeature.Contrib.Providers.Flipt;
 using OpenFeature.Model;
 
-var featureProvider = new FliptProvider("http://localhost:8080", "default-namespace");
+// namespace and clientToken is optional
+var featureProvider = new FliptProvider("http://localhost:8080", "default-namespace", "client-token");
 
 // Set the featureProvider as the provider for the OpenFeature SDK
 await OpenFeature.Api.Instance.SetProviderAsync(featureProvider);
@@ -84,7 +85,8 @@ dotnet 8.0, it was not utilized in this provider as OpenFeature aims to support 
 
 ### Rest Client using OpenAPI
 
-To work around this incompatibility, the openapi specification of [Flipt](https://github.com/flipt-io/flipt-openapi) was
+To work around this incompatibility, the openapi specification
+of [Flipt](https://github.com/flipt-io/flipt/blob/main/openapi.yaml) was
 used to generate a REST client using [nswag](https://github.com/RicoSuter/NSwag).
 
 ## Updating the REST Client
@@ -93,12 +95,11 @@ To generate or update the Flipt REST client, follow these steps:
 
 ### 1. Download the OpenAPI Specification
 
-First, download the latest `openapi.yml` file from the Flipt GitHub repository. This can be done manually or by using a
+First, download the latest `openapi.yaml` file from the Flipt GitHub repository. This can be done manually or by using a
 command like `curl`:
 
 ```
-
-curl https://raw.githubusercontent.com/flipt-io/flipt-openapi/main/openapi.yml -o openapi.yml
+curl https://raw.githubusercontent.com/flipt-io/flipt/refs/heads/main/openapi.yaml -o openapi.yaml
 ```
 
 ### 2. Generate the Client Code
@@ -107,7 +108,7 @@ With the `openapi.yml` file in your working directory, run the following `nswag`
 code. Make sure to correct the command as shown below:
 
 ```
-nswag openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:"openapi.yml" /output:"./Flipt.Rest.Client.cs" /GenerateExceptionClasses:true /OperationGenerationMode:SingleClientFromPathSegments /JsonLibrary:SystemTextJson /GenerateOptionalParameters:true /GenerateDefaultValues:true /GenerateResponseClasses:true /GenerateClientInterfaces:true /GenerateClientClasses:true /GenerateDtoTypes:true /ExceptionClass:FliptRestException /GenerateNativeRecords:true /UseBaseUrl:false /GenerateBaseUrlProperty:false 
+nswag openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:"openapi.yaml" /output:"./Flipt.Rest.Client.cs" /GenerateExceptionClasses:true /OperationGenerationMode:SingleClientFromPathSegments /JsonLibrary:SystemTextJson /GenerateOptionalParameters:true /GenerateDefaultValues:true /GenerateResponseClasses:true /GenerateClientInterfaces:true /GenerateClientClasses:true /GenerateDtoTypes:true /ExceptionClass:FliptRestException /GenerateNativeRecords:true /UseBaseUrl:false /GenerateBaseUrlProperty:false 
 ```
 
 #### Notes

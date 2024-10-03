@@ -115,7 +115,7 @@ public class FliptToOpenFeatureConverterTest
                 SegmentKeys = ["segment1"],
                 VariantAttachment = variantAttachment,
                 Match = true,
-                Reason = EvaluationReason.MATCH_EVALUATION_REASON
+                Reason = VariantEvaluationResponseReason.MATCH_EVALUATION_REASON
             });
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
@@ -133,11 +133,11 @@ public class FliptToOpenFeatureConverterTest
         const string flagKey = "variant-flag";
         const string variantKey = "variant-A";
         const string valueFromSrc = """
-                                    {
-            "name": "Mr. Robinson",
-                                        "age": 12,
-                                    }
-        """;
+                                                                {
+                                        "name": "Mr. Robinson",
+                                                                    "age": 12,
+                                                                }
+                                    """;
         var expectedValue = new Value(new Structure(new Dictionary<string, Value>
         {
             { "name", new Value("Mr. Robinson") }, { "age", new Value(12) }
@@ -153,7 +153,7 @@ public class FliptToOpenFeatureConverterTest
                 SegmentKeys = ["segment1"],
                 VariantAttachment = valueFromSrc,
                 Match = true,
-                Reason = EvaluationReason.MATCH_EVALUATION_REASON
+                Reason = VariantEvaluationResponseReason.MATCH_EVALUATION_REASON
             });
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
