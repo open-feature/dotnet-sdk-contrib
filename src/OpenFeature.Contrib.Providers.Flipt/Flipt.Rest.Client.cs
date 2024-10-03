@@ -27,203 +27,203 @@ namespace Flipt.Rest
     {
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<BooleanEvaluationResponse> EvaluateV1BooleanAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<VariantEvaluationResponse> EvaluateV1VariantAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<BatchEvaluationResponse> EvaluateV1BatchAsync(BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<AuthenticationToken> AuthV1MethodKubernetesServiceaccountAsync(Body body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<AuthMethodOIDCAuthorizeURLResponse> AuthV1MethodOidcAuthorizeAsync(string provider, string state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<AuthMethodOIDCCallbackResponse> AuthV1MethodOidcCallbackAsync(string provider, string code, string state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<AuthenticationToken> AuthV1MethodTokenAsync(Body2 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<AuthenticationList> AuthV1TokensGetAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Authentication> AuthV1TokensGetAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task AuthV1TokensDeleteAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Authentication> AuthV1SelfAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task AuthV1SelfExpireAsync(Body3 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Constraint> ApiV1NamespacesSegmentsConstraintsPostAsync(string namespaceKey, string segmentKey, ConstraintCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsDeleteAsync(string namespaceKey, string segmentKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsPutAsync(string namespaceKey, string segmentKey, string id, ConstraintUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPostAsync(string namespaceKey, string flagKey, string ruleId, DistributionCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDistributionsDeleteAsync(string namespaceKey, string flagKey, string ruleId, string id, string variantId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPutAsync(string namespaceKey, string flagKey, string ruleId, string id, DistributionUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<EvaluationResponse> ApiV1NamespacesEvaluateAsync(string namespaceKey, EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<BatchEvaluationResponse> ApiV1NamespacesBatchEvaluateAsync(string namespaceKey, BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<FlagList> ApiV1NamespacesFlagsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPostAsync(string namespaceKey, FlagCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPutAsync(string namespaceKey, string key, FlagUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<NamespaceList> ApiV1NamespacesGetAsync(int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPostAsync(NamespaceCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Namespace> ApiV1NamespacesGetAsync(string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesDeleteAsync(string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPutAsync(string key, NamespaceUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<RolloutList> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsPostAsync(string namespaceKey, string flagKey, RolloutCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsOrderAsync(string namespaceKey, string flagKey, RolloutOrderRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, string id, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsPutAsync(string namespaceKey, string flagKey, string id, RolloutUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<RuleList> ApiV1NamespacesFlagsRulesGetAsync(string namespaceKey, string flagKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesPostAsync(string namespaceKey, string flagKey, RuleCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesOrderAsync(string namespaceKey, string flagKey, RuleOrderRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesGetAsync(string namespaceKey, string flagKey, string id, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesPutAsync(string namespaceKey, string flagKey, string id, RuleUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<SegmentList> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPostAsync(string namespaceKey, SegmentCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesSegmentsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPutAsync(string namespaceKey, string key, SegmentUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPostAsync(string namespaceKey, string flagKey, VariantCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiV1NamespacesFlagsVariantsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPutAsync(string namespaceKey, string flagKey, string id, VariantUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
@@ -261,7 +261,7 @@ namespace Flipt.Rest
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<BooleanEvaluationResponse> EvaluateV1BooleanAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
@@ -313,14 +313,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<BooleanEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -338,7 +338,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<VariantEvaluationResponse> EvaluateV1VariantAsync(EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
@@ -390,14 +390,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<VariantEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -415,7 +415,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<BatchEvaluationResponse> EvaluateV1BatchAsync(BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
@@ -467,14 +467,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<BatchEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -492,7 +492,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<AuthenticationToken> AuthV1MethodKubernetesServiceaccountAsync(Body body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
@@ -544,14 +544,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<AuthenticationToken>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -569,7 +569,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<AuthMethodOIDCAuthorizeURLResponse> AuthV1MethodOidcAuthorizeAsync(string provider, string state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (provider == null)
@@ -625,14 +625,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<AuthMethodOIDCAuthorizeURLResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -650,7 +650,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<AuthMethodOIDCCallbackResponse> AuthV1MethodOidcCallbackAsync(string provider, string code, string state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (provider == null)
@@ -710,14 +710,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<AuthMethodOIDCCallbackResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -735,7 +735,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<AuthenticationToken> AuthV1MethodTokenAsync(Body2 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
@@ -787,14 +787,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<AuthenticationToken>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -812,7 +812,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<AuthenticationList> AuthV1TokensGetAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
@@ -857,14 +857,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<AuthenticationList>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -882,7 +882,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Authentication> AuthV1TokensGetAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
@@ -931,14 +931,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Authentication>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -956,7 +956,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task AuthV1TokensDeleteAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
@@ -1006,7 +1006,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1024,7 +1024,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Authentication> AuthV1SelfAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
@@ -1069,14 +1069,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Authentication>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1094,7 +1094,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task AuthV1SelfExpireAsync(Body3 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
@@ -1147,7 +1147,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1165,7 +1165,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Constraint> ApiV1NamespacesSegmentsConstraintsPostAsync(string namespaceKey, string segmentKey, ConstraintCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1227,14 +1227,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Constraint>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1252,7 +1252,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsDeleteAsync(string namespaceKey, string segmentKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1312,7 +1312,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1330,7 +1330,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesSegmentsConstraintsPutAsync(string namespaceKey, string segmentKey, string id, ConstraintUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1397,7 +1397,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1415,7 +1415,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPostAsync(string namespaceKey, string flagKey, string ruleId, DistributionCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1482,14 +1482,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Distribution>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1507,7 +1507,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDistributionsDeleteAsync(string namespaceKey, string flagKey, string ruleId, string id, string variantId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1578,7 +1578,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1596,7 +1596,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Distribution> ApiV1NamespacesFlagsRulesDistributionsPutAsync(string namespaceKey, string flagKey, string ruleId, string id, DistributionUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1667,14 +1667,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Distribution>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1692,7 +1692,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<EvaluationResponse> ApiV1NamespacesEvaluateAsync(string namespaceKey, EvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1749,14 +1749,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<EvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1774,7 +1774,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<BatchEvaluationResponse> ApiV1NamespacesBatchEvaluateAsync(string namespaceKey, BatchEvaluationRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1831,14 +1831,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<BatchEvaluationResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1856,7 +1856,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<FlagList> ApiV1NamespacesFlagsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -1924,14 +1924,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<FlagList>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -1949,7 +1949,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPostAsync(string namespaceKey, FlagCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -2006,14 +2006,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Flag>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2031,7 +2031,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -2091,14 +2091,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Flag>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2116,7 +2116,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -2171,7 +2171,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2189,7 +2189,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Flag> ApiV1NamespacesFlagsPutAsync(string namespaceKey, string key, FlagUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -2250,14 +2250,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Flag>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2275,7 +2275,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<NamespaceList> ApiV1NamespacesGetAsync(int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
@@ -2338,14 +2338,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<NamespaceList>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2363,7 +2363,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPostAsync(NamespaceCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
@@ -2415,14 +2415,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2440,7 +2440,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesGetAsync(string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (key == null)
@@ -2495,14 +2495,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2520,7 +2520,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesDeleteAsync(string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (key == null)
@@ -2570,7 +2570,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2588,7 +2588,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Namespace> ApiV1NamespacesPutAsync(string key, NamespaceUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (key == null)
@@ -2644,14 +2644,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Namespace>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2669,7 +2669,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<RolloutList> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -2742,14 +2742,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<RolloutList>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2767,7 +2767,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsPostAsync(string namespaceKey, string flagKey, RolloutCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -2829,14 +2829,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Rollout>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2854,7 +2854,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsOrderAsync(string namespaceKey, string flagKey, RolloutOrderRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -2917,7 +2917,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -2935,7 +2935,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Rollout> ApiV1NamespacesFlagsRolloutsGetAsync(string namespaceKey, string flagKey, string id, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3000,14 +3000,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Rollout>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3025,7 +3025,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3085,7 +3085,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3103,7 +3103,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRolloutsPutAsync(string namespaceKey, string flagKey, string id, RolloutUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3170,7 +3170,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3188,7 +3188,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<RuleList> ApiV1NamespacesFlagsRulesGetAsync(string namespaceKey, string flagKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3261,14 +3261,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<RuleList>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3286,7 +3286,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesPostAsync(string namespaceKey, string flagKey, RuleCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3348,14 +3348,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Rule>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3373,7 +3373,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesOrderAsync(string namespaceKey, string flagKey, RuleOrderRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3436,7 +3436,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3454,7 +3454,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Rule> ApiV1NamespacesFlagsRulesGetAsync(string namespaceKey, string flagKey, string id, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3519,14 +3519,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Rule>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3544,7 +3544,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3604,7 +3604,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3622,7 +3622,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsRulesPutAsync(string namespaceKey, string flagKey, string id, RuleUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3689,7 +3689,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3707,7 +3707,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SegmentList> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, int? limit = null, int? offset = null, string pageToken = null, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3775,14 +3775,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<SegmentList>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3800,7 +3800,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPostAsync(string namespaceKey, SegmentCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3857,14 +3857,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Segment>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3882,7 +3882,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsGetAsync(string namespaceKey, string key, string reference = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -3942,14 +3942,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Segment>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -3967,7 +3967,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesSegmentsDeleteAsync(string namespaceKey, string key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -4022,7 +4022,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -4040,7 +4040,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Segment> ApiV1NamespacesSegmentsPutAsync(string namespaceKey, string key, SegmentUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -4101,14 +4101,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Segment>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -4126,7 +4126,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPostAsync(string namespaceKey, string flagKey, VariantCreateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -4188,14 +4188,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Variant>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -4213,7 +4213,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ApiV1NamespacesFlagsVariantsDeleteAsync(string namespaceKey, string flagKey, string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -4273,7 +4273,7 @@ namespace Flipt.Rest
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -4291,7 +4291,7 @@ namespace Flipt.Rest
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="FliptException">A server side error occurred.</exception>
+        /// <exception cref="FliptRestException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Variant> ApiV1NamespacesFlagsVariantsPutAsync(string namespaceKey, string flagKey, string id, VariantUpdateRequest body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (namespaceKey == null)
@@ -4357,14 +4357,14 @@ namespace Flipt.Rest
                             var objectResponse_ = await ReadObjectResponseAsync<Variant>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new FliptException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new FliptRestException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
                         else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new FliptException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            throw new FliptRestException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
                     finally
@@ -4414,7 +4414,7 @@ namespace Flipt.Rest
                 catch (System.Text.Json.JsonException exception)
                 {
                     var message = "Could not deserialize the response body string as " + typeof(T).FullName + ".";
-                    throw new FliptException(message, (int)response.StatusCode, responseText, headers, exception);
+                    throw new FliptRestException(message, (int)response.StatusCode, responseText, headers, exception);
                 }
             }
             else
@@ -4430,7 +4430,7 @@ namespace Flipt.Rest
                 catch (System.Text.Json.JsonException exception)
                 {
                     var message = "Could not deserialize the response body stream as " + typeof(T).FullName + ".";
-                    throw new FliptException(message, (int)response.StatusCode, string.Empty, headers, exception);
+                    throw new FliptRestException(message, (int)response.StatusCode, string.Empty, headers, exception);
                 }
             }
         }
@@ -6146,7 +6146,7 @@ namespace Flipt.Rest
 
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FliptException : System.Exception
+    public partial class FliptRestException : System.Exception
     {
         public int StatusCode { get; private set; }
 
@@ -6154,7 +6154,7 @@ namespace Flipt.Rest
 
         public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
 
-        public FliptException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception innerException)
+        public FliptRestException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception innerException)
             : base(message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null) ? "(null)" : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
         {
             StatusCode = statusCode;
@@ -6169,11 +6169,11 @@ namespace Flipt.Rest
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FliptException<TResult> : FliptException
+    public partial class FliptRestException<TResult> : FliptRestException
     {
         public TResult Result { get; private set; }
 
-        public FliptException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception innerException)
+        public FliptRestException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception innerException)
             : base(message, statusCode, response, headers, innerException)
         {
             Result = result;

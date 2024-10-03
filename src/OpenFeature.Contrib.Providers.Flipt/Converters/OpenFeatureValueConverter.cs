@@ -84,14 +84,19 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
         {
             writer.WriteStartArray();
             foreach (var val in value.AsList!)
-                writer.WriteRawValue(JsonSerializer.Serialize(val.AsObject,
+            {
+                var jsonDoc = JsonDocument.Parse(JsonSerializer.Serialize(val.AsObject,
                     JsonConverterExtensions.DefaultSerializerSettings));
+                jsonDoc.WriteTo(writer);
+            }
+
             writer.WriteEndArray();
         }
         else
         {
-            writer.WriteRawValue(JsonSerializer.Serialize(value.AsObject,
+            var jsonDoc = JsonDocument.Parse(JsonSerializer.Serialize(value.AsObject,
                 JsonConverterExtensions.DefaultSerializerSettings));
+            jsonDoc.WriteTo(writer);
         }
     }
 }
