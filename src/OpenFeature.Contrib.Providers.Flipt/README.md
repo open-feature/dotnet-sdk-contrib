@@ -48,7 +48,8 @@ packet add OpenFeature.Contrib.Providers.Flipt
 
 ## Using the Flipt Provider with the OpenFeature SDK
 
-To create a Flipt provider you should define provider and pass in as parameters.
+To create a Flipt provider you should define provider and pass in the instance `url` (required), `defaultNamespace` and
+`token`.
 
 ```csharp
 using OpenFeature.Contrib.Providers.Flipt;
