@@ -1,8 +1,8 @@
 using Flipt.Rest;
 using FluentAssertions;
 using Moq;
-using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
+using OpenFeature.Error;
 using OpenFeature.Model;
 using Xunit;
 
@@ -23,7 +23,7 @@ public class FliptProviderTest
     [Fact]
     public void CreateFliptProvider_GivenEmptyUrl_ShouldThrowInvalidOperationException()
     {
-        var act = void() => new FliptProvider("");
+        var act = void () => new FliptProvider("");
         act.Should().Throw<UriFormatException>();
     }
 
@@ -49,20 +49,9 @@ public class FliptProviderTest
 
         var provider = new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object));
 
-        var doubleResolution = await provider.ResolveDoubleValueAsync(flagKey, 0.0);
-        doubleResolution.FlagKey.Should().Be(flagKey);
-        doubleResolution.Value.Should().Be(0.0);
-        doubleResolution.ErrorType.Should().Be(ErrorType.TypeMismatch);
-
-        var integerResolution = await provider.ResolveIntegerValueAsync(flagKey, 0);
-        integerResolution.FlagKey.Should().Be(flagKey);
-        integerResolution.Value.Should().Be(0);
-        integerResolution.ErrorType.Should().Be(ErrorType.TypeMismatch);
-
-        var valueResolution = await provider.ResolveStructureValueAsync(flagKey, new Value());
-        valueResolution.FlagKey.Should().Be(flagKey);
-        valueResolution.Value.Should().BeEquivalentTo(new Value());
-        valueResolution.ErrorType.Should().Be(ErrorType.TypeMismatch);
+        var resolution = async Task<ResolutionDetails<double>> () =>
+            await provider.ResolveDoubleValueAsync(flagKey, 0.0);
+        await resolution.Should().ThrowAsync<TypeMismatchException>();
     }
 
     [Fact]
@@ -79,7 +68,7 @@ public class FliptProviderTest
     public async Task ResolveDoubleValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
     {
         const string flagKey = "feature-flag-key";
-        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey, "0.0");
         await provider.ResolveDoubleValueAsync(flagKey, 0.0);
         mockFliptClientWrapper.Verify(
             fcw => fcw.EvaluateVariantAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
@@ -89,7 +78,7 @@ public class FliptProviderTest
     public async Task ResolveIntegerValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
     {
         const string flagKey = "feature-flag-key";
-        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey, "0");
         await provider.ResolveIntegerValueAsync(flagKey, 0);
         mockFliptClientWrapper.Verify(
             fcw => fcw.EvaluateVariantAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
@@ -99,7 +88,8 @@ public class FliptProviderTest
     public async Task ResolveStructureValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
     {
         const string flagKey = "feature-flag-key";
-        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        var (provider, mockFliptClientWrapper) =
+            GenerateFliptProviderWithMockedDependencies(flagKey, new Value().AsString!);
         await provider.ResolveStructureValueAsync(flagKey, new Value());
         mockFliptClientWrapper.Verify(
             fcw => fcw.EvaluateVariantAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
@@ -109,20 +99,21 @@ public class FliptProviderTest
     public async Task ResolveBooleanValueAsync_WhenCalled_ShouldCallCorrectMethodFromFliptClientWrapper()
     {
         const string flagKey = "feature-flag-key";
-        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey);
+        var (provider, mockFliptClientWrapper) = GenerateFliptProviderWithMockedDependencies(flagKey, "true");
         await provider.ResolveBooleanValueAsync(flagKey, false);
         mockFliptClientWrapper.Verify(
             fcw => fcw.EvaluateBooleanAsync(It.Is<EvaluationRequest>(er => er.FlagKey == flagKey)), Times.Once);
     }
 
-    private (FliptProvider, Mock<IFliptClientWrapper>) GenerateFliptProviderWithMockedDependencies(string flagKey)
+    private static (FliptProvider, Mock<IFliptClientWrapper>) GenerateFliptProviderWithMockedDependencies(
+        string flagKey, string variantKey = "variant-key")
     {
         var mockFliptClientWrapper = new Mock<IFliptClientWrapper>();
         mockFliptClientWrapper.Setup(fcw => fcw.EvaluateVariantAsync(It.IsAny<EvaluationRequest>()))
             .ReturnsAsync(new VariantEvaluationResponse
             {
                 FlagKey = flagKey,
-                VariantKey = "variant-key",
+                VariantKey = variantKey,
                 RequestId = Guid.NewGuid()
                     .ToString(),
                 SegmentKeys = ["segment1"],
