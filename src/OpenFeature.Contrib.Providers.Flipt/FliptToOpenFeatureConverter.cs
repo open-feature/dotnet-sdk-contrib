@@ -14,9 +14,11 @@ namespace OpenFeature.Contrib.Providers.Flipt;
 /// <summary>
 ///     A wrapper of fliptClient to handle data casting and error mappings to OpenFeature models
 /// </summary>
-public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper, string namespaceKey = "default")
-    : IFliptToOpenFeatureConverter
+public class FliptToOpenFeatureConverter : IFliptToOpenFeatureConverter
 {
+    private readonly IFliptClientWrapper _fliptClientWrapper;
+    private readonly string _namespaceKey;
+
     /// <summary>
     ///     Wrapper that uses Flipt to OpenFeature compliant models
     /// </summary>
@@ -32,13 +34,19 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
     {
     }
 
+    internal FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper, string namespaceKey = "default")
+    {
+        _fliptClientWrapper = fliptClientWrapper;
+        _namespaceKey = namespaceKey;
+    }
+
     /// <inheritdoc />
     public async Task<ResolutionDetails<T>> EvaluateAsync<T>(string flagKey, T defaultValue,
         EvaluationContext context = null)
     {
         var evaluationRequest = new EvaluationRequest
         {
-            NamespaceKey = namespaceKey,
+            NamespaceKey = _namespaceKey,
             FlagKey = flagKey,
             EntityId = context?.TargetingKey ?? "",
             Context = context.ToStringDictionary()
@@ -46,7 +54,7 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
 
         try
         {
-            var evaluationResponse = await fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
+            var evaluationResponse = await _fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
 
             if (evaluationResponse.Reason == VariantEvaluationResponseReason.FLAG_DISABLED_EVALUATION_REASON)
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
@@ -94,12 +102,12 @@ public class FliptToOpenFeatureConverter(IFliptClientWrapper fliptClientWrapper,
         {
             var evaluationRequest = new EvaluationRequest
             {
-                NamespaceKey = namespaceKey,
+                NamespaceKey = _namespaceKey,
                 FlagKey = flagKey,
                 EntityId = context?.TargetingKey ?? "",
                 Context = context.ToStringDictionary()
             };
-            var boolEvaluationResponse = await fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
+            var boolEvaluationResponse = await _fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
             return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse.Enabled, ErrorType.None,
                 Reason.TargetingMatch);
         }
