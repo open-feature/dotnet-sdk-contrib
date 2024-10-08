@@ -92,7 +92,9 @@ used to generate a REST client using [nswag](https://github.com/RicoSuter/NSwag)
 
 ## Updating the REST Client
 
-To generate or update the Flipt REST client, follow these steps:
+To generate or update the Flipt REST client **manually**, follow these steps:
+
+_This is generated automatically during build time and is saved in the `/obj/` folder_
 
 ### 1. Download the OpenAPI Specification
 
