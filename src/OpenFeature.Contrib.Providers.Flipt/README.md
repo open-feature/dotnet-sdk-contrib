@@ -94,12 +94,13 @@ used to generate a REST client using [nswag](https://github.com/RicoSuter/NSwag)
 
 To generate or update the Flipt REST client **manually**, follow these steps:
 
-_This is generated automatically during build time and is saved in the `/obj/` folder_
+_The **Rest client is generated automatically during build time** using the committed `openapi.yaml` file and is saved
+in the `/obj/` folder_
 
 ### 1. Download the OpenAPI Specification
 
 First, download the latest `openapi.yaml` file from the Flipt GitHub repository. This can be done manually or by using a
-command like `curl`:
+command like `curl` in the `/src/OpenFeature.Contrib.Providers.Flipt/`:
 
 ```
 curl https://raw.githubusercontent.com/flipt-io/flipt/refs/heads/main/openapi.yaml -o openapi.yaml
