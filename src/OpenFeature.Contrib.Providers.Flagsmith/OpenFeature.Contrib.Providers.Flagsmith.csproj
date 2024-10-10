@@ -1,31 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <PackageId>OpenFeature.Contrib.Providers.Flagsmith</PackageId>
-        <VersionNumber>0.2.0</VersionNumber> <!--x-release-please-version -->
-        <VersionPrefix>$(VersionNumber)</VersionPrefix>
-        <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
-        <FileVersion>$(VersionNumber)</FileVersion>
-        <Description>Flagsmith provider for .NET</Description>
-        <Authors>Vladimir Petrusevici</Authors>
-    </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>OpenFeature.Contrib.Providers.Flagsmith</PackageId>
+    <VersionNumber>0.2.0</VersionNumber> <!--x-release-please-version -->
+    <VersionPrefix>$(VersionNumber)</VersionPrefix>
+    <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
+    <FileVersion>$(VersionNumber)</FileVersion>
+    <Description>Flagsmith provider for .NET</Description>
+    <Authors>Vladimir Petrusevici</Authors>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <!-- make the internal methods visble to our test project -->
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>$(MSBuildProjectName).Test</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
+  <ItemGroup>
+    <!-- make the internal methods visble to our test project -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(MSBuildProjectName).Test</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Flagsmith" Version="5.3.2"/>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Flagsmith" Version="5.3.2" />
+  </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net5.0'">
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
-    <PropertyGroup>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
 </Project>
