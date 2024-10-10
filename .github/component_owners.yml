@@ -22,6 +22,9 @@ components:
   src/OpenFeature.Contrib.Providers.Statsig:
     - jenshenneberg
     - lattenborough
+  src/OpenFeature.Contrib.Providers.Flipt:
+    - jeandreidc
+    - markphelps
 
   # test/
   test/OpenFeature.Contrib.Hooks.Otel.Test:
@@ -45,6 +48,9 @@ components:
   test/src/OpenFeature.Contrib.Providers.Statsig.Test:
     - jenshenneberg
     - lattenborough
+  test/src/OpenFeature.Contrib.Providers.Flipt.Test:
+    - jeandreidc
+    - markphelps
 
 ignored-authors:
   - renovate-bot

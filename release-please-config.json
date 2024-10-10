@@ -72,6 +72,16 @@
       "extra-files": [
         "OpenFeature.Contrib.Providers.Statsig.csproj"
       ]
+    },
+    "src/OpenFeature.Contrib.Providers.Flipt": {
+      "package-name": "OpenFeature.Contrib.Providers.Flipt",
+      "release-type": "simple",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "versioning": "default",
+      "extra-files": [
+        "OpenFeature.Contrib.Providers.Flipt.csproj"
+      ]
     }
   },
   "changelog-sections": [
