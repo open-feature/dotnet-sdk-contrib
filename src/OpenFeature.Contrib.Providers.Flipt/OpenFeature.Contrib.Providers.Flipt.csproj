@@ -18,13 +18,13 @@
     </ItemGroup>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="System.Text.Json" Version="8.0.4"/>
         <PackageReference Include="System.Net.Http" Version="4.3.4"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"/>
         <Compile Include="$(ProjectDir)obj/$(ConfigurationName)/$(TargetFramework)/Flipt.Rest.Client.cs"/>
+        <PackageReference Include="System.Text.Json" Version="8.0.5" />
     </ItemGroup>
 
     <PropertyGroup>
