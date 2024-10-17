@@ -14,5 +14,9 @@
         <PackageReference Update="FluentAssertions" Version="6.12.1"/>
         <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Flipt\OpenFeature.Contrib.Providers.Flipt.csproj"/>
     </ItemGroup>
+    
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="System.Net.Http" Version="4.3.4"/>
+    </ItemGroup>
 
 </Project>
