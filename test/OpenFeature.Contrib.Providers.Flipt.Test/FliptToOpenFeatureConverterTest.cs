@@ -131,12 +131,12 @@ public class FliptToOpenFeatureConverterTest
     {
         const string flagKey = "variant-flag";
         const string variantKey = "variant-A";
-        const string valueFromSrc =  """
+        const string valueFromSrc = """
                                                                                                                                                      {
-                                         "name": "Mr. Robinson",
+            "name": "Mr. Robinson",
                                                                                                                                                          "age": 12,
                                                                                                                                                      }
-                                     """;
+        """;
         var expectedValue = new Value(new Structure(new Dictionary<string, Value>
         {
             { "name", new Value("Mr. Robinson") }, { "age", new Value(12) }
