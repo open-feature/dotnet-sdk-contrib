@@ -16,6 +16,6 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ConfigCat.Client" Version="9.3.1"/>
+    <PackageReference Include="ConfigCat.Client" Version="9.3.2"/>
   </ItemGroup>
 </Project>
