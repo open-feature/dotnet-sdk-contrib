@@ -22,6 +22,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="NSwag.MSBuild" Version="14.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"/>
         <Compile Include="$(ProjectDir)obj/$(ConfigurationName)/$(TargetFramework)/Flipt.Rest.Client.cs"/>
         <PackageReference Include="System.Text.Json" Version="8.0.5"/>
@@ -31,7 +35,7 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
-    <Target Name="NSwag" BeforeTargets="BeforeBuild" Condition="'$(TF_BUILD)'!='True'">
-        <Exec Command="nswag openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:&quot;openapi.yaml&quot; /output:&quot;$(ProjectDir)obj/$(ConfigurationName)/$(TargetFramework)/Flipt.Rest.Client.cs&quot; /GenerateExceptionClasses:true /OperationGenerationMode:SingleClientFromPathSegments /JsonLibrary:SystemTextJson /GenerateOptionalParameters:true /GenerateDefaultValues:true /GenerateResponseClasses:true /GenerateClientInterfaces:true /GenerateClientClasses:true /GenerateDtoTypes:true /ExceptionClass:FliptRestException /GenerateNativeRecords:true /UseBaseUrl:false /GenerateBaseUrlProperty:false"/>
+    <Target Name="NSwag" BeforeTargets="BeforeBuild">
+        <Exec Command="$(NSwagExe_Net80) openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:&quot;openapi.yaml&quot; /output:&quot;$(ProjectDir)obj/$(ConfigurationName)/$(TargetFramework)/Flipt.Rest.Client.cs&quot; /GenerateExceptionClasses:true /OperationGenerationMode:SingleClientFromPathSegments /JsonLibrary:SystemTextJson /GenerateOptionalParameters:true /GenerateDefaultValues:true /GenerateResponseClasses:true /GenerateClientInterfaces:true /GenerateClientClasses:true /GenerateDtoTypes:true /ExceptionClass:FliptRestException /GenerateNativeRecords:true /UseBaseUrl:false /GenerateBaseUrlProperty:false"/>
     </Target>
 </Project>
