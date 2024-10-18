@@ -102,7 +102,7 @@ in the `/obj/` folder_
 First, download the latest `openapi.yaml` file from the Flipt GitHub repository. This can be done manually or by using a
 command like `curl` in the `/src/OpenFeature.Contrib.Providers.Flipt/`:
 
-```
+```shell
 curl https://raw.githubusercontent.com/flipt-io/flipt/refs/heads/main/openapi.yaml -o openapi.yaml
 ```
 
@@ -111,7 +111,7 @@ curl https://raw.githubusercontent.com/flipt-io/flipt/refs/heads/main/openapi.ya
 With the `openapi.yml` file in your working directory, run the following `nswag` command to generate the REST client
 code. Make sure to correct the command as shown below:
 
-```
+```shell
 nswag openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:"openapi.yaml" /output:"./Flipt.Rest.Client.cs" /GenerateExceptionClasses:true /OperationGenerationMode:SingleClientFromPathSegments /JsonLibrary:SystemTextJson /GenerateOptionalParameters:true /GenerateDefaultValues:true /GenerateResponseClasses:true /GenerateClientInterfaces:true /GenerateClientClasses:true /GenerateDtoTypes:true /ExceptionClass:FliptRestException /GenerateNativeRecords:true /UseBaseUrl:false /GenerateBaseUrlProperty:false 
 ```
 
