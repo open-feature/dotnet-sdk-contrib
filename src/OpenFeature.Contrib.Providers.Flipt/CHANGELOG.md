@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flipt-v0.0.3...OpenFeature.Contrib.Providers.Flipt-v0.0.4) (2024-10-18)
+
+
+### 🐛 Bug Fixes
+
+* update docs ([#300](https://github.com/open-feature/dotnet-sdk-contrib/issues/300)) ([50fd738](https://github.com/open-feature/dotnet-sdk-contrib/commit/50fd738585567a39f6fd0b1db37b899cbae42ba5))
+
 ## [0.0.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flipt-v0.0.2...OpenFeature.Contrib.Providers.Flipt-v0.0.3) (2024-10-18)
 
 
