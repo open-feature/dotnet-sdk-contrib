@@ -82,7 +82,7 @@ Console.WriteLine(val);
 ## Code setup
 
 Since the official [flipt-csharp](https://github.com/flipt-io/flipt-server-sdks/tree/main/flipt-csharp) only supports
-dotnet 8.0, it was not utilized in this provider as OpenFeature aims to support a bigger range of dotnet versions.
+dotnet 8.0 was not utilized by this provider as OpenFeature aims to support a bigger range of dotnet versions.
 
 ### Rest Client using OpenAPI
 
