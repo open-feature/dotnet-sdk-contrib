@@ -10,7 +10,7 @@ The flipt provider allows you to connect to your Flipt instance through the Open
 
 ## Install dependencies
 
-The first things we will do is install the **Open Feature SDK** and the **Flipt Feature Flag provider**.
+The first thing we will do is install the **OpenFeature SDK** and the **Flipt Feature Flag provider**.
 
 ### .NET Cli
 
@@ -48,7 +48,7 @@ packet add OpenFeature.Contrib.Providers.Flipt
 
 ## Using the Flipt Provider with the OpenFeature SDK
 
-To create a Flipt provider you should define provider and pass in the instance `url` (required), `defaultNamespace` and
+To create a Flipt provider, you should define the provider and pass in the instance `url` (required), `defaultNamespace` and
 `token`.
 
 ```csharp
@@ -129,6 +129,6 @@ nswag openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:"
 
 -In `BuildClient()` method
 from https://github.com/open-feature/dotnet-sdk-contrib/blob/204144f6df0dacf46e6d52d34dd6b5a223a853f4/src/OpenFeature.Contrib.Providers.Flipt/ClientWrapper/FliptClientWrapper.cs#L41-L47
-a new `HttpClient` is created. In the future it would be better to allow passing of `HttpConnectionFactory` to avoid
+a new `HttpClient` is created. In the future, it would be better to allow passing of `HttpConnectionFactory` to avoid
 problems regarding socket starvation
 
