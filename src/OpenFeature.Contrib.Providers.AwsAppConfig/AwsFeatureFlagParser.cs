@@ -78,8 +78,11 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 {
                     keyValuePairs.Add(attribute.Key, ParseValueType(attribute.Value.ToString()));
                 }
-                var newAttribute = JsonSerializer.Deserialize<IDictionary<string, object>>(attribute.Value.ToString());
-                keyValuePairs.Add(attribute.Key, ParseAttributes(newAttribute));
+                else
+                {
+                    var newAttribute = JsonSerializer.Deserialize<IDictionary<string, object>>(attribute.Value.ToString());
+                    keyValuePairs.Add(attribute.Key, ParseAttributes(newAttribute));
+                }                
             }
             return new Value(new Structure(keyValuePairs));            
         }

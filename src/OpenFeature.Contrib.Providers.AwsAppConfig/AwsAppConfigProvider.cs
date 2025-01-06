@@ -31,6 +31,32 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// <returns>Metadata object containing provider information</returns>
         public override Metadata GetMetadata() => new Metadata("AWS AppConfig Provider");
         
+        /// <summary>
+        /// Constructor for AwsAppConfigProvider
+        /// </summary>
+        /// <param name="appConfigClient">The AWS AppConfig client</param>
+        /// <param name="applicationName">The name of the application in AWS AppConfig</param>
+        /// <param name="environmentName">The environment (e.g., prod, dev, staging) in AWS AppConfig</param>
+        /// <param name="configurationProfileId">The configuration profile identifier that contains the feature flags</param>
+        public AwsAppConfigProvider(IAmazonAppConfigData appConfigClient, string applicationName, string environmentName, string configurationProfileId)
+        {
+            // Application name, environment name and configuration profile ID is needed for connecting to AWS Appconfig.
+            // If any of these are missing, an exception will be thrown.
+            
+            if (string.IsNullOrEmpty(applicationName))
+                throw new ArgumentNullException(nameof(applicationName));
+            
+            if (string.IsNullOrEmpty(environmentName))
+                throw new ArgumentNullException(nameof(environmentName));
+                
+            if (string.IsNullOrEmpty(configurationProfileId))
+                throw new ArgumentNullException(nameof(configurationProfileId));
+
+            _appConfigClient = appConfigClient;
+            _applicationName = applicationName;
+            _environmentName = environmentName;
+            _configurationProfileId = configurationProfileId;
+        }
         
         /// <summary>
         /// Resolves a boolean feature flag value
