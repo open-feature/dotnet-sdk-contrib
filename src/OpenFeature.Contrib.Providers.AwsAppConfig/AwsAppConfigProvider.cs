@@ -42,9 +42,13 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// <param name="context">Additional evaluation context (optional)</param>
         /// <param name="cancellationToken">Cancellation token for async operations</param>
         /// <returns>Resolution details containing the boolean flag value</returns>
-        public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+        public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var responseString = await GetFeatureFlagsResponseJson();
+
+            var flagValue = ParseFeatureFlag(flagKey, new Value(defaultValue), responseString);           
+
+            return new ResolutionDetails<bool>(flagKey, flagValue.AsBoolean ?? defaultValue);
         }
 
         /// <summary>
@@ -55,9 +59,13 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// <param name="context">Additional evaluation context (optional)</param>
         /// <param name="cancellationToken">Cancellation token for async operations</param>
         /// <returns>Resolution details containing the double flag value</returns>
-        public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+        public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var responseString = await GetFeatureFlagsResponseJson();
+
+            var flagValue = ParseFeatureFlag(flagKey, new Value(defaultValue), responseString);           
+
+            return new ResolutionDetails<double>(flagKey, flagValue.AsDouble ?? defaultValue);
         }
 
         /// <summary>
@@ -68,9 +76,13 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// <param name="context">Additional evaluation context (optional)</param>
         /// <param name="cancellationToken">Cancellation token for async operations</param>
         /// <returns>Resolution details containing the integer flag value</returns>
-        public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+        public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var responseString = await GetFeatureFlagsResponseJson();
+
+            var flagValue = ParseFeatureFlag(flagKey, new Value(defaultValue), responseString);           
+
+            return new ResolutionDetails<int>(flagKey, flagValue.AsInteger ?? defaultValue);
         }
 
         /// <summary>
@@ -81,9 +93,13 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// <param name="context">Additional evaluation context (optional)</param>
         /// <param name="cancellationToken">Cancellation token for async operations</param>
         /// <returns>Resolution details containing the string flag value</returns>
-        public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+        public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var responseString = await GetFeatureFlagsResponseJson();
+
+            var flagValue = ParseFeatureFlag(flagKey, new Value(defaultValue), responseString);           
+
+            return new ResolutionDetails<string>(flagKey, flagValue.AsString ?? defaultValue);
         }
 
         /// <summary>
@@ -95,13 +111,27 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// <param name="cancellationToken">Cancellation token for async operations</param>
         /// <returns>Resolution details containing the structured flag value</returns>
         public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
-        {
-            var response = await GetFeatureFlagsStreamAsync();
+        {            
+            var responseString = await GetFeatureFlagsResponseJson();
 
-            // Deserialize the configuration data (assuming JSON format)
-            var responseString = System.Text.Encoding.UTF8.GetString(response.Configuration.ToArray());
             var flagValue = ParseFeatureFlag(flagKey, defaultValue, responseString);
             return await Task.FromResult(new ResolutionDetails<Value>(flagKey, new Value(flagValue)));
+        }
+
+        /// <summary>
+        /// Retrieves feature flag configurations as a string (json) from AWS AppConfig.
+        /// </summary>
+        /// <returns>A string containing JSON of the feature flag configuration data from AWS AppConfig.</returns>
+        /// <remarks>
+        /// This method fetches the feature flag configuration from AWS AppConfig service
+        /// and returns it in its raw string format. The returned string is expected to be
+        /// in JSON format that can be parsed into feature flag configurations.
+        /// </remarks>
+        /// <exception cref="AmazonAppConfigException">Thrown when there is an error retrieving the configuration from AWS AppConfig.</exception>
+        private async Task<string> GetFeatureFlagsResponseJson()
+        {
+            var response = await GetFeatureFlagsStreamAsync();
+            return System.Text.Encoding.UTF8.GetString(response.Configuration.ToArray());
         }
 
         /// <summary>
@@ -167,7 +197,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// - Each feature flag value can be a primitive type or a complex object
         /// </remarks>
         /// <exception cref="JsonException">Thrown when the input JSON is invalid or cannot be deserialized</exception>
-        /// <seealso cref="ParseChildren"/>
+        /// <seealso cref="ParseAttributes"/>
         /// <seealso cref="ParseType"/>
         private Value ParseFeatureFlag(string flagKey, Value defaultValue, string inputJson)
         {
@@ -175,13 +205,13 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
             if (!parsedJson.TryGetValue(flagKey, out var flagValue))
                 return defaultValue;
             var parsedItems = JsonSerializer.Deserialize<IDictionary<string, object>>(flagValue.ToString());
-            return ParseChildren(parsedItems);
+            return ParseAttributes(parsedItems);
         }
 
         /// <summary>
         /// Recursively parses and converts a dictionary of values into a structured Value object.
         /// </summary>
-        /// <param name="children">The source dictionary containing key-value pairs to parse</param>
+        /// <param name="attributes">The source dictionary containing key-value pairs to parse</param>
         /// <returns>A Value object containing the parsed structure</returns>
         /// <remarks>
         /// This method handles the following scenarios:
@@ -194,20 +224,20 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// For primitive types and strings, it creates a direct Value wrapper.
         /// For complex objects, it recursively processes their properties.
         /// </remarks>
-        private Value ParseChildren(IDictionary<string, object> children)
+        private Value ParseAttributes(IDictionary<string, object> attributes)
         {
-            if(children == null) return null;
+            if(attributes == null) return null;
             IDictionary<string, Value> keyValuePairs = new Dictionary<string, Value>();
 
-            foreach (var child in children)
+            foreach (var attribute in attributes)
             {
-                Type valueType = child.Value.GetType();
+                Type valueType = attribute.Value.GetType();
                 if (valueType.IsValueType || valueType == typeof(string))
                 {
-                    keyValuePairs.Add(child.Key, ParseType(child.Value.ToString()));
+                    keyValuePairs.Add(attribute.Key, ParseType(attribute.Value.ToString()));
                 }
-                var newChild = JsonSerializer.Deserialize<IDictionary<string, object>>(child.Value.ToString());
-                keyValuePairs.Add(child.Key, ParseChildren(newChild));
+                var newAttribute = JsonSerializer.Deserialize<IDictionary<string, object>>(attribute.Value.ToString());
+                keyValuePairs.Add(attribute.Key, ParseAttributes(newAttribute));
             }
             return new Value(new Structure(keyValuePairs));            
         }
