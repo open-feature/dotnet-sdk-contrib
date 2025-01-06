@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
 using Amazon.AppConfigData;
-using System.Collections.Generic;
 using Amazon.AppConfigData.Model;
 
 namespace OpenFeature.Contrib.Providers.AwsAppConfig
@@ -167,7 +165,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 ApplicationIdentifier = _applicationName,
                 EnvironmentIdentifier = _environmentName,
                 ConfigurationProfileIdentifier = _configurationProfileId
-            };
+            };            
 
             // Start a configuration session with AWS AppConfig
             var sessionResponse = await _appConfigClient.StartConfigurationSessionAsync(startConfigSessionRequest);
