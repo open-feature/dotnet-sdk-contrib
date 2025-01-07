@@ -24,7 +24,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
     /// 4. DateTime
     /// 5. String (default fallback)
     /// </remarks>    
-    public static class AwsFeatureFlagParser
+    public static class FeatureFlagParser
     {
         /// <summary>
         /// Parses a feature flag from a JSON configuration string and converts it to a Value object.
