@@ -164,11 +164,13 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
 
             var flagValues = FeatureFlagParser.ParseFeatureFlag(appConfigKey.FlagKey, defaultValue, responseString);
 
-            if(appConfigKey.HasAttribute)
-            {
-                return flagValues.AsStructure.TryGetValue(appConfigKey.AttributeKey, out var returnValue) ? returnValue: defaultValue;
-            }
-            return flagValues;            
+            if (!appConfigKey.HasAttribute) return flagValues;
+
+            var structuredValues = flagValues.AsStructure;
+
+            if(structuredValues == null) return defaultValue;
+
+            return structuredValues.TryGetValue(appConfigKey.AttributeKey, out var returnValue) ? returnValue : defaultValue;
         }
 
 
