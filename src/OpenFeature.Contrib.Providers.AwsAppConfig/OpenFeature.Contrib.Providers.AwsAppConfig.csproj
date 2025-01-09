@@ -19,5 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.AppConfigData" Version="3.7.400.72" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
   </ItemGroup>
 </Project>
