@@ -19,19 +19,30 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
     /// - Supports manual cache invalidation
     /// - Implements IDisposable for proper resource cleanup
     /// </remarks>
-    public class AppConfigRetrievalApi
+    public class AppConfigRetrievalApi: IRetrievalApi
     {
+        /// <summary>
+        /// Prefix used for session token cache keys to prevent key collisions.
+        /// </summary>
         private const string SESSION_TOKEN_KEY_PREFIX = "session_token";
+
+        /// <summary>
+        /// Prefix used for configuration value cache keys to prevent key collisions.
+        /// </summary>
         private const string CONFIGURATION_VALUE_KEY_PREFIX = "config_value";
+
+        /// <summary>
+        /// Default cache duration in minutes for configuration and session data.
+        /// </summary>
         private const double DEFAULT_CACHE_DURATION_MINUTES = 60;
 
         /// <summary>
-        /// The AWS AppConfig Data client used to interact with the AWS AppConfig service.
+        /// AWS AppConfig Data client used to interact with the AWS AppConfig service.
         /// </summary>
         private readonly IAmazonAppConfigData _appConfigDataClient;
 
         /// <summary>
-        /// The memory cache instance used for storing configuration and session data.
+        /// Memory cache instance used for storing configuration and session data.
         /// </summary>
         private readonly IMemoryCache _memoryCache;
 
@@ -58,15 +69,17 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         }
 
         /// <summary>
-        /// Retrieves configuration from AWS AppConfig using the provided configuration token.
+        /// Retrieves configuration from AWS AppConfig using the provided feature flag profile.
         /// Results are cached based on the configured cache duration.
         /// </summary>
-        /// <param name="configurationToken">The configuration token obtained from a configuration session.</param>
+        /// <param name="profile">The feature flag profile containing application, environment, and configuration identifiers.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the configuration response.</returns>
         /// <remarks>
-        /// The configuration is cached using the configuration token as part of the cache key.
-        /// Subsequent calls with the same token will return the cached result until it expires.
+        /// The configuration is cached using the profile information as part of the cache key.
+        /// If AWS returns an empty configuration, it indicates no changes from the previous configuration,
+        /// and the cached value will be returned if available.
         /// </remarks>
+        /// <exception cref="Exception">Thrown when unable to connect to AWS or retrieve configuration.</exception>
         public async Task<GetLatestConfigurationResponse>GetLatestConfigurationAsync(FeatureFlagProfile profile)
         {
             var configKey = BuildConfigurationKey(profile);
@@ -86,9 +99,10 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
             // First, update the session token to the newly returned token
             _memoryCache.Set(sessionKey, response.NextPollConfigurationToken);
 
-            if(response.Configuration == null && _memoryCache.TryGetValue(configKey, out GetLatestConfigurationResponse configValue))
+            if((response.Configuration == null || response.Configuration.Length == 0) 
+                && _memoryCache.TryGetValue(configKey, out GetLatestConfigurationResponse configValue))
             {
-                // AppConfig returns null for Configuration if value hasn't changed from last retrieval, hence use what's in cache.            
+                // AppConfig returns empty Configuration if value hasn't changed from last retrieval, hence use what's in cache.            
                 return configValue;
             }
             else
@@ -96,22 +110,41 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 // Set the new value returned from AWS.
                 _memoryCache.Set(configKey, response);
                 return response;
-            }
-            
-            
-        }    
+            }            
+        }
 
+        /// <summary>
+        /// Invalidates the cached configuration for the specified feature flag profile.
+        /// </summary>
+        /// <param name="profile">The feature flag profile whose configuration cache should be invalidated.</param>
+        /// <remarks>
+        /// This method forces the next GetLatestConfigurationAsync call to fetch fresh data from AWS AppConfig
+        /// instead of using cached values.
+        /// </remarks>
         public void InvalidateConfigurationCache(FeatureFlagProfile profile)
         {
             _memoryCache.Remove(BuildConfigurationKey(profile));
         }
 
+        /// <summary>
+        /// Invalidates the cached session token for the specified feature flag profile.
+        /// </summary>
+        /// <param name="profile">The feature flag profile whose session token cache should be invalidated.</param>
+        /// <remarks>
+        /// This method forces the next operation to create a new session with AWS AppConfig
+        /// instead of using the cached session token.
+        /// </remarks>
         public void InvalidateSessionCache(FeatureFlagProfile profile)
         {
             _memoryCache.Remove(BuildSessionKey(profile));
         }
 
-        // Implement IDisposable to properly clean up the MemoryCache
+        /// <summary>
+        /// Releases all resources used by the AppConfigRetrievalApi instance.
+        /// </summary>
+        /// <remarks>
+        /// This method ensures proper cleanup of the memory cache when the instance is disposed.
+        /// </remarks>
         public void Dispose()
         {
             if (_memoryCache is IDisposable disposableCache)
@@ -119,6 +152,16 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 disposableCache.Dispose();
             }
         }
+
+        /// <summary>
+        /// Retrieves or creates a new session token for the specified feature flag profile.
+        /// </summary>
+        /// <param name="profile">The feature flag profile for which to get a session token.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the session token.</returns>
+        /// <exception cref="ArgumentException">Thrown when the provided profile is invalid.</exception>
+        /// <remarks>
+        /// Session tokens are cached according to the configured cache duration to minimize API calls to AWS AppConfig.
+        /// </remarks>
         private async Task<string> GetSessionToken(FeatureFlagProfile profile)
         {
             if(!profile.IsValid) throw new ArgumentException("Invalid Feature Flag configuration profile");        
@@ -140,11 +183,25 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
             });
         }
 
+        /// <summary>
+        /// Retrieves or creates a new session token for the specified feature flag profile.
+        /// </summary>
+        /// <param name="profile">The feature flag profile for which to get a session token.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the session token.</returns>
+        /// <exception cref="ArgumentException">Thrown when the provided profile is invalid.</exception>
+        /// <remarks>
+        /// Session tokens are cached according to the configured cache duration to minimize API calls to AWS AppConfig.
+        /// </remarks>
         private string BuildSessionKey(FeatureFlagProfile profile)
         {
             return $"{SESSION_TOKEN_KEY_PREFIX}_{profile}";
         }
 
+        /// <summary>
+        /// Builds a cache key for configuration values based on the feature flag profile.
+        /// </summary>
+        /// <param name="profile">The feature flag profile to use in the key generation.</param>
+        /// <returns>A unique cache key for the configuration value.</returns>
         private string BuildConfigurationKey(FeatureFlagProfile profile)
         {
             return $"{CONFIGURATION_VALUE_KEY_PREFIX}_{profile}";

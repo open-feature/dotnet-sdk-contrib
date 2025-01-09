@@ -14,16 +14,13 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
     public class AppConfigProvider : FeatureProvider
     {
         // AWS AppConfig client for interacting with the service
-        private readonly IAmazonAppConfigData _appConfigClient;
+        private readonly IRetrievalApi _appConfigRetrievalApi;
         
         // The name of the application in AWS AppConfig
         private readonly string _applicationName;
         
         // The environment (e.g., prod, dev, staging) in AWS AppConfig
-        private readonly string _environmentName;
-        
-        // The configuration profile identifier that contains the feature flags
-        private readonly string _configurationProfileId;
+        private readonly string _environmentName;        
          
         /// <summary>
         /// Returns metadata about the provider
@@ -34,11 +31,10 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// <summary>
         /// Constructor for AwsAppConfigProvider
         /// </summary>
-        /// <param name="appConfigClient">The AWS AppConfig client</param>
+        /// <param name="retrievalApi">The AWS AppConfig retrieval API</param>
         /// <param name="applicationName">The name of the application in AWS AppConfig</param>
-        /// <param name="environmentName">The environment (e.g., prod, dev, staging) in AWS AppConfig</param>
-        /// <param name="configurationProfileId">The configuration profile identifier that contains the feature flags</param>
-        public AppConfigProvider(IAmazonAppConfigData appConfigClient, string applicationName, string environmentName, string configurationProfileId)
+        /// <param name="environmentName">The environment (e.g., prod, dev, staging) in AWS AppConfig</param>        
+        public AppConfigProvider(IRetrievalApi retrievalApi, string applicationName, string environmentName)
         {
             // Application name, environment name and configuration profile ID is needed for connecting to AWS Appconfig.
             // If any of these are missing, an exception will be thrown.
@@ -47,15 +43,11 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 throw new ArgumentNullException(nameof(applicationName));
             
             if (string.IsNullOrEmpty(environmentName))
-                throw new ArgumentNullException(nameof(environmentName));
-                
-            if (string.IsNullOrEmpty(configurationProfileId))
-                throw new ArgumentNullException(nameof(configurationProfileId));
-
-            _appConfigClient = appConfigClient;
+                throw new ArgumentNullException(nameof(environmentName));                
+            
+            _appConfigRetrievalApi = retrievalApi;
             _applicationName = applicationName;
-            _environmentName = environmentName;
-            _configurationProfileId = configurationProfileId;
+            _environmentName = environmentName;            
         }
         
         /// <summary>
@@ -159,8 +151,9 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// </example>
         private async Task<Value> ResolveFeatureFlagValue(string flagKey, Value defaultValue)
         {
-            var responseString = await GetFeatureFlagsResponseJson();
             var appConfigKey = new AppConfigKey(flagKey);
+
+            var responseString = await GetFeatureFlagsResponseJson(appConfigKey.ConfigurationProfileId);
 
             var flagValues = FeatureFlagParser.ParseFeatureFlag(appConfigKey.FlagKey, defaultValue, responseString);
 
@@ -184,9 +177,9 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// in JSON format that can be parsed into feature flag configurations.
         /// </remarks>
         /// <exception cref="AmazonAppConfigException">Thrown when there is an error retrieving the configuration from AWS AppConfig.</exception>
-        private async Task<string> GetFeatureFlagsResponseJson()
+        private async Task<string> GetFeatureFlagsResponseJson(string configurationProfileId, EvaluationContext context = null)
         {
-            var response = await GetFeatureFlagsStreamAsync();
+            var response = await GetFeatureFlagsStreamAsync(configurationProfileId, context);
             return System.Text.Encoding.UTF8.GetString(response.Configuration.ToArray());
         }
 
@@ -200,44 +193,39 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// - Poll interval in seconds
         /// </returns>
         /// <remarks>
-        /// This method implements AWS AppConfig's best practices for configuration retrieval:
-        /// - Uses streaming API for efficient data transfer
-        /// - Supports incremental updates through configuration tokens
-        /// - Respects AWS AppConfig's polling interval recommendations
-        /// 
-        /// The configuration token workflow:
-        /// 1. Initial call: token = null
-        /// 2. Subsequent calls: Use token from previous response
-        /// 3. Token changes when configuration is updated
-        /// </remarks>
-        /// <exception cref="AmazonAppConfigDataException">Thrown when AWS AppConfig service encounters an error</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the provider is not properly configured</exception>        
-        /// <seealso cref="IAmazonAppConfigData.GetLatestConfigurationAsync"/>        
-        private async Task<GetLatestConfigurationResponse> GetFeatureFlagsStreamAsync(EvaluationContext context = null)
+        private async Task<GetLatestConfigurationResponse> GetFeatureFlagsStreamAsync(string configurationProfileId, EvaluationContext context = null)
         {
-            // TODO: Yet to figure out how to pass along Evalutaion Context to AWS AppConfig
-
-            // Build "StartConfigurationSession" Request
-            var startConfigSessionRequest = new StartConfigurationSessionRequest
+            var profile = new FeatureFlagProfile
             {
                 ApplicationIdentifier = _applicationName,
                 EnvironmentIdentifier = _environmentName,
-                ConfigurationProfileIdentifier = _configurationProfileId
-            };            
-
-            // Start a configuration session with AWS AppConfig
-            var sessionResponse = await _appConfigClient.StartConfigurationSessionAsync(startConfigSessionRequest);
-
-            // Build "GetLatestConfiguration" request
-            var configurationRequest = new GetLatestConfigurationRequest
-            {
-                ConfigurationToken = sessionResponse.InitialConfigurationToken
+                ConfigurationProfileIdentifier = configurationProfileId
             };
 
-            // Get the configuration response from AWS AppConfig
-            var response = await _appConfigClient.GetLatestConfigurationAsync(configurationRequest);
+            return await _appConfigRetrievalApi.GetLatestConfigurationAsync(profile);
+            // // TODO: Yet to figure out how to pass along Evalutaion Context to AWS AppConfig
 
-            return response;   
+            // // Build "StartConfigurationSession" Request
+            // var startConfigSessionRequest = new StartConfigurationSessionRequest
+            // {
+            //     ApplicationIdentifier = _applicationName,
+            //     EnvironmentIdentifier = _environmentName,
+            //     ConfigurationProfileIdentifier = _configurationProfileId
+            // };            
+
+            // // Start a configuration session with AWS AppConfig
+            // var sessionResponse = await _appConfigClient.StartConfigurationSessionAsync(startConfigSessionRequest);
+
+            // // Build "GetLatestConfiguration" request
+            // var configurationRequest = new GetLatestConfigurationRequest
+            // {
+            //     ConfigurationToken = sessionResponse.InitialConfigurationToken
+            // };
+
+            // // Get the configuration response from AWS AppConfig
+            // var response = await _appConfigClient.GetLatestConfigurationAsync(configurationRequest);
+
+            // return response;   
         }             
     }
 }
