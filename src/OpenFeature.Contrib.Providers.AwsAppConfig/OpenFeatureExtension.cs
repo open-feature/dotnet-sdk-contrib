@@ -32,5 +32,3 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
     
     }
 }
-
-

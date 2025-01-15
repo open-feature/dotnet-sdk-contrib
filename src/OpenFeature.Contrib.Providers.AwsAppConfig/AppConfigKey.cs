@@ -94,5 +94,45 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 AttributeKey = parts[2];
             }   
         }
+
+        /// <summary>
+        /// Constructs an AppConfigKey using individual components.
+        /// </summary>
+        /// <param name="configurationProfileId">The AWS AppConfig configuration profile identifier</param>
+        /// <param name="flagKey">The feature flag key name</param>
+        /// <param name="attributeKey">Optional. The specific attribute key to access</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when:
+        /// - configurationProfileId is null, empty, or whitespace
+        /// - flagKey is null, empty, or whitespace
+        /// </exception>
+        public AppConfigKey(string configurationProfileId, string flagKey, string attributeKey = null)
+        {
+            if (string.IsNullOrWhiteSpace(configurationProfileId))
+            {
+                throw new ArgumentException("Configuration Profile ID cannot be null or empty");
+            }
+
+            if (string.IsNullOrWhiteSpace(flagKey))
+            {
+                throw new ArgumentException("Flag key cannot be null or empty");
+            }
+
+            ConfigurationProfileId = configurationProfileId;
+            FlagKey = flagKey;
+            AttributeKey = attributeKey;
+        }
+
+        /// <summary>
+        /// Converts the AppConfigKey object back to its string representation.
+        /// </summary>
+        /// <returns>
+        /// A string in the format "configurationProfileId:flagKey[:attributeKey]".
+        /// The attributeKey part is only included if it exists.
+        /// </returns>
+        public string ToKeyString()
+        {
+            return $"{ConfigurationProfileId}{Separator}{FlagKey}{(HasAttribute ? Separator + AttributeKey : "")}";
+        }
     }
 }
