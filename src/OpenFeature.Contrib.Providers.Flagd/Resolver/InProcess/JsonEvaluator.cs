@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.RegularExpressions;
 using JsonLogic.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,7 +10,6 @@ using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using System.Text.RegularExpressions;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 {
@@ -26,6 +26,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
         internal object Targeting { get; set; }
         [JsonProperty("source")]
         internal string Source { get; set; }
+        [JsonProperty("metadata")]
+        internal Dictionary<string, object> Metadata { get; set; }
     }
 
     internal class FlagSyncData
@@ -34,6 +36,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
         internal Dictionary<string, FlagConfiguration> Flags { get; set; }
         [JsonProperty("$evaluators")]
         internal Dictionary<string, object> Evaluators { get; set; }
+        [JsonProperty("metadata")]
+        internal Dictionary<string, object> Metadata { get; set; }
     }
 
     internal class FlagConfigurationSync
@@ -53,6 +57,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
     internal class JsonEvaluator
     {
         private Dictionary<string, FlagConfiguration> _flags = new Dictionary<string, FlagConfiguration>();
+        private Dictionary<string, object> _flagSetMetadata = new Dictionary<string, object>();
 
         private string _selector;
 
@@ -99,17 +104,17 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             {
                 case FlagConfigurationUpdateType.ALL:
                     _flags = flagConfigsMap.Flags;
+                    _flagSetMetadata = flagConfigsMap.Metadata;
                     break;
                 case FlagConfigurationUpdateType.ADD:
-                    foreach (var keyAndValue in flagConfigsMap.Flags)
-                    {
-                        _flags[keyAndValue.Key] = keyAndValue.Value;
-                    }
-                    break;
                 case FlagConfigurationUpdateType.UPDATE:
                     foreach (var keyAndValue in flagConfigsMap.Flags)
                     {
                         _flags[keyAndValue.Key] = keyAndValue.Value;
+                    }
+                    foreach (var metadata in flagConfigsMap.Metadata)
+                    {
+                        _flagSetMetadata[metadata.Key] = metadata.Value;
                     }
                     break;
                 case FlagConfigurationUpdateType.DELETE:
@@ -117,8 +122,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     {
                         _flags.Remove(keyAndValue.Key);
                     }
+                    foreach (var keyValuePair in flagConfigsMap.Metadata)
+                    {
+                        _flagSetMetadata.Remove(keyValuePair.Key);
+                    }
                     break;
-
             }
         }
 
@@ -157,6 +165,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 {
                     throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' is disabled");
                 }
+                Dictionary<string, object> combinedMetadata = new Dictionary<string, object>(_flagSetMetadata);
+                if(flagConfiguration.Metadata != null)
+                {
+                    foreach (var (key,value) in flagConfiguration.Metadata)
+                    {
+                        combinedMetadata[key] = value;
+                    }
+                }
+
+                var flagMetadata = new ImmutableMetadata(combinedMetadata);
                 var variant = flagConfiguration.DefaultVariant;
                 if (flagConfiguration.Targeting != null && !String.IsNullOrEmpty(flagConfiguration.Targeting.ToString()) && flagConfiguration.Targeting.ToString() != "{}")
                 {
@@ -212,7 +230,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                             flagKey: flagKey,
                             value,
                             reason: reason,
-                            variant: variant
+                            variant: variant,
+                            flagMetadata: flagMetadata
                             );
                 }
                 else if (flagConfiguration.Variants.TryGetValue(variant, out var foundVariantValue))
@@ -223,7 +242,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                             flagKey: flagKey,
                             value,
                             reason: reason,
-                            variant: variant
+                            variant: variant,
+                            flagMetadata: flagMetadata
                             );
                 }
             }
