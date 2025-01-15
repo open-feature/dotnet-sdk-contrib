@@ -104,7 +104,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             {
                 case FlagConfigurationUpdateType.ALL:
                     _flags = flagConfigsMap.Flags;
-                    _flagSetMetadata = flagConfigsMap.Metadata;
+                    if (flagConfigsMap.Metadata == null)
+                    {
+                        _flagSetMetadata.Clear();
+                    }
+                    else
+                    {
+                        _flagSetMetadata = flagConfigsMap.Metadata;
+                    }
+
                     break;
                 case FlagConfigurationUpdateType.ADD:
                 case FlagConfigurationUpdateType.UPDATE:
