@@ -168,9 +168,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 Dictionary<string, object> combinedMetadata = new Dictionary<string, object>(_flagSetMetadata);
                 if(flagConfiguration.Metadata != null)
                 {
-                    foreach (var (key,value) in flagConfiguration.Metadata)
+                    foreach (var metadataEntry in flagConfiguration.Metadata)
                     {
-                        combinedMetadata[key] = value;
+                        combinedMetadata[metadataEntry.Key] = metadataEntry.Value;
                     }
                 }
 
