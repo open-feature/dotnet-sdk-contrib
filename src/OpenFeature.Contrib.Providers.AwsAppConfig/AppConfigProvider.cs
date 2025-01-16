@@ -202,30 +202,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 ConfigurationProfileIdentifier = configurationProfileId
             };
 
-            return await _appConfigRetrievalApi.GetLatestConfigurationAsync(profile);
-            // // TODO: Yet to figure out how to pass along Evalutaion Context to AWS AppConfig
-
-            // // Build "StartConfigurationSession" Request
-            // var startConfigSessionRequest = new StartConfigurationSessionRequest
-            // {
-            //     ApplicationIdentifier = _applicationName,
-            //     EnvironmentIdentifier = _environmentName,
-            //     ConfigurationProfileIdentifier = _configurationProfileId
-            // };            
-
-            // // Start a configuration session with AWS AppConfig
-            // var sessionResponse = await _appConfigClient.StartConfigurationSessionAsync(startConfigSessionRequest);
-
-            // // Build "GetLatestConfiguration" request
-            // var configurationRequest = new GetLatestConfigurationRequest
-            // {
-            //     ConfigurationToken = sessionResponse.InitialConfigurationToken
-            // };
-
-            // // Get the configuration response from AWS AppConfig
-            // var response = await _appConfigClient.GetLatestConfigurationAsync(configurationRequest);
-
-            // return response;   
+            return await _appConfigRetrievalApi.GetLatestConfigurationAsync(profile);               
         }             
     }
 }
