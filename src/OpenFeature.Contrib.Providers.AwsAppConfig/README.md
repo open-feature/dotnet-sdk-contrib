@@ -45,10 +45,10 @@ Application
 
 This package maintains the aforementioned structure by supplying values in two distinct stages.
 
-Stage 1: Setup 
+**Stage 1: Setup**
 During this stage, the Application and Environment are provided at the initiation of the project. It is expected that these two values remain constant throughout the application's lifetime. If a change is necessary, a restart of the application will be required.
 
-Stage 2: Fetching Value 
+**Stage 2: Fetching Value**
 In this stage, to retrieve the AWS AppConfig feature flag, the key should be supplied in the format `configurationProfileId:flagKey[:attributeKey]`. If the AttributeKey is not included, all attributes will be returned as a structured object.
 
 
