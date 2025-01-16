@@ -98,6 +98,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             FlagSyncData data = JsonConvert.DeserializeObject<FlagSyncData>(transformed);
             Console.Error.WriteLine("metadata " + data.Metadata);
             Console.Error.WriteLine("metadata count " + data.Metadata?.Count);
+            Console.WriteLine("metadata " + data.Metadata);//.WriteLine();
+            Console.WriteLine("metadata count " + data.Metadata?.Count);
             return data;
         }
 
