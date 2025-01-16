@@ -74,15 +74,18 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// </example>
         public AppConfigKey(string key)
         {
-            // Regular expression for validating the format with last part as 0 or 1 or empty
-            string pattern = @"^[^:]+:[^:]+:(0|1)?$";
-            var match = Regex.IsMatch(key, pattern);
-            
             if(string.IsNullOrWhiteSpace(key))
             {
                 throw new ArgumentException("Key cannot be null or empty");
             }
 
+            // Regular expression for validating the format with last part as 0 or 1 or empty
+            string pattern = @"^[^:]+:[^:]+(:[^:]+)?$";
+            var match = Regex.IsMatch(key, pattern);
+
+            if(!match) throw new ArgumentException("Invalid key format. Flag key is expected in configurationProfileId:flagKey[:attributeKey] format");
+            
+            
             var parts = key.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
 
             if(parts.Length < 2 )
@@ -135,7 +138,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// A string in the format "configurationProfileId:flagKey[:attributeKey]".
         /// The attributeKey part is only included if it exists.
         /// </returns>
-        public string ToKeyString()
+        public override string ToString()
         {
             return $"{ConfigurationProfileId}{Separator}{FlagKey}{(HasAttribute ? Separator + AttributeKey : "")}";
         }

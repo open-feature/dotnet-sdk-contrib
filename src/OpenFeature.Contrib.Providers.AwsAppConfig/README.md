@@ -109,7 +109,7 @@ app.MapGet("/flagKey", async (IFeatureClient featureClient) =>
 {
     // NOTE: Refere AppConfig Key section above to understand how AppConfig configuration is strucutred.
     var key = new AppConfigKey(configurationProfileId, flagKey, "enabled");
-    var isEnabled = await featureClient.GetBooleanValue(key.ToKeyString(), false);
+    var isEnabled = await featureClient.GetBooleanValue(key.ToString(), false);
     return Results.Ok(new { FeatureEnabled = isEnabled });
 })
 .WithName("GetFeatureStatus")
@@ -119,7 +119,7 @@ app.MapGet("/flagKey/attributeKey", async (IFeatureClient featureClient) =>
 {
     // NOTE: Refere AppConfig Key section above to understand how AppConfig configuration is strucutred.
     var key = new AppConfigKey(configurationProfileId, flagKey, attributeKey);
-    var config = await featureClient.GetStringValue(key.ToKeyString(), "default");
+    var config = await featureClient.GetStringValue(key.ToString(), "default");
     return Results.Ok(new { Configuration = config });
 })
 .WithName("GetFeatureConfig")
@@ -133,7 +133,7 @@ app.MapGet("/flagKey/attributeKey", async (IFeatureClient featureClient) =>
 app.MapGet("/protected-feature", async (IFeatureClient featureClient) =>
 {
     var key = new AppConfigKey(configurationProfileId, "protected-feature", "enabled");
-    var isFeatureEnabled = await featureClient.GetBooleanValue(key.ToKeyString(), false);
+    var isFeatureEnabled = await featureClient.GetBooleanValue(key.ToString(), false);
     
     if (!isFeatureEnabled)
     {

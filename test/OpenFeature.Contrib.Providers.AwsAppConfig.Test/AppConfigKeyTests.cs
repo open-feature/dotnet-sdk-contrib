@@ -32,26 +32,7 @@ public class AppConfigKeyTests
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => 
             new AppConfigKey(confiProfileId, flagKey, attributeKey));
-    }
-
-    [Theory]
-    [InlineData("app1", "env1", "config1")]
-    [InlineData("my-app", "my-env", "my-config")]
-    [InlineData("APP", "ENV", "CONFIG")]
-    public void ToString_ShouldReturnFormattedString(
-        string configProfileId, string flagKey, string attributeKey)
-    {
-        // Arrange
-        var key = new AppConfigKey(configProfileId, flagKey, attributeKey);
-
-        // Act
-        var result = key.ToString();
-
-        // Assert
-        Assert.Contains(configProfileId, result);
-        Assert.Contains(flagKey, result);
-        Assert.Contains(attributeKey, result);
-    }
+    }   
 
     [Theory]
     [InlineData("app-123", "env-123", "config-123")]
@@ -146,29 +127,23 @@ public class AppConfigKeyTests
         Assert.True(appConfigKey.HasAttribute);
     }
 
-    [Fact]
-    public void Constructor_WithMoreThanThreeParts_IgnoresExtraParts()
-    {
-        // Arrange
-        var key = "profile123:flag456:attr789:extra:parts";
-
-        // Act
-        var appConfigKey = new AppConfigKey(key);
-
-        // Assert
-        Assert.Equal("profile123", appConfigKey.ConfigurationProfileId);
-        Assert.Equal("flag456", appConfigKey.FlagKey);
-        Assert.Equal("attr789", appConfigKey.AttributeKey);
-        Assert.True(appConfigKey.HasAttribute);
-    }
-
-    [Fact]
-    public void Constructor_WithEmptyParts_ThrowsArgumentException()
+    [Theory]
+    [InlineData("profile123:flag456:attr789:extra:parts")]
+    [InlineData("profile123::attr789:extra:parts")]
+    [InlineData("profile123:flagkey456:")]
+    [InlineData("profile123:")]
+    [InlineData(":flagkey456")]
+    [InlineData(":flagkey456:")]
+    [InlineData("::attribute789")]
+    [InlineData("::")]
+    [InlineData(":::")]
+    [InlineData("RandomSgring)()@*Q()*#Q$@#$")]
+    public void Constructor_WithInvalidPattern_ShouldThrowArgumentException(string key)
     {
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey("::"));
         Assert.Equal("Invalid key format. Flag key is expected in configurationProfileId:flagKey[:attributeKey] format", exception.Message);
-    }
+    }    
 
     [Theory]
     [InlineData("profile123::attr789")]
@@ -179,23 +154,7 @@ public class AppConfigKeyTests
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey(key));
         Assert.Equal("Invalid key format. Flag key is expected in configurationProfileId:flagKey[:attributeKey] format", exception.Message);
-    }
-
-    [Fact]
-    public void Constructor_WithTrailingSeparator_HandlesProperly()
-    {
-        // Arrange
-        var key = "profile123:flag456:";
-
-        // Act
-        var appConfigKey = new AppConfigKey(key);
-
-        // Assert
-        Assert.Equal("profile123", appConfigKey.ConfigurationProfileId);
-        Assert.Equal("flag456", appConfigKey.FlagKey);
-        Assert.Null(appConfigKey.AttributeKey);
-        Assert.False(appConfigKey.HasAttribute);
-    }
+    }    
 
     [Fact]
     public void Constructor_WithLeadingSeparator_ThrowsArgumentException()
@@ -266,5 +225,41 @@ public class AppConfigKeyTests
 
         // Act & Assert
         Assert.False(appConfigKey.HasAttribute);
+    }
+
+    [Theory]
+    [InlineData("app1", "env1", "config1")]
+    [InlineData("my-app", "my-env", "my-config")]
+    [InlineData("APP", "ENV", "CONFIG")]
+    public void ToString_ShouldReturnFormattedString(
+        string configProfileId, string flagKey, string attributeKey)
+    {
+        // Arrange
+        var key = new AppConfigKey(configProfileId, flagKey, attributeKey);
+
+        // Act
+        var result = key.ToString();
+
+        // Assert
+        Assert.Contains(configProfileId, result);
+        Assert.Contains(flagKey, result);
+        Assert.Contains(attributeKey, result);
+    }
+
+    [Theory]
+    [InlineData("app1:env1:config1")]
+    [InlineData("my-app:my-env:my-config")]
+    [InlineData("APP:ENV")]
+    public void ToString_WithSingleInput_ShouldReturnFormattedString(string input)
+    {
+        // Arrange
+        var key = new AppConfigKey(input);
+
+        // Act
+        var result = key.ToString();
+
+        // Assert
+        Assert.Contains(key.ConfigurationProfileId, result);
+        Assert.Contains(key.FlagKey, result);        
     }
 }
