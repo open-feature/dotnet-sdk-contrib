@@ -21,6 +21,11 @@ dotnet add package OpenFeature.Contrib.Providers.AwsAppConfig
 ## Config Key
 A very important stuff to understand here is the way AWS Appconfig structure is designed. 
 
+Application
+└── Environment
+    └── ConfigurationProfileId
+        └── FeatureFlag
+            └── Attribute [optional]
 
 ### Description of Each Level
 
