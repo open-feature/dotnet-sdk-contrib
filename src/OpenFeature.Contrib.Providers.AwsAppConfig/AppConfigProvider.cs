@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
-using Amazon.AppConfigData;
 using Amazon.AppConfigData.Model;
 
 namespace OpenFeature.Contrib.Providers.AwsAppConfig

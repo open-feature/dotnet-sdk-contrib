@@ -4,10 +4,9 @@
     <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.AwsAppConfig\OpenFeature.Contrib.Providers.AwsAppConfig.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+  <PropertyGroup>    
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
 </Project>

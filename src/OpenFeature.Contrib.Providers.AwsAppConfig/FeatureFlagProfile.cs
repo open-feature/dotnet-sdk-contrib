@@ -1,5 +1,3 @@
-using System;
-
 namespace OpenFeature.Contrib.Providers.AwsAppConfig
 {
     /// <summary>

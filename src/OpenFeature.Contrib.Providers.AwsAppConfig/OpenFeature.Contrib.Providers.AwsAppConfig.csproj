@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net7.0;net6.0;netcoreapp3.1;</TargetFrameworks>
+    <TargetFrameworks>net8.0;net7.0;net6.0;</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
     <PackageId>OpenFeature.Contrib.Providers.AwsAppConfig</PackageId>
     <VersionNumber>0.0.1</VersionNumber> <!--x-release-please-version -->
