@@ -21,12 +21,11 @@ dotnet add package OpenFeature.Contrib.Providers.AwsAppConfig
 ## Config Key
 A very important stuff to understand here is the way AWS Appconfig structure is designed. 
 
-graph TD;  % This defines the direction of the flowchart
-A[This is a box] --> B[Another box];  % Creates boxes with text
-B --> C{Decision};  % Creates a decision node
-C -->|Option 1| D[Result 1];  % Connects options to results
-C -->|Option 2| E[Result 2];
-
+Application
+└── Environment
+    └── ConfigurationProfileId
+        └── FeatureFlag
+            └── Attribute
 
 ## Usage
 
