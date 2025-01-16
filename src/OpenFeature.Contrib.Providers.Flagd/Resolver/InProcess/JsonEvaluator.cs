@@ -93,7 +93,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 });
             }
 
-            return JsonConvert.DeserializeObject<FlagSyncData>(transformed);
+            Console.Error.WriteLine("flagConfigurations " + flagConfigurations);
+
+            FlagSyncData data = JsonConvert.DeserializeObject<FlagSyncData>(transformed);
+            Console.Error.WriteLine("metadata " + data.Metadata);
+            Console.Error.WriteLine("metadata count " + data.Metadata?.Count);
+            return data;
         }
 
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
