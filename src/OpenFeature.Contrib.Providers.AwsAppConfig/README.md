@@ -19,14 +19,14 @@ dotnet add package OpenFeature.Contrib.Providers.AwsAppConfig
 ```
 
 ## Config Key
-A very important stuff to understand here is the way AWS Appconfig structure is designed. 
+Understanding the organization of the AWS AppConfig structure is essential. The Application serves as the top-level entity, with all other components defined underneath it, as outlined below. To obtain a feature flag value, the AppConfig client needs three elements: Application, Environment, and ConfigurationProfileId. This will return a JSON representation containing all feature flags associated with the specified ConfigurationProfileId. These flags can then be further filtered using additional values for FlagKey and attributeKey. Within the FeatureFlag, there is a default attribute named "enabled," which indicates whether the flag is active. Additional attributes can be added as needed.
 
 ```
 Application
 └── Environment
     └── ConfigurationProfileId
-        └── FeatureFlag
-            └── Attribute [optional]
+        └── FlagKey
+            └── AttributeKey
 ```
 
 ### Description of Each Level
@@ -37,14 +37,13 @@ Application
   
 - **ConfigurationProfileId**: Specific configuration profiles that group related feature flags.
   
-- **FeatureFlag**: Toggles that control the availability of specific features within the application.
+- **FlagKey**: Toggles that control the availability of specific features within the application.
   
-- **Attribute**: Additional properties associated with each feature flag (e.g., enabled status, description).
+- **AttributeKey**: Additional properties associated with each feature flag (e.g., enabled status, description).
 
 ## Example Representation
 
 Here’s an example representation of how these entities might look in practice:
-
 
 
 ## Usage
