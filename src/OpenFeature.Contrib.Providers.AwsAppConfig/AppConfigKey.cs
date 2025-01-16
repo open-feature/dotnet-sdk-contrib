@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace OpenFeature.Contrib.Providers.AwsAppConfig
 {
@@ -31,7 +32,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// <summary>
         /// Gets whether this key has an attribute component
         /// </summary>
-        public bool HasAttribute => !string.IsNullOrEmpty(AttributeKey);
+        public bool HasAttribute => !string.IsNullOrWhiteSpace(AttributeKey);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppConfigKey"/> class that represents a structured key
@@ -73,6 +74,10 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// </example>
         public AppConfigKey(string key)
         {
+            // Regular expression for validating the format with last part as 0 or 1 or empty
+            string pattern = @"^[^:]+:[^:]+:(0|1)?$";
+            var match = Regex.IsMatch(key, pattern);
+            
             if(string.IsNullOrWhiteSpace(key))
             {
                 throw new ArgumentException("Key cannot be null or empty");
@@ -110,12 +115,12 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         {
             if (string.IsNullOrWhiteSpace(configurationProfileId))
             {
-                throw new ArgumentException("Configuration Profile ID cannot be null or empty");
+                throw new ArgumentNullException("Configuration Profile ID cannot be null or empty");
             }
 
             if (string.IsNullOrWhiteSpace(flagKey))
             {
-                throw new ArgumentException("Flag key cannot be null or empty");
+                throw new ArgumentNullException("Flag key cannot be null or empty");
             }
 
             ConfigurationProfileId = configurationProfileId;

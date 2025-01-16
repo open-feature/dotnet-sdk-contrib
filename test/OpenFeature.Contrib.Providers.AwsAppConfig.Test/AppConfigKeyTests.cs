@@ -5,7 +5,7 @@ using System;
 public class AppConfigKeyTests
 {
     [Fact]
-    public void Constructor_WithValidParameters_ShouldSetProperties()
+    public void Constructor_3input_WithValidParameters_ShouldSetProperties()
     {
         // Arrange
         var configProfileID = "TestConfigProfile";
@@ -23,17 +23,15 @@ public class AppConfigKeyTests
 
     [Theory]
     [InlineData("", "env", "config")]
-    [InlineData("app", "", "config")]
-    [InlineData("app", "env", "")]
+    [InlineData("app", "", "config")]    
     [InlineData(null, "env", "config")]
-    [InlineData("app", null, "config")]
-    [InlineData("app", "env", null)]
-    public void Constructor_WithInvalidParameters_ShouldThrowArgumentException(
-        string application, string environment, string configuration)
+    [InlineData("app", null, "config")]    
+    public void Constructor_3input_WithInvalidParameters_ShouldThrowArgumentException(
+        string confiProfileId, string flagKey, string attributeKey)
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => 
-            new AppConfigKey(application, environment, configuration));
+            new AppConfigKey(confiProfileId, flagKey, attributeKey));
     }
 
     [Theory]
@@ -59,7 +57,7 @@ public class AppConfigKeyTests
     [InlineData("app-123", "env-123", "config-123")]
     [InlineData("app_123", "env_123", "config_123")]
     [InlineData("app.123", "env.123", "config.123")]
-    public void Constructor_WithSpecialCharacters_ShouldAcceptValidPatterns(
+    public void Constructor_3input_WithSpecialCharacters_ShouldAcceptValidPatterns(
         string configProfileId, string flagKey, string attributeKey)
     {
         // Arrange & Act
@@ -69,22 +67,10 @@ public class AppConfigKeyTests
         Assert.Equal(configProfileId, key.ConfigurationProfileId);
         Assert.Equal(flagKey, key.FlagKey);
         Assert.Equal(attributeKey, key.AttributeKey);
-    }
-
-    [Theory]
-    [InlineData("app$123", "env", "config")]
-    [InlineData("app", "env#123", "config")]
-    [InlineData("app", "env", "config@123")]
-    public void Constructor_WithInvalidCharacters_ShouldThrowArgumentException(
-        string application, string environment, string configuration)
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => 
-            new AppConfigKey(application, environment, configuration));
-    }
+    }    
 
     [Fact]
-    public void Constructor_WithWhitespaceValues_ShouldThrowArgumentException()
+    public void Constructor_3input_WithWhitespaceValues_ShouldThrowArgumentException()
     {
         // Arrange
         var application = "   ";
@@ -92,19 +78,193 @@ public class AppConfigKeyTests
         var configuration = "config";
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => 
+        Assert.Throws<ArgumentNullException>(() => 
             new AppConfigKey(application, environment, configuration));
     }
 
-    [Theory]
-    [InlineData("a", "env", "config")] // too short
-    [InlineData("app", "e", "config")] // too short
-    [InlineData("app", "env", "c")]    // too short
-    public void Constructor_WithTooShortValues_ShouldThrowArgumentException(
-        string application, string environment, string configuration)
+    [Fact]
+    public void Constructor_WithNullKey_ThrowsArgumentException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => 
-            new AppConfigKey(application, environment, configuration));
+        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey(null));
+        Assert.Equal("Key cannot be null or empty", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WithEmptyKey_ThrowsArgumentException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey(string.Empty));
+        Assert.Equal("Key cannot be null or empty", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WithWhitespaceKey_ThrowsArgumentException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey("   "));
+        Assert.Equal("Key cannot be null or empty", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WithSinglePart_ThrowsArgumentException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey("singlepart"));
+        Assert.Equal("Invalid key format. Flag key is expected in configurationProfileId:flagKey[:attributeKey] format", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WithTwoParts_SetsPropertiesCorrectly()
+    {
+        // Arrange
+        var key = "profile123:flag456";
+
+        // Act
+        var appConfigKey = new AppConfigKey(key);
+
+        // Assert
+        Assert.Equal("profile123", appConfigKey.ConfigurationProfileId);
+        Assert.Equal("flag456", appConfigKey.FlagKey);
+        Assert.Null(appConfigKey.AttributeKey);
+        Assert.False(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void Constructor_WithThreeParts_SetsPropertiesCorrectly()
+    {
+        // Arrange
+        var key = "profile123:flag456:attr789";
+
+        // Act
+        var appConfigKey = new AppConfigKey(key);
+
+        // Assert
+        Assert.Equal("profile123", appConfigKey.ConfigurationProfileId);
+        Assert.Equal("flag456", appConfigKey.FlagKey);
+        Assert.Equal("attr789", appConfigKey.AttributeKey);
+        Assert.True(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void Constructor_WithMoreThanThreeParts_IgnoresExtraParts()
+    {
+        // Arrange
+        var key = "profile123:flag456:attr789:extra:parts";
+
+        // Act
+        var appConfigKey = new AppConfigKey(key);
+
+        // Assert
+        Assert.Equal("profile123", appConfigKey.ConfigurationProfileId);
+        Assert.Equal("flag456", appConfigKey.FlagKey);
+        Assert.Equal("attr789", appConfigKey.AttributeKey);
+        Assert.True(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void Constructor_WithEmptyParts_ThrowsArgumentException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey("::"));
+        Assert.Equal("Invalid key format. Flag key is expected in configurationProfileId:flagKey[:attributeKey] format", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("profile123::attr789")]
+    [InlineData(":flag456:attr789")]
+    [InlineData("::attr789")]
+    public void Constructor_WithEmptyMiddleParts_PreservesNonEmptyParts(string key)
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey(key));
+        Assert.Equal("Invalid key format. Flag key is expected in configurationProfileId:flagKey[:attributeKey] format", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WithTrailingSeparator_HandlesProperly()
+    {
+        // Arrange
+        var key = "profile123:flag456:";
+
+        // Act
+        var appConfigKey = new AppConfigKey(key);
+
+        // Assert
+        Assert.Equal("profile123", appConfigKey.ConfigurationProfileId);
+        Assert.Equal("flag456", appConfigKey.FlagKey);
+        Assert.Null(appConfigKey.AttributeKey);
+        Assert.False(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void Constructor_WithLeadingSeparator_ThrowsArgumentException()
+    {
+        // Arrange
+        var key = ":profile123:flag456";
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey(key));
+        Assert.Equal("Invalid key format. Flag key is expected in configurationProfileId:flagKey[:attributeKey] format", exception.Message);
+    }
+
+    [Fact]
+    public void HasAttribute_WhenAttributeKeyIsNull_ReturnsFalse()
+    {
+        // Arrange
+        var appConfigKey = new AppConfigKey("profileId", "flagKey");
+
+        // Act & Assert
+        Assert.False(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void HasAttribute_WhenAttributeKeyIsEmpty_ReturnsFalse()
+    {
+        // Arrange
+        var appConfigKey = new AppConfigKey("profileId", "flagKey", "");
+
+        // Act & Assert
+        Assert.False(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void HasAttribute_WhenAttributeKeyIsWhitespace_ReturnsFalse()
+    {
+        // Arrange
+        var appConfigKey = new AppConfigKey("profileId", "flagKey", "   ");
+
+        // Act & Assert
+        Assert.False(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void HasAttribute_WhenAttributeKeyIsProvided_ReturnsTrue()
+    {
+        // Arrange
+        var appConfigKey = new AppConfigKey("profileId", "flagKey", "attributeKey");
+
+        // Act & Assert
+        Assert.True(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void HasAttribute_WhenConstructedWithStringWithAttribute_ReturnsTrue()
+    {
+        // Arrange
+        var appConfigKey = new AppConfigKey("profileId:flagKey:attributeKey");
+
+        // Act & Assert
+        Assert.True(appConfigKey.HasAttribute);
+    }
+
+    [Fact]
+    public void HasAttribute_WhenConstructedWithStringWithoutAttribute_ReturnsFalse()
+    {
+        // Arrange
+        var appConfigKey = new AppConfigKey("profileId:flagKey");
+
+        // Act & Assert
+        Assert.False(appConfigKey.HasAttribute);
     }
 }
