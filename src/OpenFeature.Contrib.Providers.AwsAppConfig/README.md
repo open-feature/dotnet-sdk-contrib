@@ -105,18 +105,20 @@ namespace OpenFeatureTestApp
 
 ```csharp
 // Example endpoints using feature flags
-app.MapGet("/feature-status", async (IFeatureClient featureClient) =>
+app.MapGet("/flagKey", async (IFeatureClient featureClient) =>
 {
-    var key = new AppConfigKey(configurationProfileId, flagKey, attributeName);
+    // NOTE: Refere AppConfig Key section above to understand how AppConfig configuration is strucutred.
+    var key = new AppConfigKey(configurationProfileId, flagKey, "enabled");
     var isEnabled = await featureClient.GetBooleanValue(key.ToKeyString(), false);
     return Results.Ok(new { FeatureEnabled = isEnabled });
 })
 .WithName("GetFeatureStatus")
 .WithOpenApi();
 
-app.MapGet("/feature-config", async (IFeatureClient featureClient) =>
+app.MapGet("/flagKey/attributeKey", async (IFeatureClient featureClient) =>
 {
-    var key = new AppConfigKey(configurationProfileId, flagKey, attributeName);
+    // NOTE: Refere AppConfig Key section above to understand how AppConfig configuration is strucutred.
+    var key = new AppConfigKey(configurationProfileId, flagKey, attributeKey);
     var config = await featureClient.GetStringValue(key.ToKeyString(), "default");
     return Results.Ok(new { Configuration = config });
 })
@@ -130,7 +132,8 @@ app.MapGet("/feature-config", async (IFeatureClient featureClient) =>
 // Example endpoint with feature flag controlling behavior
 app.MapGet("/protected-feature", async (IFeatureClient featureClient) =>
 {
-    var isFeatureEnabled = await featureClient.GetBooleanValue("protected-feature", false);
+    var key = new AppConfigKey(configurationProfileId, "protected-feature", "enabled");
+    var isFeatureEnabled = await featureClient.GetBooleanValue(key.ToKeyString(), false);
     
     if (!isFeatureEnabled)
     {
