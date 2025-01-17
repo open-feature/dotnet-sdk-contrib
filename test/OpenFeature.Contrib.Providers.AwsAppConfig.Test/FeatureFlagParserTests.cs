@@ -23,7 +23,7 @@ public class FeatureFlagParserTests
         // Assert
         Assert.True(result.IsStructure);
         Assert.True(result.AsStructure["enabled"].AsBoolean);
-        Assert.Equal("testValue", result.AsStructure["additionalAttribute"].AsString);
+        Assert.Equal("testValue", result.AsStructure["stringAttribute"].AsString);
     }
 
     [Fact]
