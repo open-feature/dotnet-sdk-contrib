@@ -1,0 +1,9 @@
+{
+  "test-enabled-flag": {
+    "enabled": true,
+    "additionalAttribute": "testValue"
+  },
+  "test-disabled-flag": {
+    "enabled": false
+  }  
+}

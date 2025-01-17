@@ -141,7 +141,7 @@ public class AppConfigKeyTests
     public void Constructor_WithInvalidPattern_ShouldThrowArgumentException(string key)
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey("::"));
+        var exception = Assert.Throws<ArgumentException>(() => new AppConfigKey(key));
         Assert.Equal("Invalid key format. Flag key is expected in configurationProfileId:flagKey[:attributeKey] format", exception.Message);
     }    
 
