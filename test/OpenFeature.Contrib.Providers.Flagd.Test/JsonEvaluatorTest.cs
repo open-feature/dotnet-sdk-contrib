@@ -375,6 +375,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
 
             var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
+
+            var a = result.FlagMetadata.GetInt("integer");
+
             Assert.NotNull(result.FlagMetadata);
             Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
             Assert.Equal(2, result.FlagMetadata.GetInt("integer"));
@@ -389,7 +392,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            Assert.Throws<NullReferenceException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagSetMetadata));
+            Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagSetMetadata));
         }
 
         [Fact]
@@ -399,7 +402,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            Assert.Throws<NullReferenceException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagMetadata));
+            Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagMetadata));
         }
     }
 }
