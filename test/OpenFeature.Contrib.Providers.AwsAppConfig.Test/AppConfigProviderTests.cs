@@ -160,17 +160,17 @@ public class AppConfigProviderTests
     public async Task ResolveStructureValueAsync_WhenFlagExists_ReturnsCorrectValue()
     {
         // Arrange
-        const string flagKey = "configProfileId:test-enabled-flag";
-        const string jsonValue = "{\"key\": \"value\", \"number\": 42}";
-        SetupMockResponse($"{{\"{flagKey}\": {jsonValue}}}");
+        const string flagKey = "configProfileId:test-enabled-flag";        
+        SetupMockResponse(_jsonContent);
 
         // Act
         var result = await _provider.ResolveStructureValueAsync(flagKey, new Value());
 
         // Assert
         Assert.NotNull(result.Value.AsStructure);
-        Assert.Equal("value", result.Value.AsStructure["key"].AsString);
-        Assert.Equal(42, result.Value.AsStructure["number"].AsInteger);
+        Assert.True(result.Value.AsStructure["enabled"].AsBoolean);
+        Assert.Equal("testValue", result.Value.AsStructure["stringAttribute"].AsString);
+        Assert.Equal(42, result.Value.AsStructure["intAttribute"].AsInteger);
     }
 
     [Fact]
@@ -178,10 +178,15 @@ public class AppConfigProviderTests
     {
         // Arrange
         const string flagKey = "configProfileId:test-enabled-flag";
-        var defaultValue = new Value(new Dictionary<string, Value> 
-        { 
-            ["default"] = new Value("default") 
-        });
+        var defaultValue = new Value(
+            new Structure(
+                new Dictionary<string, Value> 
+                { 
+                    ["default"] = new Value("default")
+                }
+            )
+        );
+        
         SetupMockResponse("{}");
 
         // Act
@@ -198,15 +203,14 @@ public class AppConfigProviderTests
     public async Task ResolveValue_WithAttributeKey_ReturnsAttributeValue()
     {
         // Arrange
-        const string flagKey = "myFlag:color";
-        const string expectedValue = "blue";
-        SetupMockResponse($"{{\"myFlag\": {{\"color\": \"{expectedValue}\"}}}}");
+        const string flagKey = "configProfileId:test-enabled-flag:stringAttribute";
+        SetupMockResponse(_jsonContent);
 
         // Act
         var result = await _provider.ResolveStringValueAsync(flagKey, "default");
 
         // Assert
-        Assert.Equal(expectedValue, result.Value);
+        Assert.Equal("testValue", result.Value);
     }
 
     [Fact]
