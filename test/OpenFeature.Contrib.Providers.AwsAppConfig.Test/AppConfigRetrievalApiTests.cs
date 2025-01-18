@@ -1,14 +1,12 @@
 using Xunit;
 using Moq;
 using System;
-using OpenFeature.Model;
 using Amazon.AppConfigData;
 using Amazon.AppConfigData.Model;
 using System.Text;
 using OpenFeature.Contrib.Providers.AwsAppConfig;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Caching.Memory;
 public class AppConfigRetrievalApiTests

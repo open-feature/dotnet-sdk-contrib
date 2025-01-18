@@ -47,12 +47,16 @@ This package maintains the aforementioned structure by supplying values in two d
 
 **Stage 1: Setup**
 
-During this stage, the Application and Environment are provided at the initiation of the project. It is expected that these two values remain constant throughout the application's lifetime. If a change is necessary, a restart of the application will be required.
+During this stage, the Application and Environment are provided at the initiation of the project. It is expected that these two values remain static during the application's lifetime. If a change is necessary, a restart of the application will be required.
+
+Additionally, at this point Required Minimum Polling Interval in seconds can also be configured by supplying integer value of seconds you would like to set. Default is 15 seconds and maximum allowed by AWS id 86400 seconds.
 
 **Stage 2: Fetching Value**
 
 In this stage, to retrieve the AWS AppConfig feature flag, the key should be supplied in the format `configurationProfileId:flagKey[:attributeKey]`. If the AttributeKey is not included, all attributes will be returned as a structured object.
 
+## Important information about the implementation
+As per AWS AppConfig documentation, the recommended way to access AWS AppConfig is by using 
 
 ## Usage
 
@@ -89,11 +93,12 @@ namespace OpenFeatureTestApp
 
             // Replace these values with your AWS AppConfig settings
             const string application = "YourApplication";
-            const string environment = "YourEnvironment";            
+            const string environment = "YourEnvironment";
+            const int pollingIntervalSeconds = 60; // default is 15            
 
             await Api.Instance.SetProviderAsync(
-                new AppConfigProvider(appConfigRetrievalApi, application, environment)
-            );            
+                new AppConfigProvider(appConfigRetrievalApi, application, environment, pollingIntervalSeconds)
+            );
         }
     }
 }

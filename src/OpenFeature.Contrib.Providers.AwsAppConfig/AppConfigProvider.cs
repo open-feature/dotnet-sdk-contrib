@@ -19,21 +19,24 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         private readonly string _applicationName;
         
         // The environment (e.g., prod, dev, staging) in AWS AppConfig
-        private readonly string _environmentName;        
+        private readonly string _environmentName;
+
+        private readonly int _minimumPollIntervalInSeconds;
          
         /// <summary>
         /// Returns metadata about the provider
         /// </summary>
         /// <returns>Metadata object containing provider information</returns>
         public override Metadata GetMetadata() => new Metadata("AWS AppConfig Provider");
-        
+
         /// <summary>
         /// Constructor for AwsAppConfigProvider
         /// </summary>
         /// <param name="retrievalApi">The AWS AppConfig retrieval API</param>
         /// <param name="applicationName">The name of the application in AWS AppConfig</param>
-        /// <param name="environmentName">The environment (e.g., prod, dev, staging) in AWS AppConfig</param>        
-        public AppConfigProvider(IRetrievalApi retrievalApi, string applicationName, string environmentName)
+        /// <param name="environmentName">The environment (e.g., prod, dev, staging) in AWS AppConfig</param>
+        /// <param name="minimumPollIntervalInSeconds">Client cannot call GetLatest more frequently than every specified seconds. Range 15-86400.</param>        
+        public AppConfigProvider(IRetrievalApi retrievalApi, string applicationName, string environmentName, int minimumPollIntervalInSeconds = 15)
         {
             // Application name, environment name and configuration profile ID is needed for connecting to AWS Appconfig.
             // If any of these are missing, an exception will be thrown.
@@ -46,7 +49,8 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
             
             _appConfigRetrievalApi = retrievalApi;
             _applicationName = applicationName;
-            _environmentName = environmentName;            
+            _environmentName = environmentName;
+            _minimumPollIntervalInSeconds = minimumPollIntervalInSeconds;           
         }
         
         /// <summary>
@@ -175,7 +179,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// and returns it in its raw string format. The returned string is expected to be
         /// in JSON format that can be parsed into feature flag configurations.
         /// </remarks>
-        /// <exception cref="AmazonAppConfigException">Thrown when there is an error retrieving the configuration from AWS AppConfig.</exception>
+        /// <exception cref="AmazonAppConfigDataException">Thrown when there is an error retrieving the configuration from AWS AppConfig.</exception>
         private async Task<string> GetFeatureFlagsResponseJson(string configurationProfileId, EvaluationContext context = null)
         {
             var response = await GetFeatureFlagsStreamAsync(configurationProfileId, context);
@@ -198,6 +202,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
             {
                 ApplicationIdentifier = _applicationName,
                 EnvironmentIdentifier = _environmentName,
+                RequiredMinimumPollIntervalInSeconds = _minimumPollIntervalInSeconds,
                 ConfigurationProfileIdentifier = configurationProfileId
             };
 

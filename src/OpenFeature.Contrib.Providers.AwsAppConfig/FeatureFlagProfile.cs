@@ -20,6 +20,18 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         public string EnvironmentIdentifier { get; set; }
 
         /// <summary>
+        /// Gets or sets the minimum polling interval in seconds for AWS AppConfig.
+        /// This value determines the minimum time that must elapse between configuration refresh attempts.
+        /// The default value set here is 15 seconds, which aligns with AWS AppConfig's minimum supported interval.
+        /// Range 15 to 86400 seconds.
+        /// </summary>
+        /// <remarks>
+        /// AWS AppConfig enforces a minimum interval of 15 seconds between configuration refresh attempts.
+        /// Setting a value lower than 15 seconds may result in throttling by the service.
+        /// </remarks>
+        public int RequiredMinimumPollIntervalInSeconds {get; set;} = 15;
+
+        /// <summary>
         /// Gets or sets the AWS AppConfig configuration profile identifier.
         /// This identifies the specific configuration profile containing the feature flags.
         /// </summary>

@@ -178,7 +178,8 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 {
                     ApplicationIdentifier = profile.ApplicationIdentifier,
                     EnvironmentIdentifier = profile.EnvironmentIdentifier,
-                    ConfigurationProfileIdentifier = profile.ConfigurationProfileIdentifier
+                    ConfigurationProfileIdentifier = profile.ConfigurationProfileIdentifier,
+                    RequiredMinimumPollIntervalInSeconds = profile.RequiredMinimumPollIntervalInSeconds
                 };
 
                 var sessionResponse = await _appConfigDataClient.StartConfigurationSessionAsync(request);
