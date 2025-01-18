@@ -56,7 +56,11 @@ Additionally, at this point Required Minimum Polling Interval in seconds can als
 In this stage, to retrieve the AWS AppConfig feature flag, the key should be supplied in the format `configurationProfileId:flagKey[:attributeKey]`. If the AttributeKey is not included, all attributes will be returned as a structured object.
 
 ## Important information about the implementation
-As per AWS AppConfig documentation, the recommended way to access AWS AppConfig is by using 
+As per AWS [AppConfig documentation](https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-agent-how-to-use.html), **the recommended way for retrieving configuration data from AWS AppConfig is by using AWS AppConfig Agent, but this implemntation is not using the agents, rather uses AWS AppConfig APIs** in order to have more control around caching and parsing the returned response. 
+
+This implementation uses in-memory IMemoryCache implementation, but any other cache can be easily swapped with if needed.
+
+*For detailed AWS appconfig documentation refer AWS documentation page. (link provided in References Section below).*
 
 ## Usage
 
@@ -150,3 +154,6 @@ app.MapGet("/protected-feature", async (IFeatureClient featureClient) =>
 .WithName("ProtectedFeature")
 .WithOpenApi();
 ```
+
+## References
+1. [AWS AppConfig documentation](https://docs.aws.amazon.com/appconfig/)
