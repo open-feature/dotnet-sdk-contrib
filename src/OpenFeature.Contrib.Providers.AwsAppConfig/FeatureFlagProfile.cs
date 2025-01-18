@@ -18,6 +18,12 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// This represents the deployment environment (e.g., development, production) in AWS AppConfig.
         /// </summary>
         public string EnvironmentIdentifier { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the AWS AppConfig configuration profile identifier.
+        /// This identifies the specific configuration profile containing the feature flags.
+        /// </summary>
+        public string ConfigurationProfileIdentifier { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum polling interval in seconds for AWS AppConfig.
@@ -32,12 +38,6 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         public int RequiredMinimumPollIntervalInSeconds {get; set;} = 15;
 
         /// <summary>
-        /// Gets or sets the AWS AppConfig configuration profile identifier.
-        /// This identifies the specific configuration profile containing the feature flags.
-        /// </summary>
-        public string ConfigurationProfileIdentifier { get; set; }
-
-        /// <summary>
         /// Gets a value indicating whether the profile is valid.
         /// A profile is considered valid when all identifiers (Application, Environment, and Configuration Profile)
         /// are non-null and non-empty.
@@ -48,7 +48,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
 
         /// <summary>
         /// Returns a string representation of the feature flag profile.
-        /// The format is "ApplicationIdentifier+EnvironmentIdentifier+ConfigurationProfileIdentifier".
+        /// The format is "ApplicationIdentifier_EnvironmentIdentifier_ConfigurationProfileIdentifier".
         /// </summary>
         /// <returns>A string containing all three identifiers concatenated with '+' characters.</returns>
         public override string ToString()
