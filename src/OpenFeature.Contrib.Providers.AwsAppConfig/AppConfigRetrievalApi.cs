@@ -51,17 +51,18 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// </summary>
         private readonly MemoryCacheEntryOptions _cacheOptions;
 
-        
+
         /// <summary>
         /// Initializes a new instance of the AppConfigRetrievalApi class.
         /// </summary>
         /// <param name="appConfigDataClient">The AWS AppConfig Data client used to interact with the AWS AppConfig service.</param>
+        /// <param name="memoryCache">MemoryCache instance used for caching. If null, Default is instantiated.</param>
         /// <param name="cacheDuration">Optional duration for which items should be cached. Defaults to 5 minutes if not specified.</param>
         /// <exception cref="ArgumentNullException">Thrown when appConfigDataClient is null.</exception>
-        public AppConfigRetrievalApi(IAmazonAppConfigData appConfigDataClient, TimeSpan? cacheDuration = null)
+        public AppConfigRetrievalApi(IAmazonAppConfigData appConfigDataClient, IMemoryCache memoryCache, TimeSpan? cacheDuration = null)
         {
             _appConfigDataClient = appConfigDataClient ?? throw new ArgumentNullException(nameof(appConfigDataClient));
-            _memoryCache = new MemoryCache(new MemoryCacheOptions());
+            _memoryCache = memoryCache ?? new MemoryCache(new MemoryCacheOptions());
             
             // Default cache duration of 60 minutes if not specified
             _cacheOptions = new MemoryCacheEntryOptions()
@@ -79,9 +80,12 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// If AWS returns an empty configuration, it indicates no changes from the previous configuration,
         /// and the cached value will be returned if available.
         /// </remarks>
-        /// <exception cref="Exception">Thrown when unable to connect to AWS or retrieve configuration.</exception>
+        /// <exception cref="ArgumentException">Thrown when the provided profile is invalid.</exception>
+        /// <exception cref="AmazonAppConfigDataException">Thrown when unable to connect to AWS or retrieve configuration.</exception>
         public async Task<GetLatestConfigurationResponse>GetLatestConfigurationAsync(FeatureFlagProfile profile)
         {
+            if(!profile.IsValid) throw new ArgumentException("Invalid Feature Flag configuration profile");
+
             var configKey = BuildConfigurationKey(profile);
             var sessionKey = BuildSessionKey(profile);
 
@@ -164,7 +168,7 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
         /// </remarks>
         private async Task<string> GetSessionToken(FeatureFlagProfile profile)
         {
-            if(!profile.IsValid) throw new ArgumentException("Invalid Feature Flag configuration profile");        
+            if(!profile.IsValid) throw new ArgumentException("Invalid Feature Flag configuration profile");
 
             return await _memoryCache.GetOrCreateAsync(BuildSessionKey(profile), async entry =>
             {
