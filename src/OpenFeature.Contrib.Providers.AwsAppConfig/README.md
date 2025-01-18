@@ -60,6 +60,8 @@ As per AWS [AppConfig documentation](https://docs.aws.amazon.com/appconfig/lates
 
 This implementation uses in-memory IMemoryCache implementation, but any other cache can be easily swapped with if needed.
 
+### No support for Multi-Variant flags.
+This implementation currently does not support **multi-variant** AppConfig Feature flags. Or rather there is no way to pass on calling context to the request to AWS AppConfig. I am looking at documentation to figure out how this is done, but haven't got much far on that. Will be looking to add that soon.
 
 ## Usage
 
