@@ -60,7 +60,6 @@ As per AWS [AppConfig documentation](https://docs.aws.amazon.com/appconfig/lates
 
 This implementation uses in-memory IMemoryCache implementation, but any other cache can be easily swapped with if needed.
 
-*For detailed AWS appconfig documentation refer AWS documentation page. (link provided in References Section below).*
 
 ## Usage
 
