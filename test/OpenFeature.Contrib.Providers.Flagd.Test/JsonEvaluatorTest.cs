@@ -376,8 +376,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
 
-            var a = result.FlagMetadata.GetInt("integer");
-
             Assert.NotNull(result.FlagMetadata);
             Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
             Assert.Equal(2, result.FlagMetadata.GetInt("integer"));

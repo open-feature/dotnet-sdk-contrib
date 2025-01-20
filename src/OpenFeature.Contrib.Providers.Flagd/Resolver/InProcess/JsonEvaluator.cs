@@ -96,7 +96,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     var value = data.Metadata[key];
                     if (value is long longValue)
                     {
-                        data.Metadata[key] = (int)longValue;
+                        value = data.Metadata[key] = (int)longValue;
                     }
 
                     VerifyMetadataValue(key, value);
@@ -115,7 +115,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     var value = flagConfig.Value.Metadata[key];
                     if (value is long longValue)
                     {
-                        flagConfig.Value.Metadata[key] = (int)longValue;
+                        value = flagConfig.Value.Metadata[key] = (int)longValue;
                     }
 
                     VerifyMetadataValue(key, value);
