@@ -349,7 +349,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
-        public void TestJsonEvaluatorAddsFlagSetMetadataToFlagWithoutMetdata()
+        public void TestJsonEvaluatorAddsFlagSetMetadataToFlagWithoutMetadata()
         {
             var fixture = new Fixture();
 
