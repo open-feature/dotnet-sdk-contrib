@@ -95,15 +95,27 @@ namespace OpenFeature.Contrib.Providers.AwsAppConfig
                 ConfigurationToken = await GetSessionToken(profile)
             };
 
-            var response = await _appConfigDataClient.GetLatestConfigurationAsync(configurationRequest);
+            GetLatestConfigurationResponse response;
 
-            // If not NextPollConfigurationToken, something wrong with AWS connection.
-            if(string.IsNullOrWhiteSpace(response.NextPollConfigurationToken)) throw new Exception("Unable to connect to AWS");
+            try
+            {
+                response = await _appConfigDataClient.GetLatestConfigurationAsync(configurationRequest);
+            }
+            catch
+            {
+                // On exception, could be because of connection issue or 
+                // too frequent call per defined by polling duration, get what's in cache
+                response = null;
+            }            
 
-            // First, update the session token to the newly returned token
-            _memoryCache.Set(sessionKey, response.NextPollConfigurationToken);
+            // Update Next Poll configuration token only when one is available.
+            if(response != null)
+            {
+                // First, update the session token to the newly returned token
+                 _memoryCache.Set(sessionKey, response.NextPollConfigurationToken);
+            }            
 
-            if((response.Configuration == null || response.Configuration.Length == 0) 
+            if((response?.Configuration == null || response.Configuration.Length == 0) 
                 && _memoryCache.TryGetValue(configKey, out GetLatestConfigurationResponse configValue))
             {
                 // AppConfig returns empty Configuration if value hasn't changed from last retrieval, hence use what's in cache.            
