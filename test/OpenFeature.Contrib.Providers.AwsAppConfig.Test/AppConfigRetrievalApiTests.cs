@@ -191,7 +191,7 @@ public class AppConfigRetrievalApiTests
         }
         catch (Exception e)
         {
-            Assert.Null(e); // No exception expected
+            Assert.Null(e); // No exception expected also signing off            
         }
     }
 
