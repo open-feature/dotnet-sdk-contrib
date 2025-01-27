@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using AutoFixture;
 using OpenFeature.Constant;
@@ -10,7 +11,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
     public class UnitTestJsonEvaluator
     {
-
         [Fact]
         public void TestJsonEvaluatorAddFlagConfig()
         {
@@ -23,7 +23,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var result = jsonEvaluator.ResolveBooleanValueAsync("validFlag", false);
 
             Assert.True(result.Value);
-
         }
 
         [Fact]
@@ -40,7 +39,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("#CC0000", result.Value);
             Assert.Equal("red", result.Variant);
             Assert.Equal(Reason.Static, result.Reason);
-
         }
 
         [Fact]
@@ -57,7 +55,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
             builder
-              .Set("color", "yellow");
+                .Set("color", "yellow");
 
             var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlag", false, builder.Build());
 
@@ -80,7 +78,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
 
-            var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingFlagdProperty", false, builder.Build());
+            var result =
+                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingFlagdProperty", false, builder.Build());
 
             Assert.True(result.Value);
             Assert.Equal("bool1", result.Variant);
@@ -101,7 +100,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
 
-            var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingFlagdPropertyTimestamp", false, builder.Build());
+            var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingFlagdPropertyTimestamp", false,
+                builder.Build());
 
             Assert.True(result.Value);
             Assert.Equal("bool1", result.Variant);
@@ -119,7 +119,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder().Set("email", "test@faas.com");
 
-            var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingSharedEvaluator", false, builder.Build());
+            var result =
+                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingSharedEvaluator", false, builder.Build());
 
             Assert.True(result.Value);
             Assert.Equal("bool1", result.Variant);
@@ -137,7 +138,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder().Set("email", "test@faas.com");
 
-            var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingSharedEvaluatorReturningBoolType", false, builder.Build());
+            var result =
+                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingSharedEvaluatorReturningBoolType", false,
+                    builder.Build());
 
             Assert.True(result.Value);
             Assert.Equal("true", result.Variant);
@@ -155,7 +158,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
 
-            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagWithMissingDefaultVariant", false, builder.Build()));
+            Assert.Throws<FeatureProviderException>(() =>
+                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagWithMissingDefaultVariant", false,
+                    builder.Build()));
         }
 
         [Fact]
@@ -169,7 +174,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
 
-            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagWithUnexpectedVariantType", false, builder.Build()));
+            Assert.Throws<FeatureProviderException>(() =>
+                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagWithUnexpectedVariantType", false,
+                    builder.Build()));
         }
 
         [Fact]
@@ -186,7 +193,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
             builder
-              .Set("color", "yellow");
+                .Set("color", "yellow");
 
             var result = jsonEvaluator.ResolveStringValueAsync("targetingStringFlag", "", builder.Build());
 
@@ -209,7 +216,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
             builder
-              .Set("color", "yellow");
+                .Set("color", "yellow");
 
             var result = jsonEvaluator.ResolveDoubleValueAsync("targetingFloatFlag", 0, builder.Build());
 
@@ -232,7 +239,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
             builder
-              .Set("color", "yellow");
+                .Set("color", "yellow");
 
             var result = jsonEvaluator.ResolveIntegerValueAsync("targetingNumberFlag", 0, builder.Build());
 
@@ -255,7 +262,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             var builder = EvaluationContext.Builder();
             builder
-              .Set("color", "yellow");
+                .Set("color", "yellow");
 
             var result = jsonEvaluator.ResolveStructureValueAsync("targetingObjectFlag", null, builder.Build());
 
@@ -280,7 +287,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             builder
                 .Set("color", "yellow");
 
-            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false, builder.Build()));
+            Assert.Throws<FeatureProviderException>(() =>
+                jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false, builder.Build()));
         }
 
         [Fact]
@@ -299,7 +307,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             builder
                 .Set("color", "yellow");
 
-            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValueAsync("missingFlag", false, builder.Build()));
+            Assert.Throws<FeatureProviderException>(() =>
+                jsonEvaluator.ResolveBooleanValueAsync("missingFlag", false, builder.Build()));
         }
 
         [Fact]
@@ -318,7 +327,80 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             builder
                 .Set("color", "yellow");
 
-            Assert.Throws<FeatureProviderException>(() => jsonEvaluator.ResolveBooleanValueAsync("staticStringFlag", false, builder.Build()));
+            Assert.Throws<FeatureProviderException>(() =>
+                jsonEvaluator.ResolveBooleanValueAsync("staticStringFlag", false, builder.Build()));
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorReturnsFlagMetadata()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+            var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
+            Assert.NotNull(result.FlagMetadata);
+            Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
+            Assert.Equal(2, result.FlagMetadata.GetInt("integer"));
+            Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
+            Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorAddsFlagSetMetadataToFlagWithoutMetadata()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
+
+            var result = jsonEvaluator.ResolveBooleanValueAsync("without-metadata-flag", false);
+            Assert.NotNull(result.FlagMetadata);
+            Assert.Equal("1.0.3", result.FlagMetadata.GetString("string"));
+            Assert.Equal(3, result.FlagMetadata.GetInt("integer"));
+            Assert.Equal(false, result.FlagMetadata.GetBool("boolean"));
+            Assert.Equal(.2, result.FlagMetadata.GetDouble("float"));
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorFlagMetadataOverwritesFlagSetMetadata()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
+
+            var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
+
+            Assert.NotNull(result.FlagMetadata);
+            Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
+            Assert.Equal(2, result.FlagMetadata.GetInt("integer"));
+            Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
+            Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorThrowsOnInvalidFlagSetMetadata()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagSetMetadata));
+        }
+
+        [Fact]
+        public void TestJsonEvaluatorThrowsOnInvalidFlagMetadata()
+        {
+            var fixture = new Fixture();
+
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+            Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagMetadata));
         }
     }
 }
