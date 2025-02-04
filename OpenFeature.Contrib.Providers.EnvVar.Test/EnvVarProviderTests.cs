@@ -135,6 +135,21 @@ public class EnvVarProviderTests
        Assert.Equal(ErrorType.None, resolutionDetails.ErrorType);
     }
 
+    [Theory]
+    [AutoData]
+    public async Task ResolveValueFromClient_WhenProviderConfigured_ShouldReturnValue(string prefix, string flagKey)
+    {
+        Environment.SetEnvironmentVariable(prefix + flagKey, true.ToString());
+        
+        var provider = new EnvVarProvider(prefix);
+        await OpenFeature.Api.Instance.SetProviderAsync(provider);
+        var client = OpenFeature.Api.Instance.GetClient();
+        
+        var receivedValue = await client.GetBooleanValueAsync(flagKey, false);
+        
+        Assert.True(receivedValue);
+    }
+
     private async Task ExecuteResolveValueTest<T>(string prefix, string flagKey, T defaultValue, T expectedValue,
         string expectedReason, Func<EnvVarProvider, string, T, Task<ResolutionDetails<T>>> resolve)
     {
