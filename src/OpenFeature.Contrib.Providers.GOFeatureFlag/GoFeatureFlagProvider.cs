@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.helpers;
 using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag
@@ -97,7 +98,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
                 return new ResolutionDetails<bool>(flagKey, bool.Parse(resp.value.ToString()), ErrorType.None,
-                    resp.reason, resp.variationType);
+                    resp.reason, resp.variationType, null,
+                    resp.metadata == null ? null : new ImmutableMetadata(resp.metadata));
             }
             catch (FormatException e)
             {
@@ -121,7 +123,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
         /// <exception cref="GeneralError">If an unknown error happen</exception>
         /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-        public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
+        public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey,
+            string defaultValue,
             EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             try
@@ -130,7 +133,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                 if (!(resp.value is JsonElement element && element.ValueKind == JsonValueKind.String))
                     throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
                 return new ResolutionDetails<string>(flagKey, resp.value.ToString(), ErrorType.None, resp.reason,
-                    resp.variationType);
+                    resp.variationType, null, resp.metadata == null ? null : new ImmutableMetadata(resp.metadata));
             }
             catch (FormatException e)
             {
@@ -161,7 +164,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
                 return new ResolutionDetails<int>(flagKey, int.Parse(resp.value.ToString()), ErrorType.None,
-                    resp.reason, resp.variationType);
+                    resp.reason, resp.variationType, null,
+                    resp.metadata == null ? null : new ImmutableMetadata(resp.metadata));
             }
             catch (FormatException e)
             {
@@ -185,7 +189,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
         /// <exception cref="GeneralError">If an unknown error happen</exception>
         /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-        public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
+        public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey,
+            double defaultValue,
             EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             try
@@ -193,7 +198,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                 var resp = await CallApi(flagKey, defaultValue, context);
                 return new ResolutionDetails<double>(flagKey,
                     double.Parse(resp.value.ToString(), CultureInfo.InvariantCulture), ErrorType.None,
-                    resp.reason, resp.variationType);
+                    resp.reason, resp.variationType, null,
+                    resp.metadata == null ? null : new ImmutableMetadata(resp.metadata));
             }
             catch (FormatException e)
             {
@@ -217,7 +223,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
         /// <exception cref="GeneralError">If an unknown error happen</exception>
         /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-        public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
+        public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey,
+            Value defaultValue,
             EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             try
@@ -227,7 +234,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                 {
                     var value = ConvertValue((JsonElement)resp.value);
                     return new ResolutionDetails<Value>(flagKey, value, ErrorType.None, resp.reason,
-                        resp.variationType);
+                        resp.variationType, null, resp.metadata == null ? null : new ImmutableMetadata(resp.metadata));
                 }
 
                 throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
@@ -285,6 +292,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             if ("FLAG_NOT_FOUND".Equals(goffResp.errorCode))
                 throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
+            if (goffResp.metadata != null) goffResp.metadata = DictionaryConverter.ConvertDictionary(goffResp.metadata);
             return goffResp;
         }
 
