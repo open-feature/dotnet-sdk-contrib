@@ -56,6 +56,8 @@ public class GoFeatureFlagProviderTest
             "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"CUSTOM_REASON\",\"errorCode\":\"\",\"value\":true}");
         mockHttp.When($"{prefixEval}does_not_exists{suffixEval}").Respond(mediaType,
             "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":true,\"version\":\"\",\"reason\":\"ERROR\",\"errorCode\":\"FLAG_NOT_FOUND\",\"value\":\"\"}");
+        mockHttp.When($"{prefixEval}integer_with_metadata{suffixEval}").Respond(mediaType,
+            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":100, \"metadata\": {\"key1\": \"key1\", \"key2\":1, \"key3\":1.345, \"key4\":true}}");
         return mockHttp;
     }
 
@@ -559,5 +561,29 @@ public class GoFeatureFlagProviderTest
         Assert.Equal(Reason.Error, res.Result.Reason);
         Assert.Equal(ErrorType.FlagNotFound, res.Result.ErrorType);
         Assert.Equal("flag does_not_exists was not found in your configuration", res.Result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task should_resolve_a_flag_with_metadata()
+    {
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = _mockHttp,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
+        });
+        await Api.Instance.SetProviderAsync(g);
+        var client = Api.Instance.GetClient("test-client");
+        var res = client.GetIntegerDetailsAsync("integer_with_metadata", 1200, _defaultEvaluationCtx);
+        Assert.NotNull(res.Result);
+        Assert.Equal(100, res.Result.Value);
+        Assert.Equal(ErrorType.None, res.Result.ErrorType);
+        Assert.Equal(Reason.TargetingMatch, res.Result.Reason);
+        Assert.Equal("True", res.Result.Variant);
+        Assert.NotNull(res.Result.FlagMetadata);
+        Assert.Equal("key1", res.Result.FlagMetadata.GetString("key1"));
+        Assert.Equal(1, res.Result.FlagMetadata.GetInt("key2"));
+        Assert.Equal(1.345, res.Result.FlagMetadata.GetDouble("key3"));
+        Assert.True(res.Result.FlagMetadata.GetBool("key4"));
     }
 }

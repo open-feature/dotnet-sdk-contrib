@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag
 {
     /// <summary>
@@ -39,5 +41,10 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         ///     value contains the result of the flag.
         /// </summary>
         public object value { get; set; }
+
+        /// <summary>
+        ///     metadata contains the metadata of the flag.
+        /// </summary>
+        public Dictionary<string, object> metadata { get; set; }
     }
 }
