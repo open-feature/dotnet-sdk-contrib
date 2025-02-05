@@ -2,8 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
         <VersionNumber>0.0.1</VersionNumber> <!--x-release-please-version -->
         <VersionPrefix>$(VersionNumber)</VersionPrefix>
         <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
@@ -12,8 +11,5 @@
         <Authors>Octopus Deploy</Authors>
     </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="OpenFeature" Version="2.0.0" />
-    </ItemGroup>
 
 </Project>
