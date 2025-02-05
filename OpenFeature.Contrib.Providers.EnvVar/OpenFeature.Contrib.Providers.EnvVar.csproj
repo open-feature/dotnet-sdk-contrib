@@ -4,6 +4,12 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <VersionNumber>0.0.1</VersionNumber> <!--x-release-please-version -->
+        <VersionPrefix>$(VersionNumber)</VersionPrefix>
+        <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
+        <FileVersion>$(VersionNumber)</FileVersion>
+        <Description>Environment Variable Provider for .NET</Description>
+        <Authors>Octopus Deploy</Authors>
     </PropertyGroup>
 
     <ItemGroup>
