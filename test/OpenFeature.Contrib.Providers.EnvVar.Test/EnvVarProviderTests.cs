@@ -8,7 +8,6 @@ using Xunit;
 
 namespace OpenFeature.Contrib.Providers.EnvVar.Test
 {
-
     public class EnvVarProviderTests
     {
         [Theory]
@@ -140,7 +139,7 @@ namespace OpenFeature.Contrib.Providers.EnvVar.Test
         public async Task ResolveStructureValueAsync_WhenEnvironmentVariablePresent_ShouldReturnValue(string prefix,
             string flagKey, string value, string defaultValue)
         {
-            Environment.SetEnvironmentVariable(prefix + flagKey, value.ToString());
+            Environment.SetEnvironmentVariable(prefix + flagKey, value);
 
             var provider = new EnvVarProvider(prefix);
             var resolutionDetails = await provider.ResolveStructureValueAsync(flagKey, new Value(defaultValue));
@@ -185,6 +184,5 @@ namespace OpenFeature.Contrib.Providers.EnvVar.Test
 
             Assert.Equal(expectedErrorType, exception.ErrorType);
         }
-
     }
 }
