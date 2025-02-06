@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>disable</ImplicitUsings>
+        <PackageId>OpenFeature.Contrib.Providers.EnvVar</PackageId>
         <VersionNumber>0.0.1</VersionNumber> <!--x-release-please-version -->
         <VersionPrefix>$(VersionNumber)</VersionPrefix>
         <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
@@ -10,6 +9,5 @@
         <Description>Environment Variable Provider for .NET</Description>
         <Authors>Octopus Deploy</Authors>
     </PropertyGroup>
-
 
 </Project>
