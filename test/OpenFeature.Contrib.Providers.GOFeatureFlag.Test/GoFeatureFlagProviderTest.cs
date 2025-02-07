@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
 using OpenFeature.Model;
 using RichardSzalay.MockHttp;
 using Xunit;
@@ -15,8 +18,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test;
 public class GoFeatureFlagProviderTest
 {
     private static readonly string baseUrl = "http://gofeatureflag.org";
-    private static readonly string prefixEval = baseUrl + "/v1/feature/";
-    private static readonly string suffixEval = "/eval";
+    private static readonly string prefixEval = baseUrl + "/ofrep/v1/evaluate/flags/";
     private readonly EvaluationContext _defaultEvaluationCtx = InitDefaultEvaluationCtx();
     private readonly HttpMessageHandler _mockHttp = InitMock();
 
@@ -24,38 +26,40 @@ public class GoFeatureFlagProviderTest
     {
         const string mediaType = "application/json";
         var mockHttp = new MockHttpMessageHandler();
-        mockHttp.When($"{prefixEval}fail_500{suffixEval}").Respond(HttpStatusCode.InternalServerError);
-        mockHttp.When($"{prefixEval}api_key_missing{suffixEval}").Respond(HttpStatusCode.BadRequest);
-        mockHttp.When($"{prefixEval}invalid_api_key{suffixEval}").Respond(HttpStatusCode.Unauthorized);
-        mockHttp.When($"{prefixEval}flag_not_found{suffixEval}").Respond(HttpStatusCode.NotFound);
-        mockHttp.When($"{prefixEval}bool_targeting_match{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":true}");
-        mockHttp.When($"{prefixEval}disabled{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":true}");
-        mockHttp.When($"{prefixEval}disabled_double{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":100.25}");
-        mockHttp.When($"{prefixEval}disabled_integer{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":100}");
-        mockHttp.When($"{prefixEval}disabled_object{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":null}");
-        mockHttp.When($"{prefixEval}disabled_string{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":false,\"version\":\"\",\"reason\":\"DISABLED\",\"errorCode\":\"\",\"value\":\"\"}");
-        mockHttp.When($"{prefixEval}double_key{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":100.25}");
-        mockHttp.When($"{prefixEval}flag_not_found{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"SdkDefault\",\"failed\":true,\"version\":\"\",\"reason\":\"ERROR\",\"errorCode\":\"FLAG_NOT_FOUND\",\"value\":\"false\"}");
-        mockHttp.When($"{prefixEval}integer_key{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":100}");
-        mockHttp.When($"{prefixEval}list_key{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":[\"test\",\"test1\",\"test2\",\"false\",\"test3\"]}");
-        mockHttp.When($"{prefixEval}object_key{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":{\"test\":\"test1\",\"test2\":false,\"test3\":123.3,\"test4\":1,\"test5\":null}}");
-        mockHttp.When($"{prefixEval}string_key{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"TARGETING_MATCH\",\"errorCode\":\"\",\"value\":\"CC0000\"}");
-        mockHttp.When($"{prefixEval}unknown_reason{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"True\",\"failed\":false,\"version\":\"\",\"reason\":\"CUSTOM_REASON\",\"errorCode\":\"\",\"value\":true}");
-        mockHttp.When($"{prefixEval}does_not_exists{suffixEval}").Respond(mediaType,
-            "{\"trackEvents\":true,\"variationType\":\"defaultSdk\",\"failed\":true,\"version\":\"\",\"reason\":\"ERROR\",\"errorCode\":\"FLAG_NOT_FOUND\",\"value\":\"\"}");
+        mockHttp.When($"{prefixEval}fail_500").Respond(HttpStatusCode.InternalServerError);
+        mockHttp.When($"{prefixEval}api_key_missing").Respond(HttpStatusCode.BadRequest);
+        mockHttp.When($"{prefixEval}invalid_api_key").Respond(HttpStatusCode.Unauthorized);
+        mockHttp.When($"{prefixEval}flag_not_found").Respond(HttpStatusCode.NotFound);
+        mockHttp.When($"{prefixEval}bool_targeting_match").Respond(mediaType,
+            "{ \"value\":true, \"key\":\"bool_targeting_match\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true }");
+        mockHttp.When($"{prefixEval}disabled").Respond(mediaType,
+            "{ \"value\":false, \"key\":\"disabled\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}disabled_double").Respond(mediaType,
+            "{ \"value\":100.25, \"key\":\"disabled_double\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}disabled_integer").Respond(mediaType,
+            "{ \"value\":100, \"key\":\"disabled_integer\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}disabled_object").Respond(mediaType,
+            "{ \"value\":null, \"key\":\"disabled_object\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}disabled_string").Respond(mediaType,
+            "{ \"value\":\"\", \"key\":\"disabled_string\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}double_key").Respond(mediaType,
+            "{ \"value\":100.25, \"key\":\"double_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}flag_not_found").Respond(mediaType,
+            "{ \"value\":false, \"key\":\"flag_not_found\", \"reason\":\"FLAG_NOT_FOUND\", \"variant\":\"True\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}integer_key").Respond(mediaType,
+            "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}list_key").Respond(mediaType,
+            "{ \"value\":[\"test\",\"test1\",\"test2\",\"false\",\"test3\"], \"key\":\"list_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}object_key").Respond(mediaType,
+            "{ \"value\":{\"test\":\"test1\",\"test2\":false,\"test3\":123.3,\"test4\":1,\"test5\":null}, \"key\":\"object_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}string_key").Respond(mediaType,
+            "{ \"value\":\"CC0000\", \"key\":\"string_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}unknown_reason").Respond(mediaType,
+            "{ \"value\":\"true\", \"key\":\"unknown_reason\", \"reason\":\"CUSTOM_REASON\", \"variant\":\"True\", \"cacheable\":true}");
+        mockHttp.When($"{prefixEval}does_not_exists").Respond(mediaType,
+            "{ \"value\":\"\", \"key\":\"does_not_exists\", \"errorCode\":\"FLAG_NOT_FOUND\", \"variant\":\"defaultSdk\", \"cacheable\":true, \"errorDetails\":\"flag does_not_exists was not found in your configuration\"}");
+        mockHttp.When($"{prefixEval}integer_with_metadata").Respond(mediaType,
+            "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true, \"metadata\":{\"key1\": \"key1\", \"key2\": 1, \"key3\": 1.345, \"key4\": true}}");
         return mockHttp;
     }
 
@@ -559,5 +563,103 @@ public class GoFeatureFlagProviderTest
         Assert.Equal(Reason.Error, res.Result.Reason);
         Assert.Equal(ErrorType.FlagNotFound, res.Result.ErrorType);
         Assert.Equal("flag does_not_exists was not found in your configuration", res.Result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task should_have_default_exporter_metadata_in_context()
+    {
+        string capturedRequestBody = null;
+        var mock = new MockHttpMessageHandler();
+        var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(
+            async request =>
+            {
+                capturedRequestBody = await request.Content.ReadAsStringAsync();
+                return new HttpResponseMessage
+                {
+                    Content = new StringContent(
+                        "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}"
+                        , Encoding.UTF8, "application/json")
+                };
+            });
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = mock,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
+        });
+        await Api.Instance.SetProviderAsync(g);
+        var client = Api.Instance.GetClient("test-client");
+        var res = client.GetObjectDetailsAsync("integer_key", new Value("default"), _defaultEvaluationCtx);
+        Assert.Equal(1, mock.GetMatchCount(mockedRequest));
+        await Task.Delay(100); // time to wait to be sure body is extracted
+        var want = JObject.Parse(
+            "{\"context\":{\"labels\":[\"pro\",\"beta\"],\"gofeatureflag\":{\"openfeature\":true,\"provider\":\".NET\"},\"age\":30,\"firstname\":\"john\",\"professional\":true,\"company_info\":{\"name\":\"my_company\",\"size\":120},\"lastname\":\"doe\",\"anonymous\":false,\"rate\":3.14,\"email\":\"john.doe@gofeatureflag.org\",\"targetingKey\":\"d45e303a-38c2-11ed-a261-0242ac120002\"}}");
+        var got = JObject.Parse(capturedRequestBody);
+        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+    }
+
+    [Fact]
+    public async Task should_have_custom_exporter_metadata_in_context()
+    {
+        string capturedRequestBody = null;
+        var mock = new MockHttpMessageHandler();
+        var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(
+            async request =>
+            {
+                capturedRequestBody = await request.Content.ReadAsStringAsync();
+                return new HttpResponseMessage
+                {
+                    Content = new StringContent(
+                        "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}"
+                        , Encoding.UTF8, "application/json")
+                };
+            });
+        var exporterMetadata = new ExporterMetadata();
+        exporterMetadata.Add("key1", "value1");
+        exporterMetadata.Add("key2", 1.234);
+        exporterMetadata.Add("key3", 10);
+        exporterMetadata.Add("key4", false);
+
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = mock,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
+            ExporterMetadata = exporterMetadata
+        });
+        await Api.Instance.SetProviderAsync(g);
+        var client = Api.Instance.GetClient("test-client");
+        var res = client.GetObjectDetailsAsync("integer_key", new Value("default"), _defaultEvaluationCtx);
+        Assert.Equal(1, mock.GetMatchCount(mockedRequest));
+        await Task.Delay(100); // time to wait to be sure body is extracted
+        var want = JObject.Parse(
+            "{\"context\":{\"labels\":[\"pro\",\"beta\"],\"gofeatureflag\":{\"openfeature\":true,\"provider\":\".NET\",\"key1\":\"value1\",\"key2\":1.234,\"key3\":10,\"key4\":false},\"age\":30,\"firstname\":\"john\",\"professional\":true,\"company_info\":{\"name\":\"my_company\",\"size\":120},\"lastname\":\"doe\",\"anonymous\":false,\"rate\":3.14,\"email\":\"john.doe@gofeatureflag.org\",\"targetingKey\":\"d45e303a-38c2-11ed-a261-0242ac120002\"}}");
+        var got = JObject.Parse(capturedRequestBody);
+
+        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+    }
+
+    [Fact]
+    public async Task should_resolve_a_flag_with_metadata()
+    {
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = _mockHttp,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
+        });
+        await Api.Instance.SetProviderAsync(g);
+        var client = Api.Instance.GetClient("test-client");
+        var res = client.GetIntegerDetailsAsync("integer_with_metadata", 1200, _defaultEvaluationCtx);
+        Assert.NotNull(res.Result);
+        Assert.Equal(100, res.Result.Value);
+        Assert.Equal(ErrorType.None, res.Result.ErrorType);
+        Assert.Equal(Reason.TargetingMatch, res.Result.Reason);
+        Assert.Equal("True", res.Result.Variant);
+        Assert.NotNull(res.Result.FlagMetadata);
+        Assert.Equal("key1", res.Result.FlagMetadata.GetString("key1"));
+        Assert.Equal(1, res.Result.FlagMetadata.GetInt("key2"));
+        Assert.Equal(1.345, res.Result.FlagMetadata.GetDouble("key3"));
+        Assert.True(res.Result.FlagMetadata.GetBool("key4"));
     }
 }
