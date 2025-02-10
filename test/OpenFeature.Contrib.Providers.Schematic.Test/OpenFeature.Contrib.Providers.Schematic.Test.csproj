@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+    <LangVersion>7.3</LangVersion>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+	</PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="SchematicHQ.Client" Version="1.0.8" />
+		<ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Schematic\OpenFeature.Contrib.Providers.Schematic.csproj" />
+	</ItemGroup>
+
+</Project>
