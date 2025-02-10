@@ -1,0 +1,11 @@
+{
+  "test-enabled-flag": {
+    "enabled": true,
+    "stringAttribute": "testValue",
+    "doubleAttribute": 3.14,
+    "intAttribute": 42
+  },
+  "test-disabled-flag": {
+    "enabled": false
+  }  
+}
