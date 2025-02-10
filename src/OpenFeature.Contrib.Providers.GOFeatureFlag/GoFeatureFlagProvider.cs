@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
@@ -9,7 +10,11 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.hooks;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
 using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag
@@ -20,8 +25,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
     public class GoFeatureFlagProvider : FeatureProvider
     {
         private const string ApplicationJson = "application/json";
+        private ExporterMetadata _exporterMetadata;
         private HttpClient _httpClient;
-        private JsonSerializerOptions _serializerOptions;
 
         /// <summary>
         ///     Constructor of the provider.
@@ -32,6 +37,17 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             ValidateInputOptions(options);
             InitializeProvider(options);
+        }
+
+        /// <summary>
+        ///     List of hooks to use for this provider
+        /// </summary>
+        /// <returns></returns>
+        public override IImmutableList<Hook> GetProviderHooks()
+        {
+            var hooks = ImmutableArray.CreateBuilder<Hook>();
+            hooks.Add(new EnrichEvaluationContextHook(_exporterMetadata));
+            return hooks.ToImmutable();
         }
 
         /// <summary>
@@ -53,6 +69,10 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <param name="options">Options used while creating the provider</param>
         private void InitializeProvider(GoFeatureFlagProviderOptions options)
         {
+            _exporterMetadata = options.ExporterMetadata ?? new ExporterMetadata();
+            _exporterMetadata.Add("provider", ".NET");
+            _exporterMetadata.Add("openfeature", true);
+
             _httpClient = options.HttpMessageHandler != null
                 ? new HttpClient(options.HttpMessageHandler)
                 : new HttpClient
@@ -63,7 +83,6 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                 };
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApplicationJson));
             _httpClient.BaseAddress = new Uri(options.Endpoint);
-            _serializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
             if (options.ApiKey != null)
                 _httpClient.DefaultRequestHeaders.Authorization =
@@ -96,8 +115,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
-                return new ResolutionDetails<bool>(flagKey, bool.Parse(resp.value.ToString()), ErrorType.None,
-                    resp.reason, resp.variationType);
+                return new ResolutionDetails<bool>(flagKey, bool.Parse(resp.Value.ToString()), ErrorType.None,
+                    resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
             }
             catch (FormatException e)
             {
@@ -121,16 +140,17 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
         /// <exception cref="GeneralError">If an unknown error happen</exception>
         /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-        public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
+        public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey,
+            string defaultValue,
             EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             try
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
-                if (!(resp.value is JsonElement element && element.ValueKind == JsonValueKind.String))
+                if (!(resp.Value is JsonElement element && element.ValueKind == JsonValueKind.String))
                     throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
-                return new ResolutionDetails<string>(flagKey, resp.value.ToString(), ErrorType.None, resp.reason,
-                    resp.variationType);
+                return new ResolutionDetails<string>(flagKey, resp.Value.ToString(), ErrorType.None, resp.Reason,
+                    resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
             }
             catch (FormatException e)
             {
@@ -160,8 +180,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
-                return new ResolutionDetails<int>(flagKey, int.Parse(resp.value.ToString()), ErrorType.None,
-                    resp.reason, resp.variationType);
+                return new ResolutionDetails<int>(flagKey, int.Parse(resp.Value.ToString()), ErrorType.None,
+                    resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
             }
             catch (FormatException e)
             {
@@ -185,15 +205,16 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
         /// <exception cref="GeneralError">If an unknown error happen</exception>
         /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-        public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
+        public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey,
+            double defaultValue,
             EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             try
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
                 return new ResolutionDetails<double>(flagKey,
-                    double.Parse(resp.value.ToString(), CultureInfo.InvariantCulture), ErrorType.None,
-                    resp.reason, resp.variationType);
+                    double.Parse(resp.Value.ToString(), CultureInfo.InvariantCulture), ErrorType.None,
+                    resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
             }
             catch (FormatException e)
             {
@@ -217,17 +238,18 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
         /// <exception cref="GeneralError">If an unknown error happen</exception>
         /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-        public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
+        public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey,
+            Value defaultValue,
             EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             try
             {
                 var resp = await CallApi(flagKey, defaultValue, context);
-                if (resp.value is JsonElement)
+                if (resp.Value is JsonElement)
                 {
-                    var value = ConvertValue((JsonElement)resp.value);
-                    return new ResolutionDetails<Value>(flagKey, value, ErrorType.None, resp.reason,
-                        resp.variationType);
+                    var value = ConvertValue((JsonElement)resp.Value);
+                    return new ResolutionDetails<Value>(flagKey, value, ErrorType.None, resp.Reason,
+                        resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
                 }
 
                 throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
@@ -253,39 +275,40 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
         /// <exception cref="GeneralError">If an unknown error happen</exception>
         /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-        private async Task<GoFeatureFlagResponse> CallApi<T>(string flagKey, T defaultValue,
+        private async Task<OfrepResponse> CallApi<T>(string flagKey, T defaultValue,
             EvaluationContext context = null)
         {
-            var request = new GOFeatureFlagRequest<T>
-            {
-                User = context,
-                DefaultValue = defaultValue
-            };
-            var goffRequest = JsonSerializer.Serialize(request, _serializerOptions);
-
-            var response = await _httpClient.PostAsync($"v1/feature/{flagKey}/eval",
-                new StringContent(goffRequest, Encoding.UTF8, ApplicationJson));
+            var request = new OfrepRequest(context);
+            var response = await _httpClient.PostAsync($"ofrep/v1/evaluate/flags/{flagKey}",
+                new StringContent(request.AsJsonString(), Encoding.UTF8, ApplicationJson));
 
             if (response.StatusCode == HttpStatusCode.NotFound)
                 throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
                 throw new UnauthorizedError("invalid token used to contact GO Feature Flag relay proxy instance");
 
             if (response.StatusCode >= HttpStatusCode.BadRequest)
                 throw new GeneralError("impossible to contact GO Feature Flag relay proxy instance");
 
             var responseBody = await response.Content.ReadAsStringAsync();
-            var goffResp =
-                JsonSerializer.Deserialize<GoFeatureFlagResponse>(responseBody);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var ofrepResp =
+                JsonSerializer.Deserialize<OfrepResponse>(responseBody, options);
 
-            if (goffResp != null && Reason.Disabled.Equals(goffResp.reason))
+            if (Reason.Disabled.Equals(ofrepResp?.Reason))
                 throw new FlagDisabled();
 
-            if ("FLAG_NOT_FOUND".Equals(goffResp.errorCode))
+            if ("FLAG_NOT_FOUND".Equals(ofrepResp?.ErrorCode))
                 throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
 
-            return goffResp;
+            if (ofrepResp?.Metadata != null)
+                ofrepResp.Metadata = DictionaryConverter.ConvertDictionary(ofrepResp.Metadata);
+
+            return ofrepResp;
         }
 
         /// <summary>
