@@ -1,0 +1,160 @@
+# OpenFeature AWS AppConfig Provider
+
+This package provides an AWS AppConfig provider implementation for OpenFeature, allowing you to manage feature flags using AWS AppConfig.
+
+## Requirements
+
+- open-features/dotnet-sdk
+- .NET Core 3.1 and above
+- AWSSDK.AppConfigData for talking to AWS AppConfig
+- AWS Account and Access keys / permissions for AWS AppConfig to work with
+- Microsoft.Extensions.Caching.Memory for caching local copy of AppConfig configuration
+
+## Installation
+
+Install the package via NuGet:
+
+```shell
+dotnet add package OpenFeature.Contrib.Providers.AwsAppConfig
+```
+
+## AWS AppConfig Key
+Understanding the organization of the AWS AppConfig structure is essential. The Application serves as the top-level entity, with all other components defined underneath it, as outlined below. To obtain a feature flag value, the AppConfig client needs three elements: Application, Environment, and ConfigurationProfileId. This will return a JSON representation containing all feature flags associated with the specified ConfigurationProfileId. These flags can then be further filtered using additional values for FlagKey and attributeKey. Within the FeatureFlag, there is a default attribute named "enabled," which indicates whether the flag is active. Additional attributes can be added as needed.
+
+```
+Application
+└── Environment
+    └── ConfigurationProfileId
+        └── FlagKey
+            └── AttributeKey
+```
+
+### Description of Each Level
+
+- **Application**: The top-level entity representing the application.
+  
+- **Environment**: Different stages of deployment (e.g., Development, Staging, Production).
+  
+- **ConfigurationProfileId**: Specific configuration profiles that group related feature flags.
+  
+- **FlagKey**: Toggles that control the availability of specific features within the application.
+  
+- **AttributeKey**: Additional properties associated with each feature flag (e.g., enabled status, description).
+
+### Representation
+
+This package maintains the aforementioned structure by supplying values in two distinct stages.
+
+**Stage 1: Setup**
+
+During this stage, the Application and Environment are provided at the initiation of the project. It is expected that these two values remain static during the application's lifetime. If a change is necessary, a restart of the application will be required.
+
+Additionally, at this point Required Minimum Polling Interval in seconds can also be configured by supplying integer value of seconds you would like to set. Default is 15 seconds and maximum allowed by AWS id 86400 seconds.
+
+**Stage 2: Fetching Value**
+
+In this stage, to retrieve the AWS AppConfig feature flag, the key should be supplied in the format `configurationProfileId:flagKey[:attributeKey]`. If the AttributeKey is not included, all attributes will be returned as a structured object.
+
+## Important information about the implementation
+As per AWS [AppConfig documentation](https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-agent-how-to-use.html), **the recommended way for retrieving configuration data from AWS AppConfig is by using AWS AppConfig Agent, but this implemntation is not using the agents, rather uses AWS AppConfig APIs** in order to have more control around caching and parsing the returned response. 
+
+This implementation uses in-memory IMemoryCache implementation, but any other cache can be easily swapped with if needed.
+
+### No support for Multi-Variant flags.
+This implementation currently does not support **multi-variant** AppConfig Feature flags. Or rather there is no way to pass on calling context to the request to AWS AppConfig. I am looking at documentation to figure out how this is done, but haven't got much far on that. Will be looking to add that soon.
+
+## Usage
+
+### Basic Setup
+
+AWS nuget package `AWSSDK.AppConfigData` is needed for talking to AWS AppConfig.
+
+```csharp
+namespace OpenFeatureTestApp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Create the appliation builder per the application type. Here's example from 
+            // web application
+            var builder = WebApplication.CreateBuilder(args);
+            ...
+
+            // Add AWS AppConfig client
+            builder.Services.AddAWSService<IAmazonAppConfigData>();
+
+            // Add in-memory cache provider
+            builder.services.AddSingleton<IMemoryCache, MemoryCache>()
+
+            // Add OpenFeature with AWS AppConfig provider
+            builder.Services.AddOpenFeature();
+
+            var app = builder.Build();
+
+            // Configure OpenFeature provider for AWS AppCOnfig
+            var appConfigDataClient = app.Services.GetRequiredService<IAmazonAppConfigData>();
+            var appConfigRetrievalApi = new AppConfigRetrievalApi(appConfigDataClient);
+
+            // Replace these values with your AWS AppConfig settings
+            const string application = "YourApplication";
+            const string environment = "YourEnvironment";
+            const int pollingIntervalSeconds = 60; // default is 15            
+
+            await Api.Instance.SetProviderAsync(
+                new AppConfigProvider(appConfigRetrievalApi, application, environment, pollingIntervalSeconds)
+            );
+        }
+    }
+}
+```
+
+### Example Usage
+
+#### Example endpoints using feature flags
+
+```csharp
+// Example endpoints using feature flags
+app.MapGet("/flagKey", async (IFeatureClient featureClient) =>
+{
+    // NOTE: Refere AppConfig Key section above to understand how AppConfig configuration is strucutred.
+    var key = new AppConfigKey(configurationProfileId, flagKey, "enabled");
+    var isEnabled = await featureClient.GetBooleanValue(key.ToString(), false);
+    return Results.Ok(new { FeatureEnabled = isEnabled });
+})
+.WithName("GetFeatureStatus")
+.WithOpenApi();
+
+app.MapGet("/flagKey/attributeKey", async (IFeatureClient featureClient) =>
+{
+    // NOTE: Refere AppConfig Key section above to understand how AppConfig configuration is strucutred.
+    var key = new AppConfigKey(configurationProfileId, flagKey, attributeKey);
+    var config = await featureClient.GetStringValue(key.ToString(), "default");
+    return Results.Ok(new { Configuration = config });
+})
+.WithName("GetFeatureConfig")
+.WithOpenApi();
+```
+
+#### Example endpoint with feature flag controlling behavior
+
+```csharp
+// Example endpoint with feature flag controlling behavior
+app.MapGet("/protected-feature", async (IFeatureClient featureClient) =>
+{
+    var key = new AppConfigKey(configurationProfileId, "protected-feature", "enabled");
+    var isFeatureEnabled = await featureClient.GetBooleanValue(key.ToString(), false);
+    
+    if (!isFeatureEnabled)
+    {
+        return Results.NotFound(new { Message = "Feature not available" });
+    }
+
+    return Results.Ok(new { Message = "Feature is enabled!" });
+})
+.WithName("ProtectedFeature")
+.WithOpenApi();
+```
+
+## References
+1. [AWS AppConfig documentation](https://docs.aws.amazon.com/appconfig/)
