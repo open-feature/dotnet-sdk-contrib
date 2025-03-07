@@ -45,6 +45,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Provide
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flipt.Test", "test\OpenFeature.Contrib.Providers.Flipt.Test\OpenFeature.Contrib.Providers.Flipt.Test.csproj", "{B446D481-B5A3-4509-8933-C4CF6DA9B147}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Schematic", "src\OpenFeature.Contrib.Providers.Schematic\OpenFeature.Contrib.Providers.Schematic.csproj", "{CF1AB517-1D51-455F-80C0-56B4856E6A6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Schematic.Test", "test\OpenFeature.Contrib.Providers.Schematic.Test\OpenFeature.Contrib.Providers.Schematic.Test.csproj", "{08BD26A8-0C14-40F1-BFAF-7D413B76EF6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +131,14 @@ Global
 		{B446D481-B5A3-4509-8933-C4CF6DA9B147}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B446D481-B5A3-4509-8933-C4CF6DA9B147}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B446D481-B5A3-4509-8933-C4CF6DA9B147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF1AB517-1D51-455F-80C0-56B4856E6A6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF1AB517-1D51-455F-80C0-56B4856E6A6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF1AB517-1D51-455F-80C0-56B4856E6A6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF1AB517-1D51-455F-80C0-56B4856E6A6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08BD26A8-0C14-40F1-BFAF-7D413B76EF6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08BD26A8-0C14-40F1-BFAF-7D413B76EF6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08BD26A8-0C14-40F1-BFAF-7D413B76EF6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08BD26A8-0C14-40F1-BFAF-7D413B76EF6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,5 +163,7 @@ Global
 		{F3080350-B0AB-4D59-B416-50CC38C99087} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
 		{5ECF7DBF-FE64-40A2-BF39-239DE173DA4B} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
 		{B446D481-B5A3-4509-8933-C4CF6DA9B147} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
+		{CF1AB517-1D51-455F-80C0-56B4856E6A6B} = {0E563821-BD08-4B7F-BF9D-395CAD80F026}
+		{08BD26A8-0C14-40F1-BFAF-7D413B76EF6B} = {B6D3230B-5E4D-4FF1-868E-2F4E325C84FE}
 	EndGlobalSection
 EndGlobal
