@@ -24,11 +24,11 @@ namespace OpenFeature.Contrib.Providers.EnvVar.Test
 
         [Theory]
         [AutoData]
-        public async Task ResolveBooleanValueAsync_WhenEnvironmentVariableMissing_ShouldReturnDefault(string prefix,
+        public async Task ResolveBooleanValueAsync_WhenEnvironmentVariableMissing_ShouldReturnDefaultWithError(string prefix,
             string flagKey, bool defaultValue)
         {
             // No matching environment value set
-            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, defaultValue, Reason.Default,
+            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, defaultValue, Reason.Error, ErrorType.FlagNotFound,
                 (provider, key, @default) => provider.ResolveBooleanValueAsync(key, @default));
         }
 
@@ -58,11 +58,11 @@ namespace OpenFeature.Contrib.Providers.EnvVar.Test
 
         [Theory]
         [AutoData]
-        public async Task ResolveStringValueAsync_WhenEnvironmentVariableMissing_ShouldReturnDefault(string prefix,
+        public async Task ResolveStringValueAsync_WhenEnvironmentVariableMissing_ShouldReturnDefaultWithError(string prefix,
             string flagKey, string defaultValue)
         {
             // No matching environment value set
-            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, defaultValue, Reason.Default,
+            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, defaultValue, Reason.Error, ErrorType.FlagNotFound,
                 (provider, key, @default) => provider.ResolveStringValueAsync(key, @default));
         }
 
@@ -79,11 +79,11 @@ namespace OpenFeature.Contrib.Providers.EnvVar.Test
 
         [Theory]
         [AutoData]
-        public async Task ResolveIntegerValueAsync_WhenEnvironmentVariableMissing_ShouldReturnDefault(string prefix,
+        public async Task ResolveIntegerValueAsync_WhenEnvironmentVariableMissing_ShouldReturnDefaultWithError(string prefix,
             string flagKey, int defaultValue)
         {
             // No matching environment value set
-            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, defaultValue, Reason.Default,
+            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, defaultValue, Reason.Error, ErrorType.FlagNotFound,
                 (provider, key, @default) => provider.ResolveIntegerValueAsync(key, @default));
         }
 
@@ -113,11 +113,11 @@ namespace OpenFeature.Contrib.Providers.EnvVar.Test
 
         [Theory]
         [AutoData]
-        public async Task ResolveDoubleValueAsync_WhenEnvironmentVariableMissing_ShouldReturnDefault(string prefix,
+        public async Task ResolveDoubleValueAsync_WhenEnvironmentVariableMissing_ShouldReturnDefaultWithError(string prefix,
             string flagKey, double defaultValue)
         {
             // No matching environment value set
-            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, defaultValue, Reason.Default,
+            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, defaultValue, Reason.Error, ErrorType.FlagNotFound,
                 (provider, key, @default) => provider.ResolveDoubleValueAsync(key, @default));
         }
 
@@ -167,12 +167,19 @@ namespace OpenFeature.Contrib.Providers.EnvVar.Test
         private async Task ExecuteResolveValueTest<T>(string prefix, string flagKey, T defaultValue, T expectedValue,
             string expectedReason, Func<EnvVarProvider, string, T, Task<ResolutionDetails<T>>> resolve)
         {
+            await ExecuteResolveValueTest(prefix, flagKey, defaultValue, expectedValue, expectedReason, ErrorType.None, resolve);
+        }
+        
+        private async Task ExecuteResolveValueTest<T>(string prefix, string flagKey, T defaultValue, T expectedValue,
+            string expectedReason, ErrorType expectedErrorType,
+            Func<EnvVarProvider, string, T, Task<ResolutionDetails<T>>> resolve)
+        {
             var provider = new EnvVarProvider(prefix);
             var resolutionDetails = await resolve(provider, flagKey, defaultValue);
 
             Assert.Equal(expectedValue, resolutionDetails.Value);
             Assert.Equal(expectedReason, resolutionDetails.Reason);
-            Assert.Equal(ErrorType.None, resolutionDetails.ErrorType);
+            Assert.Equal(expectedErrorType, resolutionDetails.ErrorType);
         }
 
         private async Task ExecuteResolveErrorTest<T>(string prefix, string flagKey, T defaultValue,

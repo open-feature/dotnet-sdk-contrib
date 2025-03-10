@@ -44,7 +44,7 @@ namespace OpenFeature.Contrib.Providers.EnvVar
             var value = Environment.GetEnvironmentVariable(envVarName);
 
             if (value == null)
-                return Task.FromResult(new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None, Reason.Default));
+                return Task.FromResult(new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.FlagNotFound, Reason.Error, string.Empty, $"Unable to find environment variable '{envVarName}'"));
 
             if (!tryConvert(value, out var convertedValue))
                 throw new FeatureProviderException(ErrorType.TypeMismatch, $"Could not convert the value of environment variable '{envVarName}' to {typeof(T)}");
