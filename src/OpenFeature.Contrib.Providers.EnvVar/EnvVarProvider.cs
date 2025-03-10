@@ -14,7 +14,7 @@ namespace OpenFeature.Contrib.Providers.EnvVar
     {
         private const string Name = "Environment Variable Provider";
         private readonly string _prefix;
-        private delegate bool TryConvert<TResult>(string value, out TResult result); 
+        private delegate bool TryConvert<TResult>(string value, out TResult result);
 
         /// <summary>
         /// Creates a new instance of <see cref="EnvVarProvider"/>  
@@ -29,23 +29,23 @@ namespace OpenFeature.Contrib.Providers.EnvVar
         /// <param name="prefix">A prefix which will be used when evaluating environment variables</param>
         public EnvVarProvider(string prefix)
         {
-            _prefix = prefix; 
+            _prefix = prefix;
         }
-    
+
         /// <inheritdoc/>
         public override Metadata GetMetadata()
         {
             return new Metadata(Name);
         }
-    
+
         private Task<ResolutionDetails<T>> Resolve<T>(string flagKey, T defaultValue, TryConvert<T> tryConvert)
         {
-            var envVarName = $"{_prefix}{flagKey}";  
+            var envVarName = $"{_prefix}{flagKey}";
             var value = Environment.GetEnvironmentVariable(envVarName);
 
             if (value == null)
                 return Task.FromResult(new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None, Reason.Default));
-        
+
             if (!tryConvert(value, out var convertedValue))
                 throw new FeatureProviderException(ErrorType.TypeMismatch, $"Could not convert the value of environment variable '{envVarName}' to {typeof(T)}");
 
