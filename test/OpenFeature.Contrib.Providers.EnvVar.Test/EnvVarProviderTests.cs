@@ -169,7 +169,7 @@ namespace OpenFeature.Contrib.Providers.EnvVar.Test
         {
             await ExecuteResolveValueTest(prefix, flagKey, defaultValue, expectedValue, expectedReason, ErrorType.None, resolve);
         }
-        
+
         private async Task ExecuteResolveValueTest<T>(string prefix, string flagKey, T defaultValue, T expectedValue,
             string expectedReason, ErrorType expectedErrorType,
             Func<EnvVarProvider, string, T, Task<ResolutionDetails<T>>> resolve)
