@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag
 {
@@ -34,5 +35,11 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         ///     Default: null
         /// </Summary>
         public string ApiKey { get; set; }
+
+        /// <summary>
+        ///     (optional) ExporterMetadata are static information you can set that will be available in the
+        ///     evaluation data sent to the exporter.
+        /// </summary>
+        public ExporterMetadata ExporterMetadata { get; set; }
     }
 }
