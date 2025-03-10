@@ -10,7 +10,7 @@ namespace OpenFeature.Contrib.Providers.EnvVar
     /// <summary>
     /// An OpenFeature provider using environment variables. 
     /// </summary>
-    public class EnvVarProvider : FeatureProvider
+    public sealed class EnvVarProvider : FeatureProvider
     {
         private const string Name = "Environment Variable Provider";
         private readonly string _prefix;
@@ -19,7 +19,7 @@ namespace OpenFeature.Contrib.Providers.EnvVar
         /// <summary>
         /// Creates a new instance of <see cref="EnvVarProvider"/>  
         /// </summary>
-        public EnvVarProvider() : this("")
+        public EnvVarProvider() : this(string.Empty)
         {
         }
 
