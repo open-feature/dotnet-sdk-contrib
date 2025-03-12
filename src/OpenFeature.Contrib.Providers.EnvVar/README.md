@@ -16,9 +16,8 @@ The following example shows how to use the Environment Variable provider with th
 
 ```csharp
 using System;
-using ConfigCat.Client;
+using OpenFeature;
 using OpenFeature.Contrib.EnvVar;
-
 
 // If you want to use a prefix for your environment variables, you can supply it in the constructor below.
 // For example, if you all your feature flag environment variables will be prefixed with feature-flag- then 
