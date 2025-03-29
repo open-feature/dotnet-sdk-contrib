@@ -102,7 +102,8 @@ public class FlipExtensionsTest
     {
         var sampleDictionary = new Dictionary<string, Value>();
         sampleDictionary["config2"] = new Value([
-            new Value([new Value("element1-1"), new Value("element1-2")]), new Value("element2"),
+            new Value([new Value("element1-1"), new Value("element1-2")]),
+            new Value("element2"),
             new Value("element3")
         ]);
         sampleDictionary["config3"] = new Value(DateTime.Now);

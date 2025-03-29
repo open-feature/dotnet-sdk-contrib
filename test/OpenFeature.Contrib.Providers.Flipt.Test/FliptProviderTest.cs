@@ -23,7 +23,7 @@ public class FliptProviderTest
     [Fact]
     public void CreateFliptProvider_GivenEmptyUrl_ShouldThrowInvalidOperationException()
     {
-        var act = void() => new FliptProvider("");
+        var act = void () => new FliptProvider("");
         act.Should().Throw<UriFormatException>();
     }
 
@@ -49,7 +49,7 @@ public class FliptProviderTest
 
         var provider = new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object));
 
-        var resolution = async Task<ResolutionDetails<double>>() =>
+        var resolution = async Task<ResolutionDetails<double>> () =>
             await provider.ResolveDoubleValueAsync(flagKey, 0.0);
         await resolution.Should().ThrowAsync<TypeMismatchException>();
     }
