@@ -37,7 +37,8 @@ namespace OpenFeature.Contrib.Providers.Ofrep
                                 Polling =
                                     new FeatureCacheInvalidationPolling
                                     {
-                                        Enabled = false, MinPollingIntervalMs = 60000
+                                        Enabled = false,
+                                        MinPollingIntervalMs = 60000
                                     }
                             },
 
