@@ -28,10 +28,7 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          dotnet-version: |
-            6.0.x
-            7.0.x
-            8.0.x
+          global-json-file: global.json
           source-url: https://nuget.pkg.github.com/open-feature/index.json
 
       - name: Install dependencies
@@ -45,7 +42,7 @@ jobs:
 
       - name: Pack
         if: ${{ steps.release.outputs.releases_created }}
-        run:  |
+        run: |
           dotnet pack --configuration Release --no-build
 
       - name: Publish to Nuget
