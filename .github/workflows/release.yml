@@ -16,6 +16,7 @@ jobs:
           command: manifest
           token: ${{secrets.GITHUB_TOKEN}}
           default-branch: main
+          release-type: simple
 
       - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.releases_created }}
