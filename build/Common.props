@@ -1,33 +1,34 @@
 <Project>
 
-  <ItemGroup>
-    <PackageReference Include="OpenFeature" Version="$(OpenFeatureVer)" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="OpenFeature" Version="$(OpenFeatureVer)" />
+    </ItemGroup>
 
-  <PropertyGroup>
-    <LangVersion>7.3</LangVersion>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-  </PropertyGroup>
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DebugType>full</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
 
-  <PropertyGroup Label="Package versions used in this repository">
-    <!--
+    <PropertyGroup Label="Package versions used in this repository">
+        <!--
       Please sort alphabetically.
       Refer to https://docs.microsoft.com/nuget/concepts/package-versioning for semver syntax.
     -->
-    <!-- 2.0-2.9999 -->
-    <OpenFeatureVer>[2.0,3.0)</OpenFeatureVer>
-  </PropertyGroup>
+        <!-- 2.0-2.9999 -->
+        <OpenFeatureVer>[2.0,3.0)</OpenFeatureVer>
+    </PropertyGroup>
 
-  <ItemGroup Condition="'$(OS)' == 'Unix'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-  </ItemGroup>
+    <ItemGroup Condition="'$(OS)' == 'Unix'">
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3"
+            PrivateAssets="all" />
+    </ItemGroup>
 </Project>

@@ -1,28 +1,30 @@
 <Project>
-  <Import Project=".\Common.props" />
+    <Import Project=".\Common.props" />
 
-  <PropertyGroup>
-    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
-    <Deterministic Condition="'$(CI)' == 'true'">true</Deterministic>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackRelease>true</PackRelease>
-  </PropertyGroup>
+    <PropertyGroup>
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+        <Deterministic Condition="'$(CI)' == 'true'">true</Deterministic>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackRelease>true</PackRelease>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net462;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
-    <Description>OpenFeature is an open specification that provides a vendor-agnostic, community-driven API for feature flagging that works with your favorite feature flag management tool or in-house solution.</Description>
-    <PackageTags>Feature;OpenFeature;Flags;</PackageTags>
-    <PackageIcon>openfeature-icon.png</PackageIcon>
-    <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Authors>OpenFeature Authors</Authors>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;net462;net8.0</TargetFrameworks>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/open-feature/dotnet-sdk-contrib</RepositoryUrl>
+        <Description>OpenFeature is an open specification that provides a vendor-agnostic,
+            community-driven API for feature flagging that works with your favorite feature flag
+            management tool or in-house solution.</Description>
+        <PackageTags>Feature;OpenFeature;Flags;</PackageTags>
+        <PackageIcon>openfeature-icon.png</PackageIcon>
+        <PackageProjectUrl>https://openfeature.dev</PackageProjectUrl>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <Authors>OpenFeature Authors</Authors>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)openfeature-icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)openfeature-icon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
 </Project>
