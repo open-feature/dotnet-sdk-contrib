@@ -1,10 +1,6 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base"
-  ],
-  "semanticCommits": "enabled",
-  "labels": [
-    "renovate"
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "github>open-feature/community-tooling"
+    ]
 }
