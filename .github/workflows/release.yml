@@ -26,6 +26,7 @@ jobs:
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
+        if: ${{ steps.release.outputs.releases_created }}
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
