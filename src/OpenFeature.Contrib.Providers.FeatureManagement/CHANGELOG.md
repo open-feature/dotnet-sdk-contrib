@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.FeatureManagement-v0.1.0...OpenFeature.Contrib.Providers.FeatureManagement-v0.1.1) (2025-04-09)
+
+
+### 🧹 Chore
+
+* **deps:** Upgrading to 4.0.0 of Microsoft.FeatureManagement ([#303](https://github.com/open-feature/dotnet-sdk-contrib/issues/303)) ([686cafc](https://github.com/open-feature/dotnet-sdk-contrib/commit/686cafc2c3b240736b61d0e32eec65b8449396c7))
+
 ## [0.1.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.FeatureManagement-v0.0.4...OpenFeature.Contrib.Providers.FeatureManagement-v0.1.0) (2024-08-22)
 
 
