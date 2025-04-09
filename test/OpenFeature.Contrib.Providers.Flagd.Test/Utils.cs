@@ -301,9 +301,94 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         ""off"": false
       },
       ""defaultVariant"": ""on""
+    },
+    ""metadata-flag"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""on"": true,
+        ""off"": false
+      },
+      ""defaultVariant"": ""on"",
+      ""metadata"": {
+        ""string"": ""1.0.2"",
+          ""integer"": 2,
+          ""boolean"": true,
+          ""float"": 0.1,
+      }
     }
   }
 }";
+
+        public static string metadataFlags = @"{
+  ""flags"":{
+    ""metadata-flag"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""on"": true,
+        ""off"": false
+      },
+      ""defaultVariant"": ""on"",
+      ""metadata"":{
+        ""string"": ""1.0.2"",
+          ""integer"": 2,
+          ""boolean"": true,
+          ""float"": 0.1,
+      }
+    },
+    ""without-metadata-flag"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""on"": true,
+        ""off"": false
+      },
+      ""defaultVariant"": ""on""
+    }
+  },
+  ""metadata"": {
+    ""string"": ""1.0.3"",
+    ""integer"": 3,
+    ""boolean"": false,
+    ""float"": 0.2,
+  }
+}";
+
+        public static string invalidFlagSetMetadata = @"{
+  ""flags"":{
+    ""without-metadata-flag"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""on"": true,
+        ""off"": false
+      },
+      ""defaultVariant"": ""on""
+    }
+  },
+  ""metadata"": {
+    ""string"": {""in"": ""valid""},
+    ""integer"": 3,
+    ""boolean"": false,
+    ""float"": 0.2,
+  }
+}";
+        public static string invalidFlagMetadata = @"{
+  ""flags"":{
+    ""invalid-metadata-flag"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""on"": true,
+        ""off"": false
+      },
+      ""defaultVariant"": ""on"",
+      ""metadata"": {
+        ""string"": ""1.0.2"",
+          ""integer"": 2,
+          ""boolean"": true,
+          ""float"": {""in"": ""valid""},
+      }
+    },
+  }
+}";
+
 
         /// <summary>
         /// Repeatedly runs the supplied assertion until it doesn't throw, or the timeout is reached.
@@ -312,11 +397,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         /// <param name="timeoutMillis">Timeout in millis (defaults to 1000)</param>
         /// <param name="pollIntervalMillis">Poll interval (defaults to 100</param>
         /// <returns></returns>
-        public static async Task AssertUntilAsync(Action<CancellationToken> assertionFunc, int timeoutMillis = 1000, int pollIntervalMillis = 100)
+        public static async Task AssertUntilAsync(Action<CancellationToken> assertionFunc, int timeoutMillis = 1000,
+            int pollIntervalMillis = 100)
         {
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(default(CancellationToken)))
             {
-
                 cts.CancelAfter(timeoutMillis);
 
                 var exceptions = new List<Exception>();
@@ -347,6 +432,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                         throw new AggregateException(message, exceptions);
                     }
                 }
+
                 throw new AggregateException(message, exceptions);
             }
         }

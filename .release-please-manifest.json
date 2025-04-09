@@ -1,10 +1,11 @@
 {
   "src/OpenFeature.Contrib.Hooks.Otel": "0.2.0",
   "src/OpenFeature.Contrib.Providers.Flagd": "0.3.0",
-  "src/OpenFeature.Contrib.Providers.GOFeatureFlag": "0.2.0",
+  "src/OpenFeature.Contrib.Providers.GOFeatureFlag": "0.2.1",
   "src/OpenFeature.Contrib.Providers.Flagsmith": "0.2.0",
   "src/OpenFeature.Contrib.Providers.ConfigCat": "0.1.1",
   "src/OpenFeature.Contrib.Providers.FeatureManagement": "0.1.0",
   "src/OpenFeature.Contrib.Providers.Statsig": "0.1.0",
-  "src/OpenFeature.Contrib.Providers.Flipt": "0.0.5"
+  "src/OpenFeature.Contrib.Providers.Flipt": "0.0.5",
+  "src/OpenFeature.Contrib.Providers.EnvVar": "0.0.2"
 }

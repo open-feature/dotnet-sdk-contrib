@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.RegularExpressions;
 using JsonLogic.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,31 +10,24 @@ using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using System.Text.RegularExpressions;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 {
-
     internal class FlagConfiguration
     {
-        [JsonProperty("state")]
-        internal string State { get; set; }
-        [JsonProperty("defaultVariant")]
-        internal string DefaultVariant { get; set; }
-        [JsonProperty("variants")]
-        internal Dictionary<string, object> Variants { get; set; }
-        [JsonProperty("targeting")]
-        internal object Targeting { get; set; }
-        [JsonProperty("source")]
-        internal string Source { get; set; }
+        [JsonProperty("state")] internal string State { get; set; }
+        [JsonProperty("defaultVariant")] internal string DefaultVariant { get; set; }
+        [JsonProperty("variants")] internal Dictionary<string, object> Variants { get; set; }
+        [JsonProperty("targeting")] internal object Targeting { get; set; }
+        [JsonProperty("source")] internal string Source { get; set; }
+        [JsonProperty("metadata")] internal Dictionary<string, object> Metadata { get; set; }
     }
 
     internal class FlagSyncData
     {
-        [JsonProperty("flags")]
-        internal Dictionary<string, FlagConfiguration> Flags { get; set; }
-        [JsonProperty("$evaluators")]
-        internal Dictionary<string, object> Evaluators { get; set; }
+        [JsonProperty("flags")] internal Dictionary<string, FlagConfiguration> Flags { get; set; }
+        [JsonProperty("$evaluators")] internal Dictionary<string, object> Evaluators { get; set; }
+        [JsonProperty("metadata")] internal Dictionary<string, object> Metadata { get; set; }
     }
 
     internal class FlagConfigurationSync
@@ -53,6 +47,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
     internal class JsonEvaluator
     {
         private Dictionary<string, FlagConfiguration> _flags = new Dictionary<string, FlagConfiguration>();
+        private Dictionary<string, object> _flagSetMetadata = new Dictionary<string, object>();
 
         private string _selector;
 
@@ -88,7 +83,57 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 });
             }
 
-            return JsonConvert.DeserializeObject<FlagSyncData>(transformed);
+
+            var data = JsonConvert.DeserializeObject<FlagSyncData>(transformed);
+            if (data.Metadata == null)
+            {
+                data.Metadata = new Dictionary<string, object>();
+            }
+            else
+            {
+                foreach (var key in new List<string>(data.Metadata.Keys))
+                {
+                    var value = data.Metadata[key];
+                    if (value is long longValue)
+                    {
+                        value = data.Metadata[key] = (int)longValue;
+                    }
+
+                    VerifyMetadataValue(key, value);
+                }
+            }
+
+            foreach (var flagConfig in data.Flags)
+            {
+                if (flagConfig.Value.Metadata == null)
+                {
+                    continue;
+                }
+
+                foreach (var key in new List<string>(flagConfig.Value.Metadata.Keys))
+                {
+                    var value = flagConfig.Value.Metadata[key];
+                    if (value is long longValue)
+                    {
+                        value = flagConfig.Value.Metadata[key] = (int)longValue;
+                    }
+
+                    VerifyMetadataValue(key, value);
+                }
+            }
+
+            return data;
+        }
+
+        private static void VerifyMetadataValue(string key, object value)
+        {
+            if (value is int || value is double || value is string || value is bool)
+            {
+                return;
+            }
+
+            throw new ParseErrorException("Metadata entry for key " + key + " and value " + value +
+                                          " is of unknown type");
         }
 
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
@@ -99,55 +144,69 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             {
                 case FlagConfigurationUpdateType.ALL:
                     _flags = flagConfigsMap.Flags;
+                    _flagSetMetadata = flagConfigsMap.Metadata;
+
                     break;
                 case FlagConfigurationUpdateType.ADD:
-                    foreach (var keyAndValue in flagConfigsMap.Flags)
-                    {
-                        _flags[keyAndValue.Key] = keyAndValue.Value;
-                    }
-                    break;
                 case FlagConfigurationUpdateType.UPDATE:
                     foreach (var keyAndValue in flagConfigsMap.Flags)
                     {
                         _flags[keyAndValue.Key] = keyAndValue.Value;
                     }
+
+                    foreach (var metadata in flagConfigsMap.Metadata)
+                    {
+                        _flagSetMetadata[metadata.Key] = metadata.Value;
+                    }
+
                     break;
                 case FlagConfigurationUpdateType.DELETE:
                     foreach (var keyAndValue in flagConfigsMap.Flags)
                     {
                         _flags.Remove(keyAndValue.Key);
                     }
-                    break;
 
+                    foreach (var keyValuePair in flagConfigsMap.Metadata)
+                    {
+                        _flagSetMetadata.Remove(keyValuePair.Key);
+                    }
+
+                    break;
             }
         }
 
-        public ResolutionDetails<bool> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<bool> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
+            EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        public ResolutionDetails<string> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<string> ResolveStringValueAsync(string flagKey, string defaultValue,
+            EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        public ResolutionDetails<int> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<int> ResolveIntegerValueAsync(string flagKey, int defaultValue,
+            EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        public ResolutionDetails<double> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<double> ResolveDoubleValueAsync(string flagKey, double defaultValue,
+            EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        public ResolutionDetails<Value> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
+        public ResolutionDetails<Value> ResolveStructureValueAsync(string flagKey, Value defaultValue,
+            EvaluationContext context = null)
         {
             return ResolveValue(flagKey, defaultValue, context);
         }
 
-        private ResolutionDetails<T> ResolveValue<T>(string flagKey, T defaultValue, EvaluationContext context = null)
+        private ResolutionDetails<T> ResolveValue<T>(string flagKey, T defaultValue,
+            EvaluationContext context = null)
         {
             // check if we find the flag key
             var reason = Reason.Static;
@@ -155,15 +214,30 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             {
                 if ("DISABLED" == flagConfiguration.State)
                 {
-                    throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' is disabled");
+                    throw new FeatureProviderException(ErrorType.FlagNotFound,
+                        "FLAG_NOT_FOUND: flag '" + flagKey + "' is disabled");
                 }
+
+                Dictionary<string, object> combinedMetadata = new Dictionary<string, object>(_flagSetMetadata);
+                if (flagConfiguration.Metadata != null)
+                {
+                    foreach (var metadataEntry in flagConfiguration.Metadata)
+                    {
+                        combinedMetadata[metadataEntry.Key] = metadataEntry.Value;
+                    }
+                }
+
+                var flagMetadata = new ImmutableMetadata(combinedMetadata);
                 var variant = flagConfiguration.DefaultVariant;
-                if (flagConfiguration.Targeting != null && !String.IsNullOrEmpty(flagConfiguration.Targeting.ToString()) && flagConfiguration.Targeting.ToString() != "{}")
+                if (flagConfiguration.Targeting != null &&
+                    !String.IsNullOrEmpty(flagConfiguration.Targeting.ToString()) &&
+                    flagConfiguration.Targeting.ToString() != "{}")
                 {
                     reason = Reason.TargetingMatch;
                     var flagdProperties = new Dictionary<string, Value>();
                     flagdProperties.Add(FlagdProperties.FlagKeyKey, new Value(flagKey));
-                    flagdProperties.Add(FlagdProperties.TimestampKey, new Value(DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
+                    flagdProperties.Add(FlagdProperties.TimestampKey,
+                        new Value(DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
 
                     if (context == null)
                     {
@@ -173,7 +247,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     var targetingContext = context.AsDictionary().Add(
                         FlagdProperties.FlagdPropertiesKey,
                         new Value(new Structure(flagdProperties))
-                        );
+                    );
 
                     var targetingString = flagConfiguration.Targeting.ToString();
                     // Parse json into hierarchical structure
@@ -202,32 +276,39 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 {
                     // if variant is null, revert to default
                     reason = Reason.Default;
-                    flagConfiguration.Variants.TryGetValue(flagConfiguration.DefaultVariant, out var defaultVariantValue);
+                    flagConfiguration.Variants.TryGetValue(flagConfiguration.DefaultVariant,
+                        out var defaultVariantValue);
                     if (defaultVariantValue == null)
                     {
-                        throw new FeatureProviderException(ErrorType.ParseError, "PARSE_ERROR: flag '" + flagKey + "' has missing or invalid defaultVariant.");
+                        throw new FeatureProviderException(ErrorType.ParseError,
+                            "PARSE_ERROR: flag '" + flagKey + "' has missing or invalid defaultVariant.");
                     }
+
                     var value = ExtractFoundVariant<T>(defaultVariantValue, flagKey);
                     return new ResolutionDetails<T>(
-                            flagKey: flagKey,
-                            value,
-                            reason: reason,
-                            variant: variant
-                            );
+                        flagKey: flagKey,
+                        value,
+                        reason: reason,
+                        variant: variant,
+                        flagMetadata: flagMetadata
+                    );
                 }
                 else if (flagConfiguration.Variants.TryGetValue(variant, out var foundVariantValue))
                 {
                     // if variant can be found, return it - this could be TARGETING_MATCH or STATIC. 
                     var value = ExtractFoundVariant<T>(foundVariantValue, flagKey);
                     return new ResolutionDetails<T>(
-                            flagKey: flagKey,
-                            value,
-                            reason: reason,
-                            variant: variant
-                            );
+                        flagKey: flagKey,
+                        value,
+                        reason: reason,
+                        variant: variant,
+                        flagMetadata: flagMetadata
+                    );
                 }
             }
-            throw new FeatureProviderException(ErrorType.FlagNotFound, "FLAG_NOT_FOUND: flag '" + flagKey + "' not found");
+
+            throw new FeatureProviderException(ErrorType.FlagNotFound,
+                "FLAG_NOT_FOUND: flag '" + flagKey + "' not found");
         }
 
         static T ExtractFoundVariant<T>(object foundVariantValue, string flagKey)
@@ -236,6 +317,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             {
                 foundVariantValue = Convert.ToInt32(foundVariantValue);
             }
+
             if (typeof(T) == typeof(double))
             {
                 foundVariantValue = Convert.ToDouble(foundVariantValue);
@@ -244,11 +326,14 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             {
                 foundVariantValue = ConvertJObjectToOpenFeatureValue(value);
             }
+
             if (foundVariantValue is T castValue)
             {
                 return castValue;
             }
-            throw new FeatureProviderException(ErrorType.TypeMismatch, "TYPE_MISMATCH: flag '" + flagKey + "' does not match the expected type");
+
+            throw new FeatureProviderException(ErrorType.TypeMismatch,
+                "TYPE_MISMATCH: flag '" + flagKey + "' does not match the expected type");
         }
 
         static dynamic ConvertToDynamicObject(IImmutableDictionary<string, Value> dictionary)
@@ -259,7 +344,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             foreach (var kvp in dictionary)
             {
                 expandoDict.Add(kvp.Key,
-                    kvp.Value.IsStructure ? ConvertToDynamicObject(kvp.Value.AsStructure.AsDictionary()) : kvp.Value.AsObject);
+                    kvp.Value.IsStructure
+                        ? ConvertToDynamicObject(kvp.Value.AsStructure.AsDictionary())
+                        : kvp.Value.AsObject);
             }
 
             return expandoObject;
