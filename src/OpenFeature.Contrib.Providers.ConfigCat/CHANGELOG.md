@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.1.1...OpenFeature.Contrib.Providers.ConfigCat-v0.1.2) (2025-04-09)
+
+
+### 🧹 Chore
+
+* **deps:** update dependency configcat.client to 9.3.2 ([#289](https://github.com/open-feature/dotnet-sdk-contrib/issues/289)) ([58db25e](https://github.com/open-feature/dotnet-sdk-contrib/commit/58db25ee63a6a9ba72ba06032630197dea1bcbaf))
+
 ## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.1.0...OpenFeature.Contrib.Providers.ConfigCat-v0.1.1) (2024-09-17)
 
 
