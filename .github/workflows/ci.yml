@@ -2,48 +2,45 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-    - '**.md'
+      - "**.md"
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-    - '**.md'
+      - "**.md"
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        submodules: recursive
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      env:
-        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        dotnet-version: |
-          6.0.x
-          7.0.x
-          8.0.x
-        source-url: https://nuget.pkg.github.com/open-feature/index.json
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          global-json-file: global.json
+          source-url: https://nuget.pkg.github.com/open-feature/index.json
 
-    - name: Restore
-      run: dotnet restore
+      - name: Restore
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore
+      - name: Build
+        run: dotnet build --no-restore
 
-    - name: Test
-      run: dotnet test --no-build --logger GitHubActions
+      - name: Test
+        run: dotnet test --no-build --logger GitHubActions
 
   e2e:
     runs-on: ubuntu-latest
@@ -59,25 +56,22 @@ jobs:
         ports:
           - 9090:9090
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        submodules: recursive
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      env:
-        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        dotnet-version: |
-          6.0.x
-          7.0.x
-          8.0.x
-        source-url: https://nuget.pkg.github.com/open-feature/index.json
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          global-json-file: global.json
+          source-url: https://nuget.pkg.github.com/open-feature/index.json
 
-    - name: Test
-      run: dotnet build && E2E=true dotnet test --logger GitHubActions
+      - name: Test
+        run: dotnet build && E2E=true dotnet test --logger GitHubActions
 
   packaging:
     needs: build
@@ -89,41 +83,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        submodules: recursive
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      env:
-        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        dotnet-version: |
-          6.0.x
-          7.0.x
-          8.0.x
-        source-url: https://nuget.pkg.github.com/open-feature/index.json
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          global-json-file: global.json
+          source-url: https://nuget.pkg.github.com/open-feature/index.json
 
-    - name: Restore
-      run: dotnet restore
+      - name: Restore
+        run: dotnet restore
 
-    - name: Pack NuGet packages (CI versions)
-      if: startsWith(github.ref, 'refs/heads/')
-      run: dotnet pack --no-restore --version-suffix "ci.$(date -u +%Y%m%dT%H%M%S)+sha.${GITHUB_SHA:0:9}"
+      - name: Pack NuGet packages (CI versions)
+        if: startsWith(github.ref, 'refs/heads/')
+        run: dotnet pack --no-restore --version-suffix "ci.$(date -u +%Y%m%dT%H%M%S)+sha.${GITHUB_SHA:0:9}"
 
-    - name: Pack NuGet packages (PR versions)
-      if: startsWith(github.ref, 'refs/pull/')
-      run: dotnet pack --no-restore --version-suffix "pr.$(date -u +%Y%m%dT%H%M%S)+sha.${GITHUB_SHA:0:9}"
+      - name: Pack NuGet packages (PR versions)
+        if: startsWith(github.ref, 'refs/pull/')
+        run: dotnet pack --no-restore --version-suffix "pr.$(date -u +%Y%m%dT%H%M%S)+sha.${GITHUB_SHA:0:9}"
 
-    - name: Publish NuGet packages (base)
-      if: github.event.pull_request.head.repo.fork == false
-      run: dotnet nuget push "src/**/*.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source https://nuget.pkg.github.com/open-feature/index.json
+      - name: Publish NuGet packages (base)
+        if: github.event.pull_request.head.repo.fork == false
+        run: dotnet nuget push "src/**/*.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source https://nuget.pkg.github.com/open-feature/index.json
 
-    - name: Publish NuGet packages (fork)
-      if: github.event.pull_request.head.repo.fork == true
-      uses: actions/upload-artifact@v4.3.6
-      with:
-        name: nupkgs
-        path: src/**/*.nupkg
+      - name: Publish NuGet packages (fork)
+        if: github.event.pull_request.head.repo.fork == true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nupkgs
+          path: src/**/*.nupkg

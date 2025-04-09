@@ -10,28 +10,27 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: google-github-actions/release-please-action@v3
+      - uses: google-github-actions/release-please-action@db8f2c60ee802b3748b512940dde88eabd7b7e01 # v3
         id: release
         with:
           command: manifest
           token: ${{secrets.GITHUB_TOKEN}}
           default-branch: main
+          release-type: simple
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         if: ${{ steps.release.outputs.releases_created }}
         with:
           fetch-depth: 0
           submodules: recursive
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        if: ${{ steps.release.outputs.releases_created }}
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          dotnet-version: |
-            6.0.x
-            7.0.x
-            8.0.x
+          global-json-file: global.json
           source-url: https://nuget.pkg.github.com/open-feature/index.json
 
       - name: Install dependencies
@@ -45,7 +44,7 @@ jobs:
 
       - name: Pack
         if: ${{ steps.release.outputs.releases_created }}
-        run:  |
+        run: |
           dotnet pack --configuration Release --no-build
 
       - name: Publish to Nuget
