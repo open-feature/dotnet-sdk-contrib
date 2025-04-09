@@ -30,7 +30,7 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)thrownStatusCode, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<bool>>() =>
+        var resolution = async Task<ResolutionDetails<bool>> () =>
             await fliptToOpenFeature.EvaluateBooleanAsync("flagKey", fallbackValue);
 
         await resolution.Should().ThrowAsync<HttpRequestException>();
@@ -70,7 +70,7 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<bool>>() =>
+        var resolution = async Task<ResolutionDetails<bool>> () =>
             await fliptToOpenFeature.EvaluateBooleanAsync(flagKey, fallBackValue);
 
         await resolution.Should().ThrowAsync<HttpRequestException>();
@@ -93,7 +93,7 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)thrownStatusCode, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<double>>() =>
+        var resolution = async Task<ResolutionDetails<double>> () =>
             await fliptToOpenFeature.EvaluateAsync("flagKey", fallbackValue);
 
         await resolution.Should().ThrowAsync<HttpRequestException>();
@@ -179,7 +179,7 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<Value>>() =>
+        var resolution = async Task<ResolutionDetails<Value>> () =>
             await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue);
 
         await resolution.Should().ThrowAsync<HttpRequestException>();
@@ -196,7 +196,7 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<Value>>() =>
+        var resolution = async Task<ResolutionDetails<Value>> () =>
             await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue);
 
         await resolution.Should().ThrowAsync<HttpRequestException>();
