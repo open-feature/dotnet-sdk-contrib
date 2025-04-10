@@ -28,7 +28,6 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVer)" />
         <PackageReference Include="GitHubActionsTestLogger" Version="$(GitHubActionsTestLoggerVer)" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPkgVer)" />
         <PackageReference Include="NSubstitute" Version="$(NSubstituteVer)" />
@@ -47,7 +46,6 @@
     -->
         <AutoFixtureVer>[4.17.0]</AutoFixtureVer>
         <CoverletCollectorVer>[3.1.2]</CoverletCollectorVer>
-        <FluentAssertionsVer>[6.7.0]</FluentAssertionsVer>
         <GitHubActionsTestLoggerVer>[2.3.3]</GitHubActionsTestLoggerVer>
         <MicrosoftNETTestSdkPkgVer>[17.3.2]</MicrosoftNETTestSdkPkgVer>
         <NSubstituteVer>[5.0.0]</NSubstituteVer>
