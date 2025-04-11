@@ -2,19 +2,11 @@ using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
 using System.Text.Json;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
 public class FliptExtensionsTest
 {
-    private readonly ITestOutputHelper _output;
-
-    public FliptExtensionsTest(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
     [Fact]
     public void ToStringDictionary_WithEmptyContext_ShouldReturnEmptyDictionary()
     {
