@@ -6,11 +6,11 @@ using Xunit.Abstractions;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
-public class FlipExtensionsTest
+public class FliptExtensionsTest
 {
     private readonly ITestOutputHelper _output;
 
-    public FlipExtensionsTest(ITestOutputHelper output)
+    public FliptExtensionsTest(ITestOutputHelper output)
     {
         _output = output;
     }
