@@ -26,7 +26,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
 
         public FlagdStepDefinitionsBase(ScenarioContext scenarioContext)
         {
-            Skip.If(Environment.GetEnvironmentVariable("E2E") != "true");
+            //Skip.If(Environment.GetEnvironmentVariable("E2E") != "true");
             _scenarioContext = scenarioContext;
         }
 
