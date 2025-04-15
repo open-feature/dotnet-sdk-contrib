@@ -1,13 +1,14 @@
 // ReSharper disable RedundantUsingDirective
 
-using System.Net;
-using System.Net.Http;
 using Flipt.Rest;
-using FluentAssertions;
 using Moq;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
+using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
+using System.Net;
+using System.Net.Http;
+using System.Text.Json;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
@@ -30,10 +31,8 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)thrownStatusCode, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<bool>>() =>
-            await fliptToOpenFeature.EvaluateBooleanAsync("flagKey", fallbackValue);
 
-        await resolution.Should().ThrowAsync<HttpRequestException>();
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateBooleanAsync("flagKey", fallbackValue));
     }
 
     [Theory]
@@ -54,9 +53,9 @@ public class FliptToOpenFeatureConverterTest
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
         var resolution = await fliptToOpenFeature.EvaluateBooleanAsync("show-feature", false);
 
-        resolution.FlagKey.Should().Be(flagKey);
-        resolution.Value.Should().Be(valueFromSrc);
-        resolution.Reason.Should().Be(Reason.TargetingMatch);
+        Assert.Equal(flagKey, resolution.FlagKey);
+        Assert.Equal(valueFromSrc, resolution.Value);
+        Assert.Equal(Reason.TargetingMatch, resolution.Reason);
     }
 
     [Theory]
@@ -70,10 +69,8 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<bool>>() =>
-            await fliptToOpenFeature.EvaluateBooleanAsync(flagKey, fallBackValue);
 
-        await resolution.Should().ThrowAsync<HttpRequestException>();
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateBooleanAsync(flagKey, fallBackValue));
     }
 
     // EvaluateAsync Tests
@@ -93,10 +90,8 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)thrownStatusCode, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<double>>() =>
-            await fliptToOpenFeature.EvaluateAsync("flagKey", fallbackValue);
 
-        await resolution.Should().ThrowAsync<HttpRequestException>();
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("flagKey", fallbackValue));
     }
 
     [Theory]
@@ -122,10 +117,10 @@ public class FliptToOpenFeatureConverterTest
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
         var resolution = await fliptToOpenFeature.EvaluateAsync(flagKey, valueFromSrc);
 
-        resolution.FlagKey.Should().Be(flagKey);
-        resolution.Variant.Should().Be(valueFromSrc.ToString() ?? string.Empty);
-        resolution.Value.Should().BeEquivalentTo(expectedValue?.ToString());
-        resolution.Reason.Should().Be(Reason.TargetingMatch);
+        Assert.Equal(flagKey, resolution.FlagKey);
+        Assert.Equal(valueFromSrc.ToString() ?? string.Empty, resolution.Value);
+        Assert.Equal(expectedValue?.ToString(), resolution.Value);
+        Assert.Equal(Reason.TargetingMatch, resolution.Reason);
     }
 
     [Fact]
@@ -160,11 +155,13 @@ public class FliptToOpenFeatureConverterTest
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
         var resolution = await fliptToOpenFeature.EvaluateAsync(flagKey, new Value());
 
-        resolution.FlagKey.Should().Be(flagKey);
-        resolution.Variant.Should().Be(variantKey);
-        resolution.Value.Should().BeEquivalentTo(expectedValue);
-    }
+        Assert.Equal(flagKey, resolution.FlagKey);
+        Assert.Equal(variantKey, resolution.Variant);
 
+        var expected = JsonSerializer.Serialize(expectedValue, JsonConverterExtensions.DefaultSerializerSettings);
+        var actual = JsonSerializer.Serialize(resolution.Value, JsonConverterExtensions.DefaultSerializerSettings);
+        Assert.Equal(expected, actual);
+    }
 
     [Fact]
     public async Task
@@ -179,12 +176,9 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<Value>>() =>
-            await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue);
 
-        await resolution.Should().ThrowAsync<HttpRequestException>();
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue));
     }
-
 
     [Fact]
     public async Task
@@ -196,9 +190,7 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        var resolution = async Task<ResolutionDetails<Value>>() =>
-            await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue);
 
-        await resolution.Should().ThrowAsync<HttpRequestException>();
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue));
     }
 }
