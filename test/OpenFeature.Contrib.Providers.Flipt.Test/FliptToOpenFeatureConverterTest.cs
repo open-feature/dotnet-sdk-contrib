@@ -90,7 +90,7 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)thrownStatusCode, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        
+
         await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("flagKey", fallbackValue));
     }
 
@@ -176,7 +176,7 @@ public class FliptToOpenFeatureConverterTest
             .ThrowsAsync(new FliptRestException("", (int)HttpStatusCode.NotFound, "", null, null));
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
-        
+
         await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue));
     }
 
