@@ -1,12 +1,11 @@
-using System.Text.Json;
-using FluentAssertions;
 using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
+using System.Text.Json;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
 
-public class FlipExtensionsTest
+public class FliptExtensionsTest
 {
     [Fact]
     public void ToStringDictionary_WithEmptyContext_ShouldReturnEmptyDictionary()
@@ -14,8 +13,8 @@ public class FlipExtensionsTest
         var evaluationContext = EvaluationContext.Builder().Build();
         var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().BeEmpty();
+        Assert.NotNull(result);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -27,9 +26,9 @@ public class FlipExtensionsTest
             .Build();
         var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Keys.Should().Contain("location");
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.Contains("location", result.Keys);
     }
 
     [Fact]
@@ -41,10 +40,12 @@ public class FlipExtensionsTest
             .Build();
         var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Keys.Should().Contain("age");
-        result["age"].Should().Be("23");
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.Contains("age", result.Keys);
+
+        var actual = result["age"];
+        Assert.Equal("23", actual);
     }
 
     [Fact]
@@ -62,14 +63,13 @@ public class FlipExtensionsTest
             .Build();
         var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Keys.Should().Contain("config");
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.Contains("config", result.Keys);
 
-        JsonSerializer
-            .Deserialize<Structure>(result["config"],
-                JsonConverterExtensions.DefaultSerializerSettings).Should()
-            .BeEquivalentTo(testStructure);
+        var expected = JsonSerializer.Serialize(testStructure, JsonConverterExtensions.DefaultSerializerSettings);
+        var actual = result["config"];
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -88,13 +88,13 @@ public class FlipExtensionsTest
             .Build();
         var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Keys.Should().Contain("config");
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.Contains("config", result.Keys);
 
-        var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
-            JsonConverterExtensions.DefaultSerializerSettings);
-        deserialized.Should().BeEquivalentTo(testStructure);
+        var expected = JsonSerializer.Serialize(testStructure, JsonConverterExtensions.DefaultSerializerSettings);
+        var actual = result["config"];
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -102,7 +102,8 @@ public class FlipExtensionsTest
     {
         var sampleDictionary = new Dictionary<string, Value>();
         sampleDictionary["config2"] = new Value([
-            new Value([new Value("element1-1"), new Value("element1-2")]), new Value("element2"),
+            new Value([new Value("element1-1"), new Value("element1-2")]),
+            new Value("element2"),
             new Value("element3")
         ]);
         sampleDictionary["config3"] = new Value(DateTime.Now);
@@ -115,13 +116,13 @@ public class FlipExtensionsTest
             .Build();
         var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Keys.Should().Contain("config");
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.Contains("config", result.Keys);
 
-        var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
-            JsonConverterExtensions.DefaultSerializerSettings);
-        deserialized.Should().BeEquivalentTo(testStructure);
+        var expected = JsonSerializer.Serialize(testStructure, JsonConverterExtensions.DefaultSerializerSettings);
+        var actual = result["config"];
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -144,12 +145,12 @@ public class FlipExtensionsTest
             .Build();
         var result = evaluationContext.ToStringDictionary();
 
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Keys.Should().Contain("config");
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.Contains("config", result.Keys);
 
-        var deserialized = JsonSerializer.Deserialize<Structure>(result["config"],
-            JsonConverterExtensions.DefaultSerializerSettings);
-        deserialized.Should().BeEquivalentTo(testStructure);
+        var expected = JsonSerializer.Serialize(testStructure, JsonConverterExtensions.DefaultSerializerSettings);
+        var actual = result["config"];
+        Assert.Equal(expected, actual);
     }
 }
