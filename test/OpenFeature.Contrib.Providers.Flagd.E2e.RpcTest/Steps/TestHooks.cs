@@ -6,36 +6,23 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps
     [Binding]
     public class TestHooks
     {
-        private static FlagdTestBedContainer _container;
+        public static FlagdTestBedContainer FlagdTestBed { get; private set; }
 
         [BeforeTestRun]
         public static async Task StartContainerAsync()
         {
-            _container = new FlagdTestBedContainer();
+            FlagdTestBed = new FlagdTestBedContainer();
 
-            await _container.Container.StartAsync();
-
-            var host = _container.Container.Hostname;
-            var port = _container.Container.GetMappedPublicPort(8013);
-
-            var flagdProvider = new FlagdProvider(
-                FlagdConfig.Builder()
-                    .WithHost(host)
-                    .WithPort(port)
-                    .WithResolverType(ResolverType.RPC)
-                    .Build()
-                );
-
-            await Api.Instance.SetProviderAsync("rpc-test-evaluation", flagdProvider);
+            await FlagdTestBed.Container.StartAsync();
         }
 
         [AfterTestRun]
         public static async Task StopContainerAsync()
         {
-            if (_container != null)
+            if (FlagdTestBed != null)
             {
-                await _container.Container.StopAsync();
-                await _container.Container.DisposeAsync();
+                await FlagdTestBed.Container.StopAsync();
+                await FlagdTestBed.Container.DisposeAsync();
             }
         }
     }

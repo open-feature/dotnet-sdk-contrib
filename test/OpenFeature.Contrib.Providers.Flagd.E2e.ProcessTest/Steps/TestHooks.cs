@@ -6,36 +6,23 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest.Steps
     [Binding]
     public class TestHooks
     {
-        private static FlagdSyncTestBedContainer _container;
+        public static FlagdSyncTestBedContainer FlagdSyncTestBed { get; private set; }
 
         [BeforeTestRun]
         public static async Task StartContainerAsync()
         {
-            _container = new FlagdSyncTestBedContainer();
+            FlagdSyncTestBed = new FlagdSyncTestBedContainer();
 
-            await _container.Container.StartAsync();
-
-            var host = _container.Container.Hostname;
-            var port = _container.Container.GetMappedPublicPort(9090);
-
-            var flagdProvider = new FlagdProvider(
-                FlagdConfig.Builder()
-                    .WithHost(host)
-                    .WithPort(port)
-                    .WithResolverType(ResolverType.IN_PROCESS)
-                    .Build()
-                );
-
-            Api.Instance.SetProviderAsync("process-test-flagd", flagdProvider).Wait(500);
+            await FlagdSyncTestBed.Container.StartAsync();
         }
 
         [AfterTestRun]
         public static async Task StopContainerAsync()
         {
-            if (_container != null)
+            if (FlagdSyncTestBed != null)
             {
-                await _container.Container.StopAsync();
-                await _container.Container.DisposeAsync();
+                await FlagdSyncTestBed.Container.StopAsync();
+                await FlagdSyncTestBed.Container.DisposeAsync();
             }
         }
     }
