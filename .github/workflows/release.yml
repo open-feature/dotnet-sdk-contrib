@@ -7,6 +7,7 @@ on:
 
 jobs:
   release-package:
+    environment: publish
     runs-on: windows-latest
 
     steps:
