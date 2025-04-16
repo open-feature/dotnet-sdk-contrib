@@ -15,10 +15,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps
 
             await _container.Container.StartAsync();
 
+            var host = _container.Container.Hostname;
             var port = _container.Container.GetMappedPublicPort(8013);
 
             var flagdProvider = new FlagdProvider(
                 FlagdConfig.Builder()
+                    .WithHost(host)
                     .WithPort(port)
                     .WithResolverType(ResolverType.RPC)
                     .Build()
