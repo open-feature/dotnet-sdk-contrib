@@ -26,8 +26,5 @@ jobs:
           global-json-file: global.json
           source-url: https://nuget.pkg.github.com/open-feature/index.json
 
-      - name: dotnet restore
-        run: dotnet restore DotnetSdkContrib.sln
-
       - name: dotnet format
         run: dotnet format --verify-no-changes DotnetSdkContrib.sln
