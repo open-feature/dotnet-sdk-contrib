@@ -23,4 +23,7 @@ jobs:
           global-json-file: global.json
 
       - name: dotnet format
+        run: dotnet restore DotnetSdkContrib.sln
+
+      - name: dotnet format
         run: dotnet format --verify-no-changes DotnetSdkContrib.sln
