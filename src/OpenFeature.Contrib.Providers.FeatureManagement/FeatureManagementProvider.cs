@@ -50,6 +50,19 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
         {
             var variant = await Evaluate(flagKey, context, CancellationToken.None);
 
+            if (variant == null)
+            {
+                var exists = false;
+                await foreach (var name in featureManager.GetFeatureNamesAsync().WithCancellation(cancellationToken))
+                {
+                    if (!flagKey.Equals(name, StringComparison.OrdinalIgnoreCase)) continue;
+                    exists = true;
+                    break;
+                }
+                var enabled = await featureManager.IsEnabledAsync(flagKey, context, cancellationToken);
+                return new ResolutionDetails<bool>(flagKey, exists ? enabled : defaultValue);
+            }
+
             if (Boolean.TryParse(variant?.Configuration?.Value, out var value))
                 return new ResolutionDetails<bool>(flagKey, value);
             return new ResolutionDetails<bool>(flagKey, defaultValue);
