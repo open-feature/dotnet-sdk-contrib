@@ -802,7 +802,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             await Utils.AssertUntilAsync(
                 (_) =>
                 {
-                    return Assert.ThrowsAsync<FlagNotFoundException>(() => flagdProvider.ResolveStringValueAsync("unknown", "unknown"));
+                    return Assert.ThrowsAsync<FeatureProviderException>(() => flagdProvider.ResolveStringValueAsync("unknown", "unknown"));
                 });
 
             mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
