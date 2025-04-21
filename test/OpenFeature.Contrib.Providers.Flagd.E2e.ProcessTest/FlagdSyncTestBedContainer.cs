@@ -10,8 +10,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest
         public FlagdSyncTestBedContainer()
         {
             Container = new ContainerBuilder()
-                .WithImage("ghcr.io/open-feature/sync-testbed:v0.5.6")
-                .WithPortBinding(9090, true)
+                .WithImage("ghcr.io/open-feature/flagd-testbed:v0.5.21")
+                .WithPortBinding(8015, true)
                 .Build();
         }
     }

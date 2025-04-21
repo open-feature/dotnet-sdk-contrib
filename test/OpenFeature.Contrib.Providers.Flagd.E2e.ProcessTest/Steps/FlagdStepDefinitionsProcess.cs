@@ -11,7 +11,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest.Steps
         static FlagdStepDefinitionsProcess()
         {
             var host = TestHooks.FlagdSyncTestBed.Container.Hostname;
-            var port = TestHooks.FlagdSyncTestBed.Container.GetMappedPublicPort(9090);
+            var port = TestHooks.FlagdSyncTestBed.Container.GetMappedPublicPort(8015);
 
             var flagdProvider = new FlagdProvider(
                 FlagdConfig.Builder()

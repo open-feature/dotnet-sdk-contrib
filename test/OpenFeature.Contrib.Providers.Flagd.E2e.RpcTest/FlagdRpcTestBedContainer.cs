@@ -3,11 +3,11 @@ using DotNet.Testcontainers.Containers;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest
 {
-    public class FlagdTestBedContainer
+    public class FlagdRpcTestBedContainer
     {
         public IContainer Container { get; }
 
-        public FlagdTestBedContainer()
+        public FlagdRpcTestBedContainer()
         {
             Container = new ContainerBuilder()
                 .WithImage("ghcr.io/open-feature/flagd-testbed:v0.5.21")

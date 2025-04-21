@@ -6,12 +6,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps
     [Binding]
     public class TestHooks
     {
-        public static FlagdTestBedContainer FlagdTestBed { get; private set; }
+        public static FlagdRpcTestBedContainer FlagdTestBed { get; private set; }
 
         [BeforeTestRun]
         public static async Task StartContainerAsync()
         {
-            FlagdTestBed = new FlagdTestBedContainer();
+            FlagdTestBed = new FlagdRpcTestBedContainer();
 
             await FlagdTestBed.Container.StartAsync();
         }
