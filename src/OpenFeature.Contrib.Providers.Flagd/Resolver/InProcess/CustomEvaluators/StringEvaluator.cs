@@ -18,7 +18,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
             if (!isValid(p, args, data, out string operandA, out string operandB))
             {
                 return false;
-            };
+            }
             return Convert.ToString(operandA).StartsWith(Convert.ToString(operandB));
         }
 
@@ -27,7 +27,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
             if (!isValid(p, args, data, out string operandA, out string operandB))
             {
                 return false;
-            };
+            }
             return operandA.EndsWith(operandB);
         }
 
