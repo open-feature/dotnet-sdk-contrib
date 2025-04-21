@@ -30,7 +30,7 @@
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <Compile
             Include="$(ProjectDir)obj/$(ConfigurationName)/$(TargetFramework)/Flipt.Rest.Client.cs" />
-        <PackageReference Include="System.Text.Json" Version="8.0.5" />
+        <PackageReference Include="System.Text.Json" Version="9.0.4" />
     </ItemGroup>
 
     <PropertyGroup>

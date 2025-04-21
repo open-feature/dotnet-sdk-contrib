@@ -17,7 +17,7 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="8.0.2" />
+    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="9.0.4" />
   </ItemGroup>
   <ItemGroup>
     <!-- The schema.proto file referenced here will be used to automatically generate the Grpc client when executing 'dotnet build' -->
