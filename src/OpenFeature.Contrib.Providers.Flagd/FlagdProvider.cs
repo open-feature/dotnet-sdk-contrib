@@ -116,7 +116,7 @@ namespace OpenFeature.Contrib.Providers.Flagd
                 if (t.IsFaulted)
                 {
                     throw t.Exception;
-                };
+                }
             });
         }
 
