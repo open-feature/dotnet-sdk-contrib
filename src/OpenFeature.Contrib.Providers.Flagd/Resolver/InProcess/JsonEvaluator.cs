@@ -54,8 +54,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 
         private string _selector;
 
-        //private readonly JsonEvaluator _evaluator = new Evaluator;
-
 
         internal JsonEvaluator(string selector)
         {
