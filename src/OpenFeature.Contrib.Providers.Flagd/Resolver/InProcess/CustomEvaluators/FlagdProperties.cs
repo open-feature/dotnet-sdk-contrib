@@ -6,11 +6,11 @@ using Json.More;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators
 {
-    internal class FlagdProperties
+    internal sealed class FlagdProperties
     {
 
         internal const string FlagdPropertiesKey = "$flagd";
-        internal const string FlagKeyKey = "flagKey"; // TODO prefix
+        internal const string FlagKeyKey = "flagKey";
         internal const string TimestampKey = "timestamp";
         internal const string TargetingKeyKey = "targetingKey";
 

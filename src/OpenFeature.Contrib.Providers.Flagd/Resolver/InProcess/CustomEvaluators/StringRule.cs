@@ -5,7 +5,7 @@ using Json.Logic;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators
 {
-    internal class StartsWithRule : IRule
+    internal sealed class StartsWithRule : IRule
     {
         internal StartsWithRule()
         {
@@ -21,7 +21,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
         }
     }
 
-    internal class EndsWithRule : IRule
+    internal sealed class EndsWithRule : IRule
     {
 
         internal EndsWithRule()

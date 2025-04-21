@@ -5,7 +5,7 @@ using Semver;
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators
 {
     /// <inheritdoc/>
-    public class SemVerRule : IRule
+    internal sealed class SemVerRule : IRule
     {
         internal SemVerRule()
         {

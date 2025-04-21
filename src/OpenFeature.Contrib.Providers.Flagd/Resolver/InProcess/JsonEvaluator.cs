@@ -18,19 +18,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 {
     internal class FlagConfiguration
     {
-        [JsonPropertyName("state")] public string State { get; set; }
-        [JsonPropertyName("defaultVariant")] public string DefaultVariant { get; set; }
-        [JsonPropertyName("variants")] public Dictionary<string, JsonElement> Variants { get; set; }
-        [JsonPropertyName("targeting")] public object Targeting { get; set; }
-        [JsonPropertyName("source")] public string Source { get; set; }
-        [JsonPropertyName("metadata")] public Dictionary<string, JsonElement> Metadata { get; set; }
+        [JsonPropertyName("state")] internal string State { get; set; }
+        [JsonPropertyName("defaultVariant")] internal string DefaultVariant { get; set; }
+        [JsonPropertyName("variants")] internal Dictionary<string, JsonElement> Variants { get; set; }
+        [JsonPropertyName("targeting")] internal object Targeting { get; set; }
+        [JsonPropertyName("source")] internal string Source { get; set; }
+        [JsonPropertyName("metadata")] internal Dictionary<string, JsonElement> Metadata { get; set; }
     }
 
     internal class FlagSyncData
     {
-        [JsonPropertyName("flags")] public Dictionary<string, FlagConfiguration> Flags { get; set; }
-        [JsonPropertyName("$evaluators")] public Dictionary<string, object> Evaluators { get; set; }
-        [JsonPropertyName("metadata")] public Dictionary<string, JsonElement> Metadata { get; set; }
+        [JsonPropertyName("flags")] internal Dictionary<string, FlagConfiguration> Flags { get; set; }
+        [JsonPropertyName("$evaluators")] internal Dictionary<string, object> Evaluators { get; set; }
+        [JsonPropertyName("metadata")] internal Dictionary<string, JsonElement> Metadata { get; set; }
     }
 
     internal class FlagConfigurationSync

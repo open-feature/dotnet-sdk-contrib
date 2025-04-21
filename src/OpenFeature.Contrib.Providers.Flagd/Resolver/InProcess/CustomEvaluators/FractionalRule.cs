@@ -10,7 +10,7 @@ using Murmur;
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators
 {
     /// <inheritdoc/>
-    public class FractionalEvaluator : IRule
+    internal sealed class FractionalEvaluator : IRule
     {
         internal FractionalEvaluator()
         {
