@@ -1,6 +1,4 @@
 using System;
-using System.Numerics;
-using JsonLogic.Net;
 
 namespace OpenFeature.Contrib.Providers.Flagd
 

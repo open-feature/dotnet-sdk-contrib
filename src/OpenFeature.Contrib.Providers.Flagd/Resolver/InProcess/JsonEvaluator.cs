@@ -2,32 +2,35 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using JsonLogic.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Json.Logic;
+using Json.More;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 using OpenFeature.Error;
 using OpenFeature.Model;
+using EvaluationContext = OpenFeature.Model.EvaluationContext;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 {
     internal class FlagConfiguration
     {
-        [JsonProperty("state")] internal string State { get; set; }
-        [JsonProperty("defaultVariant")] internal string DefaultVariant { get; set; }
-        [JsonProperty("variants")] internal Dictionary<string, object> Variants { get; set; }
-        [JsonProperty("targeting")] internal object Targeting { get; set; }
-        [JsonProperty("source")] internal string Source { get; set; }
-        [JsonProperty("metadata")] internal Dictionary<string, object> Metadata { get; set; }
+        [JsonPropertyName("state")] public string State { get; set; }
+        [JsonPropertyName("defaultVariant")] public string DefaultVariant { get; set; }
+        [JsonPropertyName("variants")] public Dictionary<string, JsonElement> Variants { get; set; }
+        [JsonPropertyName("targeting")] public object Targeting { get; set; }
+        [JsonPropertyName("source")] public string Source { get; set; }
+        [JsonPropertyName("metadata")] public Dictionary<string, JsonElement> Metadata { get; set; }
     }
 
     internal class FlagSyncData
     {
-        [JsonProperty("flags")] internal Dictionary<string, FlagConfiguration> Flags { get; set; }
-        [JsonProperty("$evaluators")] internal Dictionary<string, object> Evaluators { get; set; }
-        [JsonProperty("metadata")] internal Dictionary<string, object> Metadata { get; set; }
+        [JsonPropertyName("flags")] public Dictionary<string, FlagConfiguration> Flags { get; set; }
+        [JsonPropertyName("$evaluators")] public Dictionary<string, object> Evaluators { get; set; }
+        [JsonPropertyName("metadata")] public Dictionary<string, JsonElement> Metadata { get; set; }
     }
 
     internal class FlagConfigurationSync
@@ -47,31 +50,27 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
     internal class JsonEvaluator
     {
         private Dictionary<string, FlagConfiguration> _flags = new Dictionary<string, FlagConfiguration>();
-        private Dictionary<string, object> _flagSetMetadata = new Dictionary<string, object>();
+        private Dictionary<string, JsonElement> _flagSetMetadata = new Dictionary<string, JsonElement>();
 
         private string _selector;
 
-        private readonly JsonLogicEvaluator _evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
+        //private readonly JsonEvaluator _evaluator = new Evaluator;
 
 
         internal JsonEvaluator(string selector)
         {
             _selector = selector;
 
-            var stringEvaluator = new StringEvaluator();
-            var semVerEvaluator = new SemVerEvaluator();
-            var fractionalEvaluator = new FractionalEvaluator();
-
-            EvaluateOperators.Default.AddOperator("starts_with", stringEvaluator.StartsWith);
-            EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
-            EvaluateOperators.Default.AddOperator("sem_ver", semVerEvaluator.Evaluate);
-            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+            RuleRegistry.AddRule("starts_with", new StartsWithRule());
+            RuleRegistry.AddRule("ends_with", new EndsWithRule());
+            RuleRegistry.AddRule("sem_ver", new SemVerRule());
+            RuleRegistry.AddRule("fractional", new FractionalEvaluator());
         }
 
         internal FlagSyncData Parse(string flagConfigurations)
         {
-            var parsed = JsonConvert.DeserializeObject<FlagSyncData>(flagConfigurations);
-            var transformed = JsonConvert.SerializeObject(parsed);
+            var parsed = JsonSerializer.Deserialize<FlagSyncData>(flagConfigurations);
+            var transformed = JsonSerializer.Serialize(parsed);
             // replace evaluators
             if (parsed.Evaluators != null && parsed.Evaluators.Count > 0)
             {
@@ -84,21 +83,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             }
 
 
-            var data = JsonConvert.DeserializeObject<FlagSyncData>(transformed);
+            var data = JsonSerializer.Deserialize<FlagSyncData>(transformed);
             if (data.Metadata == null)
             {
-                data.Metadata = new Dictionary<string, object>();
+                data.Metadata = new Dictionary<string, JsonElement>();
             }
             else
             {
                 foreach (var key in new List<string>(data.Metadata.Keys))
                 {
                     var value = data.Metadata[key];
-                    if (value is long longValue)
-                    {
-                        value = data.Metadata[key] = (int)longValue;
-                    }
-
                     VerifyMetadataValue(key, value);
                 }
             }
@@ -113,11 +107,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 foreach (var key in new List<string>(flagConfig.Value.Metadata.Keys))
                 {
                     var value = flagConfig.Value.Metadata[key];
-                    if (value is long longValue)
-                    {
-                        value = flagConfig.Value.Metadata[key] = (int)longValue;
-                    }
-
                     VerifyMetadataValue(key, value);
                 }
             }
@@ -125,15 +114,36 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             return data;
         }
 
-        private static void VerifyMetadataValue(string key, object value)
+        private static void VerifyMetadataValue(string key, JsonElement value)
         {
-            if (value is int || value is double || value is string || value is bool)
+            //if (value is int || value is double || value is string || value is bool)
+            if (value.ValueKind == JsonValueKind.Number
+                || value.ValueKind == JsonValueKind.String
+                || value.ValueKind == JsonValueKind.True
+                || value.ValueKind == JsonValueKind.False)
             {
                 return;
             }
 
             throw new ParseErrorException("Metadata entry for key " + key + " and value " + value +
                                           " is of unknown type");
+        }
+
+        private static object ExtractMetadataValue(string key, JsonElement value)
+        {
+            switch (value.ValueKind)
+            {
+                case JsonValueKind.Number:
+                    return value.GetDouble();
+                case JsonValueKind.String:
+                    return value.GetString();
+                case JsonValueKind.False:
+                case JsonValueKind.True:
+                    return value.GetBoolean();
+
+            }
+            throw new ParseErrorException("Metadata entry for key " + key + " and value " + value +
+                          " is of unknown type");
         }
 
         internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
@@ -218,12 +228,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                         "FLAG_NOT_FOUND: flag '" + flagKey + "' is disabled");
                 }
 
-                Dictionary<string, object> combinedMetadata = new Dictionary<string, object>(_flagSetMetadata);
+                Dictionary<string, object> combinedMetadata = _flagSetMetadata.ToDictionary(
+                    entry => entry.Key,
+                    entry => ExtractMetadataValue(entry.Key, entry.Value));
+
                 if (flagConfiguration.Metadata != null)
                 {
                     foreach (var metadataEntry in flagConfiguration.Metadata)
                     {
-                        combinedMetadata[metadataEntry.Key] = metadataEntry.Value;
+                        combinedMetadata[metadataEntry.Key] = ExtractMetadataValue(metadataEntry.Key, metadataEntry.Value);
                     }
                 }
 
@@ -234,31 +247,31 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     flagConfiguration.Targeting.ToString() != "{}")
                 {
                     reason = Reason.TargetingMatch;
-                    var flagdProperties = new Dictionary<string, Value>();
-                    flagdProperties.Add(FlagdProperties.FlagKeyKey, new Value(flagKey));
-                    flagdProperties.Add(FlagdProperties.TimestampKey,
-                        new Value(DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
+                    var flagdProperties = new Dictionary<string, Value>
+                    {
+                      { FlagdProperties.FlagKeyKey, new Value(flagKey) },
+                      { FlagdProperties.TimestampKey, new Value(DateTimeOffset.UtcNow.ToUnixTimeSeconds()) }
+                    };
 
                     if (context == null)
                     {
                         context = EvaluationContext.Builder().Build();
                     }
 
-                    var targetingContext = context.AsDictionary().Add(
-                        FlagdProperties.FlagdPropertiesKey,
-                        new Value(new Structure(flagdProperties))
-                    );
 
+                    var contextDictionary = context.AsDictionary();
+                    contextDictionary = contextDictionary.Add(FlagdProperties.FlagdPropertiesKey, new Value(new Structure(flagdProperties)));
+                    // TODO: all missing comments
                     var targetingString = flagConfiguration.Targeting.ToString();
                     // Parse json into hierarchical structure
-                    var rule = JObject.Parse(targetingString);
+                    var rule = JsonNode.Parse(targetingString);
                     // the JsonLogic evaluator will return the variant for the value
 
                     // convert the EvaluationContext object into something the JsonLogic evaluator can work with
-                    dynamic contextObj = (object)ConvertToDynamicObject(targetingContext);
+                    var contextObj = JsonNode.Parse(JsonSerializer.Serialize(ConvertToDynamicObject(contextDictionary)));
 
                     // convert whatever is returned to a string to try to use it as an index to Variants
-                    var ruleResult = _evaluator.Apply(rule, contextObj);
+                    var ruleResult = JsonLogic.Apply(rule, contextObj);
                     if (ruleResult is bool)
                     {
                         // if this was a bool, convert from "True" to "true" to match JSON
@@ -278,7 +291,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     reason = Reason.Default;
                     flagConfiguration.Variants.TryGetValue(flagConfiguration.DefaultVariant,
                         out var defaultVariantValue);
-                    if (defaultVariantValue == null)
+                    if (defaultVariantValue.ValueKind == JsonValueKind.Undefined || defaultVariantValue.ValueKind == JsonValueKind.Null)
                     {
                         throw new FeatureProviderException(ErrorType.ParseError,
                             "PARSE_ERROR: flag '" + flagKey + "' has missing or invalid defaultVariant.");
@@ -311,29 +324,47 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 "FLAG_NOT_FOUND: flag '" + flagKey + "' not found");
         }
 
-        static T ExtractFoundVariant<T>(object foundVariantValue, string flagKey)
+        static T ExtractFoundVariant<T>(JsonElement foundVariantValue, string flagKey)
         {
-            if (foundVariantValue is long)
+            try
             {
-                foundVariantValue = Convert.ToInt32(foundVariantValue);
+                if (typeof(T) == typeof(int))
+                {
+                    return (T)(object)foundVariantValue.GetInt32();
+                }
+
+                if (typeof(T) == typeof(double))
+                {
+                    return (T)(object)foundVariantValue.GetDouble();
+                }
+
+                if (typeof(T) == typeof(bool))
+                {
+                    return (T)(object)foundVariantValue.GetBoolean();
+                }
+
+                if (typeof(T) == typeof(string))
+                {
+                    return (T)(object)foundVariantValue.GetString();
+                }
+
+                if (foundVariantValue.ValueKind == JsonValueKind.Object || foundVariantValue.ValueKind == JsonValueKind.Array)
+                {
+                    var converted = ConvertJsonObjectToOpenFeatureValue(foundVariantValue.AsNode().AsObject());
+                    if (converted is T castValue)
+                    {
+                        return castValue;
+                    }
+                }
+                throw new Exception("Cannot cast flag value to expected type");
+
+            }
+            catch (Exception e)
+            {
+                throw new FeatureProviderException(ErrorType.TypeMismatch,
+                    "TYPE_MISMATCH: flag '" + flagKey + "' does not match the expected type", e);
             }
 
-            if (typeof(T) == typeof(double))
-            {
-                foundVariantValue = Convert.ToDouble(foundVariantValue);
-            }
-            else if (foundVariantValue is JObject value)
-            {
-                foundVariantValue = ConvertJObjectToOpenFeatureValue(value);
-            }
-
-            if (foundVariantValue is T castValue)
-            {
-                return castValue;
-            }
-
-            throw new FeatureProviderException(ErrorType.TypeMismatch,
-                "TYPE_MISMATCH: flag '" + flagKey + "' does not match the expected type");
         }
 
         static dynamic ConvertToDynamicObject(IImmutableDictionary<string, Value> dictionary)
@@ -352,37 +383,35 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             return expandoObject;
         }
 
-        static Value ConvertJObjectToOpenFeatureValue(JObject jsonValue)
+        static Value ConvertJsonObjectToOpenFeatureValue(JsonObject jsonValue)
         {
             var result = new Dictionary<string, Value>();
 
-            foreach (var property in jsonValue.Properties())
+            foreach (var property in jsonValue.AsEnumerable())
             {
-                switch (property.Value.Type)
+                switch (property.Value.GetValueKind())
                 {
-                    case JTokenType.String:
-                        result.Add(property.Name, new Value((string)property.Value));
+                    case JsonValueKind.String:
+                        result.Add(property.Key, new Value((string)property.Value));
                         break;
 
-                    case JTokenType.Integer:
-                        result.Add(property.Name, new Value((Int64)property.Value));
+                    case JsonValueKind.Number:
+                        result.Add(property.Key, new Value((long)property.Value));
                         break;
 
-                    case JTokenType.Boolean:
-                        result.Add(property.Name, new Value((bool)property.Value));
+                    case JsonValueKind.True:
+                    case JsonValueKind.False:
+                        result.Add(property.Key, new Value((bool)property.Value));
                         break;
 
-                    case JTokenType.Float:
-                        result.Add(property.Name, new Value((float)property.Value));
-                        break;
-
-                    case JTokenType.Object:
-                        result.Add(property.Name, ConvertJObjectToOpenFeatureValue((JObject)property.Value));
+                    case JsonValueKind.Object:
+                    case JsonValueKind.Array:
+                        result.Add(property.Key, ConvertJsonObjectToOpenFeatureValue(property.Value.AsObject()));
                         break;
 
                     default:
                         // Handle unknown data type or throw an exception
-                        throw new InvalidOperationException($"Unsupported data type: {property.Value.Type}");
+                        throw new InvalidOperationException($"Unsupported data type: {property.Value.GetType()}");
                 }
             }
 
