@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
+using OpenFeature.Constant;
 using OpenFeature.Model;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,12 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
                     break;
                 }
                 var enabled = await featureManager.IsEnabledAsync(flagKey, context, cancellationToken);
-                return new ResolutionDetails<bool>(flagKey, exists ? enabled : defaultValue);
+                if (exists)
+                {
+                    return new ResolutionDetails<bool>(flagKey, enabled);
+                }
+
+                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, Reason.Error);
             }
 
             if (Boolean.TryParse(variant?.Configuration?.Value, out var value))
