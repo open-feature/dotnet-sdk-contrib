@@ -42,10 +42,10 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
     {
         internal static bool isValid(JsonNode args, Json.Logic.EvaluationContext context, out string argA, out string argB)
         {
-            // check if we have at least 2 arguments
             argA = null;
             argB = null;
 
+            // check if we have at least 2 arguments
             if (args.AsArray().Count < 2)
             {
                 return false;
