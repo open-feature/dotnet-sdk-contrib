@@ -1,6 +1,8 @@
 using System.Collections.Generic;
-using JsonLogic.Net;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Json.Logic;
+using Json.More;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 using Xunit;
 
@@ -31,9 +33,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void Evaluate(string email, string flagKey, string expected)
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var fractionalEvaluator = new FractionalEvaluator();
-            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+            RuleRegistry.AddRule("fractional", new FractionalEvaluator());
 
             var targetingString = @"{""fractional"": [
               {
@@ -42,19 +42,21 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     { ""var"":""email"" }
                 ]
               },
-              [""red"", 25], [""blue"", 25], [""green"", 25], [""yellow"", 25], 
+              [""red"", 25], [""blue"", 25], [""green"", 25], [""yellow"", 25]
             ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, object> {
-            { "email", email },
-            {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
-            };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                { "email", email },
+                { "$flagd", new Dictionary<string, object> { { "flagKey", flagKey } } }
+            }));
 
-            // Act & Assert
-            var result = evaluator.Apply(rule, data);
+            // Act
+            var result = JsonLogic.Apply(rule, data);
+
+            // Assert
             Assert.Equal(expected, result.ToString());
         }
 
@@ -63,9 +65,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void EvaluateUsingRelativeWeights(string email, string flagKey, string expected)
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var fractionalEvaluator = new FractionalEvaluator();
-            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+            RuleRegistry.AddRule("fractional", new FractionalEvaluator());
 
             var targetingString = @"{""fractional"": [
                     {
@@ -74,19 +74,21 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                             { ""var"":""email"" }
                         ]
                     },
-                    [""red"", 5], [""blue"", 5], [""green"", 5], [""yellow"", 5],
+                    [""red"", 5], [""blue"", 5], [""green"", 5], [""yellow"", 5]
                 ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, object> {
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+            {
                 { "email", email },
-                {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
-                };
+                { "$flagd", new Dictionary<string, object> { { "flagKey", flagKey } } }
+            }));
 
-            // Act & Assert
-            var result = evaluator.Apply(rule, data);
+            // Act
+            var result = JsonLogic.Apply(rule, data);
+
+            // Assert
             Assert.Equal(expected, result.ToString());
         }
 
@@ -95,9 +97,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void EvaluateUsingDefaultWeights(string email, string flagKey, string expected)
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var fractionalEvaluator = new FractionalEvaluator();
-            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+            RuleRegistry.AddRule("fractional", new FractionalEvaluator());
 
             var targetingString = @"{""fractional"": [
             {
@@ -106,19 +106,21 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                     { ""var"":""email"" }
                 ]
             },
-            [""red""], [""blue""], [""green""], [""yellow""],
+            [""red""], [""blue""], [""green""], [""yellow""]
             ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, object> {
-            { "email", email },
-            {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
-            };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                { "email", email },
+                { "$flagd", new Dictionary<string, object> { { "flagKey", flagKey } } }
+            }));
 
-            // Act & Assert
-            var result = evaluator.Apply(rule, data);
+            // Act
+            var result = JsonLogic.Apply(rule, data);
+
+            // Assert
             Assert.Equal(expected, result.ToString());
         }
 
@@ -127,26 +129,25 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void EvaluateUsingTargetingKey(string flagKey, string expected)
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var fractionalEvaluator = new FractionalEvaluator();
-            EvaluateOperators.Default.AddOperator("fractional", fractionalEvaluator.Evaluate);
+            RuleRegistry.AddRule("fractional", new FractionalEvaluator());
 
             var targetingString = @"{""fractional"": [
-              [""red"", 25], [""blue"", 25], [""green"", 25], [""yellow"", 25],
+              [""red"", 25], [""blue"", 25], [""green"", 25], [""yellow"", 25]
             ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, object> {
-            { "targetingKey", "myKey" },
-            {"$flagd", new Dictionary<string, object> { {"flagKey", flagKey } } }
-            };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                { "targetingKey", "myKey" },
+                { "$flagd", new Dictionary<string, object> { { "flagKey", flagKey } } }
+            }));
 
-            // Act & Assert
-            var result = evaluator.Apply(rule, data);
+            // Act
+            var result = JsonLogic.Apply(rule, data);
+
+            // Assert
             Assert.Equal(expected, result.ToString());
-
         }
     }
 }
