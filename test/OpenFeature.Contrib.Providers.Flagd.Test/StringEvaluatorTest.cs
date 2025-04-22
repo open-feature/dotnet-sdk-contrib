@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using JsonLogic.Net;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Json.Logic;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 using Xunit;
 
@@ -8,177 +9,156 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 {
     public class StringEvaluatorTest
     {
-
         [Fact]
         public void StartsWith()
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var stringEvaluator = new StringEvaluator();
-            EvaluateOperators.Default.AddOperator("starts_with", stringEvaluator.StartsWith);
+            RuleRegistry.AddRule("starts_with", new StartsWithRule());
 
             var targetingString = @"{""starts_with"": [
-              {
-                ""var"": [
-                  ""color""
-                ]
-              },
+              { ""var"": ""color"" },
               ""yellow""
             ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, string> { { "color", "yellowcolor" } };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, string>
+            {
+                { "color", "yellowcolor" }
+            }));
 
             // Act & Assert
-            var result = evaluator.Apply(rule, data);
-            Assert.True(result.IsTruthy());
+            var result = JsonLogic.Apply(rule, data);
+            Assert.True(result.GetValue<bool>());
 
-            data.Clear();
-            data.Add("color", "blue");
+            data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, string>
+            {
+                { "color", "blue" }
+            }));
 
-            result = evaluator.Apply(rule, data);
-            Assert.False(result.IsTruthy());
+            result = JsonLogic.Apply(rule, data);
+            Assert.False(result.GetValue<bool>());
         }
 
         [Fact]
         public void EndsWith()
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var stringEvaluator = new StringEvaluator();
-            EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
+            RuleRegistry.AddRule("ends_with", new EndsWithRule());
 
             var targetingString = @"{""ends_with"": [
-                        {
-                          ""var"": [
-                            ""color""
-                          ]
-                        },
-                        ""purple""
-                      ]}";
+              { ""var"": ""color"" },
+              ""purple""
+            ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, string> { { "color", "deep-purple" } };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, string>
+            {
+                { "color", "deep-purple" }
+            }));
 
             // Act & Assert
-            var result = evaluator.Apply(rule, data);
-            Assert.True(result.IsTruthy());
+            var result = JsonLogic.Apply(rule, data);
+            Assert.True(result.GetValue<bool>());
 
-            data.Clear();
-            data.Add("color", "purple-nightmare");
+            data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, string>
+            {
+                { "color", "purple-nightmare" }
+            }));
 
-            result = evaluator.Apply(rule, data);
-            Assert.False(result.IsTruthy());
+            result = JsonLogic.Apply(rule, data);
+            Assert.False(result.GetValue<bool>());
         }
 
         [Fact]
         public void NonStringTypeInRule()
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var stringEvaluator = new StringEvaluator();
-            EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
+            RuleRegistry.AddRule("ends_with", new EndsWithRule());
 
             var targetingString = @"{""ends_with"": [
-                        {
-                          ""var"": [
-                            ""color""
-                          ]
-                        },
-                        1
-                      ]}";
+              { ""var"": ""color"" },
+              1
+            ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, string> { { "color", "deep-purple" } };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, string>
+            {
+                { "color", "deep-purple" }
+            }));
 
             // Act & Assert
-            var result = evaluator.Apply(rule, data);
-            Assert.False(result.IsTruthy());
+            var result = JsonLogic.Apply(rule, data);
+            Assert.False(result.GetValue<bool>());
         }
 
         [Fact]
         public void NonStringTypeInData()
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var stringEvaluator = new StringEvaluator();
-            EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
+            RuleRegistry.AddRule("ends_with", new EndsWithRule());
 
             var targetingString = @"{""ends_with"": [
-                        {
-                          ""var"": [
-                            ""color""
-                          ]
-                        },
-                        ""green""
-                      ]}";
+              { ""var"": ""color"" },
+              ""green""
+            ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, int> { { "color", 5 } };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                { "color", 5 }
+            }));
 
             // Act & Assert
-            var result = evaluator.Apply(rule, data);
-            Assert.False(result.IsTruthy());
+            var result = JsonLogic.Apply(rule, data);
+            Assert.False(result.GetValue<bool>());
         }
 
         [Fact]
         public void EndsWithNotEnoughArguments()
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var stringEvaluator = new StringEvaluator();
-            EvaluateOperators.Default.AddOperator("ends_with", stringEvaluator.EndsWith);
+            RuleRegistry.AddRule("ends_with", new EndsWithRule());
 
             var targetingString = @"{""ends_with"": [
-                        {
-                          ""var"": [
-                            ""color""
-                          ]
-                        }
-                      ]}";
+              { ""var"": ""color"" }
+            ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, int> { { "color", 5 } };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                { "color", 5 }
+            }));
 
             // Act & Assert
-            var result = evaluator.Apply(rule, data);
-            Assert.False(result.IsTruthy());
+            var result = JsonLogic.Apply(rule, data);
+            Assert.False(result.GetValue<bool>());
         }
 
         [Fact]
         public void StartsWithNotEnoughArguments()
         {
             // Arrange
-            var evaluator = new JsonLogicEvaluator(EvaluateOperators.Default);
-            var stringEvaluator = new StringEvaluator();
-            EvaluateOperators.Default.AddOperator("starts_with", stringEvaluator.EndsWith);
+            RuleRegistry.AddRule("starts_with", new StartsWithRule());
 
             var targetingString = @"{""starts_with"": [
-                        {
-                          ""var"": [
-                            ""color""
-                          ]
-                        }
-                      ]}";
+              { ""var"": ""color"" }
+            ]}";
 
-            // Parse json into hierarchical structure
-            var rule = JObject.Parse(targetingString);
+            var rule = JsonNode.Parse(targetingString);
 
-            var data = new Dictionary<string, int> { { "color", 5 } };
+            var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                { "color", 5 }
+            }));
 
             // Act & Assert
-            var result = evaluator.Apply(rule, data);
-            Assert.False(result.IsTruthy());
+            var result = JsonLogic.Apply(rule, data);
+            Assert.False(result.GetValue<bool>());
         }
     }
 }
