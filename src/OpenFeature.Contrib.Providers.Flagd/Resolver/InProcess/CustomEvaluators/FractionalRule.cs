@@ -12,10 +12,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
     /// <inheritdoc/>
     internal sealed class FractionalEvaluator : IRule
     {
-        internal FractionalEvaluator()
-        {
-        }
-
         class FractionalEvaluationDistribution
         {
             public string variant;

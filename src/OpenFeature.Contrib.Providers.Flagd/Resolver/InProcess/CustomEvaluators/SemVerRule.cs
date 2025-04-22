@@ -7,10 +7,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
     /// <inheritdoc/>
     internal sealed class SemVerRule : IRule
     {
-        internal SemVerRule()
-        {
-        }
-
         const string OperatorEqual = "=";
         const string OperatorNotEqual = "!=";
         const string OperatorLess = "<";
