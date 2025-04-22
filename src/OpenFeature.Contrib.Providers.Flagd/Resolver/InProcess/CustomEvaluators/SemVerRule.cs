@@ -1,17 +1,12 @@
-using System;
-using JsonLogic.Net;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
+using Json.Logic;
 using Semver;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators
 {
     /// <inheritdoc/>
-    public class SemVerEvaluator
+    internal sealed class SemVerRule : IRule
     {
-        internal SemVerEvaluator()
-        {
-        }
-
         const string OperatorEqual = "=";
         const string OperatorNotEqual = "!=";
         const string OperatorLess = "<";
@@ -21,21 +16,23 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
         const string OperatorMatchMajor = "^";
         const string OperatorMatchMinor = "~";
 
-        internal object Evaluate(IProcessJsonLogic p, JToken[] args, object data)
+
+        /// <inheritdoc/>
+        public JsonNode Apply(JsonNode args, EvaluationContext context)
         {
             // check if we have at least 3 arguments
-            if (args.Length < 3)
+            if (args.AsArray().Count < 3)
             {
                 return false;
             }
             // get the value from the provided evaluation context
-            var versionString = p.Apply(args[0], data).ToString();
+            var versionString = JsonLogic.Apply(args[0], context).ToString();
 
             // get the operator
-            var semVerOperator = p.Apply(args[1], data).ToString();
+            var semVerOperator = JsonLogic.Apply(args[1], context).ToString();
 
             // get the target version
-            var targetVersionString = p.Apply(args[2], data).ToString();
+            var targetVersionString = JsonLogic.Apply(args[2], context).ToString();
 
             //convert to semantic versions
             if (!SemVersion.TryParse(versionString, SemVersionStyles.Strict, out var version) ||
