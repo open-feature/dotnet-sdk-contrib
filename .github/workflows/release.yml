@@ -10,7 +10,7 @@ jobs:
     environment: publish
     runs-on: windows-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
 
     steps:
