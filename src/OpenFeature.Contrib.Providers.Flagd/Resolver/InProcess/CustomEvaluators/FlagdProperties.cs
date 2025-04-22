@@ -1,8 +1,12 @@
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Json.Logic;
+using Json.More;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators
 {
-    internal class FlagdProperties
+    internal sealed class FlagdProperties
     {
 
         internal const string FlagdPropertiesKey = "$flagd";
@@ -14,30 +18,23 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
         internal long Timestamp { get; set; }
         internal string TargetingKey { get; set; }
 
-        internal FlagdProperties(object from)
+        internal FlagdProperties(EvaluationContext from)
         {
-            //object value;
-            if (from is IDictionary<string, object> dict)
+
+            if (from.TryFind(TargetingKeyKey, out JsonNode targetingKeyValue)
+                && targetingKeyValue.GetValueKind() == JsonValueKind.String)
             {
-                if (dict.TryGetValue(TargetingKeyKey, out object targetingKeyValue)
-                    && targetingKeyValue is string targetingKeyString)
-                {
-                    TargetingKey = targetingKeyString;
-                }
-                if (dict.TryGetValue(FlagdPropertiesKey, out object flagdPropertiesObj)
-                    && flagdPropertiesObj is IDictionary<string, object> flagdProperties)
-                {
-                    if (flagdProperties.TryGetValue(FlagKeyKey, out object flagKeyObj)
-                        && flagKeyObj is string flagKey)
-                    {
-                        FlagKey = flagKey;
-                    }
-                    if (flagdProperties.TryGetValue(TimestampKey, out object timestampObj)
-                        && timestampObj is long timestamp)
-                    {
-                        Timestamp = timestamp;
-                    }
-                }
+                TargetingKey = targetingKeyValue.ToString();
+            }
+            if (from.TryFind($"{FlagdPropertiesKey}.{FlagKeyKey}", out JsonNode flagKeyValue)
+                && flagKeyValue.GetValueKind() == JsonValueKind.String)
+            {
+                FlagKey = flagKeyValue.ToString();
+            }
+            if (from.TryFind($"{FlagdPropertiesKey}.{TimestampKey}", out JsonNode timestampValue)
+                && timestampValue.GetValueKind() == JsonValueKind.Number)
+            {
+                Timestamp = timestampValue.GetValue<long>();
             }
         }
     }
