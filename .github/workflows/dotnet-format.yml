@@ -27,7 +27,10 @@ jobs:
           source-url: https://nuget.pkg.github.com/open-feature/index.json
 
       - name: Restore
-        run: dotnet restore DotnetSdkContrib.sln
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
 
       - name: dotnet format
         run: dotnet format --verify-no-changes --no-restore DotnetSdkContrib.sln
