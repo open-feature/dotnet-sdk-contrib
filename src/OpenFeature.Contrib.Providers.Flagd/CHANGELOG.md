@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.1...OpenFeature.Contrib.Providers.Flagd-v0.3.2) (2025-04-23)
+
+
+### 🧹 Chore
+
+* update sdk version in readme ([90750b6](https://github.com/open-feature/dotnet-sdk-contrib/commit/90750b66218dadb09355f53ef0f796fd7185632e))
+
 ## [0.3.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.0...OpenFeature.Contrib.Providers.Flagd-v0.3.1) (2025-04-22)
 
 
