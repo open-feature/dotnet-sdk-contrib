@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
@@ -17,7 +18,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("my-value", value);
         }
         [Fact]
-        public void TestCacheCapacity()
+        public async Task TestCacheCapacity()
         {
             int capacity = 5;
             var cache = new LRUCache<string, string>(capacity);
@@ -32,7 +33,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var e = tasks.GetEnumerator();
             while (e.MoveNext())
             {
-                e.Current.Wait();
+                await e.Current;
             }
 
             string value;
@@ -55,7 +56,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
-        public void TestCacheCapacityMultiThreaded()
+        public async Task TestCacheCapacityMultiThreaded()
         {
             int capacity = 5;
             var cache = new LRUCache<string, string>(capacity);
@@ -76,7 +77,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var e = tasks.GetEnumerator();
             while (e.MoveNext())
             {
-                e.Current.Wait();
+                await e.Current;
             }
 
             string value;
