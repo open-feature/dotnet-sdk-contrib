@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
 {
@@ -13,6 +8,16 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement.Test
         private static string VALID_GROUP = "test.group";
         private static string INVALID_EMAIL = "missing.user@openfeature.dev";
         private static string INVALID_GROUP = "missing.group";
+
+        public static IEnumerable<object[]> BooleanSimple()
+        {
+            yield return new object[] { "simple_flag_on", false, true };
+            yield return new object[] { "simple_flag_on", true, true };
+            yield return new object[] { "simple_flag_off", false, false };
+            yield return new object[] { "simple_flag_off", true, false };
+            yield return new object[] { "simple_flag_missing", false, false };
+            yield return new object[] { "simple_flag_missing", true, true };
+        }
 
         public static IEnumerable<object[]> BooleanNoContext()
         {
