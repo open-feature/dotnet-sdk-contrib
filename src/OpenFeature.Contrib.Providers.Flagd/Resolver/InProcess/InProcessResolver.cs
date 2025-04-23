@@ -54,7 +54,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             return Task.Run(() =>
             {
                 var latch = new CountdownEvent(1);
-                _handleEventsThread = new Thread(() => HandleEvents(latch))
+                _handleEventsThread = new Thread(async () => await HandleEvents(latch))
                 {
                     IsBackground = true
                 };
@@ -101,7 +101,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
             return Task.FromResult(_evaluator.ResolveStructureValueAsync(flagKey, defaultValue, context));
         }
 
-        private async void HandleEvents(CountdownEvent latch)
+        private async Task HandleEvents(CountdownEvent latch)
         {
             CancellationToken token = _cancellationTokenSource.Token;
             while (!token.IsCancellationRequested)
