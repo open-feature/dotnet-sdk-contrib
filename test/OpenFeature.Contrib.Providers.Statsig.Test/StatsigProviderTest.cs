@@ -1,9 +1,9 @@
 using AutoFixture.Xunit2;
-using OpenFeature.Constant;
 using OpenFeature.Model;
+using Statsig;
 using System.Threading.Tasks;
 using Xunit;
-using Statsig;
+
 namespace OpenFeature.Contrib.Providers.Statsig.Test;
 
 public class StatsigProviderTest
