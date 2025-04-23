@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Model;
-using TechTalk.SpecFlow;
+using Reqnroll;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
@@ -94,7 +94,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         }
 
         [Then(@"the resolved boolean zero-value should be ""(.*)""")]
-        public async void ThenTheResolvedBooleanZero_ValueShouldBe(string expectedValue)
+        public async Task ThenTheResolvedBooleanZero_ValueShouldBe(string expectedValue)
         {
             Assert.Equal(bool.Parse(expectedValue), await booleanZeroValue);
         }
@@ -183,7 +183,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test
         }
 
         [Then(@"the returned value should be ""(.*)""")]
-        public async void ThenTheReturnedValueShouldBe(string expectedValue)
+        public async Task ThenTheReturnedValueShouldBe(string expectedValue)
         {
             var details = await client.GetStringDetailsAsync(stringFlagKey, stringDefaultValue, evaluationContext);
             Assert.Equal(expectedValue, details.Value);

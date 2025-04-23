@@ -2,47 +2,44 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using JsonLogic.Net;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Json.Logic;
 using Murmur;
-using Newtonsoft.Json.Linq;
-using Semver;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators
 {
     /// <inheritdoc/>
-    public class FractionalEvaluator
+    internal sealed class FractionalEvaluator : IRule
     {
-        internal FractionalEvaluator()
-        {
-        }
-
         class FractionalEvaluationDistribution
         {
             public string variant;
             public int weight;
         }
 
-        internal object Evaluate(IProcessJsonLogic p, JToken[] args, object data)
+        /// <inheritdoc/>
+        public JsonNode Apply(JsonNode args, EvaluationContext context)
         {
             // check if we have at least two arguments:
             // 1. the property value
             // 2. the array containing the buckets
 
-            if (args.Length == 0)
+            if (args.AsArray().Count == 0)
             {
                 return null;
             }
 
-            var flagdProperties = new FlagdProperties(data);
+            var flagdProperties = new FlagdProperties(context);
 
             var bucketStartIndex = 0;
 
-            var arg0 = p.Apply(args[0], data);
+            var arg0 = JsonLogic.Apply(args[0], context);
 
             string propertyValue;
-            if (arg0 is string stringValue)
+            if (arg0.GetValueKind() == JsonValueKind.String)
             {
-                propertyValue = stringValue;
+                propertyValue = arg0.ToString();
                 bucketStartIndex = 1;
             }
             else
@@ -53,16 +50,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
             var distributions = new List<FractionalEvaluationDistribution>();
             var distributionSum = 0;
 
-            for (var i = bucketStartIndex; i < args.Length; i++)
+            for (var i = bucketStartIndex; i < args.AsArray().Count; i++)
             {
-                var bucket = p.Apply(args[i], data);
+                var bucket = JsonLogic.Apply(args[i], context);
 
-                if (!bucket.IsEnumerable())
+                if (!(bucket.GetValueKind() == JsonValueKind.Array))
                 {
                     continue;
                 }
 
-                var bucketArr = bucket.MakeEnumerable().ToArray();
+                var bucketArr = bucket.AsArray();
 
                 if (!bucketArr.Any())
                 {
@@ -71,9 +68,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
 
                 var weight = 1;
 
-                if (bucketArr.Length >= 2 && bucketArr.ElementAt(1).IsNumeric())
+                if (bucketArr.Count >= 2 && bucketArr.ElementAt(1).GetValueKind() == JsonValueKind.Number)
                 {
-                    weight = Convert.ToInt32(bucketArr.ElementAt(1));
+                    weight = bucketArr.ElementAt(1).GetValue<int>();
                 }
 
                 distributions.Add(new FractionalEvaluationDistribution

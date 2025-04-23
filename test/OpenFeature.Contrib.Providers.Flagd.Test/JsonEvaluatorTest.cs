@@ -343,7 +343,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
             Assert.NotNull(result.FlagMetadata);
             Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
-            Assert.Equal(2, result.FlagMetadata.GetInt("integer"));
+            Assert.Equal(2, result.FlagMetadata.GetDouble("integer"));
             Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
             Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
         }
@@ -360,7 +360,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var result = jsonEvaluator.ResolveBooleanValueAsync("without-metadata-flag", false);
             Assert.NotNull(result.FlagMetadata);
             Assert.Equal("1.0.3", result.FlagMetadata.GetString("string"));
-            Assert.Equal(3, result.FlagMetadata.GetInt("integer"));
+            Assert.Equal(3, result.FlagMetadata.GetDouble("integer"));
             Assert.Equal(false, result.FlagMetadata.GetBool("boolean"));
             Assert.Equal(.2, result.FlagMetadata.GetDouble("float"));
         }
@@ -378,7 +378,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             Assert.NotNull(result.FlagMetadata);
             Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
-            Assert.Equal(2, result.FlagMetadata.GetInt("integer"));
+            Assert.Equal(2, result.FlagMetadata.GetDouble("integer"));
             Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
             Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
         }

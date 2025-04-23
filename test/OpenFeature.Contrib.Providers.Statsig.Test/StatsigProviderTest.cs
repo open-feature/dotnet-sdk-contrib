@@ -1,9 +1,9 @@
 using AutoFixture.Xunit2;
-using OpenFeature.Constant;
 using OpenFeature.Model;
+using Statsig;
 using System.Threading.Tasks;
 using Xunit;
-using Statsig;
+
 namespace OpenFeature.Contrib.Providers.Statsig.Test;
 
 public class StatsigProviderTest
@@ -25,8 +25,11 @@ public class StatsigProviderTest
         var ec = EvaluationContext.Builder().SetTargetingKey(userId).Build();
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue, userId);
 
-        // Act & Assert
-        Assert.Equal(expectedValue, statsigProvider.ResolveBooleanValueAsync(flagName, false, ec).Result.Value);
+        // Act
+        var result = await statsigProvider.ResolveBooleanValueAsync(flagName, false, ec);
+
+        // Assert
+        Assert.Equal(expectedValue, result.Value);
     }
 
     [Theory]
@@ -38,8 +41,11 @@ public class StatsigProviderTest
         await statsigProvider.InitializeAsync(null);
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue);
 
-        // Act & Assert
-        Assert.Equal(defaultValue, statsigProvider.ResolveBooleanValueAsync(flagName, defaultValue).Result.Value);
+        // Act 
+        var result = await statsigProvider.ResolveBooleanValueAsync(flagName, defaultValue);
+
+        // Assert
+        Assert.Equal(defaultValue, result.Value);
     }
 
     [Theory]

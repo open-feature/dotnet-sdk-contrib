@@ -9,6 +9,10 @@ jobs:
   release-package:
     environment: publish
     runs-on: windows-latest
+    permissions:
+      contents: write # for googleapis/release-please-action to create release commit
+      pull-requests: write # for googleapis/release-please-action to create release PR
+      packages: read # for internal nuget reading
 
     steps:
       - uses: google-github-actions/release-please-action@db8f2c60ee802b3748b512940dde88eabd7b7e01 # v3
