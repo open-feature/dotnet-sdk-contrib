@@ -455,7 +455,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 catch (FeatureProviderException e)
                 {
                     Assert.Equal(ErrorType.General, e.ErrorType);
-                    Assert.Equal(ErrorType.General.ToString(), e.Message);
+                    Assert.Equal("unknown error", e.Message);
                     throw;
                 }
             });
