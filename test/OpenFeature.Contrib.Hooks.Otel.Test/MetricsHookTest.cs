@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenFeature.Model;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -26,7 +27,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
         }
 
         [Fact]
-        public async void After_Test()
+        public async Task After_Test()
         {
             // Arrange
             const string metricName = "feature_flag.evaluation_success_total";
@@ -50,7 +51,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
         }
 
         [Fact]
-        public async void Error_Test()
+        public async Task Error_Test()
         {
             // Arrange
             const string metricName = "feature_flag.evaluation_error_total";
@@ -74,7 +75,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
         }
 
         [Fact]
-        public async void Finally_Test()
+        public async Task Finally_Test()
         {
             // Arrange
             const string metricName = "feature_flag.evaluation_active_count";
@@ -98,7 +99,7 @@ namespace OpenFeature.Contrib.Hooks.Otel.Test
         }
 
         [Fact]
-        public async void Before_Test()
+        public async Task Before_Test()
         {
 
             // Arrange

@@ -7,6 +7,9 @@
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <NuGetAudit>true</NuGetAudit>
+        <NuGetAuditMode>all</NuGetAuditMode>
+        <NuGetAuditLevel>low</NuGetAuditLevel>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">
