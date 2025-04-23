@@ -1,3 +1,9 @@
+using Newtonsoft.Json.Linq;
+using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
+using OpenFeature.Model;
+using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -5,12 +11,6 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
-using OpenFeature.Model;
-using RichardSzalay.MockHttp;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test;
@@ -589,7 +589,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetObjectDetailsAsync("integer_key", new Value("default"), _defaultEvaluationCtx);
+        var res = await client.GetObjectDetailsAsync("integer_key", new Value("default"), _defaultEvaluationCtx);
         Assert.Equal(1, mock.GetMatchCount(mockedRequest));
         await Task.Delay(100); // time to wait to be sure body is extracted
         var want = JObject.Parse(
@@ -629,7 +629,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = client.GetObjectDetailsAsync("integer_key", new Value("default"), _defaultEvaluationCtx);
+        var res = await client.GetObjectDetailsAsync("integer_key", new Value("default"), _defaultEvaluationCtx);
         Assert.Equal(1, mock.GetMatchCount(mockedRequest));
         await Task.Delay(100); // time to wait to be sure body is extracted
         var want = JObject.Parse(

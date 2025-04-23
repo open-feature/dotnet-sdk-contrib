@@ -5,9 +5,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SpecFlow" Version="3.9.74" />
-    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.9.74" />
-    <PackageReference Include="SpecFlow.xUnit" Version="3.9.74" />
+    <PackageReference Include="Reqnroll" Version="2.4.0" />
+    <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" Version="2.4.0" />
+    <PackageReference Include="Reqnroll.xUnit" Version="2.4.0" />
   </ItemGroup>
 
 </Project>
