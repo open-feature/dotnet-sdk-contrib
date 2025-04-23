@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
+using OpenFeature.Constant;
 using OpenFeature.Model;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,24 @@ namespace OpenFeature.Contrib.Providers.FeatureManagement
         public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         {
             var variant = await Evaluate(flagKey, context, CancellationToken.None);
+
+            if (variant == null)
+            {
+                var exists = false;
+                await foreach (var name in featureManager.GetFeatureNamesAsync().WithCancellation(cancellationToken))
+                {
+                    if (!flagKey.Equals(name, StringComparison.OrdinalIgnoreCase)) continue;
+                    exists = true;
+                    break;
+                }
+                var enabled = await featureManager.IsEnabledAsync(flagKey, context, cancellationToken);
+                if (exists)
+                {
+                    return new ResolutionDetails<bool>(flagKey, enabled);
+                }
+
+                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, Reason.Error);
+            }
 
             if (Boolean.TryParse(variant?.Configuration?.Value, out var value))
                 return new ResolutionDetails<bool>(flagKey, value);
