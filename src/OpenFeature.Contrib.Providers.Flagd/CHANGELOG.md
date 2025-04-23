@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.3.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.0...OpenFeature.Contrib.Providers.Flagd-v0.3.1) (2025-04-22)
+
+
+### 🐛 Bug Fixes
+
+* migrate to System.Text.Json and JsonLogic ([#347](https://github.com/open-feature/dotnet-sdk-contrib/issues/347)) ([ef98686](https://github.com/open-feature/dotnet-sdk-contrib/commit/ef9868688f0804e26a1b69b6ea25be5f105c26b5))
+
+
+### ✨ New Features
+
+* Update in-process resolver to support flag metadata [#305](https://github.com/open-feature/dotnet-sdk-contrib/issues/305) ([#309](https://github.com/open-feature/dotnet-sdk-contrib/issues/309)) ([e603c08](https://github.com/open-feature/dotnet-sdk-contrib/commit/e603c08df7c19f360b2d8896caef3e3a5bcdcefd))
+
+
+### 🧹 Chore
+
+* **deps:** update dependency google.protobuf to 3.28.2 ([#272](https://github.com/open-feature/dotnet-sdk-contrib/issues/272)) ([1c45c1a](https://github.com/open-feature/dotnet-sdk-contrib/commit/1c45c1a3578ddc814483ac83549c2be5579d403c))
+* **deps:** update dependency google.protobuf to 3.30.2 ([#335](https://github.com/open-feature/dotnet-sdk-contrib/issues/335)) ([3f63d35](https://github.com/open-feature/dotnet-sdk-contrib/commit/3f63d35540979dfb42e1f9d80ba5d2bba0b4a509))
+* **deps:** update dependency grpc.net.client to 2.66.0 ([#282](https://github.com/open-feature/dotnet-sdk-contrib/issues/282)) ([04803d7](https://github.com/open-feature/dotnet-sdk-contrib/commit/04803d7cfcf739ea17c11dc576444ae75ba85192))
+* **deps:** update dependency grpc.net.client to 2.70.0 ([#336](https://github.com/open-feature/dotnet-sdk-contrib/issues/336)) ([cd4cd4f](https://github.com/open-feature/dotnet-sdk-contrib/commit/cd4cd4f29bedebcca0a11085307bed72e6e7b794))
+* **deps:** update dependency grpc.tools to 2.66.0 ([#271](https://github.com/open-feature/dotnet-sdk-contrib/issues/271)) ([161fb63](https://github.com/open-feature/dotnet-sdk-contrib/commit/161fb638f22eecae2d4caa84c6c595878c8c48c9))
+* **deps:** update dependency grpc.tools to 2.71.0 ([#286](https://github.com/open-feature/dotnet-sdk-contrib/issues/286)) ([84acae2](https://github.com/open-feature/dotnet-sdk-contrib/commit/84acae2663677cf60c7e9691fb22fd250af6fd64))
+* **deps:** update dependency semver to v3 ([#351](https://github.com/open-feature/dotnet-sdk-contrib/issues/351)) ([9f47608](https://github.com/open-feature/dotnet-sdk-contrib/commit/9f4760807f6d5ddf416a8ec7bd931f698f4f30b2))
+* **deps:** update ghcr.io/open-feature/flagd-testbed docker tag to v0.5.21 ([#291](https://github.com/open-feature/dotnet-sdk-contrib/issues/291)) ([29553b2](https://github.com/open-feature/dotnet-sdk-contrib/commit/29553b252344057dc4eba7379b95acb085e9caa1))
+* **deps:** update ghcr.io/open-feature/flagd-testbed-unstable docker tag to v0.5.21 ([#323](https://github.com/open-feature/dotnet-sdk-contrib/issues/323)) ([faa44cc](https://github.com/open-feature/dotnet-sdk-contrib/commit/faa44cc6db5b014069f3dd72b1bf34e3e5ada1df))
+* **deps:** update ghcr.io/open-feature/flagd-testbed-unstable docker tag to v1 ([#339](https://github.com/open-feature/dotnet-sdk-contrib/issues/339)) ([308cc42](https://github.com/open-feature/dotnet-sdk-contrib/commit/308cc42afce6196ff4c4ffc89350454a44f1d1e0))
+* **deps:** update ghcr.io/open-feature/sync-testbed-unstable docker tag to v0.5.13 ([#333](https://github.com/open-feature/dotnet-sdk-contrib/issues/333)) ([6cbf656](https://github.com/open-feature/dotnet-sdk-contrib/commit/6cbf6563e7f5b2f4c4b8e0b557f978cfe12f79c9))
+* **deps:** update src/openfeature.contrib.providers.flagd/schemas digest to 9b0ee43 ([#332](https://github.com/open-feature/dotnet-sdk-contrib/issues/332)) ([1f7214d](https://github.com/open-feature/dotnet-sdk-contrib/commit/1f7214d28f04e504fdf8f3dac7fa14ff613fa677))
+* **deps:** update src/openfeature.contrib.providers.flagd/schemas digest to c707f56 ([#343](https://github.com/open-feature/dotnet-sdk-contrib/issues/343)) ([5d142fd](https://github.com/open-feature/dotnet-sdk-contrib/commit/5d142fd798da9b668d8b45f5f6310a03b1424c36))
+* Use TestContainers instead of github services / docker for e2e tests ([#345](https://github.com/open-feature/dotnet-sdk-contrib/issues/345)) ([1173f4f](https://github.com/open-feature/dotnet-sdk-contrib/commit/1173f4f1c0a06f191d4aa6b0353ac54f81889ec6))
+
 ## [0.3.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.2.3...OpenFeature.Contrib.Providers.Flagd-v0.3.0) (2024-08-22)
 
 
