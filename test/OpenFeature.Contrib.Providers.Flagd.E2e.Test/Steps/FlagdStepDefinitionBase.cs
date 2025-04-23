@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Model;
-using TechTalk.SpecFlow;
+using Reqnroll;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test

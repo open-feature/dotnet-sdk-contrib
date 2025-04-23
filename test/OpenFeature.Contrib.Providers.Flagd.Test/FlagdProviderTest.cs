@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NSubstitute.ReceivedExtensions;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
@@ -15,6 +9,11 @@ using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc.Evaluation;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 using Xunit;
 using Metadata = Grpc.Core.Metadata;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
@@ -338,18 +337,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
-            await Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            var ex = await Assert.ThrowsAsync<FeatureProviderException>(async () =>
             {
-                try
-                {
-                    await flagdProvider.ResolveBooleanValueAsync("my-key", true);
-                }
-                catch (FeatureProviderException e)
-                {
-                    Assert.Equal(ErrorType.FlagNotFound, e.ErrorType);
-                    Assert.Equal(ErrorType.FlagNotFound.ToString(), e.Message);
-                    throw;
-                }
+                await flagdProvider.ResolveBooleanValueAsync("my-key", true);
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(ErrorType.FlagNotFound, ex.ErrorType);
+                Assert.Equal(ErrorType.FlagNotFound.ToString(), ex.Message);
             });
         }
 
@@ -374,18 +370,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
-            await Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            var ex = await Assert.ThrowsAsync<FeatureProviderException>(async () =>
             {
-                try
-                {
-                    await flagdProvider.ResolveBooleanValueAsync("my-key", true);
-                }
-                catch (FeatureProviderException e)
-                {
-                    Assert.Equal(ErrorType.ProviderNotReady, e.ErrorType);
-                    Assert.Equal(ErrorType.ProviderNotReady.ToString(), e.Message);
-                    throw;
-                }
+                await flagdProvider.ResolveBooleanValueAsync("my-key", true);
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(ErrorType.ProviderNotReady, ex.ErrorType);
+                Assert.Equal(ErrorType.ProviderNotReady.ToString(), ex.Message);
             });
         }
 
@@ -410,25 +403,22 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
-            await Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            var ex = await Assert.ThrowsAsync<FeatureProviderException>(() =>
             {
-                try
-                {
-                    await flagdProvider.ResolveBooleanValueAsync("my-key", true);
-                }
-                catch (FeatureProviderException e)
-                {
-                    Assert.Equal(ErrorType.TypeMismatch, e.ErrorType);
-                    Assert.Equal(ErrorType.TypeMismatch.ToString(), e.Message);
-                    throw;
-                }
+                return flagdProvider.ResolveBooleanValueAsync("my-key", true);
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(ErrorType.TypeMismatch, ex.ErrorType);
+                Assert.Equal(ErrorType.TypeMismatch.ToString(), ex.Message);
             });
         }
 
         [Fact]
         public async Task TestResolveUnknownError()
         {
-            var exc = new RpcException(new Status(StatusCode.Internal, "unknown error"));
+            var exc = new RpcException(new Status(StatusCode.Internal, ErrorType.General.ToString()));
 
             var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
                 Task.FromException<ResolveBooleanResponse>(exc),
@@ -446,18 +436,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
-            await Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            var ex = await Assert.ThrowsAsync<FeatureProviderException>(() =>
             {
-                try
-                {
-                    await flagdProvider.ResolveBooleanValueAsync("my-key", true);
-                }
-                catch (FeatureProviderException e)
-                {
-                    Assert.Equal(ErrorType.General, e.ErrorType);
-                    Assert.Equal("unknown error", e.Message);
-                    throw;
-                }
+                return flagdProvider.ResolveBooleanValueAsync("my-key", true);
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(ErrorType.General, ex.ErrorType);
+                Assert.Equal(ErrorType.General.ToString(), ex.Message);
             });
         }
 
@@ -757,7 +744,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             await Utils.AssertUntilAsync(
                 async _ =>
                 {
-                    var val = await flagdProvider.ResolveBooleanValueAsync("staticBoolFlag", false);
+                    var val = await flagdProvider.ResolveBooleanValueAsync("staticBoolFlag", false, cancellationToken: CancellationToken.None);
                     Assert.True(val.Value);
                 });
 
