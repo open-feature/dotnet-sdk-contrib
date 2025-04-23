@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.Providers.Flagd</PackageId>
-    <VersionNumber>0.3.0</VersionNumber> <!--x-release-please-version -->
+    <VersionNumber>0.3.1</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
