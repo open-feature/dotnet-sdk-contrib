@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using TechTalk.SpecFlow;
+using Reqnroll;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest.Steps
 {
