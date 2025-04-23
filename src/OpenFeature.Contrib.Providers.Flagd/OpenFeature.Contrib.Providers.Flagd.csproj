@@ -22,9 +22,9 @@
   <ItemGroup>
     <!-- The schema.proto file referenced here will be used to automatically generate the Grpc client when executing 'dotnet build' -->
     <!-- The generated files will be placed in ./obj/Debug/netstandard2.0/Protos -->
-    <PackageReference Include="JsonLogic.Net" Version="1.1.11" />
+    <PackageReference Include="JsonLogic" Version="5.4.0" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
-    <PackageReference Include="Semver" Version="2.3.0" />
+    <PackageReference Include="Semver" Version="3.0.0" />
     <Protobuf Include="schemas\protobuf\flagd\evaluation\v1\evaluation.proto" GrpcServices="Client" />
     <Protobuf Include="schemas\protobuf\flagd\sync\v1\sync.proto" GrpcServices="Client" />
     <PackageReference Include="Google.Protobuf" Version="3.30.2" />
@@ -33,5 +33,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
   </ItemGroup>
 </Project>

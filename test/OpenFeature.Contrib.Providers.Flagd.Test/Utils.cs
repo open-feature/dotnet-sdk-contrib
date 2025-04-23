@@ -162,7 +162,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
       },
       ""defaultVariant"": ""bool2"",
       ""targeting"": {
-        ""if"": [{ $ref: ""emailWithFaas"" }, ""bool1""]
+        ""if"": [{ ""$ref"": ""emailWithFaas"" }, ""bool1""]
       }
     },
   ""targetingBoolFlagUsingSharedEvaluatorReturningBoolType"": {
@@ -173,7 +173,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
       },
       ""defaultVariant"": ""true"",
       ""targeting"": {
-        ""if"": [{ $ref: ""emailWithFaas"" }, true]
+        ""if"": [{ ""$ref"": ""emailWithFaas"" }, true]
       }
     },
     ""targetingBoolFlagWithMissingDefaultVariant"": {
@@ -184,7 +184,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
       },
       ""defaultVariant"": ""true"",
       ""targeting"": {
-        ""if"": [{ $ref: ""emailWithFaas"" }, ""bool1""]
+        ""if"": [{ ""$ref"": ""emailWithFaas"" }, ""bool1""]
       }
     },
     ""targetingBoolFlagWithUnexpectedVariantType"": {
@@ -195,7 +195,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
       },
       ""defaultVariant"": ""true"",
       ""targeting"": {
-        ""if"": [{ $ref: ""emailWithFaas"" }, ""bool1""]
+        ""if"": [{ ""$ref"": ""emailWithFaas"" }, ""bool1""]
       }
     },
     ""targetingStringFlag"": {
@@ -313,7 +313,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         ""string"": ""1.0.2"",
           ""integer"": 2,
           ""boolean"": true,
-          ""float"": 0.1,
+          ""float"": 0.1
       }
     }
   }
@@ -332,7 +332,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         ""string"": ""1.0.2"",
           ""integer"": 2,
           ""boolean"": true,
-          ""float"": 0.1,
+          ""float"": 0.1
       }
     },
     ""without-metadata-flag"": {
@@ -348,7 +348,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
     ""string"": ""1.0.3"",
     ""integer"": 3,
     ""boolean"": false,
-    ""float"": 0.2,
+    ""float"": 0.2
   }
 }";
 
@@ -367,7 +367,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
     ""string"": {""in"": ""valid""},
     ""integer"": 3,
     ""boolean"": false,
-    ""float"": 0.2,
+    ""float"": 0.2
   }
 }";
         public static string invalidFlagMetadata = @"{
@@ -383,9 +383,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         ""string"": ""1.0.2"",
           ""integer"": 2,
           ""boolean"": true,
-          ""float"": {""in"": ""valid""},
+          ""float"": {""in"": ""valid""}
       }
-    },
+    }
   }
 }";
 
