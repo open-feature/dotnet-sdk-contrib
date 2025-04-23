@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
@@ -17,23 +18,19 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("my-value", value);
         }
         [Fact]
-        public void TestCacheCapacity()
+        public async Task TestCacheCapacity()
         {
             int capacity = 5;
             var cache = new LRUCache<string, string>(capacity);
 
-            var tasks = new System.Collections.Generic.List<System.Threading.Tasks.Task>();
+            var tasks = new System.Collections.Generic.List<Task>(capacity);
 
             for (int i = 0; i < capacity; i++)
             {
                 cache.Add($"key-{i}", $"value-{i}");
             }
 
-            var e = tasks.GetEnumerator();
-            while (e.MoveNext())
-            {
-                e.Current.Wait();
-            }
+            await Task.WhenAll(tasks);
 
             string value;
             // verify that we can retrieve all items
@@ -55,17 +52,17 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
-        public void TestCacheCapacityMultiThreaded()
+        public async Task TestCacheCapacityMultiThreaded()
         {
             int capacity = 5;
             var cache = new LRUCache<string, string>(capacity);
 
-            var tasks = new System.Collections.Generic.List<System.Threading.Tasks.Task>();
+            var tasks = new System.Collections.Generic.List<Task>(capacity);
 
             var counter = 0;
             for (int i = 0; i < capacity; i++)
             {
-                tasks.Add(System.Threading.Tasks.Task.Run(() =>
+                tasks.Add(Task.Run(() =>
                 {
                     var id = System.Threading.Interlocked.Increment(ref counter);
                     cache.Add($"key-{id}", $"value-{id}");
@@ -73,11 +70,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 //cache.Add($"key-{i}", $"value-{i}");
             }
 
-            var e = tasks.GetEnumerator();
-            while (e.MoveNext())
-            {
-                e.Current.Wait();
-            }
+            await Task.WhenAll(tasks);
 
             string value;
             // verify that we can retrieve all items

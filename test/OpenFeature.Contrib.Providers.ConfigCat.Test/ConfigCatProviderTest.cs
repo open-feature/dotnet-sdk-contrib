@@ -56,7 +56,7 @@ namespace OpenFeature.Contrib.ConfigCat.Test
 
         [Theory]
         [AutoData]
-        public async void CreateConfigCatProvider_WithSdkKey_CreatesProviderInstanceSuccessfully(string sdkKey)
+        public async Task CreateConfigCatProvider_WithSdkKey_CreatesProviderInstanceSuccessfully(string sdkKey)
         {
             var configCatProvider =
                 new ConfigCatProvider(sdkKey, options => { options.FlagOverrides = BuildFlagOverrides(); });

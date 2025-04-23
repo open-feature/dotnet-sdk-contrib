@@ -397,7 +397,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         /// <param name="timeoutMillis">Timeout in millis (defaults to 1000)</param>
         /// <param name="pollIntervalMillis">Poll interval (defaults to 100</param>
         /// <returns></returns>
-        public static async Task AssertUntilAsync(Action<CancellationToken> assertionFunc, int timeoutMillis = 1000,
+        public static async Task AssertUntilAsync(Func<CancellationToken, Task> assertionFunc, int timeoutMillis = 10000,
             int pollIntervalMillis = 100)
         {
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(default(CancellationToken)))
@@ -411,7 +411,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 {
                     try
                     {
-                        assertionFunc(cts.Token);
+                        await assertionFunc(cts.Token);
                         return;
                     }
                     catch (TaskCanceledException) when (cts.IsCancellationRequested)
