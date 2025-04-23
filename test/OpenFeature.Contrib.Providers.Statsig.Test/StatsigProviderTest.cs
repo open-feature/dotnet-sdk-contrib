@@ -25,9 +25,11 @@ public class StatsigProviderTest
         var ec = EvaluationContext.Builder().SetTargetingKey(userId).Build();
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue, userId);
 
-        // Act & Assert
-        var res = await statsigProvider.ResolveBooleanValueAsync(flagName, false, ec);
-        Assert.Equal(expectedValue, res.Value);
+        // Act
+        var result = await statsigProvider.ResolveBooleanValueAsync(flagName, false, ec);
+
+        // Assert
+        Assert.Equal(expectedValue, result.Value);
     }
 
     [Theory]
@@ -39,9 +41,11 @@ public class StatsigProviderTest
         await statsigProvider.InitializeAsync(null);
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue);
 
-        // Act & Assert
-        var res = await statsigProvider.ResolveBooleanValueAsync(flagName, defaultValue);
-        Assert.Equal(defaultValue, res.Value);
+        // Act 
+        var result = await statsigProvider.ResolveBooleanValueAsync(flagName, defaultValue);
+
+        // Assert
+        Assert.Equal(defaultValue, result.Value);
     }
 
     [Theory]

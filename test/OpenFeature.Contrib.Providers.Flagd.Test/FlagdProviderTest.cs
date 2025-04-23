@@ -742,7 +742,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             await Utils.AssertUntilAsync(
-                async (_) =>
+                async _ =>
                 {
                     var val = await flagdProvider.ResolveBooleanValueAsync("staticBoolFlag", false, cancellationToken: CancellationToken.None);
                     Assert.True(val.Value);
@@ -798,11 +798,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(inProcessResolver);
             await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
-            // resolve with default set to false to make sure we return what the grpc server gives us
+            // resolve with default set false to make sure we return what the grpc server gives us
             await Utils.AssertUntilAsync(
-                (_) =>
+                async _ =>
                 {
-                    return Assert.ThrowsAsync<FeatureProviderException>(() => flagdProvider.ResolveStringValueAsync("unknown", "unknown"));
+                    var exception = await Assert.ThrowsAsync<FeatureProviderException>(async () => await flagdProvider.ResolveStringValueAsync("unknown", "unknown"));
+                    Assert.Equal(ErrorType.FlagNotFound, exception.ErrorType);
                 });
 
             mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
