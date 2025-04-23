@@ -319,7 +319,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
-        public void TestResolveFlagNotFound()
+        public async Task TestResolveFlagNotFound()
         {
             var exc = new RpcException(new Status(StatusCode.NotFound, ErrorType.FlagNotFound.ToString()));
 
@@ -338,7 +338,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
-            Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            await Assert.ThrowsAsync<FeatureProviderException>(async () =>
             {
                 try
                 {
@@ -354,7 +354,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
-        public void TestResolveGrpcHostUnavailable()
+        public async Task TestResolveGrpcHostUnavailable()
         {
             var exc = new RpcException(new Status(StatusCode.Unavailable, ErrorType.ProviderNotReady.ToString()));
 
@@ -374,7 +374,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
-            Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            await Assert.ThrowsAsync<FeatureProviderException>(async () =>
             {
                 try
                 {
@@ -390,7 +390,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
-        public void TestResolveTypeMismatch()
+        public async Task TestResolveTypeMismatch()
         {
             var exc = new RpcException(new Status(StatusCode.InvalidArgument, ErrorType.TypeMismatch.ToString()));
 
@@ -410,7 +410,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
-            Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            await Assert.ThrowsAsync<FeatureProviderException>(async () =>
             {
                 try
                 {
@@ -426,7 +426,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         }
 
         [Fact]
-        public void TestResolveUnknownError()
+        public async Task TestResolveUnknownError()
         {
             var exc = new RpcException(new Status(StatusCode.Internal, "unknown error"));
 
@@ -446,7 +446,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             var flagdProvider = new FlagdProvider(rpcResolver);
 
             // make sure the correct exception is thrown
-            Assert.ThrowsAsync<FeatureProviderException>(async () =>
+            await Assert.ThrowsAsync<FeatureProviderException>(async () =>
             {
                 try
                 {
@@ -813,9 +813,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             // resolve with default set to false to make sure we return what the grpc server gives us
             await Utils.AssertUntilAsync(
-                _ =>
+                async _ =>
                 {
-                    Assert.ThrowsAsync<FlagNotFoundException>(() => flagdProvider.ResolveStringValueAsync("unknown", "unknown"));
+                    await Assert.ThrowsAsync<FlagNotFoundException>(async () => await flagdProvider.ResolveStringValueAsync("unknown", "unknown"));
                 });
 
             mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
