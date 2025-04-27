@@ -169,6 +169,92 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 Assert.Equal("Unable to retrieve Flagd flags and targeting JSON Schemas", actual.Message);
             });
         }
+
+        [Fact]
+        public async Task ValidateSchemaNoWarnings()
+        {
+            // Arrange
+            var targetingResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(_targetingSchemaJson, Encoding.UTF8, "application/json")
+            };
+            var flagsResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(_flagsSchemaJson, Encoding.UTF8, "application/json")
+            };
+            var httpClient = new HttpClient(new MockHttpMessageHandler(targetingResponse, flagsResponse))
+            {
+                BaseAddress = new Uri("https://example.com")
+            };
+            var logger = new FakeLogger<JsonSchemaValidatorTests>();
+            var validator = new JsonSchemaValidator(httpClient, logger);
+
+            await validator.InitializeAsync();
+
+            // Act
+            var configuration = @"{""$schema"":""https://example.com/example2.schema.jsonhttps://example.com/example2.schema.json"",""name"":""test""}";
+            validator.Validate(configuration);
+
+            // Assert
+            var logs = logger.Collector.GetSnapshot();
+            Assert.Empty(logs);
+        }
+
+        [Fact]
+        public async Task ValidateSchemaInvalidJsonWarning()
+        {
+            // Arrange
+            var targetingResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(_targetingSchemaJson, Encoding.UTF8, "application/json")
+            };
+            var flagsResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(_flagsSchemaJson, Encoding.UTF8, "application/json")
+            };
+            var httpClient = new HttpClient(new MockHttpMessageHandler(targetingResponse, flagsResponse))
+            {
+                BaseAddress = new Uri("https://example.com")
+            };
+            var logger = new FakeLogger<JsonSchemaValidatorTests>();
+            var validator = new JsonSchemaValidator(httpClient, logger);
+
+            await validator.InitializeAsync();
+
+            // Act
+            var configuration = @"{""$schema"":""https://example.com/example2.schema.jsonhttps://example.com/example2.schema.json"",""name"":15}";
+            validator.Validate(configuration);
+
+            // Assert
+            var logs = logger.Collector.GetSnapshot();
+            Assert.Single(logs);
+            Assert.Multiple(() =>
+            {
+                var actual = logs[0];
+                Assert.Equal(LogLevel.Warning, actual.Level);
+                Assert.StartsWith("Validating Flagd configuration resulted in Schema Validation errors", actual.Message);
+            });
+        }
+
+        [Fact]
+        public void WhenNotInitializedThenValidateSchemaNoWarnings()
+        {
+            // Arrange
+            var httpClient = new HttpClient(new MockHttpMessageHandler(null, null))
+            {
+                BaseAddress = new Uri("https://example.com")
+            };
+            var logger = new FakeLogger<JsonSchemaValidatorTests>();
+            var validator = new JsonSchemaValidator(httpClient, logger);
+
+            // Act
+            var configuration = @"{""$schema"":""https://example.com/example2.schema.jsonhttps://example.com/example2.schema.json"",""name"":""test""}";
+            validator.Validate(configuration);
+
+            // Assert
+            var logs = logger.Collector.GetSnapshot();
+            Assert.Empty(logs);
+        }
     }
 
     public class MockHttpMessageHandler : HttpMessageHandler
