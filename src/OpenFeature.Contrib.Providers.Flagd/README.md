@@ -161,7 +161,7 @@ namespace OpenFeatureTestApp
 }
 ```
 
-By default the in-process provider will attempt to validate the flag configurations against the [Flags](https://flagd.dev/schema/v0/flags.json) and targeting [JSON](https://flagd.dev/schema/v0/targeting.json) schemas. If validation fails a warning log will be generated. You must configure a logger using the FlagdConfigBuilder. The in-process provider uses the Microsoft.Extensions.Logging abstractions.
+By default the in-process provider will attempt to validate the flag configurations against the [Flags](https://flagd.dev/schema/v0/flags.json) and [targeting](https://flagd.dev/schema/v0/targeting.json) schemas. If validation fails a warning log will be generated. You must configure a logger using the FlagdConfigBuilder. The in-process provider uses the Microsoft.Extensions.Logging abstractions.
 
 ```
 var logger = loggerFactory.CreateLogger<Program>();
