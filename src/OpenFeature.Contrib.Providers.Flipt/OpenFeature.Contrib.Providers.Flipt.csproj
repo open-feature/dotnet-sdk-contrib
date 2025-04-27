@@ -39,6 +39,6 @@
 
     <Target Name="NSwag" BeforeTargets="BeforeBuild">
         <Exec
-            Command="$(NSwagExe_Net80) openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:&quot;openapi.yaml&quot; /output:&quot;$(ProjectDir)obj/$(ConfigurationName)/$(TargetFramework)/Flipt.Rest.Client.cs&quot; /GenerateExceptionClasses:true /OperationGenerationMode:SingleClientFromPathSegments /JsonLibrary:SystemTextJson /GenerateOptionalParameters:true /GenerateDefaultValues:true /GenerateResponseClasses:true /GenerateClientInterfaces:true /GenerateClientClasses:true /GenerateDtoTypes:true /ExceptionClass:FliptRestException /GenerateNativeRecords:true /UseBaseUrl:false /GenerateBaseUrlProperty:false" />
+            Command="$(NSwagExe_Net90) openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:&quot;openapi.yaml&quot; /output:&quot;$(ProjectDir)obj/$(ConfigurationName)/$(TargetFramework)/Flipt.Rest.Client.cs&quot; /GenerateExceptionClasses:true /OperationGenerationMode:SingleClientFromPathSegments /JsonLibrary:SystemTextJson /GenerateOptionalParameters:true /GenerateDefaultValues:true /GenerateResponseClasses:true /GenerateClientInterfaces:true /GenerateClientClasses:true /GenerateDtoTypes:true /ExceptionClass:FliptRestException /GenerateNativeRecords:true /UseBaseUrl:false /GenerateBaseUrlProperty:false" />
     </Target>
 </Project>
