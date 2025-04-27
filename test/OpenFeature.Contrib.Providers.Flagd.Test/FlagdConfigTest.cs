@@ -1,3 +1,6 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Testing;
 using System;
 using Xunit;
 
@@ -13,6 +16,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 
             Assert.False(config.CacheEnabled);
             Assert.Equal(new Uri("http://localhost:8013"), config.GetUri());
+        }
+
+        [Fact]
+        public void TestFlagdConfigDefaultLogger()
+        {
+            Utils.CleanEnvVars();
+            var config = new FlagdConfig();
+
+            Assert.NotNull(config.Logger);
+            Assert.Equal(NullLogger.Instance, config.Logger);
         }
 
         [Fact]
@@ -172,6 +185,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestFlagdConfigBuilder()
         {
             Utils.CleanEnvVars();
+
+            var logger = new FakeLogger<UnitTestFlagdConfig>();
             var config = new FlagdConfigBuilder()
                 .WithCache(true)
                 .WithMaxCacheSize(1)
@@ -182,6 +197,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 .WithSocketPath("some-socket")
                 .WithTls(true)
                 .WithSourceSelector("source-selector")
+                .WithLogger(logger)
                 .Build();
 
             Assert.Equal(ResolverType.IN_PROCESS, config.ResolverType);
@@ -194,7 +210,25 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             Assert.Equal("some-socket", config.SocketPath);
             Assert.True(config.UseTls);
             Assert.True(config.UseCertificate);
+            Assert.Equal(logger, config.Logger);
+        }
+    }
 
+    public class TestLogger : ILogger
+    {
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            throw new NotImplementedException();
         }
     }
 }

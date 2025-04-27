@@ -48,7 +48,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 
                 if (!targeting.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning("Unable to retrieve Flagd targeting JSON Schema, status code: {StatusCode}", flag.StatusCode);
+                    _logger.LogWarning("Unable to retrieve Flagd targeting JSON Schema, status code: {StatusCode}", targeting.StatusCode);
                     return;
                 }
 
@@ -58,7 +58,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     return;
                 }
 
+#if NET5_0_OR_GREATER
+                var targetingJson = await targeting.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#else
                 var targetingJson = await targeting.Content.ReadAsStringAsync().ConfigureAwait(false);
+#endif
+
                 var targetingSchema = await JsonSchema.FromJsonAsync(targetingJson, "targeting.json", schema =>
                 {
                     var schemaResolver = new JsonSchemaResolver(schema, new SystemTextJsonSchemaGeneratorSettings());
@@ -67,7 +72,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     return resolver;
                 }, cancellationToken).ConfigureAwait(false);
 
+#if NET5_0_OR_GREATER
+                var flagJson = await flag.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#else
                 var flagJson = await flag.Content.ReadAsStringAsync().ConfigureAwait(false);
+#endif
                 var flagSchema = await JsonSchema.FromJsonAsync(flagJson, "flags.json", schema =>
                 {
                     var schemaResolver = new JsonSchemaResolver(schema, new SystemTextJsonSchemaGeneratorSettings());
