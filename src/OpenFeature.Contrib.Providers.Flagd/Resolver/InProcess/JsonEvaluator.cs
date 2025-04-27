@@ -1,3 +1,9 @@
+using Json.Logic;
+using Json.More;
+using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+using OpenFeature.Error;
+using OpenFeature.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -6,12 +12,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Json.Logic;
-using Json.More;
-using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
-using OpenFeature.Error;
-using OpenFeature.Model;
 using EvaluationContext = OpenFeature.Model.EvaluationContext;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
@@ -53,11 +53,12 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
         private Dictionary<string, JsonElement> _flagSetMetadata = new Dictionary<string, JsonElement>();
 
         private string _selector;
+        private readonly IJsonSchemaValidator _schemaValidator;
 
-
-        internal JsonEvaluator(string selector)
+        internal JsonEvaluator(string selector, IJsonSchemaValidator schemaValidator)
         {
             _selector = selector;
+            _schemaValidator = schemaValidator;
 
             RuleRegistry.AddRule("starts_with", new StartsWithRule());
             RuleRegistry.AddRule("ends_with", new EndsWithRule());
@@ -67,6 +68,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
 
         internal FlagSyncData Parse(string flagConfigurations)
         {
+            _schemaValidator.Validate(flagConfigurations);
+
             var parsed = JsonSerializer.Deserialize<FlagSyncData>(flagConfigurations);
             var transformed = JsonSerializer.Serialize(parsed);
             // replace evaluators
@@ -79,7 +82,6 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                     transformed = evaluatorRegex.Replace(transformed, Convert.ToString(val));
                 });
             }
-
 
             var data = JsonSerializer.Deserialize<FlagSyncData>(transformed);
             if (data.Metadata == null)

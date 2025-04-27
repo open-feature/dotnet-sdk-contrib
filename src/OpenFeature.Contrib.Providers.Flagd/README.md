@@ -92,6 +92,7 @@ The URI of the flagd server to which the `flagd Provider` connects to can either
 | Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |                 |
 | Resolver type                | FLAGD_RESOLVER                 | string  | rpc       | rpc, in-process |
 | Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                 |
+| Logger                       | n/a                            | n/a     |           |                 |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
 
@@ -158,5 +159,14 @@ namespace OpenFeatureTestApp
         }
     }
 }
+```
+
+By default the in-process provider will attempt to validate the flag configurations against the [Flags](https://flagd.dev/schema/v0/flags.json) and targeting [JSON](https://flagd.dev/schema/v0/targeting.json) schemas. If validation fails a warning log will be generated. You must configure a logger using the FlagdConfigBuilder. The in-process provider uses the Microsoft.Extensions.Logging abstractions.
+
+```
+var logger = loggerFactory.CreateLogger<Program>();
+var flagdConfig = new FlagdConfigBuilder()
+    .WithLogger(logger)
+    .Build();
 ```
 

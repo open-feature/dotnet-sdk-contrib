@@ -701,8 +701,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             resp.Reason = "STATIC";
 
             var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();
-
             var asyncStreamReader = Substitute.For<IAsyncStreamReader<SyncFlagsResponse>>();
+            var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
             var l = new List<SyncFlagsResponse>
             {
@@ -736,7 +736,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             config.MaxEventStreamRetries = 1;
             config.SourceSelector = "source-selector";
 
-            var rpcResolver = new InProcessResolver(mockGrpcClient, config, MakeChannel(), MakeProviderMetadata());
+            var rpcResolver = new InProcessResolver(mockGrpcClient, config, MakeChannel(), MakeProviderMetadata(), mockJsonSchemaValidator);
             var flagdProvider = new FlagdProvider(rpcResolver);
             await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -759,8 +759,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             resp.Reason = "STATIC";
 
             var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();
-
             var asyncStreamReader = Substitute.For<IAsyncStreamReader<SyncFlagsResponse>>();
+            var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
             var l = new List<SyncFlagsResponse>
             {
@@ -794,7 +794,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
             config.MaxEventStreamRetries = 1;
             config.SourceSelector = "source-selector";
 
-            var inProcessResolver = new InProcessResolver(mockGrpcClient, config, MakeChannel(), MakeProviderMetadata());
+            var inProcessResolver = new InProcessResolver(mockGrpcClient, config, MakeChannel(), MakeProviderMetadata(), mockJsonSchemaValidator);
             var flagdProvider = new FlagdProvider(inProcessResolver);
             await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 

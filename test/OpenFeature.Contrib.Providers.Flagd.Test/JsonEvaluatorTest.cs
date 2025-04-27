@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Immutable;
 using AutoFixture;
+using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Error;
 using OpenFeature.Model;
+using System.Collections.Immutable;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Test
@@ -15,8 +15,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorAddFlagConfig()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ADD, Utils.validFlagConfig);
 
@@ -29,8 +30,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorAddStaticStringEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -45,8 +47,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicBoolEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -68,8 +71,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdPropertyFlagKey()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -90,8 +94,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdPropertyTimestamp()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -112,8 +117,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicBoolEvaluationSharedEvaluator()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -131,8 +137,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicBoolEvaluationSharedEvaluatorReturningBoolType()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -151,8 +158,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicBoolEvaluationWithMissingDefaultVariant()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -167,8 +175,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicBoolEvaluationWithUnexpectedVariantType()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -183,8 +192,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicStringEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -206,8 +216,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicFloatEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -229,8 +240,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicIntEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -252,8 +264,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDynamicObjectEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -275,8 +288,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorDisabledBoolEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -295,8 +309,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorFlagNotFoundEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -315,8 +330,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorWrongTypeEvaluation()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -335,8 +351,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorReturnsFlagMetadata()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
@@ -352,8 +369,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorAddsFlagSetMetadataToFlagWithoutMetadata()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
 
@@ -369,8 +387,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorFlagMetadataOverwritesFlagSetMetadata()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
 
@@ -387,8 +406,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorThrowsOnInvalidFlagSetMetadata()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagSetMetadata));
         }
@@ -397,8 +417,9 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
         public void TestJsonEvaluatorThrowsOnInvalidFlagMetadata()
         {
             var fixture = new Fixture();
+            var jsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>(), jsonSchemaValidator);
 
             Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagMetadata));
         }
