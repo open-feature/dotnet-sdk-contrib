@@ -47,11 +47,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
         }
 
         internal InProcessResolver(
-            FlagSyncService.FlagSyncServiceClient client, 
-            FlagdConfig config, 
-            Channel<object> eventChannel, 
+            FlagSyncService.FlagSyncServiceClient client,
+            FlagdConfig config,
+            Channel<object> eventChannel,
             Model.Metadata providerMetadata,
-            IJsonSchemaValidator jsonSchemaValidator) 
+            IJsonSchemaValidator jsonSchemaValidator)
                 : this(config, eventChannel, providerMetadata, jsonSchemaValidator)
         {
             _client = client;

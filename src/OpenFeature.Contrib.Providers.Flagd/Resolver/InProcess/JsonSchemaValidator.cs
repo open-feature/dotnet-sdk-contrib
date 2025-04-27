@@ -92,7 +92,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess
                 var errors = _validator.Validate(configuration);
                 if (errors.Count > 0)
                 {
-                    _logger.LogWarning("Validating Flagd configuration resulted in Schema Validation errors {Errors}", 
+                    _logger.LogWarning("Validating Flagd configuration resulted in Schema Validation errors {Errors}",
                         errors);
                 }
             }
