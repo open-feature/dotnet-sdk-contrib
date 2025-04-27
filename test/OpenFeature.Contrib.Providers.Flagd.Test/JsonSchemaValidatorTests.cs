@@ -1,11 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Testing;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -261,7 +259,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
     {
         private readonly HttpResponseMessage _targetingResponse;
         private readonly HttpResponseMessage _flagsResponse;
-        
+
         public MockHttpMessageHandler(HttpResponseMessage targetingResponse, HttpResponseMessage flagsResponse)
         {
             _targetingResponse = targetingResponse;
