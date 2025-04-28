@@ -1,6 +1,9 @@
 // ReSharper disable RedundantUsingDirective
 
 using System.Net;
+#if NET462_OR_GREATER
+using System.Net.Http;
+#endif
 using System.Text.Json;
 using Flipt.Rest;
 using Moq;
