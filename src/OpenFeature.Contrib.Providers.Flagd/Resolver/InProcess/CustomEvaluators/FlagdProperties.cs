@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Logic;
-using Json.More;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 

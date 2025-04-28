@@ -5,8 +5,6 @@ using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Model;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
-using OpenFeature.Constant;
-using System.Diagnostics.Tracing;
 using System.Threading;
 
 namespace OpenFeature.Contrib.Providers.Flagd;

@@ -2,7 +2,6 @@
 using Microsoft.FeatureManagement.FeatureFilters;
 using OpenFeature.Model;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 using Xunit;
 

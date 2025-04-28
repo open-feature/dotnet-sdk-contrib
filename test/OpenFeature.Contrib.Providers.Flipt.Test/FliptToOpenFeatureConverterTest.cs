@@ -7,7 +7,6 @@ using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
 using Xunit;
 

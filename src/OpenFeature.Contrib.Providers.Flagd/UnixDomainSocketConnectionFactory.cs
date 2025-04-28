@@ -1,3 +1,4 @@
+#if NET5_0_OR_GREATER
 using System;
 using System.IO;
 using System.Net;
@@ -46,3 +47,4 @@ public class UnixDomainSocketConnectionFactory
     }
 #endif
 }
+#endif

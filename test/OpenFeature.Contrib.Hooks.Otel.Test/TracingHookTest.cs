@@ -6,7 +6,6 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Collections.Generic;
 using OpenTelemetry.Exporter;
-using System.Linq;
 
 namespace OpenFeature.Contrib.Hooks.Otel.Test;
 

@@ -4,15 +4,18 @@ using OpenFeature.Model;
 using OpenFeature.Flagd.Grpc.Sync;
 using System;
 using System.IO;
+#if NET462_OR_GREATER
 using System.Linq;
 using System.Net.Security;
+#endif
 using System.Security.Cryptography.X509Certificates;
 using Grpc.Net.Client;
+#if NET8_0_OR_GREATER
 using System.Net.Sockets; // needed for unix sockets
+#endif
 using System.Threading;
 using Grpc.Core;
 using Value = OpenFeature.Model.Value;
-using System.Diagnostics.Tracing;
 using System.Threading.Channels;
 using OpenFeature.Constant;
 

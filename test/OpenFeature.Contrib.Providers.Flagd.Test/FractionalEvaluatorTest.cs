@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Logic;
-using Json.More;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 using Xunit;
 
