@@ -5,37 +5,36 @@ using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Threading;
 
-namespace OpenFeature.Contrib.Hooks.Otel
+namespace OpenFeature.Contrib.Hooks.Otel;
 
+
+/// <summary>
+/// Stub.
+/// </summary>
+[ExcludeFromCodeCoverage]
+[Obsolete("This class is obsolete and will be removed in a future version. Please use TracingHook instead.")]
+public class OtelHook : Hook
 {
-    /// <summary>
-    /// Stub.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    [Obsolete("This class is obsolete and will be removed in a future version. Please use TracingHook instead.")]
-    public class OtelHook : Hook
+    private readonly TracingHook _tracingHook = new TracingHook();
+
+    /// <inheritdoc/>
+    public override ValueTask AfterAsync<T>(HookContext<T> context, FlagEvaluationDetails<T> details,
+        IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
     {
-        private readonly TracingHook _tracingHook = new TracingHook();
+        _tracingHook.AfterAsync(context, details, hints);
 
-        /// <inheritdoc/>
-        public override ValueTask AfterAsync<T>(HookContext<T> context, FlagEvaluationDetails<T> details,
-            IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
-        {
-            _tracingHook.AfterAsync(context, details, hints);
-
-            return default;
-        }
-
-        /// <inheritdoc/>
-        public override ValueTask ErrorAsync<T>(HookContext<T> context, System.Exception error,
-            IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
-        {
-            _tracingHook.ErrorAsync(context, error, hints);
-
-            return default;
-        }
-
+        return default;
     }
+
+    /// <inheritdoc/>
+    public override ValueTask ErrorAsync<T>(HookContext<T> context, System.Exception error,
+        IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+    {
+        _tracingHook.ErrorAsync(context, error, hints);
+
+        return default;
+    }
+
 }
 
 
