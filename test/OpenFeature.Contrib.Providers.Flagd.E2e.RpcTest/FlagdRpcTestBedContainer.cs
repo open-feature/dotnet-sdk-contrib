@@ -1,4 +1,4 @@
-﻿using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest;

@@ -1,16 +1,16 @@
-﻿using Flagsmith;
-using OpenFeature.Constant;
-using OpenFeature.Model;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using Trait = Flagsmith.Trait;
-using OpenFeature.Error;
-using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
+using Flagsmith;
+using OpenFeature.Constant;
+using OpenFeature.Error;
+using OpenFeature.Model;
+using Trait = Flagsmith.Trait;
 
 namespace OpenFeature.Contrib.Providers.Flagsmith;
 

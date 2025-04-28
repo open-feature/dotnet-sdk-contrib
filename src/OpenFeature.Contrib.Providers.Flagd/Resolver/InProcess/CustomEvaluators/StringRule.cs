@@ -7,7 +7,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluator
 
 internal sealed class StartsWithRule : IRule
 {
-    public JsonNode Apply(JsonNode args, Json.Logic.EvaluationContext context)
+    public JsonNode Apply(JsonNode args, EvaluationContext context)
     {
         if (!StringRule.isValid(args, context, out string operandA, out string operandB))
         {
@@ -19,7 +19,7 @@ internal sealed class StartsWithRule : IRule
 
 internal sealed class EndsWithRule : IRule
 {
-    public JsonNode Apply(JsonNode args, Json.Logic.EvaluationContext context)
+    public JsonNode Apply(JsonNode args, EvaluationContext context)
     {
         if (!StringRule.isValid(args, context, out string operandA, out string operandB))
         {
@@ -31,7 +31,7 @@ internal sealed class EndsWithRule : IRule
 
 internal static class StringRule
 {
-    internal static bool isValid(JsonNode args, Json.Logic.EvaluationContext context, out string argA, out string argB)
+    internal static bool isValid(JsonNode args, EvaluationContext context, out string argA, out string argB)
     {
         argA = null;
         argB = null;

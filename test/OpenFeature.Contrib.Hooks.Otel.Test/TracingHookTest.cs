@@ -1,11 +1,11 @@
-using Xunit;
+using System.Collections.Generic;
 using System.Diagnostics;
 using OpenFeature.Model;
 using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System.Collections.Generic;
-using OpenTelemetry.Exporter;
+using Xunit;
 
 namespace OpenFeature.Contrib.Hooks.Otel.Test;
 
@@ -33,11 +33,11 @@ public class TracingHookTest
 
         var otelHook = new TracingHook();
 
-        var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
+        var evaluationContext = EvaluationContext.Empty;
 
         var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-        var hookTask = otelHook.AfterAsync<string>(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
+        var hookTask = otelHook.AfterAsync(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
 
         Assert.True(hookTask.IsCompleted);
 
@@ -82,11 +82,11 @@ public class TracingHookTest
 
         var otelHook = new TracingHook();
 
-        var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
+        var evaluationContext = EvaluationContext.Empty;
 
         var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-        var hookTask = otelHook.AfterAsync<string>(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
+        var hookTask = otelHook.AfterAsync(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
 
         Assert.True(hookTask.IsCompleted);
 
@@ -115,11 +115,11 @@ public class TracingHookTest
 
         var otelHook = new TracingHook();
 
-        var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
+        var evaluationContext = EvaluationContext.Empty;
 
         var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-        var hookTask = otelHook.ErrorAsync<string>(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
+        var hookTask = otelHook.ErrorAsync(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
 
         Assert.True(hookTask.IsCompleted);
 
@@ -160,11 +160,11 @@ public class TracingHookTest
 
         var otelHook = new TracingHook();
 
-        var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
+        var evaluationContext = EvaluationContext.Empty;
 
         var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-        var hookTask = otelHook.ErrorAsync<string>(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
+        var hookTask = otelHook.ErrorAsync(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
 
         Assert.True(hookTask.IsCompleted);
 

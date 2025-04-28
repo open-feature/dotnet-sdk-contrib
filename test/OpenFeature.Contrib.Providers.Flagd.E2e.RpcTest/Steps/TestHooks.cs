@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Reqnroll;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps;

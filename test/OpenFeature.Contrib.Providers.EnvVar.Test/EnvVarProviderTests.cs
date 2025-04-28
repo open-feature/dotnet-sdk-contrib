@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using OpenFeature.Constant;
@@ -156,8 +156,8 @@ public class EnvVarProviderTests
         Environment.SetEnvironmentVariable(prefix + flagKey, true.ToString());
 
         var provider = new EnvVarProvider(prefix);
-        await OpenFeature.Api.Instance.SetProviderAsync(provider);
-        var client = OpenFeature.Api.Instance.GetClient();
+        await Api.Instance.SetProviderAsync(provider);
+        var client = Api.Instance.GetClient();
 
         var receivedValue = await client.GetBooleanValueAsync(flagKey, false);
 

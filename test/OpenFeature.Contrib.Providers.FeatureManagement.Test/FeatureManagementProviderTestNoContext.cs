@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.FeatureManagement.Test;

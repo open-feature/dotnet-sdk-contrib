@@ -1,9 +1,9 @@
-﻿using OpenFeature.Model;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Diagnostics;
-using OpenTelemetry.Trace;
 using System.Threading;
+using System.Threading.Tasks;
+using OpenFeature.Model;
+using OpenTelemetry.Trace;
 
 namespace OpenFeature.Contrib.Hooks.Otel;
 

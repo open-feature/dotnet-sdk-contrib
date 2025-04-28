@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.FeatureManagement.FeatureFilters;
-using OpenFeature.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.FeatureManagement.FeatureFilters;
+using OpenFeature.Model;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.FeatureManagement.Test;

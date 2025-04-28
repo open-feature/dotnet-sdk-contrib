@@ -158,9 +158,9 @@ public class ConfigCatProviderTest
         var configCatProvider = new ConfigCatProvider("fake-67890123456789012/1234567890123456789012", options =>
             { options.ConfigFetcher = new FakeConfigFetcher(TestConfigJson); });
 
-        await OpenFeature.Api.Instance.SetProviderAsync(configCatProvider);
+        await Api.Instance.SetProviderAsync(configCatProvider);
 
-        var client = OpenFeature.Api.Instance.GetClient();
+        var client = Api.Instance.GetClient();
 
         var evaluationContext = EvaluationContext.Builder()
             .Set("email", email)
@@ -172,7 +172,7 @@ public class ConfigCatProviderTest
         Assert.Equal("isPOCFeatureEnabled", result.FlagKey);
         Assert.Equal(ErrorType.None, result.ErrorType);
 
-        await OpenFeature.Api.Instance.ShutdownAsync();
+        await Api.Instance.ShutdownAsync();
     }
 
     private static async Task ExecuteResolveTest<T>(object value, T defaultValue, T expectedValue, string sdkKey, Func<ConfigCatProvider, string, T, Task<ResolutionDetails<T>>> resolveFunc)

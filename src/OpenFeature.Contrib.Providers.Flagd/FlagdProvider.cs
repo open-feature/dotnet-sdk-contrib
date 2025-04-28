@@ -1,11 +1,11 @@
-﻿using System;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
-using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 using OpenFeature.Model;
 using Metadata = OpenFeature.Model.Metadata;
 using Value = OpenFeature.Model.Value;
-using System.Threading;
 
 namespace OpenFeature.Contrib.Providers.Flagd;
 

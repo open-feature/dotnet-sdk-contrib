@@ -1,4 +1,4 @@
-﻿using OpenFeature.Error;
+using OpenFeature.Error;
 using OpenFeature.Model;
 using Statsig;
 

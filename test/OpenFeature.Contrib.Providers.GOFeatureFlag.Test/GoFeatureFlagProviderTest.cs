@@ -1,9 +1,3 @@
-using Newtonsoft.Json.Linq;
-using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
-using OpenFeature.Model;
-using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -11,6 +5,12 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
+using OpenFeature.Model;
+using RichardSzalay.MockHttp;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test;

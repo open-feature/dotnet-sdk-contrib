@@ -1,4 +1,4 @@
-﻿namespace OpenFeature.Contrib.Providers.Flagsmith;
+namespace OpenFeature.Contrib.Providers.Flagsmith;
 
 /// <summary>
 /// Settings for Flagsmith open feature provider

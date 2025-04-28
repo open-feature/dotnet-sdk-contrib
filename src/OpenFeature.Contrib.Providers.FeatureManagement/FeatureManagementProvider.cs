@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.FeatureManagement;
-using Microsoft.FeatureManagement.FeatureFilters;
-using OpenFeature.Constant;
-using OpenFeature.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.FeatureManagement;
+using Microsoft.FeatureManagement.FeatureFilters;
+using OpenFeature.Constant;
+using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.FeatureManagement;
 

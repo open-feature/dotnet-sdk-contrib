@@ -1,11 +1,11 @@
-﻿using OpenFeature.Constant;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using OpenFeature.Constant;
 using OpenFeature.Model;
 using Statsig;
 using Statsig.Server;
 using Statsig.Server.Evaluation;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OpenFeature.Contrib.Providers.Statsig;
 

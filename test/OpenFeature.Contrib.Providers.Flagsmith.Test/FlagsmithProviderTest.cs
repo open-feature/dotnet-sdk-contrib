@@ -1,14 +1,14 @@
-using Xunit;
 using System;
-using Flagsmith;
-using System.Net.Http;
-using NSubstitute;
-using System.Threading.Tasks;
-using OpenFeature.Constant;
-using OpenFeature.Model;
-using System.Linq;
-using OpenFeature.Error;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Flagsmith;
+using NSubstitute;
+using OpenFeature.Constant;
+using OpenFeature.Error;
+using OpenFeature.Model;
+using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagsmith.Test;
 

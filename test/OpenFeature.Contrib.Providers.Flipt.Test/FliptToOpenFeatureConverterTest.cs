@@ -1,13 +1,13 @@
 // ReSharper disable RedundantUsingDirective
 
+using System.Net;
+using System.Text.Json;
 using Flipt.Rest;
 using Moq;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
-using System.Net;
-using System.Text.Json;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;

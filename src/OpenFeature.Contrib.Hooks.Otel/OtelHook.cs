@@ -1,9 +1,9 @@
-﻿using OpenFeature.Model;
-using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System;
 using System.Threading;
+using System.Threading.Tasks;
+using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Hooks.Otel;
 
@@ -27,7 +27,7 @@ public class OtelHook : Hook
     }
 
     /// <inheritdoc/>
-    public override ValueTask ErrorAsync<T>(HookContext<T> context, System.Exception error,
+    public override ValueTask ErrorAsync<T>(HookContext<T> context, Exception error,
         IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
     {
         _tracingHook.ErrorAsync(context, error, hints);

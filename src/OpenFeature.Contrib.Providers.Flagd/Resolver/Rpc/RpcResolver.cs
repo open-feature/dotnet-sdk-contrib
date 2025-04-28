@@ -1,18 +1,18 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
+using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc.Evaluation;
 using OpenFeature.Model;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
-using System.Threading;
 using Value = OpenFeature.Model.Value;
-using System.Threading.Channels;
-using OpenFeature.Constant;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 
@@ -419,18 +419,18 @@ internal class RpcResolver : Resolver
     /// </summary>
     /// <param name="e">The exception thrown by the Grpc client</param>
     /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-    private FeatureProviderException GetOFException(Grpc.Core.RpcException e)
+    private FeatureProviderException GetOFException(RpcException e)
     {
         switch (e.Status.StatusCode)
         {
-            case Grpc.Core.StatusCode.NotFound:
-                return new FeatureProviderException(Constant.ErrorType.FlagNotFound, e.Status.Detail, e);
-            case Grpc.Core.StatusCode.Unavailable:
-                return new FeatureProviderException(Constant.ErrorType.ProviderNotReady, e.Status.Detail, e);
-            case Grpc.Core.StatusCode.InvalidArgument:
-                return new FeatureProviderException(Constant.ErrorType.TypeMismatch, e.Status.Detail, e);
+            case StatusCode.NotFound:
+                return new FeatureProviderException(ErrorType.FlagNotFound, e.Status.Detail, e);
+            case StatusCode.Unavailable:
+                return new FeatureProviderException(ErrorType.ProviderNotReady, e.Status.Detail, e);
+            case StatusCode.InvalidArgument:
+                return new FeatureProviderException(ErrorType.TypeMismatch, e.Status.Detail, e);
             default:
-                return new FeatureProviderException(Constant.ErrorType.General, e.Status.Detail, e);
+                return new FeatureProviderException(ErrorType.General, e.Status.Detail, e);
         }
     }
 

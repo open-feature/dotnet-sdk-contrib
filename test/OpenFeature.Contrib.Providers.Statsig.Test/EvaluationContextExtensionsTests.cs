@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using AutoFixture.Xunit2;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Statsig.Test;
