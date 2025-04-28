@@ -54,7 +54,7 @@ internal class InProcessResolver : Resolver
         return Task.Run(() =>
         {
             var latch = new CountdownEvent(1);
-            _handleEventsThread = new Thread(async () => await HandleEvents(latch))
+            _handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
             {
                 IsBackground = true
             };
@@ -113,7 +113,7 @@ internal class InProcessResolver : Resolver
             try
             {
                 // Read the response stream asynchronously
-                while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token))
+                while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
                     _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
@@ -132,7 +132,7 @@ internal class InProcessResolver : Resolver
             catch (RpcException)
             {
                 // Handle the dropped connection by reconnecting and retrying the stream
-                await HandleErrorEvent();
+                await HandleErrorEvent().ConfigureAwait(false);
             }
         }
     }
@@ -159,7 +159,7 @@ internal class InProcessResolver : Resolver
             _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name });
         }
         _mtx.ReleaseMutex();
-        await Task.Delay(_eventStreamRetryBackoff * 1000);
+        await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
     }
 
     private void HandleProviderChangeEvent()

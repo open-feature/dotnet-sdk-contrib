@@ -79,14 +79,14 @@ public class FlagsmithProvider : FeatureProvider
     private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, T defaultValue, TryParseDelegate<T> tryParse, EvaluationContext context)
     {
 
-        var flags = await GetFlags(context);
-        var isFlagEnabled = await flags.IsFeatureEnabled(flagKey);
+        var flags = await GetFlags(context).ConfigureAwait(false);
+        var isFlagEnabled = await flags.IsFeatureEnabled(flagKey).ConfigureAwait(false);
         if (!isFlagEnabled)
         {
             return new(flagKey, defaultValue, reason: Reason.Disabled);
         }
 
-        var stringValue = await flags.GetFeatureValue(flagKey);
+        var stringValue = await flags.GetFeatureValue(flagKey).ConfigureAwait(false);
 
         if (tryParse(stringValue, out var parsedValue))
         {
@@ -98,8 +98,8 @@ public class FlagsmithProvider : FeatureProvider
 
     private async Task<ResolutionDetails<bool>> IsFeatureEnabled(string flagKey, EvaluationContext context)
     {
-        var flags = await GetFlags(context);
-        var isFeatureEnabled = await flags.IsFeatureEnabled(flagKey);
+        var flags = await GetFlags(context).ConfigureAwait(false);
+        var isFeatureEnabled = await flags.IsFeatureEnabled(flagKey).ConfigureAwait(false);
         return new(flagKey, isFeatureEnabled);
     }
 

@@ -180,15 +180,15 @@ public class ConfigCatProviderTest
         var configCatProvider = new ConfigCatProvider(sdkKey,
             options => { options.FlagOverrides = BuildFlagOverrides(("example-feature", value)); });
 
-        await configCatProvider.InitializeAsync(EvaluationContext.Empty);
+        await configCatProvider.InitializeAsync(EvaluationContext.Empty).ConfigureAwait(false);
 
-        var result = await resolveFunc(configCatProvider, "example-feature", defaultValue);
+        var result = await resolveFunc(configCatProvider, "example-feature", defaultValue).ConfigureAwait(false);
 
         Assert.Equal(expectedValue, result.Value);
         Assert.Equal("example-feature", result.FlagKey);
         Assert.Equal(ErrorType.None, result.ErrorType);
 
-        await configCatProvider.ShutdownAsync();
+        await configCatProvider.ShutdownAsync().ConfigureAwait(false);
     }
 
     private static async Task ExecuteResolveErrorTest<T>(object value, T defaultValue, ErrorType expectedErrorType, string sdkKey, Func<ConfigCatProvider, string, T, Task<ResolutionDetails<T>>> resolveFunc)
@@ -196,13 +196,13 @@ public class ConfigCatProviderTest
         var configCatProvider = new ConfigCatProvider(sdkKey,
             options => { options.FlagOverrides = BuildFlagOverrides(("example-feature", value)); });
 
-        await configCatProvider.InitializeAsync(EvaluationContext.Empty);
+        await configCatProvider.InitializeAsync(EvaluationContext.Empty).ConfigureAwait(false);
 
-        var exception = await Assert.ThrowsAsync<FeatureProviderException>(() => resolveFunc(configCatProvider, "example-feature", defaultValue));
+        var exception = await Assert.ThrowsAsync<FeatureProviderException>(() => resolveFunc(configCatProvider, "example-feature", defaultValue)).ConfigureAwait(false);
 
         Assert.Equal(expectedErrorType, exception.ErrorType);
 
-        await configCatProvider.ShutdownAsync();
+        await configCatProvider.ShutdownAsync().ConfigureAwait(false);
     }
 
     private static FlagOverrides BuildFlagOverrides(params (string key, object value)[] values)

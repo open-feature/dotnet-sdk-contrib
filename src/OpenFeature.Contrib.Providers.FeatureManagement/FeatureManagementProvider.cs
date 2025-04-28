@@ -49,7 +49,7 @@ public sealed class FeatureManagementProvider : FeatureProvider
     /// <inheritdoc />
     public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
     {
-        var variant = await Evaluate(flagKey, context, CancellationToken.None);
+        var variant = await Evaluate(flagKey, context, CancellationToken.None).ConfigureAwait(false);
 
         if (variant == null)
         {
@@ -60,7 +60,7 @@ public sealed class FeatureManagementProvider : FeatureProvider
                 exists = true;
                 break;
             }
-            var enabled = await featureManager.IsEnabledAsync(flagKey, context, cancellationToken);
+            var enabled = await featureManager.IsEnabledAsync(flagKey, context, cancellationToken).ConfigureAwait(false);
             if (exists)
             {
                 return new ResolutionDetails<bool>(flagKey, enabled);
@@ -77,7 +77,7 @@ public sealed class FeatureManagementProvider : FeatureProvider
     /// <inheritdoc />
     public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
     {
-        var variant = await Evaluate(flagKey, context, CancellationToken.None);
+        var variant = await Evaluate(flagKey, context, CancellationToken.None).ConfigureAwait(false);
 
         if (Double.TryParse(variant?.Configuration?.Value, out var value))
             return new ResolutionDetails<double>(flagKey, value);
@@ -88,7 +88,7 @@ public sealed class FeatureManagementProvider : FeatureProvider
     /// <inheritdoc />
     public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
     {
-        var variant = await Evaluate(flagKey, context, CancellationToken.None);
+        var variant = await Evaluate(flagKey, context, CancellationToken.None).ConfigureAwait(false);
 
         if (int.TryParse(variant?.Configuration?.Value, out var value))
             return new ResolutionDetails<int>(flagKey, value);
@@ -99,7 +99,7 @@ public sealed class FeatureManagementProvider : FeatureProvider
     /// <inheritdoc />
     public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
     {
-        var variant = await Evaluate(flagKey, context, CancellationToken.None);
+        var variant = await Evaluate(flagKey, context, CancellationToken.None).ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(variant?.Configuration?.Value))
             return new ResolutionDetails<string>(flagKey, defaultValue);
@@ -110,7 +110,7 @@ public sealed class FeatureManagementProvider : FeatureProvider
     /// <inheritdoc />
     public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
     {
-        var variant = await Evaluate(flagKey, context, CancellationToken.None);
+        var variant = await Evaluate(flagKey, context, CancellationToken.None).ConfigureAwait(false);
 
         if (variant == null)
             return new ResolutionDetails<Value>(flagKey, defaultValue);

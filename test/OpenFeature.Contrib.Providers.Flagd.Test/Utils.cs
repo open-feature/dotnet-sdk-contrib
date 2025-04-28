@@ -411,7 +411,7 @@ public class Utils
             {
                 try
                 {
-                    await assertionFunc(cts.Token);
+                    await assertionFunc(cts.Token).ConfigureAwait(false);
                     return;
                 }
                 catch (TaskCanceledException) when (cts.IsCancellationRequested)

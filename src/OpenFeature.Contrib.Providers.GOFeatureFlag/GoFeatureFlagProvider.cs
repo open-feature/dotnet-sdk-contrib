@@ -114,7 +114,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context);
+                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                 return new ResolutionDetails<bool>(flagKey, bool.Parse(resp.Value.ToString()), ErrorType.None,
                     resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
             }
@@ -146,7 +146,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context);
+                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                 if (!(resp.Value is JsonElement element && element.ValueKind == JsonValueKind.String))
                     throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
                 return new ResolutionDetails<string>(flagKey, resp.Value.ToString(), ErrorType.None, resp.Reason,
@@ -179,7 +179,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context);
+                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                 return new ResolutionDetails<int>(flagKey, int.Parse(resp.Value.ToString()), ErrorType.None,
                     resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
             }
@@ -211,7 +211,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context);
+                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                 return new ResolutionDetails<double>(flagKey,
                     double.Parse(resp.Value.ToString(), CultureInfo.InvariantCulture), ErrorType.None,
                     resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
@@ -244,7 +244,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context);
+                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                 if (resp.Value is JsonElement)
                 {
                     var value = ConvertValue((JsonElement)resp.Value);
@@ -280,7 +280,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             var request = new OfrepRequest(context);
             var response = await _httpClient.PostAsync($"ofrep/v1/evaluate/flags/{flagKey}",
-                new StringContent(request.AsJsonString(), Encoding.UTF8, ApplicationJson));
+                new StringContent(request.AsJsonString(), Encoding.UTF8, ApplicationJson)).ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
                 throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
@@ -291,7 +291,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             if (response.StatusCode >= HttpStatusCode.BadRequest)
                 throw new GeneralError("impossible to contact GO Feature Flag relay proxy instance");
 
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true

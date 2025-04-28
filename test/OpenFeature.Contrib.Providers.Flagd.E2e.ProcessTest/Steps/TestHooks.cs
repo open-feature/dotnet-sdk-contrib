@@ -13,7 +13,7 @@ public class TestHooks
     {
         FlagdSyncTestBed = new FlagdSyncTestBedContainer();
 
-        await FlagdSyncTestBed.Container.StartAsync();
+        await FlagdSyncTestBed.Container.StartAsync().ConfigureAwait(false);
     }
 
     [AfterTestRun]
@@ -21,8 +21,8 @@ public class TestHooks
     {
         if (FlagdSyncTestBed != null)
         {
-            await FlagdSyncTestBed.Container.StopAsync();
-            await FlagdSyncTestBed.Container.DisposeAsync();
+            await FlagdSyncTestBed.Container.StopAsync().ConfigureAwait(false);
+            await FlagdSyncTestBed.Container.DisposeAsync().ConfigureAwait(false);
         }
     }
 }

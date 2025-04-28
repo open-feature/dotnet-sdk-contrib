@@ -110,7 +110,7 @@ public sealed class FlagdProvider : FeatureProvider
     {
         return Task.Run(async () =>
         {
-            await _resolver.Init();
+            await _resolver.Init().ConfigureAwait(false);
         }).ContinueWith((t) =>
         {
             if (t.IsFaulted)

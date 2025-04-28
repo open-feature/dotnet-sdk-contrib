@@ -167,7 +167,7 @@ public class EnvVarProviderTests
     private async Task ExecuteResolveValueTest<T>(string prefix, string flagKey, T defaultValue, T expectedValue,
         string expectedReason, Func<EnvVarProvider, string, T, Task<ResolutionDetails<T>>> resolve)
     {
-        await ExecuteResolveValueTest(prefix, flagKey, defaultValue, expectedValue, expectedReason, ErrorType.None, resolve);
+        await ExecuteResolveValueTest(prefix, flagKey, defaultValue, expectedValue, expectedReason, ErrorType.None, resolve).ConfigureAwait(false);
     }
 
     private async Task ExecuteResolveValueTest<T>(string prefix, string flagKey, T defaultValue, T expectedValue,
@@ -175,7 +175,7 @@ public class EnvVarProviderTests
         Func<EnvVarProvider, string, T, Task<ResolutionDetails<T>>> resolve)
     {
         var provider = new EnvVarProvider(prefix);
-        var resolutionDetails = await resolve(provider, flagKey, defaultValue);
+        var resolutionDetails = await resolve(provider, flagKey, defaultValue).ConfigureAwait(false);
 
         Assert.Equal(expectedValue, resolutionDetails.Value);
         Assert.Equal(expectedReason, resolutionDetails.Reason);
@@ -187,7 +187,7 @@ public class EnvVarProviderTests
     {
         var provider = new EnvVarProvider(prefix);
         var exception =
-            await Assert.ThrowsAsync<FeatureProviderException>(() => resolve(provider, flagKey, defaultValue));
+            await Assert.ThrowsAsync<FeatureProviderException>(() => resolve(provider, flagKey, defaultValue)).ConfigureAwait(false);
 
         Assert.Equal(expectedErrorType, exception.ErrorType);
     }

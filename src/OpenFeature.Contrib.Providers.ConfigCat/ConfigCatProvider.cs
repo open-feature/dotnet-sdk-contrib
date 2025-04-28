@@ -76,7 +76,7 @@ public sealed class ConfigCatProvider : FeatureProvider
     public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
     {
         var user = context?.BuildUser();
-        var result = await Client.GetValueDetailsAsync(flagKey, defaultValue?.AsObject, user, cancellationToken);
+        var result = await Client.GetValueDetailsAsync(flagKey, defaultValue?.AsObject, user, cancellationToken).ConfigureAwait(false);
         var returnValue = result.IsDefaultValue ? defaultValue : new Value(result.Value);
         var details = new ResolutionDetails<Value>(flagKey, returnValue, TranslateErrorCode(result.ErrorCode), errorMessage: result.ErrorMessage, variant: result.VariationId);
         if (details.ErrorType == ErrorType.None)
@@ -90,7 +90,7 @@ public sealed class ConfigCatProvider : FeatureProvider
     private async Task<ResolutionDetails<T>> ResolveFlag<T>(string flagKey, EvaluationContext context, T defaultValue, CancellationToken cancellationToken)
     {
         var user = context?.BuildUser();
-        var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user, cancellationToken);
+        var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user, cancellationToken).ConfigureAwait(false);
         var details = new ResolutionDetails<T>(flagKey, result.Value, TranslateErrorCode(result.ErrorCode), errorMessage: result.ErrorMessage, variant: result.VariationId);
         if (details.ErrorType == ErrorType.None)
         {

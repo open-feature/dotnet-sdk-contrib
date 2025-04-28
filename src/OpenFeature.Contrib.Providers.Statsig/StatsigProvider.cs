@@ -103,7 +103,7 @@ public sealed class StatsigProvider : FeatureProvider
     /// <inheritdoc/>
     public override async Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)
     {
-        await ServerDriver.Initialize();
+        await ServerDriver.Initialize().ConfigureAwait(false);
     }
 
     /// <inheritdoc/>

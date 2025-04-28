@@ -96,7 +96,7 @@ public abstract class FlagdStepDefinitionsBase
     [Then(@"the resolved boolean zero-value should be ""(.*)""")]
     public async Task ThenTheResolvedBooleanZero_ValueShouldBe(string expectedValue)
     {
-        Assert.Equal(bool.Parse(expectedValue), await booleanZeroValue);
+        Assert.Equal(bool.Parse(expectedValue), await booleanZeroValue.ConfigureAwait(false));
     }
 
     [When(@"a zero-value string flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
@@ -108,7 +108,7 @@ public abstract class FlagdStepDefinitionsBase
     [Then(@"the resolved string zero-value should be ""(.*)""")]
     public async Task ThenTheResolvedStringZero_ValueShouldBeAsync(string expectedValue)
     {
-        Assert.Equal(expectedValue, await stringZeroValue);
+        Assert.Equal(expectedValue, await stringZeroValue.ConfigureAwait(false));
     }
 
     [When(@"a zero-value integer flag with key ""(.*)"" is evaluated with default value (.*)")]
@@ -120,7 +120,7 @@ public abstract class FlagdStepDefinitionsBase
     [Then(@"the resolved integer zero-value should be (.*)")]
     public async Task ThenTheResolvedIntegerZero_ValueShouldBeAsync(int expectedValue)
     {
-        Assert.Equal(expectedValue, await intZeroFlagValue);
+        Assert.Equal(expectedValue, await intZeroFlagValue.ConfigureAwait(false));
     }
 
     [When(@"a zero-value float flag with key ""(.*)"" is evaluated with default value (.*)")]
@@ -132,7 +132,7 @@ public abstract class FlagdStepDefinitionsBase
     [Then(@"the resolved float zero-value should be (.*)")]
     public async Task ThenTheResolvedFloatZero_ValueShouldBeAsync(decimal expectedValue)
     {
-        Assert.Equal(decimal.ToDouble(expectedValue), await doubleZeroFlagValue);
+        Assert.Equal(decimal.ToDouble(expectedValue), await doubleZeroFlagValue.ConfigureAwait(false));
     }
 
     [When(@"a string flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
@@ -185,21 +185,21 @@ public abstract class FlagdStepDefinitionsBase
     [Then(@"the returned value should be ""(.*)""")]
     public async Task ThenTheReturnedValueShouldBe(string expectedValue)
     {
-        var details = await client.GetStringDetailsAsync(stringFlagKey, stringDefaultValue, evaluationContext);
+        var details = await client.GetStringDetailsAsync(stringFlagKey, stringDefaultValue, evaluationContext).ConfigureAwait(false);
         Assert.Equal(expectedValue, details.Value);
     }
 
     [Then(@"the returned value should be (.*)")]
     public async Task ThenTheReturnedValueShouldBeAsync(long expectedValue)
     {
-        var details = await client.GetIntegerDetailsAsync(intFlagKey, intDefaultValue, evaluationContext);
+        var details = await client.GetIntegerDetailsAsync(intFlagKey, intDefaultValue, evaluationContext).ConfigureAwait(false);
         Assert.Equal(expectedValue, details.Value);
     }
 
     [Then(@"the returned reason should be ""(.*)""")]
     public async Task ThenTheReturnedReasonShouldBeAsync(string expectedReason)
     {
-        var details = await client.GetStringDetailsAsync(stringFlagKey, stringDefaultValue, evaluationContext);
+        var details = await client.GetStringDetailsAsync(stringFlagKey, stringDefaultValue, evaluationContext).ConfigureAwait(false);
         Assert.Equal(expectedReason, details.Reason);
     }
 

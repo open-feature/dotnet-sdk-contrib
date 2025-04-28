@@ -573,7 +573,7 @@ public class GoFeatureFlagProviderTest
         var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(
             async request =>
             {
-                capturedRequestBody = await request.Content.ReadAsStringAsync();
+                capturedRequestBody = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new HttpResponseMessage
                 {
                     Content = new StringContent(
@@ -606,7 +606,7 @@ public class GoFeatureFlagProviderTest
         var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(
             async request =>
             {
-                capturedRequestBody = await request.Content.ReadAsStringAsync();
+                capturedRequestBody = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return new HttpResponseMessage
                 {
                     Content = new StringContent(

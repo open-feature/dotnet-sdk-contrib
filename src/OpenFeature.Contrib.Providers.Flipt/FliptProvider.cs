@@ -44,7 +44,7 @@ public class FliptProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptToOpenFeatureConverter.EvaluateBooleanAsync(flagKey, defaultValue, context);
+        return await _fliptToOpenFeatureConverter.EvaluateBooleanAsync(flagKey, defaultValue, context).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -52,7 +52,7 @@ public class FliptProvider : FeatureProvider
         string defaultValue, EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context);
+        return await _fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -60,7 +60,7 @@ public class FliptProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context);
+        return await _fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -68,7 +68,7 @@ public class FliptProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context);
+        return await _fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -76,6 +76,6 @@ public class FliptProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await _fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context);
+        return await _fliptToOpenFeatureConverter.EvaluateAsync(flagKey, defaultValue, context).ConfigureAwait(false);
     }
 }

@@ -339,7 +339,7 @@ public class UnitTestFlagdProvider
         // make sure the correct exception is thrown
         var ex = await Assert.ThrowsAsync<FeatureProviderException>(async () =>
         {
-            await flagdProvider.ResolveBooleanValueAsync("my-key", true);
+            await flagdProvider.ResolveBooleanValueAsync("my-key", true).ConfigureAwait(false);
         });
 
         Assert.Multiple(() =>
@@ -372,7 +372,7 @@ public class UnitTestFlagdProvider
         // make sure the correct exception is thrown
         var ex = await Assert.ThrowsAsync<FeatureProviderException>(async () =>
         {
-            await flagdProvider.ResolveBooleanValueAsync("my-key", true);
+            await flagdProvider.ResolveBooleanValueAsync("my-key", true).ConfigureAwait(false);
         });
 
         Assert.Multiple(() =>
@@ -744,7 +744,7 @@ public class UnitTestFlagdProvider
         await Utils.AssertUntilAsync(
             async _ =>
             {
-                var val = await flagdProvider.ResolveBooleanValueAsync("staticBoolFlag", false, cancellationToken: CancellationToken.None);
+                var val = await flagdProvider.ResolveBooleanValueAsync("staticBoolFlag", false, cancellationToken: CancellationToken.None).ConfigureAwait(false);
                 Assert.True(val.Value);
             });
 
@@ -802,7 +802,7 @@ public class UnitTestFlagdProvider
         await Utils.AssertUntilAsync(
             async _ =>
             {
-                var exception = await Assert.ThrowsAsync<FeatureProviderException>(async () => await flagdProvider.ResolveStringValueAsync("unknown", "unknown"));
+                var exception = await Assert.ThrowsAsync<FeatureProviderException>(async () => await flagdProvider.ResolveStringValueAsync("unknown", "unknown").ConfigureAwait(false)).ConfigureAwait(false);
                 Assert.Equal(ErrorType.FlagNotFound, exception.ErrorType);
             });
 

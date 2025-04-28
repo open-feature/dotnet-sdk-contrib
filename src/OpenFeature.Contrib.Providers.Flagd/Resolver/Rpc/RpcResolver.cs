@@ -89,7 +89,7 @@ internal class RpcResolver : Resolver
                 reason: resolveBooleanResponse.Reason,
                 variant: resolveBooleanResponse.Variant
                 );
-        }, context);
+        }, context).ConfigureAwait(false);
     }
 
     public async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
@@ -108,7 +108,7 @@ internal class RpcResolver : Resolver
                 reason: resolveStringResponse.Reason,
                 variant: resolveStringResponse.Variant
                 );
-        }, context);
+        }, context).ConfigureAwait(false);
     }
 
     public async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
@@ -127,7 +127,7 @@ internal class RpcResolver : Resolver
                 reason: resolveIntResponse.Reason,
                 variant: resolveIntResponse.Variant
                 );
-        }, context);
+        }, context).ConfigureAwait(false);
     }
 
     public async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
@@ -146,7 +146,7 @@ internal class RpcResolver : Resolver
                 reason: resolveDoubleResponse.Reason,
                 variant: resolveDoubleResponse.Variant
                 );
-        }, context);
+        }, context).ConfigureAwait(false);
     }
 
     public async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
@@ -165,7 +165,7 @@ internal class RpcResolver : Resolver
                 reason: resolveObjectResponse.Reason,
                 variant: resolveObjectResponse.Variant
                 );
-        }, context);
+        }, context).ConfigureAwait(false);
     }
 
     private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
@@ -181,7 +181,7 @@ internal class RpcResolver : Resolver
                     return (ResolutionDetails<T>)value;
                 }
             }
-            var result = await resolveDelegate.Invoke(ConvertToContext(context));
+            var result = await resolveDelegate.Invoke(ConvertToContext(context)).ConfigureAwait(false);
 
             if (result.Reason.Equals("STATIC") && _config.CacheEnabled)
             {
@@ -205,7 +205,7 @@ internal class RpcResolver : Resolver
             try
             {
                 // Read the response stream asynchronously
-                while (!token.IsCancellationRequested && call != null && await call.ResponseStream.MoveNext())
+                while (!token.IsCancellationRequested && call != null && await call.ResponseStream.MoveNext().ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
 
@@ -229,7 +229,7 @@ internal class RpcResolver : Resolver
             catch (RpcException)
             {
                 // Handle the dropped connection by reconnecting and retrying the stream
-                await HandleErrorEvent();
+                await HandleErrorEvent().ConfigureAwait(false);
             }
         }
     }
@@ -292,7 +292,7 @@ internal class RpcResolver : Resolver
         _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
         _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name });
         _mtx.ReleaseMutex();
-        await Task.Delay(_eventStreamRetryBackoff * 1000);
+        await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
     }
 
     /// <summary>
