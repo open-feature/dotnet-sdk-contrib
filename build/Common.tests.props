@@ -11,6 +11,10 @@
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <NoWarn>$(NoWarn);CA2007</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
         <Content
             Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'DotnetSdkContrib.sln'))\build\xunit.runner.json">
@@ -38,9 +42,11 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
 
-        <!-- Fare and System.Text.RegularExpressions are referenced directly to avoid indirect vulnerable packages from AutoFixture -->
+        <!-- Fare and System.Text.RegularExpressions are referenced directly to avoid indirect
+        vulnerable packages from AutoFixture -->
         <PackageReference Include="Fare" Version="$(FareVer)" />
-        <PackageReference Include="System.Text.RegularExpressions" Version="$(SystemTextRegularExpressionsVer)" />
+        <PackageReference Include="System.Text.RegularExpressions"
+            Version="$(SystemTextRegularExpressionsVer)" />
     </ItemGroup>
 
     <PropertyGroup Label="Package versions used in this repository">

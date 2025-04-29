@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Immutable;
 using AutoFixture;
 using OpenFeature.Constant;
@@ -7,400 +6,399 @@ using OpenFeature.Error;
 using OpenFeature.Model;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.Flagd.Test
+namespace OpenFeature.Contrib.Providers.Flagd.Test;
+
+public class UnitTestJsonEvaluator
 {
-    public class UnitTestJsonEvaluator
+    [Fact]
+    public void TestJsonEvaluatorAddFlagConfig()
     {
-        [Fact]
-        public void TestJsonEvaluatorAddFlagConfig()
-        {
-            var fixture = new Fixture();
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ADD, Utils.validFlagConfig);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ADD, Utils.validFlagConfig);
 
-            var result = jsonEvaluator.ResolveBooleanValueAsync("validFlag", false);
+        var result = jsonEvaluator.ResolveBooleanValueAsync("validFlag", false);
 
-            Assert.True(result.Value);
-        }
+        Assert.True(result.Value);
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorAddStaticStringEvaluation()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorAddStaticStringEvaluation()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var result = jsonEvaluator.ResolveStringValueAsync("staticStringFlag", "");
+        var result = jsonEvaluator.ResolveStringValueAsync("staticStringFlag", "");
 
-            Assert.Equal("#CC0000", result.Value);
-            Assert.Equal("red", result.Variant);
-            Assert.Equal(Reason.Static, result.Reason);
-        }
+        Assert.Equal("#CC0000", result.Value);
+        Assert.Equal("red", result.Variant);
+        Assert.Equal(Reason.Static, result.Reason);
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicBoolEvaluation()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorDynamicBoolEvaluation()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            var builder = EvaluationContext.Builder();
-            builder
-                .Set("color", "yellow");
+        var builder = EvaluationContext.Builder();
+        builder
+            .Set("color", "yellow");
 
-            var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlag", false, builder.Build());
+        var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlag", false, builder.Build());
 
-            Assert.True(result.Value);
-            Assert.Equal("bool1", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+        Assert.True(result.Value);
+        Assert.Equal("bool1", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdPropertyFlagKey()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdPropertyFlagKey()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            var builder = EvaluationContext.Builder();
+        var builder = EvaluationContext.Builder();
 
-            var result =
-                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingFlagdProperty", false, builder.Build());
+        var result =
+            jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingFlagdProperty", false, builder.Build());
 
-            Assert.True(result.Value);
-            Assert.Equal("bool1", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+        Assert.True(result.Value);
+        Assert.Equal("bool1", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdPropertyTimestamp()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorDynamicBoolEvaluationUsingFlagdPropertyTimestamp()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            var builder = EvaluationContext.Builder();
+        var builder = EvaluationContext.Builder();
 
-            var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingFlagdPropertyTimestamp", false,
+        var result = jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingFlagdPropertyTimestamp", false,
+            builder.Build());
+
+        Assert.True(result.Value);
+        Assert.Equal("bool1", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
+
+    [Fact]
+    public void TestJsonEvaluatorDynamicBoolEvaluationSharedEvaluator()
+    {
+        var fixture = new Fixture();
+
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+        var builder = EvaluationContext.Builder().Set("email", "test@faas.com");
+
+        var result =
+            jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingSharedEvaluator", false, builder.Build());
+
+        Assert.True(result.Value);
+        Assert.Equal("bool1", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
+
+    [Fact]
+    public void TestJsonEvaluatorDynamicBoolEvaluationSharedEvaluatorReturningBoolType()
+    {
+        var fixture = new Fixture();
+
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+        var builder = EvaluationContext.Builder().Set("email", "test@faas.com");
+
+        var result =
+            jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingSharedEvaluatorReturningBoolType", false,
                 builder.Build());
 
-            Assert.True(result.Value);
-            Assert.Equal("bool1", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+        Assert.True(result.Value);
+        Assert.Equal("true", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicBoolEvaluationSharedEvaluator()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorDynamicBoolEvaluationWithMissingDefaultVariant()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var builder = EvaluationContext.Builder().Set("email", "test@faas.com");
+        var builder = EvaluationContext.Builder();
 
-            var result =
-                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingSharedEvaluator", false, builder.Build());
+        Assert.Throws<FeatureProviderException>(() =>
+            jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagWithMissingDefaultVariant", false,
+                builder.Build()));
+    }
 
-            Assert.True(result.Value);
-            Assert.Equal("bool1", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+    [Fact]
+    public void TestJsonEvaluatorDynamicBoolEvaluationWithUnexpectedVariantType()
+    {
+        var fixture = new Fixture();
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicBoolEvaluationSharedEvaluatorReturningBoolType()
-        {
-            var fixture = new Fixture();
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        var builder = EvaluationContext.Builder();
 
-            var builder = EvaluationContext.Builder().Set("email", "test@faas.com");
+        Assert.Throws<FeatureProviderException>(() =>
+            jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagWithUnexpectedVariantType", false,
+                builder.Build()));
+    }
 
-            var result =
-                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagUsingSharedEvaluatorReturningBoolType", false,
-                    builder.Build());
+    [Fact]
+    public void TestJsonEvaluatorDynamicStringEvaluation()
+    {
+        var fixture = new Fixture();
 
-            Assert.True(result.Value);
-            Assert.Equal("true", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicBoolEvaluationWithMissingDefaultVariant()
-        {
-            var fixture = new Fixture();
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        var builder = EvaluationContext.Builder();
+        builder
+            .Set("color", "yellow");
 
-            var builder = EvaluationContext.Builder();
+        var result = jsonEvaluator.ResolveStringValueAsync("targetingStringFlag", "", builder.Build());
 
-            Assert.Throws<FeatureProviderException>(() =>
-                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagWithMissingDefaultVariant", false,
-                    builder.Build()));
-        }
+        Assert.Equal("my-string", result.Value);
+        Assert.Equal("str1", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicBoolEvaluationWithUnexpectedVariantType()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorDynamicFloatEvaluation()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var builder = EvaluationContext.Builder();
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            Assert.Throws<FeatureProviderException>(() =>
-                jsonEvaluator.ResolveBooleanValueAsync("targetingBoolFlagWithUnexpectedVariantType", false,
-                    builder.Build()));
-        }
+        var builder = EvaluationContext.Builder();
+        builder
+            .Set("color", "yellow");
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicStringEvaluation()
-        {
-            var fixture = new Fixture();
+        var result = jsonEvaluator.ResolveDoubleValueAsync("targetingFloatFlag", 0, builder.Build());
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        Assert.Equal(100, result.Value);
+        Assert.Equal("number1", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+    [Fact]
+    public void TestJsonEvaluatorDynamicIntEvaluation()
+    {
+        var fixture = new Fixture();
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            var builder = EvaluationContext.Builder();
-            builder
-                .Set("color", "yellow");
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var result = jsonEvaluator.ResolveStringValueAsync("targetingStringFlag", "", builder.Build());
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            Assert.Equal("my-string", result.Value);
-            Assert.Equal("str1", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+        var builder = EvaluationContext.Builder();
+        builder
+            .Set("color", "yellow");
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicFloatEvaluation()
-        {
-            var fixture = new Fixture();
+        var result = jsonEvaluator.ResolveIntegerValueAsync("targetingNumberFlag", 0, builder.Build());
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        Assert.Equal(100, result.Value);
+        Assert.Equal("number1", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+    [Fact]
+    public void TestJsonEvaluatorDynamicObjectEvaluation()
+    {
+        var fixture = new Fixture();
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            var builder = EvaluationContext.Builder();
-            builder
-                .Set("color", "yellow");
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var result = jsonEvaluator.ResolveDoubleValueAsync("targetingFloatFlag", 0, builder.Build());
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            Assert.Equal(100, result.Value);
-            Assert.Equal("number1", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+        var builder = EvaluationContext.Builder();
+        builder
+            .Set("color", "yellow");
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicIntEvaluation()
-        {
-            var fixture = new Fixture();
+        var result = jsonEvaluator.ResolveStructureValueAsync("targetingObjectFlag", null, builder.Build());
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        Assert.True(result.Value.AsStructure.AsDictionary()["key"].AsBoolean);
+        Assert.Equal("object1", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+    [Fact]
+    public void TestJsonEvaluatorDisabledBoolEvaluation()
+    {
+        var fixture = new Fixture();
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            var builder = EvaluationContext.Builder();
-            builder
-                .Set("color", "yellow");
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var result = jsonEvaluator.ResolveIntegerValueAsync("targetingNumberFlag", 0, builder.Build());
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            Assert.Equal(100, result.Value);
-            Assert.Equal("number1", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+        var builder = EvaluationContext.Builder();
+        builder
+            .Set("color", "yellow");
 
-        [Fact]
-        public void TestJsonEvaluatorDynamicObjectEvaluation()
-        {
-            var fixture = new Fixture();
+        Assert.Throws<FeatureProviderException>(() =>
+            jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false, builder.Build()));
+    }
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+    [Fact]
+    public void TestJsonEvaluatorFlagNotFoundEvaluation()
+    {
+        var fixture = new Fixture();
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var builder = EvaluationContext.Builder();
-            builder
-                .Set("color", "yellow");
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            var result = jsonEvaluator.ResolveStructureValueAsync("targetingObjectFlag", null, builder.Build());
+        var builder = EvaluationContext.Builder();
+        builder
+            .Set("color", "yellow");
 
-            Assert.True(result.Value.AsStructure.AsDictionary()["key"].AsBoolean);
-            Assert.Equal("object1", result.Variant);
-            Assert.Equal(Reason.TargetingMatch, result.Reason);
-        }
+        Assert.Throws<FeatureProviderException>(() =>
+            jsonEvaluator.ResolveBooleanValueAsync("missingFlag", false, builder.Build()));
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorDisabledBoolEvaluation()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorWrongTypeEvaluation()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
+        attributes.Add("color", new Value("yellow"));
 
-            var builder = EvaluationContext.Builder();
-            builder
-                .Set("color", "yellow");
+        var builder = EvaluationContext.Builder();
+        builder
+            .Set("color", "yellow");
 
-            Assert.Throws<FeatureProviderException>(() =>
-                jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false, builder.Build()));
-        }
+        Assert.Throws<FeatureProviderException>(() =>
+            jsonEvaluator.ResolveBooleanValueAsync("staticStringFlag", false, builder.Build()));
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorFlagNotFoundEvaluation()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorReturnsFlagMetadata()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
+        Assert.NotNull(result.FlagMetadata);
+        Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
+        Assert.Equal(2, result.FlagMetadata.GetDouble("integer"));
+        Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
+        Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
+    }
 
-            var builder = EvaluationContext.Builder();
-            builder
-                .Set("color", "yellow");
+    [Fact]
+    public void TestJsonEvaluatorAddsFlagSetMetadataToFlagWithoutMetadata()
+    {
+        var fixture = new Fixture();
 
-            Assert.Throws<FeatureProviderException>(() =>
-                jsonEvaluator.ResolveBooleanValueAsync("missingFlag", false, builder.Build()));
-        }
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-        [Fact]
-        public void TestJsonEvaluatorWrongTypeEvaluation()
-        {
-            var fixture = new Fixture();
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var result = jsonEvaluator.ResolveBooleanValueAsync("without-metadata-flag", false);
+        Assert.NotNull(result.FlagMetadata);
+        Assert.Equal("1.0.3", result.FlagMetadata.GetString("string"));
+        Assert.Equal(3, result.FlagMetadata.GetDouble("integer"));
+        Assert.Equal(false, result.FlagMetadata.GetBool("boolean"));
+        Assert.Equal(.2, result.FlagMetadata.GetDouble("float"));
+    }
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+    [Fact]
+    public void TestJsonEvaluatorFlagMetadataOverwritesFlagSetMetadata()
+    {
+        var fixture = new Fixture();
 
-            var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-            attributes.Add("color", new Value("yellow"));
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            var builder = EvaluationContext.Builder();
-            builder
-                .Set("color", "yellow");
+        jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
 
-            Assert.Throws<FeatureProviderException>(() =>
-                jsonEvaluator.ResolveBooleanValueAsync("staticStringFlag", false, builder.Build()));
-        }
+        var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
 
-        [Fact]
-        public void TestJsonEvaluatorReturnsFlagMetadata()
-        {
-            var fixture = new Fixture();
+        Assert.NotNull(result.FlagMetadata);
+        Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
+        Assert.Equal(2, result.FlagMetadata.GetDouble("integer"));
+        Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
+        Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
+    }
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+    [Fact]
+    public void TestJsonEvaluatorThrowsOnInvalidFlagSetMetadata()
+    {
+        var fixture = new Fixture();
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
-            Assert.NotNull(result.FlagMetadata);
-            Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
-            Assert.Equal(2, result.FlagMetadata.GetDouble("integer"));
-            Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
-            Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
-        }
+        Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagSetMetadata));
+    }
 
-        [Fact]
-        public void TestJsonEvaluatorAddsFlagSetMetadataToFlagWithoutMetadata()
-        {
-            var fixture = new Fixture();
+    [Fact]
+    public void TestJsonEvaluatorThrowsOnInvalidFlagMetadata()
+    {
+        var fixture = new Fixture();
 
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
+        var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
 
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
-
-            var result = jsonEvaluator.ResolveBooleanValueAsync("without-metadata-flag", false);
-            Assert.NotNull(result.FlagMetadata);
-            Assert.Equal("1.0.3", result.FlagMetadata.GetString("string"));
-            Assert.Equal(3, result.FlagMetadata.GetDouble("integer"));
-            Assert.Equal(false, result.FlagMetadata.GetBool("boolean"));
-            Assert.Equal(.2, result.FlagMetadata.GetDouble("float"));
-        }
-
-        [Fact]
-        public void TestJsonEvaluatorFlagMetadataOverwritesFlagSetMetadata()
-        {
-            var fixture = new Fixture();
-
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
-
-            jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.metadataFlags);
-
-            var result = jsonEvaluator.ResolveBooleanValueAsync("metadata-flag", false);
-
-            Assert.NotNull(result.FlagMetadata);
-            Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
-            Assert.Equal(2, result.FlagMetadata.GetDouble("integer"));
-            Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
-            Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
-        }
-
-        [Fact]
-        public void TestJsonEvaluatorThrowsOnInvalidFlagSetMetadata()
-        {
-            var fixture = new Fixture();
-
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
-
-            Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagSetMetadata));
-        }
-
-        [Fact]
-        public void TestJsonEvaluatorThrowsOnInvalidFlagMetadata()
-        {
-            var fixture = new Fixture();
-
-            var jsonEvaluator = new JsonEvaluator(fixture.Create<string>());
-
-            Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagMetadata));
-        }
+        Assert.Throws<ParseErrorException>(() => jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagMetadata));
     }
 }

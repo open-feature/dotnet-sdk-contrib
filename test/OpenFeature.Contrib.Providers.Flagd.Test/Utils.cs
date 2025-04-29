@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenFeature.Contrib.Providers.Flagd.Test
+namespace OpenFeature.Contrib.Providers.Flagd.Test;
+
+public class Utils
 {
-    public class Utils
-    {
-        public static string validFlagConfig = @"{
+    public static string validFlagConfig = @"{
             ""flags"": {
                 ""validFlag"": {
                     ""state"": ""ENABLED"",
@@ -20,7 +20,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
                 }
         }";
 
-        public static string invalidFlagConfig = @"{
+    public static string invalidFlagConfig = @"{
   ""flags"": {
     ""invalidFlag"": {
       ""notState"": ""ENABLED"",
@@ -33,7 +33,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
   }
 }";
 
-        public static string flags = @"{
+    public static string flags = @"{
   ""$evaluators"":{
     ""emailWithFaas"": {
         ""ends_with"": [{""var"":""email""}, ""@faas.com""]
@@ -319,7 +319,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
   }
 }";
 
-        public static string metadataFlags = @"{
+    public static string metadataFlags = @"{
   ""flags"":{
     ""metadata-flag"": {
       ""state"": ""ENABLED"",
@@ -352,7 +352,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
   }
 }";
 
-        public static string invalidFlagSetMetadata = @"{
+    public static string invalidFlagSetMetadata = @"{
   ""flags"":{
     ""without-metadata-flag"": {
       ""state"": ""ENABLED"",
@@ -370,7 +370,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
     ""float"": 0.2
   }
 }";
-        public static string invalidFlagMetadata = @"{
+    public static string invalidFlagMetadata = @"{
   ""flags"":{
     ""invalid-metadata-flag"": {
       ""state"": ""ENABLED"",
@@ -390,61 +390,60 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test
 }";
 
 
-        /// <summary>
-        /// Repeatedly runs the supplied assertion until it doesn't throw, or the timeout is reached.
-        /// </summary>
-        /// <param name="assertionFunc">Function which makes an assertion</param>
-        /// <param name="timeoutMillis">Timeout in millis (defaults to 1000)</param>
-        /// <param name="pollIntervalMillis">Poll interval (defaults to 100</param>
-        /// <returns></returns>
-        public static async Task AssertUntilAsync(Func<CancellationToken, Task> assertionFunc, int timeoutMillis = 10000,
-            int pollIntervalMillis = 100)
+    /// <summary>
+    /// Repeatedly runs the supplied assertion until it doesn't throw, or the timeout is reached.
+    /// </summary>
+    /// <param name="assertionFunc">Function which makes an assertion</param>
+    /// <param name="timeoutMillis">Timeout in millis (defaults to 1000)</param>
+    /// <param name="pollIntervalMillis">Poll interval (defaults to 100</param>
+    /// <returns></returns>
+    public static async Task AssertUntilAsync(Func<CancellationToken, Task> assertionFunc, int timeoutMillis = 10000,
+        int pollIntervalMillis = 100)
+    {
+        using (var cts = CancellationTokenSource.CreateLinkedTokenSource(default(CancellationToken)))
         {
-            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(default(CancellationToken)))
+            cts.CancelAfter(timeoutMillis);
+
+            var exceptions = new List<Exception>();
+            var message = "AssertUntilAsync timeout reached.";
+
+            while (!cts.IsCancellationRequested)
             {
-                cts.CancelAfter(timeoutMillis);
-
-                var exceptions = new List<Exception>();
-                var message = "AssertUntilAsync timeout reached.";
-
-                while (!cts.IsCancellationRequested)
+                try
                 {
-                    try
-                    {
-                        await assertionFunc(cts.Token);
-                        return;
-                    }
-                    catch (TaskCanceledException) when (cts.IsCancellationRequested)
-                    {
-                        throw new AggregateException(message, exceptions);
-                    }
-                    catch (Exception e)
-                    {
-                        exceptions.Add(e);
-                    }
-
-                    try
-                    {
-                        await Task.Delay(pollIntervalMillis, cts.Token).ConfigureAwait(false);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        throw new AggregateException(message, exceptions);
-                    }
+                    await assertionFunc(cts.Token).ConfigureAwait(false);
+                    return;
+                }
+                catch (TaskCanceledException) when (cts.IsCancellationRequested)
+                {
+                    throw new AggregateException(message, exceptions);
+                }
+                catch (Exception e)
+                {
+                    exceptions.Add(e);
                 }
 
-                throw new AggregateException(message, exceptions);
+                try
+                {
+                    await Task.Delay(pollIntervalMillis, cts.Token).ConfigureAwait(false);
+                }
+                catch (TaskCanceledException)
+                {
+                    throw new AggregateException(message, exceptions);
+                }
             }
-        }
 
-        internal static void CleanEnvVars()
-        {
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "");
+            throw new AggregateException(message, exceptions);
         }
+    }
+
+    internal static void CleanEnvVars()
+    {
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "");
     }
 }
