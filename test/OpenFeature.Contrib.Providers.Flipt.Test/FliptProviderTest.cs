@@ -46,7 +46,7 @@ public class FliptProviderTest
 
         var provider = new FliptProvider(new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object));
 
-        await Assert.ThrowsAsync<TypeMismatchException>(async () => await provider.ResolveDoubleValueAsync(flagKey, 0.0));
+        await Assert.ThrowsAsync<TypeMismatchException>(async () => await provider.ResolveDoubleValueAsync(flagKey, 0.0).ConfigureAwait(false));
     }
 
     [Fact]
