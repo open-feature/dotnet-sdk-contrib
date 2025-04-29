@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
@@ -16,6 +17,7 @@ using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.hooks;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
 using OpenFeature.Model;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag
 {
@@ -27,6 +29,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         private const string ApplicationJson = "application/json";
         private ExporterMetadata _exporterMetadata;
         private HttpClient _httpClient;
+
+        private IFusionCache _cache = null;
 
         /// <summary>
         ///     Constructor of the provider.
@@ -87,6 +91,27 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             if (options.ApiKey != null)
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", options.ApiKey);
+
+
+            var cacheMaxSize = options.CacheMaxSize ?? 10000;
+            var cacheMaxTTL = options.CacheMaxTTL ?? TimeSpan.FromSeconds(60);
+
+            var backingMemoryCache = new MemoryCache(new MemoryCacheOptions
+            {
+                SizeLimit = cacheMaxSize,
+                CompactionPercentage = 0.1,                    
+            });
+            
+            _cache = new FusionCache(new FusionCacheOptions
+            {
+                DefaultEntryOptions = new FusionCacheEntryOptions
+                {
+                    Size = 1,
+                    Duration = cacheMaxTTL,
+                },
+                
+            }, backingMemoryCache);
+           
         }
 
         /// <summary>
@@ -114,9 +139,13 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-                return new ResolutionDetails<bool>(flagKey, bool.Parse(resp.Value.ToString()), ErrorType.None,
-                    resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                var key = GenerateCacheKey(flagKey, context);
+                return await _cache.GetOrSetAsync<ResolutionDetails<bool>>(key, async (_, _) =>
+                {
+                    var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
+                    return new ResolutionDetails<bool>(flagKey, bool.Parse(resp.Value.ToString()), ErrorType.None,
+                        resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                }).ConfigureAwait(false);
             }
             catch (FormatException e)
             {
@@ -146,11 +175,15 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-                if (!(resp.Value is JsonElement element && element.ValueKind == JsonValueKind.String))
-                    throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
-                return new ResolutionDetails<string>(flagKey, resp.Value.ToString(), ErrorType.None, resp.Reason,
-                    resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                var key = GenerateCacheKey(flagKey, context);
+                return await _cache.GetOrSetAsync<ResolutionDetails<string>>(key, async (_,_) =>
+                {
+                    var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
+                    if (!(resp.Value is JsonElement element && element.ValueKind == JsonValueKind.String))
+                        throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
+                    return new ResolutionDetails<string>(flagKey, resp.Value.ToString(), ErrorType.None, resp.Reason,
+                        resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                }).ConfigureAwait(false);
             }
             catch (FormatException e)
             {
@@ -179,9 +212,13 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-                return new ResolutionDetails<int>(flagKey, int.Parse(resp.Value.ToString()), ErrorType.None,
-                    resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                var key = GenerateCacheKey(flagKey, context);
+                return await _cache.GetOrSetAsync<ResolutionDetails<int>>(key, async (_,_) =>
+                { 
+                    var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
+                    return new ResolutionDetails<int>(flagKey, int.Parse(resp.Value.ToString()), ErrorType.None,
+                        resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                }).ConfigureAwait(false);
             }
             catch (FormatException e)
             {
@@ -211,10 +248,14 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-                return new ResolutionDetails<double>(flagKey,
-                    double.Parse(resp.Value.ToString(), CultureInfo.InvariantCulture), ErrorType.None,
-                    resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                var key = GenerateCacheKey(flagKey, context);
+                return await _cache.GetOrSetAsync<ResolutionDetails<double>>(key, async (_,_) =>
+                {
+                    var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
+                    return new ResolutionDetails<double>(flagKey,
+                        double.Parse(resp.Value.ToString(), CultureInfo.InvariantCulture), ErrorType.None,
+                        resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                }).ConfigureAwait(false);
             }
             catch (FormatException e)
             {
@@ -244,15 +285,19 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         {
             try
             {
-                var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-                if (resp.Value is JsonElement)
+                var key = GenerateCacheKey(flagKey, context);
+                return await _cache.GetOrSetAsync<ResolutionDetails<Value>>(key, async (_,_) =>
                 {
-                    var value = ConvertValue((JsonElement)resp.Value);
-                    return new ResolutionDetails<Value>(flagKey, value, ErrorType.None, resp.Reason,
-                        resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
-                }
+                    var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
+                    if (resp.Value is JsonElement)
+                    {
+                        var value = ConvertValue((JsonElement)resp.Value);
+                        return new ResolutionDetails<Value>(flagKey, value, ErrorType.None, resp.Reason,
+                            resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
+                    }
 
-                throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
+                    throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
+                }).ConfigureAwait(false);
             }
             catch (FormatException e)
             {
@@ -309,6 +354,11 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                 ofrepResp.Metadata = DictionaryConverter.ConvertDictionary(ofrepResp.Metadata);
 
             return ofrepResp;
+        }
+
+        private string GenerateCacheKey(string flagKey, EvaluationContext ctx)
+        {
+            return ctx != null ? new OfrepRequest(ctx).AsJsonString() : flagKey;
         }
 
         /// <summary>

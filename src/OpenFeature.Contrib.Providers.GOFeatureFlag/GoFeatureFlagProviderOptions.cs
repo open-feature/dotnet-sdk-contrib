@@ -41,5 +41,18 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         ///     evaluation data sent to the exporter.
         /// </summary>
         public ExporterMetadata ExporterMetadata { get; set; }
+
+
+        /// <summary>
+        ///     (optional) How long is an entry allowed to be cached in memory 
+        ///     Default: 60 seconds
+        /// </summary>
+        public TimeSpan? CacheMaxTTL { get; set; }
+
+        /// <summary>
+        ///     (optional) How many entries may be cached
+        ///     Default: 10000
+        /// </summary>
+        public int? CacheMaxSize { get; set; }
     }
 }
