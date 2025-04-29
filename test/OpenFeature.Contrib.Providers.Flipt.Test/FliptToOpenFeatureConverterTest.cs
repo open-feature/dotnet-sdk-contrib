@@ -1,14 +1,16 @@
 // ReSharper disable RedundantUsingDirective
 
+using System.Net;
+#if NET462_OR_GREATER
+using System.Net.Http;
+#endif
+using System.Text.Json;
 using Flipt.Rest;
 using Moq;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
-using System.Net;
-using System.Net.Http;
-using System.Text.Json;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
@@ -32,7 +34,7 @@ public class FliptToOpenFeatureConverterTest
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
 
-        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateBooleanAsync("flagKey", fallbackValue));
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateBooleanAsync("flagKey", fallbackValue).ConfigureAwait(false));
     }
 
     [Theory]
@@ -70,7 +72,7 @@ public class FliptToOpenFeatureConverterTest
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
 
-        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateBooleanAsync(flagKey, fallBackValue));
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateBooleanAsync(flagKey, fallBackValue).ConfigureAwait(false));
     }
 
     // EvaluateAsync Tests
@@ -91,7 +93,7 @@ public class FliptToOpenFeatureConverterTest
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
 
-        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("flagKey", fallbackValue));
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("flagKey", fallbackValue).ConfigureAwait(false));
     }
 
     [Theory]
@@ -177,7 +179,7 @@ public class FliptToOpenFeatureConverterTest
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
 
-        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue));
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue).ConfigureAwait(false));
     }
 
     [Fact]
@@ -191,6 +193,6 @@ public class FliptToOpenFeatureConverterTest
 
         var fliptToOpenFeature = new FliptToOpenFeatureConverter(mockFliptClientWrapper.Object);
 
-        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue));
+        await Assert.ThrowsAsync<HttpRequestException>(async () => await fliptToOpenFeature.EvaluateAsync("non-existent-flag", fallbackValue).ConfigureAwait(false));
     }
 }

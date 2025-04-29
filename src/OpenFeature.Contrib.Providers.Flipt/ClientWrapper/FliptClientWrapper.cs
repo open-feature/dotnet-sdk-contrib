@@ -27,13 +27,13 @@ public class FliptClientWrapper : IFliptClientWrapper
     /// <inheritdoc />
     public async Task<VariantEvaluationResponse> EvaluateVariantAsync(EvaluationRequest evaluationRequest)
     {
-        return await _fliptRestClient.EvaluateV1VariantAsync(evaluationRequest);
+        return await _fliptRestClient.EvaluateV1VariantAsync(evaluationRequest).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<BooleanEvaluationResponse> EvaluateBooleanAsync(EvaluationRequest evaluationRequest)
     {
-        return await _fliptRestClient.EvaluateV1BooleanAsync(evaluationRequest);
+        return await _fliptRestClient.EvaluateV1BooleanAsync(evaluationRequest).ConfigureAwait(false);
     }
 
     private static FliptRestClient BuildClient(string fliptUrl, string clientToken, int timeoutInSeconds = 30)
