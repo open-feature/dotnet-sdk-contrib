@@ -54,7 +54,7 @@ public class FliptToOpenFeatureConverter : IFliptToOpenFeatureConverter
 
         try
         {
-            var evaluationResponse = await _fliptClientWrapper.EvaluateVariantAsync(evaluationRequest);
+            var evaluationResponse = await _fliptClientWrapper.EvaluateVariantAsync(evaluationRequest).ConfigureAwait(false);
 
             if (evaluationResponse.Reason == VariantEvaluationResponseReason.FLAG_DISABLED_EVALUATION_REASON)
                 return new ResolutionDetails<T>(flagKey, defaultValue, ErrorType.None,
@@ -107,7 +107,7 @@ public class FliptToOpenFeatureConverter : IFliptToOpenFeatureConverter
                 EntityId = context?.TargetingKey ?? "",
                 Context = context.ToStringDictionary()
             };
-            var boolEvaluationResponse = await _fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest);
+            var boolEvaluationResponse = await _fliptClientWrapper.EvaluateBooleanAsync(evaluationRequest).ConfigureAwait(false);
             return new ResolutionDetails<bool>(flagKey, boolEvaluationResponse.Enabled, ErrorType.None,
                 Reason.TargetingMatch);
         }

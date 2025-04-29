@@ -1,6 +1,6 @@
+using System.Text.Json;
 using OpenFeature.Contrib.Providers.Flipt.Converters;
 using OpenFeature.Model;
-using System.Text.Json;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flipt.Test;
