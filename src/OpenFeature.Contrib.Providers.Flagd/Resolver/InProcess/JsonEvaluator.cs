@@ -1,9 +1,3 @@
-using Json.Logic;
-using Json.More;
-using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
-using OpenFeature.Error;
-using OpenFeature.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -12,6 +6,12 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using Json.Logic;
+using Json.More;
+using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+using OpenFeature.Error;
+using OpenFeature.Model;
 using EvaluationContext = OpenFeature.Model.EvaluationContext;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
