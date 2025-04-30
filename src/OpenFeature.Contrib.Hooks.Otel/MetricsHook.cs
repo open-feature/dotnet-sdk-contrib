@@ -7,95 +7,94 @@ using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Hooks.Otel
+namespace OpenFeature.Contrib.Hooks.Otel;
+
+/// <summary>
+/// Represents a hook for capturing metrics related to flag evaluations.
+/// The meter name is "OpenFeature.Contrib.Hooks.Otel".
+/// </summary>
+public class MetricsHook : Hook
 {
+    private static readonly AssemblyName AssemblyName = typeof(MetricsHook).Assembly.GetName();
+    private static readonly string InstrumentationName = AssemblyName.Name;
+    private static readonly string InstrumentationVersion = AssemblyName.Version?.ToString();
+
+    private readonly UpDownCounter<long> _evaluationActiveUpDownCounter;
+    private readonly Counter<long> _evaluationRequestCounter;
+    private readonly Counter<long> _evaluationSuccessCounter;
+    private readonly Counter<long> _evaluationErrorCounter;
+
     /// <summary>
-    /// Represents a hook for capturing metrics related to flag evaluations.
-    /// The meter name is "OpenFeature.Contrib.Hooks.Otel".
+    /// Initializes a new instance of the <see cref="MetricsHook"/> class.
     /// </summary>
-    public class MetricsHook : Hook
+    public MetricsHook()
     {
-        private static readonly AssemblyName AssemblyName = typeof(MetricsHook).Assembly.GetName();
-        private static readonly string InstrumentationName = AssemblyName.Name;
-        private static readonly string InstrumentationVersion = AssemblyName.Version?.ToString();
+        var meter = new Meter(InstrumentationName, InstrumentationVersion);
 
-        private readonly UpDownCounter<long> _evaluationActiveUpDownCounter;
-        private readonly Counter<long> _evaluationRequestCounter;
-        private readonly Counter<long> _evaluationSuccessCounter;
-        private readonly Counter<long> _evaluationErrorCounter;
+        _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<long>(MetricsConstants.ActiveCountName, description: MetricsConstants.ActiveDescription);
+        _evaluationRequestCounter = meter.CreateCounter<long>(MetricsConstants.RequestsTotalName, "{request}", MetricsConstants.RequestsDescription);
+        _evaluationSuccessCounter = meter.CreateCounter<long>(MetricsConstants.SuccessTotalName, "{impression}", MetricsConstants.SuccessDescription);
+        _evaluationErrorCounter = meter.CreateCounter<long>(MetricsConstants.ErrorTotalName, description: MetricsConstants.ErrorDescription);
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MetricsHook"/> class.
-        /// </summary>
-        public MetricsHook()
+    /// <inheritdoc/>
+    public override ValueTask<EvaluationContext> BeforeAsync<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+    {
+        var tagList = new TagList
         {
-            var meter = new Meter(InstrumentationName, InstrumentationVersion);
+            { MetricsConstants.KeyAttr, context.FlagKey },
+            { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name }
+        };
 
-            _evaluationActiveUpDownCounter = meter.CreateUpDownCounter<long>(MetricsConstants.ActiveCountName, description: MetricsConstants.ActiveDescription);
-            _evaluationRequestCounter = meter.CreateCounter<long>(MetricsConstants.RequestsTotalName, "{request}", MetricsConstants.RequestsDescription);
-            _evaluationSuccessCounter = meter.CreateCounter<long>(MetricsConstants.SuccessTotalName, "{impression}", MetricsConstants.SuccessDescription);
-            _evaluationErrorCounter = meter.CreateCounter<long>(MetricsConstants.ErrorTotalName, description: MetricsConstants.ErrorDescription);
-        }
+        _evaluationActiveUpDownCounter.Add(1, tagList);
+        _evaluationRequestCounter.Add(1, tagList);
 
-        /// <inheritdoc/>
-        public override ValueTask<EvaluationContext> BeforeAsync<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+        return base.BeforeAsync(context, hints);
+    }
+
+
+    /// <inheritdoc/>
+    public override ValueTask AfterAsync<T>(HookContext<T> context, FlagEvaluationDetails<T> details, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+    {
+        var tagList = new TagList
         {
-            var tagList = new TagList
-            {
-                { MetricsConstants.KeyAttr, context.FlagKey },
-                { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name }
-            };
+            { MetricsConstants.KeyAttr, context.FlagKey },
+            { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name },
+            { MetricsConstants.VariantAttr, details.Variant ?? details.Value?.ToString() },
+            { MetricsConstants.ReasonAttr, details.Reason ?? "UNKNOWN" }
+        };
 
-            _evaluationActiveUpDownCounter.Add(1, tagList);
-            _evaluationRequestCounter.Add(1, tagList);
+        _evaluationSuccessCounter.Add(1, tagList);
 
-            return base.BeforeAsync(context, hints);
-        }
+        return base.AfterAsync(context, details, hints);
+    }
 
-
-        /// <inheritdoc/>
-        public override ValueTask AfterAsync<T>(HookContext<T> context, FlagEvaluationDetails<T> details, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public override ValueTask ErrorAsync<T>(HookContext<T> context, Exception error, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+    {
+        var tagList = new TagList
         {
-            var tagList = new TagList
-            {
-                { MetricsConstants.KeyAttr, context.FlagKey },
-                { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name },
-                { MetricsConstants.VariantAttr, details.Variant ?? details.Value?.ToString() },
-                { MetricsConstants.ReasonAttr, details.Reason ?? "UNKNOWN" }
-            };
+            { MetricsConstants.KeyAttr, context.FlagKey },
+            { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name },
+            { MetricsConstants.ExceptionAttr, error?.Message ?? "Unknown error" }
+        };
 
-            _evaluationSuccessCounter.Add(1, tagList);
+        _evaluationErrorCounter.Add(1, tagList);
 
-            return base.AfterAsync(context, details, hints);
-        }
+        return base.ErrorAsync(context, error, hints);
+    }
 
-        /// <inheritdoc/>
-        public override ValueTask ErrorAsync<T>(HookContext<T> context, Exception error, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public override ValueTask FinallyAsync<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+    {
+        var tagList = new TagList
         {
-            var tagList = new TagList
-            {
-                { MetricsConstants.KeyAttr, context.FlagKey },
-                { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name },
-                { MetricsConstants.ExceptionAttr, error?.Message ?? "Unknown error" }
-            };
+            { MetricsConstants.KeyAttr, context.FlagKey },
+            { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name }
+        };
 
-            _evaluationErrorCounter.Add(1, tagList);
+        _evaluationActiveUpDownCounter.Add(-1, tagList);
 
-            return base.ErrorAsync(context, error, hints);
-        }
-
-        /// <inheritdoc/>
-        public override ValueTask FinallyAsync<T>(HookContext<T> context, IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
-        {
-            var tagList = new TagList
-            {
-                { MetricsConstants.KeyAttr, context.FlagKey },
-                { MetricsConstants.ProviderNameAttr, context.ProviderMetadata.Name }
-            };
-
-            _evaluationActiveUpDownCounter.Add(-1, tagList);
-
-            return base.FinallyAsync(context, hints);
-        }
+        return base.FinallyAsync(context, hints);
     }
 }

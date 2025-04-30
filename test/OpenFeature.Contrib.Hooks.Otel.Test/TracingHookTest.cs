@@ -1,176 +1,174 @@
-using Xunit;
+using System.Collections.Generic;
 using System.Diagnostics;
 using OpenFeature.Model;
 using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System.Collections.Generic;
-using OpenTelemetry.Exporter;
-using System.Linq;
+using Xunit;
 
-namespace OpenFeature.Contrib.Hooks.Otel.Test
+namespace OpenFeature.Contrib.Hooks.Otel.Test;
+
+public class TracingHookTest
 {
-    public class TracingHookTest
+    [Fact]
+    public void TestAfter()
     {
-        [Fact]
-        public void TestAfter()
-        {
-            // List that will be populated with the traces by InMemoryExporter
-            var exportedItems = new List<Activity>();
+        // List that will be populated with the traces by InMemoryExporter
+        var exportedItems = new List<Activity>();
 
-            // Create a new in-memory exporter
-            var exporter = new InMemoryExporter<Activity>(exportedItems);
+        // Create a new in-memory exporter
+        var exporter = new InMemoryExporter<Activity>(exportedItems);
 
-            var tracerProvider = Sdk.CreateTracerProviderBuilder()
-                    .AddSource("my-tracer")
-                    .ConfigureResource(r => r.AddService("inmemory-test"))
-                    .AddInMemoryExporter(exportedItems)
-                    .Build();
+        var tracerProvider = Sdk.CreateTracerProviderBuilder()
+                .AddSource("my-tracer")
+                .ConfigureResource(r => r.AddService("inmemory-test"))
+                .AddInMemoryExporter(exportedItems)
+                .Build();
 
 
-            var tracer = tracerProvider.GetTracer("my-tracer");
+        var tracer = tracerProvider.GetTracer("my-tracer");
 
-            var span = tracer.StartActiveSpan("my-span");
+        var span = tracer.StartActiveSpan("my-span");
 
-            var otelHook = new TracingHook();
+        var otelHook = new TracingHook();
 
-            var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
+        var evaluationContext = EvaluationContext.Empty;
 
-            var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
+        var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-            var hookTask = otelHook.AfterAsync<string>(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
+        var hookTask = otelHook.AfterAsync(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
 
-            Assert.True(hookTask.IsCompleted);
+        Assert.True(hookTask.IsCompleted);
 
-            span.End();
+        span.End();
 
-            Assert.Single(exportedItems);
+        Assert.Single(exportedItems);
 
-            var rootSpan = exportedItems[0];
+        var rootSpan = exportedItems[0];
 
-            Assert.Single(rootSpan.Events);
+        Assert.Single(rootSpan.Events);
 
-            var eventsEnum = rootSpan.Events.GetEnumerator();
-            eventsEnum.MoveNext();
+        var eventsEnum = rootSpan.Events.GetEnumerator();
+        eventsEnum.MoveNext();
 
-            ActivityEvent ev = (ActivityEvent)eventsEnum.Current;
-            Assert.Equal("feature_flag", ev.Name);
+        ActivityEvent ev = (ActivityEvent)eventsEnum.Current;
+        Assert.Equal("feature_flag", ev.Name);
 
-            var tagsEnum = ev.Tags.GetEnumerator();
+        var tagsEnum = ev.Tags.GetEnumerator();
 
-            Assert.Contains(new KeyValuePair<string, object>("feature_flag.key", "my-flag"), ev.Tags);
-            Assert.Contains(new KeyValuePair<string, object>("feature_flag.variant", "default"), ev.Tags);
-            Assert.Contains(new KeyValuePair<string, object>("feature_flag.provider_name", "my-provider"), ev.Tags);
-        }
+        Assert.Contains(new KeyValuePair<string, object>("feature_flag.key", "my-flag"), ev.Tags);
+        Assert.Contains(new KeyValuePair<string, object>("feature_flag.variant", "default"), ev.Tags);
+        Assert.Contains(new KeyValuePair<string, object>("feature_flag.provider_name", "my-provider"), ev.Tags);
+    }
 
-        [Fact]
-        public void TestAfterNoSpan()
-        {
-            // List that will be populated with the traces by InMemoryExporter
-            var exportedItems = new List<Activity>();
+    [Fact]
+    public void TestAfterNoSpan()
+    {
+        // List that will be populated with the traces by InMemoryExporter
+        var exportedItems = new List<Activity>();
 
-            // Create a new in-memory exporter
-            var exporter = new InMemoryExporter<Activity>(exportedItems);
+        // Create a new in-memory exporter
+        var exporter = new InMemoryExporter<Activity>(exportedItems);
 
-            var tracerProvider = Sdk.CreateTracerProviderBuilder()
-                    .AddSource("my-tracer")
-                    .ConfigureResource(r => r.AddService("inmemory-test"))
-                    .AddInMemoryExporter(exportedItems)
-                    .Build();
-
-
-            var tracer = tracerProvider.GetTracer("my-tracer");
-
-            var otelHook = new TracingHook();
-
-            var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
-
-            var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
-
-            var hookTask = otelHook.AfterAsync<string>(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
-
-            Assert.True(hookTask.IsCompleted);
-
-            Assert.Empty(exportedItems);
-        }
-
-        [Fact]
-        public void TestError()
-        {
-            // List that will be populated with the traces by InMemoryExporter
-            var exportedItems = new List<Activity>();
-
-            // Create a new in-memory exporter
-            var exporter = new InMemoryExporter<Activity>(exportedItems);
-
-            var tracerProvider = Sdk.CreateTracerProviderBuilder()
-                    .AddSource("my-tracer")
-                    .ConfigureResource(r => r.AddService("inmemory-test"))
-                    .AddInMemoryExporter(exportedItems)
-                    .Build();
+        var tracerProvider = Sdk.CreateTracerProviderBuilder()
+                .AddSource("my-tracer")
+                .ConfigureResource(r => r.AddService("inmemory-test"))
+                .AddInMemoryExporter(exportedItems)
+                .Build();
 
 
-            var tracer = tracerProvider.GetTracer("my-tracer");
+        var tracer = tracerProvider.GetTracer("my-tracer");
 
-            var span = tracer.StartActiveSpan("my-span");
+        var otelHook = new TracingHook();
 
-            var otelHook = new TracingHook();
+        var evaluationContext = EvaluationContext.Empty;
 
-            var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
+        var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-            var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
+        var hookTask = otelHook.AfterAsync(ctx, new FlagEvaluationDetails<string>("my-flag", "foo", Constant.ErrorType.None, "STATIC", "default"), new Dictionary<string, object>());
 
-            var hookTask = otelHook.ErrorAsync<string>(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
+        Assert.True(hookTask.IsCompleted);
 
-            Assert.True(hookTask.IsCompleted);
+        Assert.Empty(exportedItems);
+    }
 
-            span.End();
+    [Fact]
+    public void TestError()
+    {
+        // List that will be populated with the traces by InMemoryExporter
+        var exportedItems = new List<Activity>();
 
-            Assert.Single(exportedItems);
+        // Create a new in-memory exporter
+        var exporter = new InMemoryExporter<Activity>(exportedItems);
 
-            var rootSpan = exportedItems[0];
-
-            Assert.Single(rootSpan.Events);
-
-            var enumerator = rootSpan.Events.GetEnumerator();
-            enumerator.MoveNext();
-            var ev = (ActivityEvent)enumerator.Current;
-
-            Assert.Equal("exception", ev.Name);
-
-            Assert.Contains(new KeyValuePair<string, object>("exception.message", "unexpected error"), ev.Tags);
-        }
-
-        [Fact]
-        public void TestErrorNoSpan()
-        {
-            // List that will be populated with the traces by InMemoryExporter
-            var exportedItems = new List<Activity>();
-
-            // Create a new in-memory exporter
-            var exporter = new InMemoryExporter<Activity>(exportedItems);
-
-            var tracerProvider = Sdk.CreateTracerProviderBuilder()
-                    .AddSource("my-tracer")
-                    .ConfigureResource(r => r.AddService("inmemory-test"))
-                    .AddInMemoryExporter(exportedItems)
-                    .Build();
+        var tracerProvider = Sdk.CreateTracerProviderBuilder()
+                .AddSource("my-tracer")
+                .ConfigureResource(r => r.AddService("inmemory-test"))
+                .AddInMemoryExporter(exportedItems)
+                .Build();
 
 
-            var tracer = tracerProvider.GetTracer("my-tracer");
+        var tracer = tracerProvider.GetTracer("my-tracer");
 
-            var otelHook = new TracingHook();
+        var span = tracer.StartActiveSpan("my-span");
 
-            var evaluationContext = OpenFeature.Model.EvaluationContext.Empty;
+        var otelHook = new TracingHook();
 
-            var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
+        var evaluationContext = EvaluationContext.Empty;
 
-            var hookTask = otelHook.ErrorAsync<string>(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
+        var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
 
-            Assert.True(hookTask.IsCompleted);
+        var hookTask = otelHook.ErrorAsync(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
 
-            Assert.Empty(exportedItems);
-        }
+        Assert.True(hookTask.IsCompleted);
+
+        span.End();
+
+        Assert.Single(exportedItems);
+
+        var rootSpan = exportedItems[0];
+
+        Assert.Single(rootSpan.Events);
+
+        var enumerator = rootSpan.Events.GetEnumerator();
+        enumerator.MoveNext();
+        var ev = (ActivityEvent)enumerator.Current;
+
+        Assert.Equal("exception", ev.Name);
+
+        Assert.Contains(new KeyValuePair<string, object>("exception.message", "unexpected error"), ev.Tags);
+    }
+
+    [Fact]
+    public void TestErrorNoSpan()
+    {
+        // List that will be populated with the traces by InMemoryExporter
+        var exportedItems = new List<Activity>();
+
+        // Create a new in-memory exporter
+        var exporter = new InMemoryExporter<Activity>(exportedItems);
+
+        var tracerProvider = Sdk.CreateTracerProviderBuilder()
+                .AddSource("my-tracer")
+                .ConfigureResource(r => r.AddService("inmemory-test"))
+                .AddInMemoryExporter(exportedItems)
+                .Build();
+
+
+        var tracer = tracerProvider.GetTracer("my-tracer");
+
+        var otelHook = new TracingHook();
+
+        var evaluationContext = EvaluationContext.Empty;
+
+        var ctx = new HookContext<string>("my-flag", "foo", Constant.FlagValueType.String, new ClientMetadata("my-client", "1.0"), new Metadata("my-provider"), evaluationContext);
+
+        var hookTask = otelHook.ErrorAsync(ctx, new System.Exception("unexpected error"), new Dictionary<string, object>());
+
+        Assert.True(hookTask.IsCompleted);
+
+        Assert.Empty(exportedItems);
     }
 }
 
