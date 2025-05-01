@@ -24,7 +24,7 @@
     <!-- The generated files will be placed in ./obj/Debug/netstandard2.0/Protos -->
     <PackageReference Include="JsonLogic" Version="5.4.0" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
-    <PackageReference Include="NJsonSchema" Version="11.2.0" />
+    <PackageReference Include="NJsonSchema" Version="11.0.0" />
     <PackageReference Include="Semver" Version="3.0.0" />
     <Protobuf Include="schemas\protobuf\flagd\evaluation\v1\evaluation.proto" GrpcServices="Client" />
     <Protobuf Include="schemas\protobuf\flagd\sync\v1\sync.proto" GrpcServices="Client" />
