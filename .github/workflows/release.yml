@@ -23,8 +23,9 @@ jobs:
           default-branch: main
           release-type: simple
     outputs:
-      releases_created: ${{ steps.release.outputs.releases_created }}
+      release_created: ${{ steps.release.outputs.releases_created }}
       release_tag_name: ${{ steps.release.outputs.release_tag_name }}
+      release_path: ${{ steps.release.outputs.releases_path }}
 
   release:
     needs: release-package
@@ -34,7 +35,7 @@ jobs:
       id-token: write
       contents: read
       attestations: write
-    if: ${{ needs.release-package.outputs.releases_created }}
+    if: ${{ needs.release-package.outputs.release_created }}
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
