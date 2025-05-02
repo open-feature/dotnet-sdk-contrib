@@ -1,5 +1,3 @@
-﻿using Flagsmith;
-
 namespace OpenFeature.Contrib.Providers.Flagsmith;
 
 /// <summary>
