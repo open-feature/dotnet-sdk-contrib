@@ -8,7 +8,7 @@ on:
 jobs:
   release-package:
     environment: publish
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write # for googleapis/release-please-action to create release commit
       pull-requests: write # for googleapis/release-please-action to create release PR
@@ -22,16 +22,28 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           default-branch: main
           release-type: simple
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      release_tag_name: ${{ steps.release.outputs.release_tag_name }}
 
+  release:
+    needs: release-package
+    environment: publish
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+    if: ${{ needs.release-package.outputs.releases_created }}
+
+    steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        if: ${{ steps.release.outputs.releases_created }}
         with:
           fetch-depth: 0
           submodules: recursive
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
-        if: ${{ steps.release.outputs.releases_created }}
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -39,20 +51,16 @@ jobs:
           source-url: https://nuget.pkg.github.com/open-feature/index.json
 
       - name: Install dependencies
-        if: ${{ steps.release.outputs.releases_created }}
         run: dotnet restore
 
       - name: Build
-        if: ${{ steps.release.outputs.releases_created }}
         run: |
           dotnet build --configuration Release --no-restore -p:Deterministic=true
 
       - name: Pack
-        if: ${{ steps.release.outputs.releases_created }}
         run: |
           dotnet pack --configuration Release --no-build
 
       - name: Publish to Nuget
-        if: ${{ steps.release.outputs.releases_created }}
         run: |
           dotnet nuget push --skip-duplicate "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_TOKEN}}
