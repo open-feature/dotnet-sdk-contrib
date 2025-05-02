@@ -7,12 +7,14 @@
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
-    <Description>An OpenFeature Provider built on top of the standard Microsoft FeatureManagement Library</Description>
+    <Description>An OpenFeature Provider built on top of the standard Microsoft FeatureManagement
+      Library</Description>
     <Authors>Eric Pattison</Authors>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.FeatureManagement" Version="4.0.0" />
+    <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
   </ItemGroup>
 
 </Project>
