@@ -9,7 +9,7 @@
     <Description>flagd provider for .NET</Description>
     <Authors>Todd Baert</Authors>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <!-- make the internal methods visble to our test project -->
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
@@ -20,7 +20,8 @@
     <PackageReference Include="System.Net.Http.WinHttpHandler" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <!-- The schema.proto file referenced here will be used to automatically generate the Grpc client when executing 'dotnet build' -->
+    <!-- The schema.proto file referenced here will be used to automatically generate the Grpc
+    client when executing 'dotnet build' -->
     <!-- The generated files will be placed in ./obj/Debug/netstandard2.0/Protos -->
     <PackageReference Include="JsonLogic" Version="5.4.0" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
@@ -33,6 +34,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0"
+      Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
   </ItemGroup>
 </Project>
