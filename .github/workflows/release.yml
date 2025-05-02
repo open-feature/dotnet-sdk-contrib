@@ -64,3 +64,11 @@ jobs:
       - name: Publish to Nuget
         run: |
           dotnet nuget push --skip-duplicate "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_TOKEN}}
+
+      # This will publish the attestations of all the artifacts, including the ones that are not published to a registry
+      # It is important to prevent the publishing of the attestations of the artifacts that are not published to a registry
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        with:
+          subject-path: "**/*.nupkg"
+        if: false
