@@ -47,12 +47,12 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         ///     (optional) How long is an entry allowed to be cached in memory 
         ///     Default: 60 seconds
         /// </summary>
-        public TimeSpan? CacheMaxTTL { get; set; }
+        public TimeSpan CacheMaxTTL { get; set; } = TimeSpan.FromSeconds(60);
 
         /// <summary>
         ///     (optional) How many entries may be cached
         ///     Default: 10000
         /// </summary>
-        public int? CacheMaxSize { get; set; }
+        public int CacheMaxSize { get; set; } = 10000;
     }
 }

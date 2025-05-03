@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -19,6 +20,7 @@ using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
 using OpenFeature.Model;
 using ZiggyCreatures.Caching.Fusion;
 
+[assembly: InternalsVisibleTo("OpenFeature.Contrib.Providers.GOFeatureFlag.Test")]
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag
 {
     /// <summary>
@@ -30,7 +32,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
         private ExporterMetadata _exporterMetadata;
         private HttpClient _httpClient;
 
-        private IFusionCache _cache = null;
+        internal IFusionCache _cache = null;
+        internal MemoryCache _backingCache = null;
 
         /// <summary>
         ///     Constructor of the provider.
@@ -93,26 +96,24 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
                     new AuthenticationHeaderValue("Bearer", options.ApiKey);
 
 
-            var cacheMaxSize = options.CacheMaxSize ?? 10000;
-            var cacheMaxTTL = options.CacheMaxTTL ?? TimeSpan.FromSeconds(60);
 
-            var backingMemoryCache = new MemoryCache(new MemoryCacheOptions
+            _backingCache = new MemoryCache(new MemoryCacheOptions
             {
-                SizeLimit = cacheMaxSize,
-                CompactionPercentage = 0.1,                    
+                SizeLimit = options.CacheMaxSize,
+                CompactionPercentage = 0.1,
             });
-            
+
             _cache = new FusionCache(new FusionCacheOptions
             {
                 DefaultEntryOptions = new FusionCacheEntryOptions
                 {
                     Size = 1,
-                    Duration = cacheMaxTTL,
+                    Duration = options.CacheMaxTTL,
                 },
-                
-            }, backingMemoryCache);
-           
+
+            }, _backingCache);
         }
+
 
         /// <summary>
         ///     Return the metadata associated to this provider.
@@ -176,7 +177,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var key = GenerateCacheKey(flagKey, context);
-                return await _cache.GetOrSetAsync<ResolutionDetails<string>>(key, async (_,_) =>
+                return await _cache.GetOrSetAsync<ResolutionDetails<string>>(key, async (_, _) =>
                 {
                     var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                     if (!(resp.Value is JsonElement element && element.ValueKind == JsonValueKind.String))
@@ -213,8 +214,8 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var key = GenerateCacheKey(flagKey, context);
-                return await _cache.GetOrSetAsync<ResolutionDetails<int>>(key, async (_,_) =>
-                { 
+                return await _cache.GetOrSetAsync<ResolutionDetails<int>>(key, async (_, _) =>
+                {
                     var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                     return new ResolutionDetails<int>(flagKey, int.Parse(resp.Value.ToString()), ErrorType.None,
                         resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
@@ -249,7 +250,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var key = GenerateCacheKey(flagKey, context);
-                return await _cache.GetOrSetAsync<ResolutionDetails<double>>(key, async (_,_) =>
+                return await _cache.GetOrSetAsync<ResolutionDetails<double>>(key, async (_, _) =>
                 {
                     var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                     return new ResolutionDetails<double>(flagKey,
@@ -286,7 +287,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
             try
             {
                 var key = GenerateCacheKey(flagKey, context);
-                return await _cache.GetOrSetAsync<ResolutionDetails<Value>>(key, async (_,_) =>
+                return await _cache.GetOrSetAsync<ResolutionDetails<Value>>(key, async (_, _) =>
                 {
                     var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
                     if (resp.Value is JsonElement)
@@ -358,7 +359,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
 
         private string GenerateCacheKey(string flagKey, EvaluationContext ctx)
         {
-            return ctx != null ? new OfrepRequest(ctx).AsJsonString() : flagKey;
+            return ctx != null ? flagKey + ":" + new OfrepRequest(ctx).AsJsonString() : flagKey;
         }
 
         /// <summary>
