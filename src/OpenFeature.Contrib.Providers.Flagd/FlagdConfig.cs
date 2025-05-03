@@ -18,7 +18,13 @@ public enum ResolverType
     ///     locally for in-process evaluation.
     ///     Evaluations are preformed in-process.
     /// </summary>
-    IN_PROCESS
+    IN_PROCESS,
+    /// <summary>
+    ///     This is the in-process offline mode resolving type, where flags are fetched from a file and stored
+    ///     locally for in-process evaluation.
+    ///     Evaluations are preformed in-process.
+    /// </summary>
+    FILE,
 }
 
 /// <summary>
@@ -147,6 +153,16 @@ public class FlagdConfig
         set => _sourceSelector = value;
     }
 
+    /// <summary>
+    ///     File source of flags to be used by offline mode.
+    ///     Provide full path including directory and file name.
+    /// </summary>
+    public string OfflineFlagSourceFullPath
+    {
+        get => this._offlineFlagSourceFullPath;
+        set => this._offlineFlagSourceFullPath = value;
+    }
+
     internal bool UseCertificate => _cert.Length > 0;
 
     private string _host;
@@ -158,6 +174,7 @@ public class FlagdConfig
     private int _maxCacheSize;
     private int _maxEventStreamRetries;
     private string _sourceSelector;
+    private string _offlineFlagSourceFullPath;
     private ResolverType _resolverType;
 
     internal FlagdConfig()
@@ -324,6 +341,16 @@ public class FlagdConfigBuilder
     public FlagdConfigBuilder WithSourceSelector(string sourceSelector)
     {
         _config.SourceSelector = sourceSelector;
+        return this;
+    }
+
+    /// <summary>
+    ///     File source of flags to be used by offline mode.
+    ///     Provide full path including directory and file name.
+    /// </summary>
+    public FlagdConfigBuilder OfflineFlagSourceFullPath(string path)
+    {
+        _config.OfflineFlagSourceFullPath = path;
         return this;
     }
 

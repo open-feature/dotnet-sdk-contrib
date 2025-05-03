@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -807,5 +808,62 @@ public class UnitTestFlagdProvider
             });
 
         mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task TestInProcessFileResolver()
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "flags.json");
+        await File.WriteAllTextAsync(path, Utils.flags);
+
+        var config = new FlagdConfig();
+        config.CacheEnabled = true;
+        config.OfflineFlagSourceFullPath = path;
+        config.ResolverType = ResolverType.FILE;
+
+        var inProcessResolver = new InProcessResolver(config, MakeChannel(), MakeProviderMetadata());
+        var flagdProvider = new FlagdProvider(inProcessResolver);
+        await flagdProvider.InitializeAsync(EvaluationContext.Empty);
+
+        // resolve with default set to false to make sure we return what the file gives us
+        await Utils.AssertUntilAsync(
+            async _ =>
+            {
+                var val = await flagdProvider.ResolveBooleanValueAsync("staticBoolFlag", false, cancellationToken: CancellationToken.None).ConfigureAwait(false);
+                Assert.True(val.Value);
+            });
+    }
+
+    [Fact]
+    public async Task TestInProcessFileResolverChangeEvents()
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "flags.json");
+        await File.WriteAllTextAsync(path, Utils.flags);
+
+        var config = new FlagdConfig();
+        config.CacheEnabled = true;
+        config.OfflineFlagSourceFullPath = path;
+        config.ResolverType = ResolverType.FILE;
+
+        var inProcessResolver = new InProcessResolver(config, MakeChannel(), MakeProviderMetadata());
+        var flagdProvider = new FlagdProvider(inProcessResolver);
+        await flagdProvider.InitializeAsync(EvaluationContext.Empty);
+
+        // resolve with default set to false to make sure we return what the file gives us
+        await Utils.AssertUntilAsync(
+            async _ =>
+            {
+                var val = await flagdProvider.ResolveBooleanValueAsync("staticBoolFlag", false, cancellationToken: CancellationToken.None).ConfigureAwait(false);
+                Assert.True(val.Value);
+            });
+
+        await File.WriteAllTextAsync(path, Utils.validFlagConfig);
+
+        await Utils.AssertUntilAsync(
+            async _ =>
+            {
+                var exception = await Assert.ThrowsAsync<FeatureProviderException>(async () => await flagdProvider.ResolveBooleanValueAsync("static", false).ConfigureAwait(false)).ConfigureAwait(false);
+                Assert.Equal(ErrorType.FlagNotFound, exception.ErrorType);
+            });
     }
 }

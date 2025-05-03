@@ -1,82 +1,70 @@
-using System.Net.Http;
 using System.Threading.Tasks;
 using OpenFeature.Model;
 using OpenFeature.Flagd.Grpc.Sync;
 using System;
-using System.IO;
-#if NET462_OR_GREATER
-using System.Linq;
-using System.Net.Security;
-#endif
-using System.Security.Cryptography.X509Certificates;
-using Grpc.Net.Client;
-#if NET8_0_OR_GREATER
-using System.Net.Sockets; // needed for unix sockets
-#endif
 using System.Threading;
-using Grpc.Core;
 using Value = OpenFeature.Model.Value;
 using System.Threading.Channels;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess.Storage;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 
 internal class InProcessResolver : Resolver
 {
-    static readonly int InitialEventStreamRetryBaseBackoff = 1;
-    static readonly int MaxEventStreamRetryBackoff = 60;
     readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-    private readonly FlagSyncService.FlagSyncServiceClient _client;
+    private readonly Storage.Storage _storage;
     private readonly JsonEvaluator _evaluator;
-    private readonly Mutex _mtx;
-    private int _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
-    private readonly FlagdConfig _config;
     private Thread _handleEventsThread;
-    private GrpcChannel _channel;
     private Channel<object> _eventChannel;
     private Model.Metadata _providerMetadata;
-    private bool connected = false;
 
     internal InProcessResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata)
     {
         _eventChannel = eventChannel;
         _providerMetadata = providerMetadata;
-        _config = config;
-        _client = BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
-        _mtx = new Mutex();
         _evaluator = new JsonEvaluator(config.SourceSelector);
+        this._storage = config.ResolverType switch
+        {
+            ResolverType.FILE => new FileStorage(config),
+            _ => new RpcStorage(config),
+        };
     }
 
     internal InProcessResolver(FlagSyncService.FlagSyncServiceClient client, FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata) : this(config, eventChannel, providerMetadata)
     {
-        _client = client;
+        this._storage = new RpcStorage(client, config);
     }
 
     public Task Init()
     {
-        return Task.Run(() =>
+        Task.Run(() =>
         {
             var latch = new CountdownEvent(1);
-            _handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
+            _handleEventsThread = new Thread(async () =>
+            {
+                await _storage.Init().ConfigureAwait(false);
+                await HandleStorageEvents(latch).ConfigureAwait(false);
+            })
             {
                 IsBackground = true
             };
             _handleEventsThread.Start();
             latch.Wait();
-        }).ContinueWith((task) =>
+        }).ContinueWith(task =>
         {
             if (task.IsFaulted) throw task.Exception;
         });
+        return Task.CompletedTask;
     }
 
     public Task Shutdown()
     {
         _cancellationTokenSource.Cancel();
-        return _channel?.ShutdownAsync().ContinueWith((t) =>
+        return this._storage.Shutdown().ContinueWith(t =>
         {
-            _channel.Dispose();
             if (t.IsFaulted) throw t.Exception;
-        });
+        });;
     }
 
     public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
@@ -104,230 +92,51 @@ internal class InProcessResolver : Resolver
         return Task.FromResult(_evaluator.ResolveStructureValueAsync(flagKey, defaultValue, context));
     }
 
-    private async Task HandleEvents(CountdownEvent latch)
+    private async Task HandleStorageEvents(CountdownEvent latch)
     {
         CancellationToken token = _cancellationTokenSource.Token;
-        while (!token.IsCancellationRequested)
+        while (await this._storage.EventChannel().Reader.WaitToReadAsync(token).ConfigureAwait(false))
         {
-            var call = _client.SyncFlags(new SyncFlagsRequest
-            {
-                Selector = _config.SourceSelector
-            });
             try
             {
-                // Read the response stream asynchronously
-                while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
+                var storageEvent = await this._storage.EventChannel().Reader.ReadAsync().ConfigureAwait(false);
+                switch (storageEvent.EventType)
                 {
-                    var response = call.ResponseStream.Current;
-                    _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
-                    if (!latch.IsSet)
-                    {
-                        latch.Signal();
-                    }
-                    HandleProviderReadyEvent();
-                    HandleProviderChangeEvent();
+                    case StorageEvent.Type.READY:
+                        _evaluator.Sync(FlagConfigurationUpdateType.ALL, storageEvent.FlagConfiguration);
+                        if (!latch.IsSet)
+                        {
+                            _eventChannel.Writer.TryWrite(new ProviderEventPayload
+                            {
+                                Type = ProviderEventTypes.ProviderReady, ProviderName = _providerMetadata.Name
+                            });
+                            latch.Signal();
+                        }
+
+                        break;
+                    case StorageEvent.Type.CHANGED:
+                        _evaluator.Sync(FlagConfigurationUpdateType.ALL, storageEvent.FlagConfiguration);
+                        _eventChannel.Writer.TryWrite(new ProviderEventPayload
+                        {
+                            Type = ProviderEventTypes.ProviderConfigurationChanged,
+                            ProviderName = _providerMetadata.Name
+                        });
+                        break;
+                    case StorageEvent.Type.ERROR:
+                        _eventChannel.Writer.TryWrite(new ProviderEventPayload
+                        {
+                            Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name
+                        });
+                        break;
                 }
             }
-            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+            catch (Exception)
             {
-                // do nothing, we've been shutdown
-            }
-            catch (RpcException)
-            {
-                // Handle the dropped connection by reconnecting and retrying the stream
-                await HandleErrorEvent().ConfigureAwait(false);
+                _eventChannel.Writer.TryWrite(new ProviderEventPayload
+                {
+                    Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name
+                });
             }
         }
     }
-
-    private void HandleProviderReadyEvent()
-    {
-        _mtx.WaitOne();
-        _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
-        if (!connected)
-        {
-            connected = true;
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderReady, ProviderName = _providerMetadata.Name });
-        }
-        _mtx.ReleaseMutex();
-    }
-
-    private async Task HandleErrorEvent()
-    {
-        _mtx.WaitOne();
-        _eventStreamRetryBackoff = Math.Min(_eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
-        if (connected)
-        {
-            connected = false;
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name });
-        }
-        _mtx.ReleaseMutex();
-        await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
-    }
-
-    private void HandleProviderChangeEvent()
-    {
-        _mtx.WaitOne();
-        if (connected)
-        {
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderConfigurationChanged, ProviderName = _providerMetadata.Name });
-        }
-        _mtx.ReleaseMutex();
-    }
-
-    private T BuildClient<T>(FlagdConfig config, Func<GrpcChannel, T> constructorFunc)
-    {
-        var useUnixSocket = config.GetUri().ToString().StartsWith("unix://");
-
-        if (!useUnixSocket)
-        {
-#if NET462_OR_GREATER
-            var handler = new WinHttpHandler();
-#else
-            var handler = new HttpClientHandler();
-#endif
-            if (config.UseCertificate)
-            {
-                if (File.Exists(config.CertificatePath))
-                {
-                    X509Certificate2 certificate = new X509Certificate2(config.CertificatePath);
-#if NET5_0_OR_GREATER
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
-                        // the the custom cert to the chain, Build returns a bool if valid.
-                        chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
-                        chain.ChainPolicy.CustomTrustStore.Add(certificate);
-                        return chain.Build(cert);
-                    };
-#elif NET462_OR_GREATER
-                    handler.ServerCertificateValidationCallback = (message, cert, chain, errors) =>
-                    {
-                        if (errors == SslPolicyErrors.None) { return true; }
-
-                        chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
-
-                        chain.ChainPolicy.ExtraStore.Add(certificate);
-
-                        var isChainValid = chain.Build(cert);
-
-                        if (!isChainValid) { return false; }
-
-                        var isValid = chain.ChainElements
-                            .Cast<X509ChainElement>()
-                            .Any(x => x.Certificate.RawData.SequenceEqual(certificate.GetRawCertData()));
-
-                        return isValid;
-                    };
-#else
-                    throw new ArgumentException("Custom Certificates are not supported on your platform");
-#endif
-                }
-                else
-                {
-                    throw new ArgumentException("Specified certificate cannot be found.");
-                }
-            }
-            _channel = GrpcChannel.ForAddress(config.GetUri(), new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-            return constructorFunc(_channel);
-
-        }
-
-#if NET5_0_OR_GREATER
-        var udsEndPoint = new UnixDomainSocketEndPoint(config.GetUri().ToString().Substring("unix://".Length));
-        var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-        var socketsHttpHandler = new SocketsHttpHandler
-        {
-            ConnectCallback = connectionFactory.ConnectAsync
-        };
-
-        // point to localhost and let the custom ConnectCallback handle the communication over the unix socket
-        // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
-        _channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
-        {
-            HttpHandler = socketsHttpHandler,
-        });
-        return constructorFunc(_channel);
-#endif
-        // unix socket support is not available in this dotnet version
-        throw new Exception("unix sockets are not supported in this version.");
-    }
-
-    private FlagSyncService.FlagSyncServiceClient BuildClientForPlatform(FlagdConfig config)
-    {
-        var useUnixSocket = config.GetUri().ToString().StartsWith("unix://");
-
-        if (!useUnixSocket)
-        {
-#if NET462_OR_GREATER
-            var handler = new WinHttpHandler();
-#else
-            var handler = new HttpClientHandler();
-#endif
-            if (config.UseCertificate)
-            {
-                if (File.Exists(config.CertificatePath))
-                {
-                    X509Certificate2 certificate = new X509Certificate2(config.CertificatePath);
-#if NET5_0_OR_GREATER
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
-                        // the the custom cert to the chain, Build returns a bool if valid.
-                        chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
-                        chain.ChainPolicy.CustomTrustStore.Add(certificate);
-                        return chain.Build(cert);
-                    };
-#elif NET462_OR_GREATER
-                    handler.ServerCertificateValidationCallback = (message, cert, chain, errors) =>
-                    {
-                        if (errors == SslPolicyErrors.None) { return true; }
-
-                        chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
-
-                        chain.ChainPolicy.ExtraStore.Add(certificate);
-
-                        var isChainValid = chain.Build(cert);
-
-                        if (!isChainValid) { return false; }
-
-                        var isValid = chain.ChainElements
-                            .Cast<X509ChainElement>()
-                            .Any(x => x.Certificate.RawData.SequenceEqual(certificate.GetRawCertData()));
-
-                        return isValid;
-                    };
-#else
-                    throw new ArgumentException("Custom Certificates are not supported on your platform");
-#endif
-                }
-                else
-                {
-                    throw new ArgumentException("Specified certificate cannot be found.");
-                }
-            }
-            return new FlagSyncService.FlagSyncServiceClient(GrpcChannel.ForAddress(config.GetUri(), new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            }));
-        }
-
-#if NET5_0_OR_GREATER
-        var udsEndPoint = new UnixDomainSocketEndPoint(config.GetUri().ToString().Substring("unix://".Length));
-        var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-        var socketsHttpHandler = new SocketsHttpHandler
-        {
-            ConnectCallback = connectionFactory.ConnectAsync
-        };
-
-        // point to localhost and let the custom ConnectCallback handle the communication over the unix socket
-        // see https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess-uds?view=aspnetcore-7.0 for more details
-        return new FlagSyncService.FlagSyncServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
-        {
-            HttpHandler = socketsHttpHandler,
-        }));
-#endif
-        // unix socket support is not available in this dotnet version
-        throw new Exception("unix sockets are not supported in this version.");
-    }
-
 }

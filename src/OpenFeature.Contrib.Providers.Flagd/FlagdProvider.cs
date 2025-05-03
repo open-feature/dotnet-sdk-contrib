@@ -65,14 +65,11 @@ public sealed class FlagdProvider : FeatureProvider
 
         _config = config;
 
-        if (_config.ResolverType == ResolverType.IN_PROCESS)
+        _resolver = _config.ResolverType switch
         {
-            _resolver = new InProcessResolver(_config, EventChannel, _providerMetadata);
-        }
-        else
-        {
-            _resolver = new RpcResolver(config, EventChannel, _providerMetadata);
-        }
+            ResolverType.RPC => new RpcResolver(config, EventChannel, _providerMetadata),
+            _ => new InProcessResolver(_config, EventChannel, _providerMetadata)
+        };
     }
 
     // just for testing, internal but visible in tests
