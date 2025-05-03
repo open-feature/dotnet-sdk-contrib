@@ -1,4 +1,6 @@
 using System;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace OpenFeature.Contrib.Providers.Flagd;
 
@@ -147,6 +149,15 @@ public class FlagdConfig
         set => _sourceSelector = value;
     }
 
+    /// <summary>
+    ///     Logger for the provider. When not specified <see cref="NullLogger.Instance"/> is used.
+    /// </summary>
+    public ILogger Logger
+    {
+        get => _logger;
+        set => _logger = value;
+    }
+
     internal bool UseCertificate => _cert.Length > 0;
 
     private string _host;
@@ -158,6 +169,7 @@ public class FlagdConfig
     private int _maxCacheSize;
     private int _maxEventStreamRetries;
     private string _sourceSelector;
+    private ILogger _logger;
     private ResolverType _resolverType;
 
     internal FlagdConfig()
@@ -168,6 +180,7 @@ public class FlagdConfig
         _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
         _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
         _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
+        _logger = NullLogger.Instance;
         var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
         if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))
@@ -324,6 +337,17 @@ public class FlagdConfigBuilder
     public FlagdConfigBuilder WithSourceSelector(string sourceSelector)
     {
         _config.SourceSelector = sourceSelector;
+        return this;
+    }
+
+    /// <summary>
+    ///     Provide a <see cref="ILogger"/> to be used by the Flagd provider.
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <returns></returns>
+    public FlagdConfigBuilder WithLogger(ILogger logger)
+    {
+        _config.Logger = logger;
         return this;
     }
 

@@ -1,23 +1,23 @@
-using System.Net.Http;
-using System.Threading.Tasks;
-using OpenFeature.Model;
-using OpenFeature.Flagd.Grpc.Sync;
 using System;
 using System.IO;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 #if NET462_OR_GREATER
 using System.Linq;
 using System.Net.Security;
 #endif
 using System.Security.Cryptography.X509Certificates;
-using Grpc.Net.Client;
 #if NET8_0_OR_GREATER
 using System.Net.Sockets; // needed for unix sockets
 #endif
-using System.Threading;
 using Grpc.Core;
-using Value = OpenFeature.Model.Value;
-using System.Threading.Channels;
+using Grpc.Net.Client;
 using OpenFeature.Constant;
+using OpenFeature.Flagd.Grpc.Sync;
+using OpenFeature.Model;
+using Value = OpenFeature.Model.Value;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 
@@ -35,26 +35,36 @@ internal class InProcessResolver : Resolver
     private GrpcChannel _channel;
     private Channel<object> _eventChannel;
     private Model.Metadata _providerMetadata;
+    private readonly IJsonSchemaValidator _jsonSchemaValidator;
     private bool connected = false;
 
-    internal InProcessResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata)
+    internal InProcessResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata, IJsonSchemaValidator jsonSchemaValidator)
     {
         _eventChannel = eventChannel;
         _providerMetadata = providerMetadata;
+        _jsonSchemaValidator = jsonSchemaValidator;
         _config = config;
         _client = BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
         _mtx = new Mutex();
-        _evaluator = new JsonEvaluator(config.SourceSelector);
+        _evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
     }
 
-    internal InProcessResolver(FlagSyncService.FlagSyncServiceClient client, FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata) : this(config, eventChannel, providerMetadata)
+    internal InProcessResolver(
+        FlagSyncService.FlagSyncServiceClient client,
+        FlagdConfig config,
+        Channel<object> eventChannel,
+        Model.Metadata providerMetadata,
+        IJsonSchemaValidator jsonSchemaValidator)
+            : this(config, eventChannel, providerMetadata, jsonSchemaValidator)
     {
         _client = client;
     }
 
-    public Task Init()
+    public async Task Init()
     {
-        return Task.Run(() =>
+        await _jsonSchemaValidator.InitializeAsync().ConfigureAwait(false);
+
+        await Task.Run(() =>
         {
             var latch = new CountdownEvent(1);
             _handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
@@ -66,7 +76,7 @@ internal class InProcessResolver : Resolver
         }).ContinueWith((task) =>
         {
             if (task.IsFaulted) throw task.Exception;
-        });
+        }).ConfigureAwait(false);
     }
 
     public Task Shutdown()
