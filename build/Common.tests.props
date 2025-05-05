@@ -7,7 +7,7 @@
     <TargetFrameworks Condition="$(OS) == 'Windows_NT'">$(TargetFrameworks);net462</TargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Test'))">
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('Test'))">
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
@@ -15,7 +15,7 @@
     <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('Test'))">
     <Content
       Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'DotnetSdkContrib.sln'))\build\xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
