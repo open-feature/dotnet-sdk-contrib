@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference
       Include="..\..\src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj" />
