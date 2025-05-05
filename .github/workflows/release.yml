@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: write # for googleapis/release-please-action to create release commit
       pull-requests: write # for googleapis/release-please-action to create release PR
-      packages: read # for internal nuget reading
+      issues: write # for googleapis/release-please-action to create labels
 
     steps:
       - uses: google-github-actions/release-please-action@db8f2c60ee802b3748b512940dde88eabd7b7e01 # v3
@@ -34,6 +34,7 @@ jobs:
       id-token: write
       contents: write # upload sbom to a release
       attestations: write
+      packages: read # for internal nuget reading
     if: ${{ needs.release-package.outputs.release_created }}
     strategy:
       matrix:
