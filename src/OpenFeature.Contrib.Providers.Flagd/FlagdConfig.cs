@@ -162,7 +162,7 @@ public class FlagdConfig
 
     internal FlagdConfig()
     {
-        _host = Environment.GetEnvironmentVariable(EnvVarHost) ?? "localhost";
+        _host = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvVarHost)) ? "localhost" : Environment.GetEnvironmentVariable(EnvVarHost);
         _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 8013;
         _useTLS = bool.TryParse(Environment.GetEnvironmentVariable(EnvVarTLS), out var useTLS) ? useTLS : false;
         _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
