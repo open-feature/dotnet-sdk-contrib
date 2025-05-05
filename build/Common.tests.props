@@ -1,67 +1,67 @@
 <Project>
-    <Import Project=".\Common.props" />
+  <Import Project=".\Common.props" />
 
-    <PropertyGroup>
-        <IsPackable>false</IsPackable>
-        <TargetFrameworks>net8.0</TargetFrameworks>
-        <TargetFrameworks Condition="$(OS) == 'Windows_NT'">$(TargetFrameworks);net462</TargetFrameworks>
-    </PropertyGroup>
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks Condition="$(OS) == 'Windows_NT'">$(TargetFrameworks);net462</TargetFrameworks>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Test'))">
-        <IsTestProject>true</IsTestProject>
-    </PropertyGroup>
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Test'))">
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <NoWarn>$(NoWarn);CA2007</NoWarn>
-    </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+  </PropertyGroup>
 
-    <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
-        <Content
-            Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'DotnetSdkContrib.sln'))\build\xunit.runner.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+    <Content
+      Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'DotnetSdkContrib.sln'))\build\xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="AutoFixture" Version="$(AutoFixtureVer)" />
-        <PackageReference Include="coverlet.collector" Version="$(CoverletCollectorVer)">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="coverlet.msbuild" Version="$(CoverletCollectorVer)">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="GitHubActionsTestLogger" Version="$(GitHubActionsTestLoggerVer)" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPkgVer)" />
-        <PackageReference Include="NSubstitute" Version="$(NSubstituteVer)" />
-        <PackageReference Include="xunit" Version="$(XUnitPkgVer)" />
-        <PackageReference Include="xunit.runner.visualstudio"
-            Version="$(XUnitRunnerVisualStudioPkgVer)">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
+  <ItemGroup>
+    <PackageReference Include="AutoFixture" Version="$(AutoFixtureVer)" />
+    <PackageReference Include="coverlet.collector" Version="$(CoverletCollectorVer)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="$(CoverletCollectorVer)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="GitHubActionsTestLogger" Version="$(GitHubActionsTestLoggerVer)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPkgVer)" />
+    <PackageReference Include="NSubstitute" Version="$(NSubstituteVer)" />
+    <PackageReference Include="xunit" Version="$(XUnitPkgVer)" />
+    <PackageReference Include="xunit.runner.visualstudio"
+      Version="$(XUnitRunnerVisualStudioPkgVer)">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
 
-        <!-- Fare and System.Text.RegularExpressions are referenced directly to avoid indirect
+    <!-- Fare and System.Text.RegularExpressions are referenced directly to avoid indirect
         vulnerable packages from AutoFixture -->
-        <PackageReference Include="Fare" Version="$(FareVer)" />
-        <PackageReference Include="System.Text.RegularExpressions"
-            Version="$(SystemTextRegularExpressionsVer)" />
-    </ItemGroup>
+    <PackageReference Include="Fare" Version="$(FareVer)" />
+    <PackageReference Include="System.Text.RegularExpressions"
+      Version="$(SystemTextRegularExpressionsVer)" />
+  </ItemGroup>
 
-    <PropertyGroup Label="Package versions used in this repository">
-        <!--
+  <PropertyGroup Label="Package versions used in this repository">
+    <!--
       Please sort alphabetically.
       Refer to https://docs.microsoft.com/nuget/concepts/package-versioning for semver syntax.
     -->
-        <AutoFixtureVer>[4.18.1]</AutoFixtureVer>
-        <CoverletCollectorVer>[3.1.2]</CoverletCollectorVer>
-        <FareVer>[2.2.1]</FareVer>
-        <GitHubActionsTestLoggerVer>[2.3.3]</GitHubActionsTestLoggerVer>
-        <MicrosoftNETTestSdkPkgVer>[17.13.0]</MicrosoftNETTestSdkPkgVer>
-        <NSubstituteVer>[5.0.0]</NSubstituteVer>
-        <SystemTextRegularExpressionsVer>[4.3.1]</SystemTextRegularExpressionsVer>
-        <XUnitRunnerVisualStudioPkgVer>[2.8.2,3.0)</XUnitRunnerVisualStudioPkgVer>
-        <XUnitPkgVer>[2.9.3,3.0)</XUnitPkgVer>
-    </PropertyGroup>
+    <AutoFixtureVer>[4.18.1]</AutoFixtureVer>
+    <CoverletCollectorVer>[3.1.2]</CoverletCollectorVer>
+    <FareVer>[2.2.1]</FareVer>
+    <GitHubActionsTestLoggerVer>[2.3.3]</GitHubActionsTestLoggerVer>
+    <MicrosoftNETTestSdkPkgVer>[17.13.0]</MicrosoftNETTestSdkPkgVer>
+    <NSubstituteVer>[5.0.0]</NSubstituteVer>
+    <SystemTextRegularExpressionsVer>[4.3.1]</SystemTextRegularExpressionsVer>
+    <XUnitRunnerVisualStudioPkgVer>[2.8.2,3.0)</XUnitRunnerVisualStudioPkgVer>
+    <XUnitPkgVer>[2.9.3,3.0)</XUnitPkgVer>
+  </PropertyGroup>
 </Project>
