@@ -22,7 +22,7 @@
     <ProjectReference
       Include="..\..\src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj" />
     <ProjectReference
-      Include="..\OpenFeature.Contrib.Providers.Flagd.E2e.Test\OpenFeature.Contrib.Providers.Flagd.E2e.Test.csproj" />
+      Include="..\OpenFeature.Contrib.Providers.Flagd.E2e.Common\OpenFeature.Contrib.Providers.Flagd.E2e.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
