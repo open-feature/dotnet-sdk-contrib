@@ -7,7 +7,6 @@ on:
 
 jobs:
   release-package:
-    environment: publish
     runs-on: ubuntu-latest
     permissions:
       contents: write # for googleapis/release-please-action to create release commit
