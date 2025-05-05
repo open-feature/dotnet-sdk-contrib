@@ -24,7 +24,7 @@ jobs:
     outputs:
       release_created: ${{ steps.release.outputs.releases_created }}
       release_tag_name: ${{ steps.release.outputs.release_tag_name }}
-      paths_released: ${{ steps.release.outputs.paths_released }}
+      paths_released: ${{ fromJSON(steps.release.outputs.paths_released)[0] != null }} # if we have a single release path, do the release
 
   release:
     needs: release-package
