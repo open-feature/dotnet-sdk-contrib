@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reqnroll.xUnit" Version="2.4.0" />
+    <PackageReference Include="Reqnroll" Version="2.4.0" />
   </ItemGroup>
 
 </Project>
