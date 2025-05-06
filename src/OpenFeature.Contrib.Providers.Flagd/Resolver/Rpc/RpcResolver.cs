@@ -8,6 +8,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.Utils;
 using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc.Evaluation;
 using OpenFeature.Model;
@@ -449,7 +450,7 @@ internal class RpcResolver : Resolver
             {
                 if (File.Exists(config.CertificatePath))
                 {
-                    System.Security.Cryptography.X509Certificates.X509Certificate2 certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(config.CertificatePath);
+                    var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 #if NET5_0_OR_GREATER
                     handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
                         // the the custom cert to the chain, Build returns a bool if valid.
