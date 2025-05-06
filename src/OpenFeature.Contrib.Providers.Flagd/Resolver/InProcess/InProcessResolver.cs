@@ -7,10 +7,11 @@ using System.IO;
 #if NET462_OR_GREATER
 using System.Linq;
 using System.Net.Security;
-#endif
 using System.Security.Cryptography.X509Certificates;
+#endif
 using Grpc.Net.Client;
 #if NET8_0_OR_GREATER
+using System.Security.Cryptography.X509Certificates;
 using System.Net.Sockets; // needed for unix sockets
 #endif
 using System.Threading;
@@ -18,6 +19,7 @@ using Grpc.Core;
 using Value = OpenFeature.Model.Value;
 using System.Threading.Channels;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.Utils;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 
@@ -190,8 +192,9 @@ internal class InProcessResolver : Resolver
             {
                 if (File.Exists(config.CertificatePath))
                 {
-                    X509Certificate2 certificate = new X509Certificate2(config.CertificatePath);
-#if NET5_0_OR_GREATER
+                    var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
+
+#if NET8_0_OR_GREATER
                     handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
                         // the the custom cert to the chain, Build returns a bool if valid.
                         chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
@@ -269,7 +272,7 @@ internal class InProcessResolver : Resolver
             {
                 if (File.Exists(config.CertificatePath))
                 {
-                    X509Certificate2 certificate = new X509Certificate2(config.CertificatePath);
+                    var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 #if NET5_0_OR_GREATER
                     handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
                         // the the custom cert to the chain, Build returns a bool if valid.

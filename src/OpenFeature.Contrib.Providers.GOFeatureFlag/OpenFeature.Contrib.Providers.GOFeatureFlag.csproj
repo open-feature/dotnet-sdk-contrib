@@ -10,9 +10,14 @@
     <Authors>Thomas Poignant</Authors>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
-	<PackageReference Include="System.Text.Json" Version="8.0.5" />
-  <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  <ItemGroup
+    Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
   </ItemGroup>
 
 </Project>
