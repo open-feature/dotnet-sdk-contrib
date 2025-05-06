@@ -5,7 +5,7 @@ using OpenFeature.Model;
 using Reqnroll;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.Flagd.E2e.Test;
+namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 
 public abstract class FlagdStepDefinitionsBase
 {
