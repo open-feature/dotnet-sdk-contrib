@@ -1,4 +1,4 @@
-using OpenFeature.Contrib.Providers.Flagd.E2e.Test;
+using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 using Reqnroll;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest.Steps;
