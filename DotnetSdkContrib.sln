@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Provide
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.FeatureManagement.Test", "test\OpenFeature.Contrib.Providers.FeatureManagement.Test\OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj", "{9EBB5E8F-9F05-4DFF-9E99-2BAA5D5325FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagd.E2e.Test", "test\OpenFeature.Contrib.Providers.Flagd.E2e.Test\OpenFeature.Contrib.Providers.Flagd.E2e.Test.csproj", "{4A2C6E0F-8A23-454F-8019-AE3DD91AA193}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagd.E2e.Common", "test\OpenFeature.Contrib.Providers.Flagd.E2e.Common\OpenFeature.Contrib.Providers.Flagd.E2e.Common.csproj", "{4A2C6E0F-8A23-454F-8019-AE3DD91AA193}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest", "test\OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest\OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.csproj", "{2ACD9150-A8F4-450E-B49A-C628895992BF}"
 EndProject
