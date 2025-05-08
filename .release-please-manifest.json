@@ -7,5 +7,5 @@
   "src/OpenFeature.Contrib.Providers.FeatureManagement": "0.1.0",
   "src/OpenFeature.Contrib.Providers.Statsig": "0.1.0",
   "src/OpenFeature.Contrib.Providers.Flipt": "0.0.5",
-  "src/OpenFeature.Contrib.Providers.EnvVar": "0.0.2"
+  "src/OpenFeature.Contrib.Providers.EnvVar": "0.0.3"
 }
