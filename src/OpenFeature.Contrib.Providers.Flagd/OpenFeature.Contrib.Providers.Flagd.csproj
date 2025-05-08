@@ -8,6 +8,7 @@
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>flagd provider for .NET</Description>
     <Authors>Todd Baert</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

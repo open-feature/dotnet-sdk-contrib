@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <IsTestProject>false</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
