@@ -10,7 +10,7 @@ The environment Variables provider allows you to read feature flags from the [pr
 dotnet add package OpenFeature.Contrib.Providers.EnvVar
 ```
 
-## Using the ConfigCat Provider with the OpenFeature SDK
+## Using the Environment Variable Provider with the OpenFeature SDK
 
 The following example shows how to use the Environment Variable provider with the OpenFeature SDK.
 
