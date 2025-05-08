@@ -1,6 +1,7 @@
 {
   "bootstrap-sha": "fd59f2328fd5aba0b7705b2fdbf76e39afa244dd",
   "separate-pull-requests": true,
+  "signoff": "OpenFeature Bot <109696520+openfeaturebot@users.noreply.github.com>",
   "packages": {
     "src/OpenFeature.Contrib.Hooks.Otel": {
       "package-name": "OpenFeature.Contrib.Hooks.Otel",
