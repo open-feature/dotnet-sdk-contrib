@@ -8,6 +8,7 @@
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>Flipt provider for .NET</Description>
     <Authors>Jean Andrei de la Cruz Austria</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

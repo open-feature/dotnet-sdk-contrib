@@ -8,6 +8,7 @@
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>Flagsmith provider for .NET</Description>
     <Authors>Vladimir Petrusevici</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
