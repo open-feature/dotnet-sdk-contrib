@@ -18,7 +18,6 @@ jobs:
         id: release
         with:
           token: ${{secrets.RELEASE_PLEASE_ACTION_TOKEN}}
-          release-type: simple
     outputs:
       release_created: ${{ steps.release.outputs.releases_created }}
       release_tag_name: ${{ steps.release.outputs.release_tag_name }}
