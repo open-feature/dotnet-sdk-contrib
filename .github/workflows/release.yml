@@ -7,31 +7,45 @@ on:
 
 jobs:
   release-package:
-    environment: publish
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write # for googleapis/release-please-action to create release commit
       pull-requests: write # for googleapis/release-please-action to create release PR
-      packages: read # for internal nuget reading
+      issues: write # for googleapis/release-please-action to create labels
 
     steps:
-      - uses: google-github-actions/release-please-action@db8f2c60ee802b3748b512940dde88eabd7b7e01 # v3
+      - uses: googleapis/release-please-action@a02a34c4d625f9be7cb89156071d8567266a2445 #v4
         id: release
         with:
-          command: manifest
-          token: ${{secrets.GITHUB_TOKEN}}
-          default-branch: main
+          token: ${{secrets.RELEASE_PLEASE_ACTION_TOKEN}}
           release-type: simple
+    outputs:
+      release_created: ${{ steps.release.outputs.releases_created }}
+      release_tag_name: ${{ steps.release.outputs.release_tag_name }}
+      paths_released: ${{ fromJSON(steps.release.outputs.paths_released)[0] != null }} # if we have a single release path, do the release
 
+  release:
+    needs: release-package
+    environment: publish
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write # upload sbom to a release
+      attestations: write
+      packages: read # for internal nuget reading
+    if: ${{ needs.release-package.outputs.release_created }}
+    strategy:
+      matrix:
+        release: ${{ fromJSON(needs.release-package.outputs.paths_released) }}
+
+    steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        if: ${{ steps.release.outputs.releases_created }}
         with:
           fetch-depth: 0
           submodules: recursive
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
-        if: ${{ steps.release.outputs.releases_created }}
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -39,20 +53,40 @@ jobs:
           source-url: https://nuget.pkg.github.com/open-feature/index.json
 
       - name: Install dependencies
-        if: ${{ steps.release.outputs.releases_created }}
         run: dotnet restore
 
       - name: Build
-        if: ${{ steps.release.outputs.releases_created }}
         run: |
           dotnet build --configuration Release --no-restore -p:Deterministic=true
 
       - name: Pack
-        if: ${{ steps.release.outputs.releases_created }}
         run: |
           dotnet pack --configuration Release --no-build
 
       - name: Publish to Nuget
-        if: ${{ steps.release.outputs.releases_created }}
         run: |
-          dotnet nuget push --skip-duplicate "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_TOKEN}}
+          dotnet nuget push "${{ matrix.release }}/**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        with:
+          subject-path: "${{ matrix.release }}/**/*.nupkg"
+
+      - name: Generate JSON SBOM
+        uses: CycloneDX/gh-dotnet-generate-sbom@c183e4ac30e5b99354cb9a98c38548e07c538346 # v1.0.1
+        with:
+          path: "${{ matrix.release }}/**/*.csproj"
+          out: ./artifacts/sboms
+          json: true
+          github-bearer-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attest package
+        uses: actions/attest-sbom@115c3be05ff3974bcbd596578934b3f9ce39bf68 # v2.2.0
+        with:
+          subject-path: "${{ matrix.release }}/**/*.nupkg"
+          sbom-path: artifacts/sboms/bom.json
+
+      - name: Attach SBOM to artifact
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: gh release upload ${{ needs.release-package.outputs.release_tag_name }} artifacts/sboms/bom.json
