@@ -19,9 +19,9 @@ jobs:
         with:
           token: ${{secrets.RELEASE_PLEASE_ACTION_TOKEN}}
     outputs:
-      release_created: ${{ steps.release.outputs.releases_created }}
+      release_created: ${{ fromJSON(steps.release.outputs.paths_released)[0] != null }} # if we have a single release path, do the release
       release_tag_name: ${{ steps.release.outputs.release_tag_name }}
-      paths_released: ${{ fromJSON(steps.release.outputs.paths_released)[0] != null }} # if we have a single release path, do the release
+      paths_released: ${{ steps.release.outputs.paths_released }}
 
   release:
     needs: release-package
