@@ -10,6 +10,7 @@
     <Description>An OpenFeature Provider built on top of the standard Microsoft FeatureManagement
       Library</Description>
     <Authors>Eric Pattison</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
