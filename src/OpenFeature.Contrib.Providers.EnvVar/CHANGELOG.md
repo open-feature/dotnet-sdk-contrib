@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.EnvVar-v0.0.3...OpenFeature.Contrib.Providers.EnvVar-v0.0.4) (2025-05-08)
+
+
+### 🧹 Chore
+
+* update README ([ed1c3ae](https://github.com/open-feature/dotnet-sdk-contrib/commit/ed1c3ae133df6a4ee6949dee3b3e441ef2dafea1))
+
 ## [0.0.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.EnvVar-v0.0.2...OpenFeature.Contrib.Providers.EnvVar-v0.0.3) (2025-05-06)
 
 
