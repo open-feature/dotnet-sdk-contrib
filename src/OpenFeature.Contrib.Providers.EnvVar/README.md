@@ -1,6 +1,6 @@
 # .NET Environment Variable Provider
 
-The environment Variables provider allows you to read feature flags from the [process's environment](https://en.wikipedia.org/wiki/Environment_variable).
+The environment Variable provider allows you to read feature flags from the [process's environment](https://en.wikipedia.org/wiki/Environment_variable).
 
 ## Installation
 
