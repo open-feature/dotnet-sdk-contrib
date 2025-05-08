@@ -1,6 +1,6 @@
 # .NET Environment Variable Provider
 
-This provider supports using the OpenFeature SDK to evaluate feature flags backed by environment variables.
+The environment Variables provider allows you to read feature flags from the [process's environment](https://en.wikipedia.org/wiki/Environment_variable).
 
 ## Installation
 
