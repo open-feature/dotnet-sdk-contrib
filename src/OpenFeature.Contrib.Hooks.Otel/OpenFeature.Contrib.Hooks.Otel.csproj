@@ -8,6 +8,7 @@
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>Open Telemetry Hook for .NET</Description>
     <Authors>Florian Bacher</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
