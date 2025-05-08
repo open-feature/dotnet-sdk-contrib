@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.EnvVar-v0.0.4...OpenFeature.Contrib.Providers.EnvVar-v0.0.5) (2025-05-08)
+
+
+### 🧹 Chore
+
+* typo in readme ([e1c1450](https://github.com/open-feature/dotnet-sdk-contrib/commit/e1c1450e0c237764485d84e90a8573c2bcdb2edd))
+
 ## [0.0.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.EnvVar-v0.0.3...OpenFeature.Contrib.Providers.EnvVar-v0.0.4) (2025-05-08)
 
 
