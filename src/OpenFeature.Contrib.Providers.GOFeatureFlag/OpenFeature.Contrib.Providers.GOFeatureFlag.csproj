@@ -8,6 +8,7 @@
     <FileVersion>$(VersionNumber)</FileVersion>
     <Description>GO Feature Flag provider for .NET</Description>
     <Authors>Thomas Poignant</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup

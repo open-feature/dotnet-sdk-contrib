@@ -2,6 +2,7 @@
   <Import Project=".\Common.props" />
 
   <PropertyGroup>
+    <NoWarn>$(NoWarn);1591</NoWarn>
     <IsPackable>false</IsPackable>
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <TargetFrameworks Condition="$(OS) == 'Windows_NT'">$(TargetFrameworks);net462</TargetFrameworks>
