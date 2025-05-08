@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.EnvVar-v0.0.5...OpenFeature.Contrib.Providers.EnvVar-v0.0.6) (2025-05-08)
+
+
+### 🧹 Chore
+
+* relax doc requirements for test projects ([e204e16](https://github.com/open-feature/dotnet-sdk-contrib/commit/e204e168ee8ccda34f46de325d45447e3ef85f73))
+
 ## [0.0.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.EnvVar-v0.0.4...OpenFeature.Contrib.Providers.EnvVar-v0.0.5) (2025-05-08)
 
 
