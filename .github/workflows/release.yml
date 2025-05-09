@@ -90,6 +90,8 @@ jobs:
           subject-path: "${{ matrix.release }}/**/*.nupkg"
           sbom-path: bom.json
 
+      # TODO: We need to look into this link and fix the tag_name https://github.com/googleapis/release-please-action?tab=readme-ov-file#outputs
+      # Because we are using a multiple release path, we need to use the <path>--tag_name from the release-package job
       # - name: Attach SBOM to artifact
       #   env:
       #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
