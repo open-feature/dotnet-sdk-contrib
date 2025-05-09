@@ -20,7 +20,7 @@ jobs:
           token: ${{secrets.RELEASE_PLEASE_ACTION_TOKEN}}
     outputs:
       release_created: ${{ fromJSON(steps.release.outputs.paths_released)[0] != null }} # if we have a single release path, do the release
-      release_tag_name: ${{ steps.release.outputs.release_tag_name }}
+      # release_tag_name: ${{ steps.release.outputs.release_tag_name }}
       paths_released: ${{ steps.release.outputs.paths_released }}
 
   release:
@@ -90,7 +90,9 @@ jobs:
           subject-path: "${{ matrix.release }}/**/*.nupkg"
           sbom-path: bom.json
 
-      - name: Attach SBOM to artifact
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        run: gh release upload ${{ needs.release-package.outputs.release_tag_name }} bom.json
+      # TODO: We need to look into this link and fix the tag_name https://github.com/googleapis/release-please-action?tab=readme-ov-file#outputs
+      # Because we are using a multiple release path, we need to use the <path>--tag_name from the release-package job
+      # - name: Attach SBOM to artifact
+      #   env:
+      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      #   run: gh release upload ${{ needs.release-package.outputs.release_tag_name }} bom.json
