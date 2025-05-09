@@ -4,7 +4,4 @@
     <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Flagsmith\OpenFeature.Contrib.Providers.Flagsmith.csproj" />
   </ItemGroup>
 	
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
 </Project>
