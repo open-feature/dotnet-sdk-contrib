@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsTestProject>false</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference
+      Include="..\..\src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Reqnroll.xUnit" Version="2.4.0" />
+  </ItemGroup>
+
+</Project>

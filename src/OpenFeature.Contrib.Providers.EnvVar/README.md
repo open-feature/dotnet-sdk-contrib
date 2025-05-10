@@ -1,6 +1,6 @@
 # .NET Environment Variable Provider
 
-This provider supports using the OpenFeature SDK to evaluate feature flags backed by environment variables.
+The environment Variable provider allows you to read feature flags from the [process's environment](https://en.wikipedia.org/wiki/Environment_variable).
 
 ## Installation
 
@@ -10,7 +10,7 @@ This provider supports using the OpenFeature SDK to evaluate feature flags backe
 dotnet add package OpenFeature.Contrib.Providers.EnvVar
 ```
 
-## Using the ConfigCat Provider with the OpenFeature SDK
+## Using the Environment Variable Provider with the OpenFeature SDK
 
 The following example shows how to use the Environment Variable provider with the OpenFeature SDK.
 
@@ -20,7 +20,7 @@ using OpenFeature;
 using OpenFeature.Contrib.EnvVar;
 
 // If you want to use a prefix for your environment variables, you can supply it in the constructor below.
-// For example, if you all your feature flag environment variables will be prefixed with feature-flag- then 
+// For example, if you all your feature flag environment variables will be prefixed with feature-flag- then
 // you would use:
 // var envVarProvider = new EnvVarProvider("feature-flag-");
 var envVarProvider = new EnvVarProvider();

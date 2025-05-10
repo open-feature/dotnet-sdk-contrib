@@ -9,6 +9,7 @@
     <Description>Statsig provider for .NET</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Authors>Jens Kjær Henneberg</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <!-- make the internal methods visble to our test project -->

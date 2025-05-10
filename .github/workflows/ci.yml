@@ -108,7 +108,7 @@ jobs:
 
       - name: Publish NuGet packages (base)
         if: github.event.pull_request.head.repo.fork == false
-        run: dotnet nuget push "src/**/*.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source https://nuget.pkg.github.com/open-feature/index.json
+        run: dotnet nuget push "src/**/*.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source https://nuget.pkg.github.com/open-feature/index.json --skip-duplicate
 
       - name: Publish NuGet packages (fork)
         if: github.event.pull_request.head.repo.fork == true

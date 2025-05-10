@@ -20,7 +20,7 @@ public class MetricsHookTest
     {
         exportedItems = new List<Metric>();
         meterProvider = Sdk.CreateMeterProviderBuilder()
-            .AddMeter("*")
+            .AddMeter("OpenFeature.Contrib.Hooks.Otel")
             .ConfigureResource(r => r.AddService("openfeature"))
             .AddInMemoryExporter(exportedItems)
             .Build();

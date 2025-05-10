@@ -174,9 +174,9 @@ public class FlagdConfig
 
     internal FlagdConfig()
     {
-        _host = Environment.GetEnvironmentVariable(EnvVarHost) ?? "localhost";
+        _host = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvVarHost)) ? "localhost" : Environment.GetEnvironmentVariable(EnvVarHost);
         _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 8013;
-        _useTLS = bool.Parse(Environment.GetEnvironmentVariable(EnvVarTLS) ?? "false");
+        _useTLS = bool.TryParse(Environment.GetEnvironmentVariable(EnvVarTLS), out var useTLS) ? useTLS : false;
         _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
         _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
         _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
@@ -186,8 +186,8 @@ public class FlagdConfig
         if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))
         {
             _cache = true;
-            _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
-            _maxEventStreamRetries = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries) ?? "3");
+            _maxCacheSize = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize), out var maxCacheSize) ? maxCacheSize : CacheSizeDefault;
+            _maxEventStreamRetries = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries), out var maxEventStreamRetries) ? maxEventStreamRetries : 3;
         }
 
         var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
@@ -213,8 +213,8 @@ public class FlagdConfig
         if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))
         {
             _cache = true;
-            _maxCacheSize = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize) ?? $"{CacheSizeDefault}");
-            _maxEventStreamRetries = int.Parse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries) ?? "3");
+            _maxCacheSize = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize), out var maxCacheSize) ? maxCacheSize : CacheSizeDefault;
+            _maxEventStreamRetries = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries), out var maxEventStreamRetries) ? maxEventStreamRetries : 3;
         }
 
         var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
