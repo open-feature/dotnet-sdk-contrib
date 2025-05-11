@@ -359,7 +359,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag
 
         private string GenerateCacheKey(string flagKey, EvaluationContext ctx)
         {
-            return ctx != null ? flagKey + ":" + new OfrepRequest(ctx).AsJsonString() : flagKey;
+            return ctx != null ? flagKey + ":" + new OfrepRequest(ctx).AsJsonString().GetHashCode() : flagKey;
         }
 
         /// <summary>
