@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flipt-v0.0.5...OpenFeature.Contrib.Providers.Flipt-v0.0.6) (2025-05-12)
+
+
+### 🧹 Chore
+
+* Add .editorconfig and cleanup code ([#375](https://github.com/open-feature/dotnet-sdk-contrib/issues/375)) ([683a392](https://github.com/open-feature/dotnet-sdk-contrib/commit/683a392604aca6c9a92b1f64fa30bc9e3e069b4f))
+* **deps:** update SDK version ([#364](https://github.com/open-feature/dotnet-sdk-contrib/issues/364)) ([aa18366](https://github.com/open-feature/dotnet-sdk-contrib/commit/aa18366883e4eb62bdb46a54bab08426a77dcbe8))
+* relax doc requirements for test projects ([e204e16](https://github.com/open-feature/dotnet-sdk-contrib/commit/e204e168ee8ccda34f46de325d45447e3ef85f73))
+
 ## [0.0.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flipt-v0.0.4...OpenFeature.Contrib.Providers.Flipt-v0.0.5) (2024-10-18)
 
 
