@@ -205,6 +205,8 @@ public class UnitTestFlagdProvider
         var val = await flagdProvider.ResolveBooleanValueAsync("my-key", false);
 
         Assert.True(val.Value);
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -231,6 +233,8 @@ public class UnitTestFlagdProvider
         var val = await flagdProvider.ResolveStringValueAsync("my-key", "");
 
         Assert.Equal("my-value", val.Value);
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -258,6 +262,8 @@ public class UnitTestFlagdProvider
         var val = await flagdProvider.ResolveIntegerValueAsync("my-key", 0);
 
         Assert.Equal(10, val.Value);
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -285,6 +291,8 @@ public class UnitTestFlagdProvider
         var val = await flagdProvider.ResolveDoubleValueAsync("my-key", 0.0);
 
         Assert.Equal(10.0, val.Value);
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -315,6 +323,8 @@ public class UnitTestFlagdProvider
         var val = await flagdProvider.ResolveStructureValueAsync("my-key", null);
 
         Assert.True(val.Value.AsStructure.ContainsKey("my-key"));
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -347,6 +357,8 @@ public class UnitTestFlagdProvider
             Assert.Equal(ErrorType.FlagNotFound, ex.ErrorType);
             Assert.Equal(ErrorType.FlagNotFound.ToString(), ex.Message);
         });
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -380,6 +392,8 @@ public class UnitTestFlagdProvider
             Assert.Equal(ErrorType.ProviderNotReady, ex.ErrorType);
             Assert.Equal(ErrorType.ProviderNotReady.ToString(), ex.Message);
         });
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -413,6 +427,8 @@ public class UnitTestFlagdProvider
             Assert.Equal(ErrorType.TypeMismatch, ex.ErrorType);
             Assert.Equal(ErrorType.TypeMismatch.ToString(), ex.Message);
         });
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -446,6 +462,8 @@ public class UnitTestFlagdProvider
             Assert.Equal(ErrorType.General, ex.ErrorType);
             Assert.Equal(ErrorType.General.ToString(), ex.Message);
         });
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -695,6 +713,8 @@ public class UnitTestFlagdProvider
         mockCache.Received(2).Add("my-key", Arg.Any<object>());
         mockCache.Received().Delete("my-key");
         mockGrpcClient.Received(Quantity.AtLeastOne()).EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None);
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -753,6 +773,8 @@ public class UnitTestFlagdProvider
             });
 
         mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -811,5 +833,7 @@ public class UnitTestFlagdProvider
             });
 
         mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
+
+        await flagdProvider.ShutdownAsync();
     }
 }
