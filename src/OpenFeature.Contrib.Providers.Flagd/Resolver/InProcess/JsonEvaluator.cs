@@ -53,11 +53,12 @@ internal class JsonEvaluator
     private Dictionary<string, JsonElement> _flagSetMetadata = new Dictionary<string, JsonElement>();
 
     private string _selector;
+    private readonly IJsonSchemaValidator _schemaValidator;
 
-
-    internal JsonEvaluator(string selector)
+    internal JsonEvaluator(string selector, IJsonSchemaValidator schemaValidator)
     {
         _selector = selector;
+        _schemaValidator = schemaValidator;
 
         RuleRegistry.AddRule("starts_with", new StartsWithRule());
         RuleRegistry.AddRule("ends_with", new EndsWithRule());
@@ -67,6 +68,8 @@ internal class JsonEvaluator
 
     internal FlagSyncData Parse(string flagConfigurations)
     {
+        _schemaValidator.Validate(flagConfigurations);
+
         var parsed = JsonSerializer.Deserialize<FlagSyncData>(flagConfigurations);
         var transformed = JsonSerializer.Serialize(parsed);
         // replace evaluators
@@ -79,7 +82,6 @@ internal class JsonEvaluator
                 transformed = evaluatorRegex.Replace(transformed, Convert.ToString(val));
             });
         }
-
 
         var data = JsonSerializer.Deserialize<FlagSyncData>(transformed);
         if (data.Metadata == null)
