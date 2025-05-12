@@ -1,7 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.GOFeatureFlag\OpenFeature.Contrib.Providers.GOFeatureFlag.csproj" />
   </ItemGroup>

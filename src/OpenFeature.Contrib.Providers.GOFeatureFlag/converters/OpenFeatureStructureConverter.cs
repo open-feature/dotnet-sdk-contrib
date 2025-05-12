@@ -4,28 +4,27 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.converters
-{
-    /// <summary>
-    /// OpenFeatureStructureConverter
-    /// </summary>
-    public class OpenFeatureStructureConverter : JsonConverter<Structure>
-    {
-        /// <inheritdoc />
-        public override void Write(Utf8JsonWriter writer, Structure value, JsonSerializerOptions options)
-        {
-            var jsonDoc = JsonDocument.Parse(JsonSerializer.Serialize(value.AsDictionary(),
-                JsonConverterExtensions.DefaultSerializerSettings));
-            jsonDoc.WriteTo(writer);
-        }
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
 
-        /// <inheritdoc />
-        public override Structure Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            using var jsonDocument = JsonDocument.ParseValue(ref reader);
-            var jsonText = jsonDocument.RootElement.GetRawText();
-            return new Structure(JsonSerializer.Deserialize<Dictionary<string, Value>>(jsonText,
-                JsonConverterExtensions.DefaultSerializerSettings));
-        }
+/// <summary>
+/// OpenFeatureStructureConverter
+/// </summary>
+public class OpenFeatureStructureConverter : JsonConverter<Structure>
+{
+    /// <inheritdoc />
+    public override void Write(Utf8JsonWriter writer, Structure value, JsonSerializerOptions options)
+    {
+        var jsonDoc = JsonDocument.Parse(JsonSerializer.Serialize(value.AsDictionary(),
+            JsonConverterExtensions.DefaultSerializerSettings));
+        jsonDoc.WriteTo(writer);
+    }
+
+    /// <inheritdoc />
+    public override Structure Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        using var jsonDocument = JsonDocument.ParseValue(ref reader);
+        var jsonText = jsonDocument.RootElement.GetRawText();
+        return new Structure(JsonSerializer.Deserialize<Dictionary<string, Value>>(jsonText,
+            JsonConverterExtensions.DefaultSerializerSettings));
     }
 }
