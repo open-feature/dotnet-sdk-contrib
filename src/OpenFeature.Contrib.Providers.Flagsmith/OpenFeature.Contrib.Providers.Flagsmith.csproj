@@ -30,8 +30,4 @@
     Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net5.0'">
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
 </Project>
