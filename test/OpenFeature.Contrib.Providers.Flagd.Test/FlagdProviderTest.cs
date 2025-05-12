@@ -523,6 +523,8 @@ public class UnitTestFlagdProvider
         mockCache.Received(1).TryGet(Arg.Is<string>(s => s == "my-key"));
         mockCache.Received(1).Add(Arg.Is<string>(s => s == "my-key"), Arg.Any<object>());
         mockGrpcClient.Received(Quantity.AtLeastOne()).EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None);
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
@@ -587,6 +589,8 @@ public class UnitTestFlagdProvider
         Assert.True(_autoResetEvent.WaitOne(10000));
         mockCache.Received(1).TryGet("my-key");
         mockGrpcClient.Received(Quantity.AtLeastOne()).EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None);
+
+        await flagdProvider.ShutdownAsync();
     }
 
     [Fact]
