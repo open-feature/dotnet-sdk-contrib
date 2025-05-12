@@ -35,10 +35,6 @@
     <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
   <Target Name="NSwag" BeforeTargets="BeforeBuild">
     <Exec
       Command="$(NSwagExe_Net90) openapi2csclient /className:FliptRestClient /namespace:Flipt.Rest /input:&quot;openapi.yaml&quot; /output:&quot;$(ProjectDir)obj/$(ConfigurationName)/$(TargetFramework)/Flipt.Rest.Client.cs&quot; /GenerateExceptionClasses:true /OperationGenerationMode:SingleClientFromPathSegments /JsonLibrary:SystemTextJson /GenerateOptionalParameters:true /GenerateDefaultValues:true /GenerateResponseClasses:true /GenerateClientInterfaces:true /GenerateClientClasses:true /GenerateDtoTypes:true /ExceptionClass:FliptRestException /GenerateNativeRecords:true /UseBaseUrl:false /GenerateBaseUrlProperty:false" />

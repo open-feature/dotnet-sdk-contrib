@@ -1,24 +1,23 @@
 using System.Text.Json;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.converters
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
+
+/// <summary>
+///     Extensions for default JsonConverter behavior
+/// </summary>
+public static class JsonConverterExtensions
 {
     /// <summary>
-    ///     Extensions for default JsonConverter behavior
+    ///     JsonConverter serializer settings for GO Feature Flag to OpenFeature model deserialization
     /// </summary>
-    public static class JsonConverterExtensions
+    public static readonly JsonSerializerOptions DefaultSerializerSettings = new JsonSerializerOptions
     {
-        /// <summary>
-        ///     JsonConverter serializer settings for GO Feature Flag to OpenFeature model deserialization
-        /// </summary>
-        public static readonly JsonSerializerOptions DefaultSerializerSettings = new JsonSerializerOptions
+        WriteIndented = true,
+        AllowTrailingCommas = true,
+        Converters =
         {
-            WriteIndented = true,
-            AllowTrailingCommas = true,
-            Converters =
-            {
-                new OpenFeatureStructureConverter(),
-                new OpenFeatureValueConverter()
-            }
-        };
-    }
+            new OpenFeatureStructureConverter(),
+            new OpenFeatureValueConverter()
+        }
+    };
 }
