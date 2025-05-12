@@ -20,7 +20,7 @@ jobs:
           token: ${{secrets.RELEASE_PLEASE_ACTION_TOKEN}}
     outputs:
       release_created: ${{ fromJSON(steps.release.outputs.paths_released)[0] != null }} # if we have a single release path, do the release
-      release_tag_name: ${{ steps.release.outputs.release_tag_name }}
+      # release_tag_name: ${{ steps.release.outputs.release_tag_name }}
       paths_released: ${{ steps.release.outputs.paths_released }}
 
   release:
@@ -71,11 +71,16 @@ jobs:
         with:
           subject-path: "${{ matrix.release }}/**/*.nupkg"
 
+      - name: Find csproj file and set as environment variable
+        id: find-csproj
+        run: |
+          csproj_path=$(find "${{ matrix.release }}" -name '*.csproj' -type f -print -quit)
+          echo "CSPROJ_PATH=$csproj_path" >> "$GITHUB_OUTPUT"
+
       - name: Generate JSON SBOM
         uses: CycloneDX/gh-dotnet-generate-sbom@c183e4ac30e5b99354cb9a98c38548e07c538346 # v1.0.1
         with:
-          path: "${{ matrix.release }}/**/*.csproj"
-          out: ./artifacts/sboms
+          path: ${{ steps.find-csproj.outputs.CSPROJ_PATH }}
           json: true
           github-bearer-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -83,9 +88,11 @@ jobs:
         uses: actions/attest-sbom@115c3be05ff3974bcbd596578934b3f9ce39bf68 # v2.2.0
         with:
           subject-path: "${{ matrix.release }}/**/*.nupkg"
-          sbom-path: artifacts/sboms/bom.json
+          sbom-path: bom.json
 
-      - name: Attach SBOM to artifact
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        run: gh release upload ${{ needs.release-package.outputs.release_tag_name }} artifacts/sboms/bom.json
+      # TODO: We need to look into this link and fix the tag_name https://github.com/googleapis/release-please-action?tab=readme-ov-file#outputs
+      # Because we are using a multiple release path, we need to use the <path>--tag_name from the release-package job
+      # - name: Attach SBOM to artifact
+      #   env:
+      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      #   run: gh release upload ${{ needs.release-package.outputs.release_tag_name }} bom.json
