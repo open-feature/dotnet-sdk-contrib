@@ -36,7 +36,8 @@ jobs:
     strategy:
       matrix:
         release: ${{ fromJSON(needs.release-package.outputs.paths_released) }}
-        all: ${{ toJSON(needs.release-package.outputs) }}
+    env:
+      TAG: ${{ fromJSON(needs.release-package.outputs.all)[format('{0}--tag_name', matrix.release)] }}
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
