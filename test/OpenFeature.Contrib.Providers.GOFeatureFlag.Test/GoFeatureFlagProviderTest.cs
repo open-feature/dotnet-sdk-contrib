@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
@@ -17,14 +18,16 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test;
 
 public class GoFeatureFlagProviderTest
 {
+    private static readonly string mediaType = "application/json";
     private static readonly string baseUrl = "http://gofeatureflag.org";
     private static readonly string prefixEval = baseUrl + "/ofrep/v1/evaluate/flags/";
     private readonly EvaluationContext _defaultEvaluationCtx = InitDefaultEvaluationCtx();
-    private readonly HttpMessageHandler _mockHttp = InitMock();
+    private readonly MockHttpMessageHandler _mockHttp = InitMock();
 
-    private static HttpMessageHandler InitMock()
+
+    private static MockHttpMessageHandler InitMock()
     {
-        const string mediaType = "application/json";
+
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.When($"{prefixEval}fail_500").Respond(HttpStatusCode.InternalServerError);
         mockHttp.When($"{prefixEval}api_key_missing").Respond(HttpStatusCode.BadRequest);
@@ -60,7 +63,14 @@ public class GoFeatureFlagProviderTest
             "{ \"value\":\"\", \"key\":\"does_not_exists\", \"errorCode\":\"FLAG_NOT_FOUND\", \"variant\":\"defaultSdk\", \"cacheable\":true, \"errorDetails\":\"flag does_not_exists was not found in your configuration\"}");
         mockHttp.When($"{prefixEval}integer_with_metadata").Respond(mediaType,
             "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true, \"metadata\":{\"key1\": \"key1\", \"key2\": 1, \"key3\": 1.345, \"key4\": true}}");
+        for (int i = 0; i < 5; i++)
+        {
+            mockHttp.When($"{prefixEval}string_key{i}").Respond(mediaType,
+                $"{{ \"value\":\"C{i}\", \"key\":\"string_key{i}\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}}");
+        }
+
         return mockHttp;
+
     }
 
     private static EvaluationContext InitDefaultEvaluationCtx()
@@ -303,6 +313,87 @@ public class GoFeatureFlagProviderTest
     }
 
     [Fact]
+    public async Task should_cache_2nd_call()
+    {
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = _mockHttp,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
+        });
+        var req = _mockHttp.When($"{prefixEval}string_key_cache").Respond(mediaType,
+            "{ \"value\":\"CC00AA\", \"key\":\"string_key_cache\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
+        Assert.Equal(0, _mockHttp.GetMatchCount(req));
+
+        await Api.Instance.SetProviderAsync(g);
+        var client = Api.Instance.GetClient("test-client");
+        var result = await client.GetStringDetailsAsync("string_key_cache", "defaultValue", _defaultEvaluationCtx);
+        Assert.NotNull(result);
+        Assert.Equal("CC00AA", result.Value);
+        Assert.Equal(1, _mockHttp.GetMatchCount(req));
+
+        var result2 = await client.GetStringDetailsAsync("string_key_cache", "defaultValue", _defaultEvaluationCtx);
+        Assert.NotNull(result2);
+        Assert.Equal("CC00AA", result.Value);
+        Assert.Equal(1, _mockHttp.GetMatchCount(req)); // 2nd lookup should hit cache and not activate http
+    }
+
+
+
+    [Fact]
+    public async Task should_limit_cached_items()
+    {
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = _mockHttp,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
+            CacheMaxSize = 2
+        });
+        await Api.Instance.SetProviderAsync(g);
+        var client = Api.Instance.GetClient("test-client");
+
+        for (var i = 0; i < 5; i++)
+        {
+            var res1 = await client.GetStringDetailsAsync($"string_key{i}", "defaultValue", _defaultEvaluationCtx);
+            Assert.NotNull(res1);
+            Assert.Equal($"C{i}", res1.Value);
+        }
+
+        Assert.Equal(2, g._backingCache.Count);
+    }
+
+    [Fact]
+    public async Task should_not_cache()
+    {
+        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        {
+            Endpoint = baseUrl,
+            HttpMessageHandler = _mockHttp,
+            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
+            CacheMaxTTL = TimeSpan.FromSeconds(0)
+        });
+        var req = _mockHttp.When($"{prefixEval}string_key_cache").Respond(mediaType,
+            "{ \"value\":\"CC00AA\", \"key\":\"string_key_cache\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
+
+
+        Assert.Equal(0, _mockHttp.GetMatchCount(req));
+
+        await Api.Instance.SetProviderAsync(g);
+        var client = Api.Instance.GetClient("test-client");
+        var result = await client.GetStringDetailsAsync("string_key_cache", "defaultValue", _defaultEvaluationCtx);
+        Assert.NotNull(result);
+        Assert.Equal("CC00AA", result.Value);
+        Assert.Equal(1, _mockHttp.GetMatchCount(req));
+
+        var result2 = await client.GetStringDetailsAsync("string_key_cache", "defaultValue", _defaultEvaluationCtx);
+        Assert.NotNull(result2);
+        Assert.Equal("CC00AA", result.Value);
+        Assert.Equal(2, _mockHttp.GetMatchCount(req)); // 2nd lookup should not be cached, but hit http bringing total matches up
+    }
+
+
+    [Fact]
     public async Task should_resolve_a_valid_string_flag_with_TARGETING_MATCH_reason()
     {
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
@@ -387,6 +478,7 @@ public class GoFeatureFlagProviderTest
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
         var result = await client.GetIntegerDetailsAsync("disabled_integer", 1225, _defaultEvaluationCtx);
+
         Assert.NotNull(result);
         Assert.Equal(1225, result.Value);
         Assert.Equal(Reason.Disabled, result.Reason);

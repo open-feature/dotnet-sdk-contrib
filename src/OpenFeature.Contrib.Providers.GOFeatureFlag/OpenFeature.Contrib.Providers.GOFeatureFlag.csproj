@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.GOFeatureFlag</PackageId>
@@ -21,8 +21,12 @@
     <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.1.0" />
+  </ItemGroup>
+
   <PropertyGroup>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
 </Project>
