@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc" Version="2.46.6" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.4.0" />
   </ItemGroup>
 
   <Target Name="CI" DependsOnTargets="T1, T2">
