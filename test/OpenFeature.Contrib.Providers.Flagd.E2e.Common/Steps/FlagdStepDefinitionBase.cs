@@ -12,10 +12,10 @@ public abstract class FlagdStepDefinitionsBase
     private readonly ScenarioContext _scenarioContext;
     protected FeatureClient client;
     protected FeatureClient name;
-    private Task<bool> booleanZeroValue;
-    private Task<string> stringZeroValue;
-    private Task<int> intZeroFlagValue;
-    private Task<double> doubleZeroFlagValue;
+    private bool booleanZeroValue;
+    private string stringZeroValue;
+    private int intZeroFlagValue;
+    private double doubleZeroFlagValue;
     private string intFlagKey;
     private int intDefaultValue;
     private string stringFlagKey;
@@ -39,7 +39,6 @@ public abstract class FlagdStepDefinitionsBase
     [When(@"a PROVIDER_READY handler is added")]
     public void WhenAPROVIDER_READYHandlerIsAddedAsync()
     {
-
         var tcs = new TaskCompletionSource<bool>();
         EventHandlerDelegate handler = (details) =>
         {
@@ -88,51 +87,51 @@ public abstract class FlagdStepDefinitionsBase
     }
 
     [When(@"a zero-value boolean flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
-    public void WhenAZero_ValueBooleanFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
+    public async Task WhenAZero_ValueBooleanFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
     {
-        booleanZeroValue = client.GetBooleanValueAsync(flagKey, bool.Parse(defaultValueString));
+        booleanZeroValue = await client.GetBooleanValueAsync(flagKey, bool.Parse(defaultValueString)).ConfigureAwait(false);
     }
 
     [Then(@"the resolved boolean zero-value should be ""(.*)""")]
-    public async Task ThenTheResolvedBooleanZero_ValueShouldBe(string expectedValue)
+    public void ThenTheResolvedBooleanZero_ValueShouldBe(string expectedValue)
     {
-        Assert.Equal(bool.Parse(expectedValue), await booleanZeroValue.ConfigureAwait(false));
+        Assert.Equal(bool.Parse(expectedValue), booleanZeroValue);
     }
 
     [When(@"a zero-value string flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
-    public void WhenAZero_ValueStringFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
+    public async Task WhenAZero_ValueStringFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
     {
-        stringZeroValue = client.GetStringValueAsync(flagKey, defaultValueString);
+        stringZeroValue = await client.GetStringValueAsync(flagKey, defaultValueString).ConfigureAwait(false);
     }
 
     [Then(@"the resolved string zero-value should be ""(.*)""")]
-    public async Task ThenTheResolvedStringZero_ValueShouldBeAsync(string expectedValue)
+    public void ThenTheResolvedStringZero_ValueShouldBeAsync(string expectedValue)
     {
-        Assert.Equal(expectedValue, await stringZeroValue.ConfigureAwait(false));
+        Assert.Equal(expectedValue, stringZeroValue);
     }
 
     [When(@"a zero-value integer flag with key ""(.*)"" is evaluated with default value (.*)")]
-    public void WhenAZero_ValueIntegerFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
+    public async Task WhenAZero_ValueIntegerFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, string defaultValueString)
     {
-        intZeroFlagValue = client.GetIntegerValueAsync(flagKey, int.Parse(defaultValueString));
+        intZeroFlagValue = await client.GetIntegerValueAsync(flagKey, int.Parse(defaultValueString)).ConfigureAwait(false);
     }
 
     [Then(@"the resolved integer zero-value should be (.*)")]
-    public async Task ThenTheResolvedIntegerZero_ValueShouldBeAsync(int expectedValue)
+    public void ThenTheResolvedIntegerZero_ValueShouldBeAsync(int expectedValue)
     {
-        Assert.Equal(expectedValue, await intZeroFlagValue.ConfigureAwait(false));
+        Assert.Equal(expectedValue, intZeroFlagValue);
     }
 
     [When(@"a zero-value float flag with key ""(.*)"" is evaluated with default value (.*)")]
-    public void WhenAZero_ValueFloatFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, decimal defaultValue)
+    public async Task WhenAZero_ValueFloatFlagWithKeyIsEvaluatedWithDefaultValue(string flagKey, decimal defaultValue)
     {
-        doubleZeroFlagValue = client.GetDoubleValueAsync(flagKey, decimal.ToDouble(defaultValue));
+        doubleZeroFlagValue = await client.GetDoubleValueAsync(flagKey, decimal.ToDouble(defaultValue)).ConfigureAwait(false);
     }
 
     [Then(@"the resolved float zero-value should be (.*)")]
-    public async Task ThenTheResolvedFloatZero_ValueShouldBeAsync(decimal expectedValue)
+    public void ThenTheResolvedFloatZero_ValueShouldBeAsync(decimal expectedValue)
     {
-        Assert.Equal(decimal.ToDouble(expectedValue), await doubleZeroFlagValue.ConfigureAwait(false));
+        Assert.Equal(decimal.ToDouble(expectedValue), doubleZeroFlagValue);
     }
 
     [When(@"a string flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
@@ -202,5 +201,4 @@ public abstract class FlagdStepDefinitionsBase
         var details = await client.GetStringDetailsAsync(stringFlagKey, stringDefaultValue, evaluationContext).ConfigureAwait(false);
         Assert.Equal(expectedReason, details.Reason);
     }
-
 }
