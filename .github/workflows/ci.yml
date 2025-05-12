@@ -2,13 +2,18 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - name
     paths-ignore:
       - "**.md"
   pull_request:
-    branches: [main]
-    paths-ignore:
-      - "**.md"
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+  merge_group:
 
 jobs:
   build:
