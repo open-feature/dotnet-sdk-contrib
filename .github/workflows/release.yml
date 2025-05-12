@@ -32,7 +32,7 @@ jobs:
       contents: write # upload sbom to a release
       attestations: write
       packages: read # for internal nuget reading
-    if: ${{ needs.release-package.outputs.releases_created }}
+    if: ${{ fromJSON(needs.release-package.outputs.releases_created || false) }}
     strategy:
       matrix:
         release: ${{ fromJSON(needs.release-package.outputs.paths_released) }}
