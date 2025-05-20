@@ -19,32 +19,7 @@ public static class FeatureBuilderExtensions
     public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder)
         => builder.AddProvider(sp =>
         {
-            return CreateProvider(sp, null, null);
-        });
-
-    /// <summary>
-    /// Adds the <see cref="FlagdProvider"/> to the <see cref="OpenFeatureBuilder"/> with specified <see cref="FlagdProviderOptions"/> configuration.
-    /// </summary>
-    /// <param name="builder">The <see cref="OpenFeatureBuilder"/> instance to configure.</param>
-    /// <param name="configureOptions">Delegate to configure the <see cref="FlagdProvider"/>.</param>
-    /// <returns>The <see cref="OpenFeatureBuilder"/> instance for chaining.</returns>
-    public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, Action<FlagdProviderOptions> configureOptions)
-        => builder.AddProvider(sp =>
-        {
-            return CreateProvider(sp, null, configureOptions);
-        });
-
-    /// <summary>
-    /// Adds the <see cref="FlagdProvider"/> to the <see cref="OpenFeatureBuilder"/> with a specific domain and <see cref="FlagdProviderOptions"/> configuration.
-    /// </summary>
-    /// <param name="builder">The <see cref="OpenFeatureBuilder"/> instance to configure.</param>
-    /// <param name="domain">The unique domain of the provider.</param>
-    /// <param name="configureOptions">Delegate to configure the <see cref="FlagdProvider"/>.</param>
-    /// <returns>The <see cref="OpenFeatureBuilder"/> instance for chaining.</returns>
-    public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, string domain, Action<FlagdProviderOptions> configureOptions)
-        => builder.AddProvider(domain, (sp, domain) =>
-        {
-            return CreateProvider(sp, domain, configureOptions);
+            return CreateProvider(sp, null, new FlagdProviderOptions());
         });
 
     /// <summary>
@@ -56,7 +31,7 @@ public static class FeatureBuilderExtensions
     public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, FlagdProviderOptions options)
         => builder.AddProvider(sp =>
         {
-            return CreateProvider(sp, null, o => { o = options; });
+            return CreateProvider(sp, null, options);
         });
 
     /// <summary>
@@ -68,7 +43,7 @@ public static class FeatureBuilderExtensions
     public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, string domain)
         => builder.AddProvider(domain, (sp, domain) =>
         {
-            return CreateProvider(sp, domain, null);
+            return CreateProvider(sp, domain, new FlagdProviderOptions());
         });
 
     /// <summary>
@@ -81,15 +56,12 @@ public static class FeatureBuilderExtensions
     public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, string domain, FlagdProviderOptions options)
         => builder.AddProvider(domain, (sp, domain) =>
         {
-            return CreateProvider(sp, domain, o => { o = options; });
+            return CreateProvider(sp, domain, options);
         });
 
-    private static FlagdProvider CreateProvider(IServiceProvider provider, string _, Action<FlagdProviderOptions> configureOptions)
+    private static FlagdProvider CreateProvider(IServiceProvider provider, string _, FlagdProviderOptions options)
     {
         var logger = provider.GetService<ILogger<FlagdProvider>>();
-        var options = new FlagdProviderOptions();
-
-        configureOptions?.Invoke(options);
         logger ??= NullLogger<FlagdProvider>.Instance;
 
         var config = FlagdConfig.Builder()
