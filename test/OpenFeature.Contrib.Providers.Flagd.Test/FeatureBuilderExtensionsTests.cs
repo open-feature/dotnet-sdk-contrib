@@ -81,8 +81,10 @@ public class FeatureBuilderExtensionsTests
                     UseTls = true,
                     CacheEnabled = true,
                     MaxCacheSize = 500,
-                    CertificatePath = "/path/to/cert",
-                    SocketPath = "/path/to/socket",
+                    CertificatePath = "mycert.pem",
+#if NET8_0_OR_GREATER
+                    SocketPath = "tmp.sock",
+#endif
                     MaxEventStreamRetries = -1,
                     ResolverType = ResolverType.IN_PROCESS,
                     SourceSelector = "source-selector"
@@ -108,8 +110,10 @@ public class FeatureBuilderExtensionsTests
             () => Assert.True(config.UseTls),
             () => Assert.True(config.CacheEnabled),
             () => Assert.Equal(500, config.MaxCacheSize),
-            () => Assert.Equal("/path/to/cert", config.CertificatePath),
-            () => Assert.Equal("/path/to/socket", config.SocketPath),
+            () => Assert.Equal("mycert.pem", config.CertificatePath),
+#if NET8_0_OR_GREATER
+            () => Assert.Equal("tmp.sock", config.SocketPath),
+#endif
             () => Assert.Equal(-1, config.MaxEventStreamRetries),
             () => Assert.Equal(ResolverType.IN_PROCESS, config.ResolverType),
             () => Assert.Equal("source-selector", config.SourceSelector)
@@ -131,8 +135,10 @@ public class FeatureBuilderExtensionsTests
                     UseTls = true,
                     CacheEnabled = true,
                     MaxCacheSize = 500,
-                    CertificatePath = "/path/to/cert",
-                    SocketPath = "/path/to/socket",
+                    CertificatePath = "mycert.pem",
+#if NET8_0_OR_GREATER
+                    SocketPath = "tmp.sock",
+#endif
                     MaxEventStreamRetries = -1,
                     ResolverType = ResolverType.IN_PROCESS,
                     SourceSelector = "source-selector"
