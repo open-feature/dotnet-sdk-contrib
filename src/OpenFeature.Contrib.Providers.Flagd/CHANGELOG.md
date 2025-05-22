@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.2...OpenFeature.Contrib.Providers.Flagd-v0.3.3) (2025-05-22)
+
+
+### ✨ New Features
+
+* add JSON Schema validation for Flagd provider when in-process mode is used ([#373](https://github.com/open-feature/dotnet-sdk-contrib/issues/373)) ([5037f60](https://github.com/open-feature/dotnet-sdk-contrib/commit/5037f60c4a2bf14b79fb1420e9340c66da6671b4))
+
+
+### 🧹 Chore
+
+* Add .editorconfig and cleanup code ([#375](https://github.com/open-feature/dotnet-sdk-contrib/issues/375)) ([683a392](https://github.com/open-feature/dotnet-sdk-contrib/commit/683a392604aca6c9a92b1f64fa30bc9e3e069b4f))
+* relax doc requirements for test projects ([e204e16](https://github.com/open-feature/dotnet-sdk-contrib/commit/e204e168ee8ccda34f46de325d45447e3ef85f73))
+
 ## [0.3.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.1...OpenFeature.Contrib.Providers.Flagd-v0.3.2) (2025-04-23)
 
 
