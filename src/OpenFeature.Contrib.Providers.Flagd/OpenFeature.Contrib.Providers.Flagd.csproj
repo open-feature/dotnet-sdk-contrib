@@ -37,7 +37,10 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="OpenFeature" Version="[2.2,3.0)" />
-    <PackageReference Include="OpenFeature.DependencyInjection" Version="[2.2,3.0)" />
+    <PackageReference Include="OpenFeature" Version="$(OpenFeatureVersion)" />
+    <PackageReference Include="OpenFeature.DependencyInjection" Version="$(OpenFeatureVersion)" />
   </ItemGroup>
+  <PropertyGroup>
+    <OpenFeatureVersion>[2.2,3.0)</OpenFeatureVersion> 
+  </PropertyGroup>
 </Project>
