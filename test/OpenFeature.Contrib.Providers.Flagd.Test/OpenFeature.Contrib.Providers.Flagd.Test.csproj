@@ -9,6 +9,12 @@
     <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="mycert.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="CI" DependsOnTargets="T1, T2">
   </Target>
 
