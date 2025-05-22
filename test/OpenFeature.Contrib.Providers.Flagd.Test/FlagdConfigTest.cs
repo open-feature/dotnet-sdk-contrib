@@ -1,5 +1,4 @@
 using System;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Testing;
 using Xunit;
@@ -211,23 +210,5 @@ public class UnitTestFlagdConfig
         Assert.True(config.UseTls);
         Assert.True(config.UseCertificate);
         Assert.Equal(logger, config.Logger);
-    }
-}
-
-public class TestLogger : ILogger
-{
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool IsEnabled(LogLevel logLevel)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-    {
-        throw new NotImplementedException();
     }
 }
