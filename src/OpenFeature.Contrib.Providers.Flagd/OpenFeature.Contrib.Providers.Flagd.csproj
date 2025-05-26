@@ -41,6 +41,6 @@
     <PackageReference Include="OpenFeature.DependencyInjection" Version="$(OpenFeatureVersion)" />
   </ItemGroup>
   <PropertyGroup>
-    <OpenFeatureVersion>[2.2,3.0)</OpenFeatureVersion> 
+    <OpenFeatureVersion>[2.2,2.99999]</OpenFeatureVersion> 
   </PropertyGroup>
 </Project>
