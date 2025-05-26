@@ -80,7 +80,6 @@ public sealed class FlagdProvider : FeatureProvider
     internal FlagdProvider(Resolver.Resolver resolver)
     {
         _resolver = resolver;
-        _resolver.Init();
     }
 
     // just for testing, internal but visible in tests

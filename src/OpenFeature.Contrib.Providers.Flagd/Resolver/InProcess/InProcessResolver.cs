@@ -77,17 +77,13 @@ internal class InProcessResolver : Resolver
 
     public async Task Shutdown()
     {
+        _cancellationTokenSource.Cancel();
         try
         {
-            _cancellationTokenSource.Cancel();
             if (_channel != null)
             {
                 await _channel.ShutdownAsync().ConfigureAwait(false);
             }
-        }
-        catch (Exception)
-        {
-            throw;
         }
         finally
         {

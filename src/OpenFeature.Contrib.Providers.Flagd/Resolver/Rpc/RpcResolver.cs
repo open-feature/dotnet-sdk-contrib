@@ -57,21 +57,26 @@ internal class RpcResolver : Resolver
         _cache = cache;
     }
 
-    public Task Init()
+    public async Task Init()
     {
-        _handleEventsThread = new Thread(HandleEvents);
+        _handleEventsThread = new Thread(async () => await HandleEvents().ConfigureAwait(false))
+        {
+            IsBackground = true
+        };
         _handleEventsThread.Start();
-        return Task.CompletedTask; // TODO: an elegant way of testing the connection status before completing this task
     }
 
-    public Task Shutdown()
+    public async Task Shutdown()
     {
         _cancellationTokenSource.Cancel();
-        return _channel?.ShutdownAsync().ContinueWith((t) =>
+        try
         {
-            _channel.Dispose();
-            if (t.IsFaulted) throw t.Exception;
-        });
+            await _channel.ShutdownAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            _channel?.Dispose();
+        }
     }
 
     public async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
@@ -197,7 +202,7 @@ internal class RpcResolver : Resolver
         }
     }
 
-    private async void HandleEvents()
+    private async Task HandleEvents()
     {
         CancellationToken token = _cancellationTokenSource.Token;
         while (!token.IsCancellationRequested && _eventStreamRetries < _config.MaxEventStreamRetries)
@@ -452,7 +457,8 @@ internal class RpcResolver : Resolver
                 {
                     var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 #if NET5_0_OR_GREATER
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) =>
+                    {
                         // the the custom cert to the chain, Build returns a bool if valid.
                         chain.ChainPolicy.TrustMode = System.Security.Cryptography.X509Certificates.X509ChainTrustMode.CustomRootTrust;
                         chain.ChainPolicy.CustomTrustStore.Add(certificate);
