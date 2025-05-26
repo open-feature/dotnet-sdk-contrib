@@ -28,7 +28,7 @@ public record FlagdProviderOptions
     public bool UseTls { get; set; } = false;
 
     /// <summary>
-    /// 
+    /// Enable/disable the local cache for static flag values. Defaults to false.
     /// </summary>
     public bool CacheEnabled { get; set; } = false;
 

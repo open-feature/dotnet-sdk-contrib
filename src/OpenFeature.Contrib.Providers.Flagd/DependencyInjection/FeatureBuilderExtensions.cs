@@ -67,15 +67,9 @@ public static class FeatureBuilderExtensions
         var logger = provider.GetService<ILogger<FlagdProvider>>();
         logger ??= NullLogger<FlagdProvider>.Instance;
 
-        FlagdProviderOptions options;
-        if (string.IsNullOrEmpty(domain))
-        {
-            options = optionsMonitor.Get(FlagdProviderOptions.DefaultName);
-        }
-        else
-        {
-            options = optionsMonitor.Get(domain);
-        }
+        var options = string.IsNullOrEmpty(domain)
+            ? optionsMonitor.Get(FlagdProviderOptions.DefaultName)
+            : optionsMonitor.Get(domain);
         
         var config = options.ToFlagdConfig();
         config.Logger = logger;
