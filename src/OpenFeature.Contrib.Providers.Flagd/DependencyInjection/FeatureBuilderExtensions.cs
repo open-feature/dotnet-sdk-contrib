@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OpenFeature.Contrib.Providers.Flagd;
+using OpenFeature.Contrib.Providers.Flagd.DependencyInjection;
 
 namespace OpenFeature.DependencyInjection.Providers.Flagd;
 
@@ -64,19 +65,8 @@ public static class FeatureBuilderExtensions
         var logger = provider.GetService<ILogger<FlagdProvider>>();
         logger ??= NullLogger<FlagdProvider>.Instance;
 
-        var config = FlagdConfig.Builder()
-            .WithHost(options.Host)
-            .WithPort(options.Port)
-            .WithTls(options.UseTls)
-            .WithCache(options.CacheEnabled)
-            .WithMaxCacheSize(options.MaxCacheSize)
-            .WithCertificatePath(options.CertificatePath)
-            .WithSocketPath(options.SocketPath)
-            .WithMaxEventStreamRetries(options.MaxEventStreamRetries)
-            .WithResolverType(options.ResolverType)
-            .WithSourceSelector(options.SourceSelector)
-            .WithLogger(logger)
-            .Build();
+        var config = options.ToFlagdConfig();
+        config.Logger = logger;
 
         return new FlagdProvider(config);
     }
