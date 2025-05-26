@@ -105,27 +105,15 @@ public sealed class FlagdProvider : FeatureProvider
     internal Resolver.Resolver GetResolver() => _resolver;
 
     /// <inheritdoc/>
-    public override Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)
+    public override async Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)
     {
-        return Task.Run(async () =>
-        {
-            await _resolver.Init().ConfigureAwait(false);
-        }).ContinueWith((t) =>
-        {
-            if (t.IsFaulted)
-            {
-                throw t.Exception;
-            }
-        });
+        await _resolver.Init().ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public override Task ShutdownAsync(CancellationToken cancellationToken = default)
+    public override async Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
-        return _resolver.Shutdown().ContinueWith((t) =>
-        {
-            if (t.IsFaulted) throw t.Exception;
-        });
+        await _resolver.Shutdown().ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
