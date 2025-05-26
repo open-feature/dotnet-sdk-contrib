@@ -70,7 +70,7 @@ public static class FeatureBuilderExtensions
         var options = string.IsNullOrEmpty(domain)
             ? optionsMonitor.Get(FlagdProviderOptions.DefaultName)
             : optionsMonitor.Get(domain);
-        
+
         var config = options.ToFlagdConfig();
         config.Logger = logger;
 
