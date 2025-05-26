@@ -2,6 +2,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using OpenFeature.Contrib.Providers.Flagd;
 using OpenFeature.Contrib.Providers.Flagd.DependencyInjection;
 
@@ -18,10 +19,10 @@ public static class FeatureBuilderExtensions
     /// <param name="builder">The <see cref="OpenFeatureBuilder"/> instance to configure.</param>
     /// <returns>The <see cref="OpenFeatureBuilder"/> instance for chaining.</returns>
     public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder)
-        => builder.AddProvider(sp =>
-        {
-            return CreateProvider(sp, null, new FlagdProviderOptions());
-        });
+    {
+        builder.Services.AddOptions<FlagdProviderOptions>(FlagdProviderOptions.DefaultName);
+        return builder.AddProvider(sp => CreateProvider(sp, null));
+    }
 
     /// <summary>
     /// Adds the <see cref="FlagdProvider"/> to the <see cref="OpenFeatureBuilder"/> with <see cref="FlagdProviderOptions"/> configuration.
@@ -29,11 +30,11 @@ public static class FeatureBuilderExtensions
     /// <param name="builder">The <see cref="OpenFeatureBuilder"/> instance to configure.</param>
     /// <param name="options">Options to configure <see cref="FlagdProvider"/>.</param>
     /// <returns>The <see cref="OpenFeatureBuilder"/> instance for chaining.</returns>
-    public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, FlagdProviderOptions options)
-        => builder.AddProvider(sp =>
-        {
-            return CreateProvider(sp, null, options);
-        });
+    public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, Action<FlagdProviderOptions> options)
+    {
+        builder.Services.Configure(FlagdProviderOptions.DefaultName, options);
+        return builder.AddProvider(sp => CreateProvider(sp, null));
+    }
 
     /// <summary>
     /// Adds the <see cref="FlagdProvider"/> to the <see cref="OpenFeatureBuilder"/> with a specific domain and default <see cref="FlagdProviderOptions"/> configuration.
@@ -42,10 +43,10 @@ public static class FeatureBuilderExtensions
     /// <param name="domain">The unique domain of the provider.</param>
     /// <returns>The <see cref="OpenFeatureBuilder"/> instance for chaining.</returns>
     public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, string domain)
-        => builder.AddProvider(domain, (sp, domain) =>
-        {
-            return CreateProvider(sp, domain, new FlagdProviderOptions());
-        });
+    {
+        builder.Services.AddOptions<FlagdProviderOptions>(domain);
+        return builder.AddProvider(domain, CreateProvider);
+    }
 
     /// <summary>
     /// Adds the <see cref="FlagdProvider"/> to the <see cref="OpenFeatureBuilder"/> with a specific domain and <see cref="FlagdProviderOptions"/> configuration.
@@ -54,17 +55,28 @@ public static class FeatureBuilderExtensions
     /// <param name="domain">The unique domain of the provider.</param>
     /// <param name="options">Options to configure <see cref="FlagdProvider"/>.</param>
     /// <returns>The <see cref="OpenFeatureBuilder"/> instance for chaining.</returns>
-    public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, string domain, FlagdProviderOptions options)
-        => builder.AddProvider(domain, (sp, domain) =>
-        {
-            return CreateProvider(sp, domain, options);
-        });
-
-    private static FlagdProvider CreateProvider(IServiceProvider provider, string _, FlagdProviderOptions options)
+    public static OpenFeatureBuilder AddFlagdProvider(this OpenFeatureBuilder builder, string domain, Action<FlagdProviderOptions> options)
     {
+        builder.Services.Configure(domain, options);
+        return builder.AddProvider(domain, CreateProvider);
+    }
+
+    private static FlagdProvider CreateProvider(IServiceProvider provider, string domain)
+    {
+        var optionsMonitor = provider.GetRequiredService<IOptionsMonitor<FlagdProviderOptions>>();
         var logger = provider.GetService<ILogger<FlagdProvider>>();
         logger ??= NullLogger<FlagdProvider>.Instance;
 
+        FlagdProviderOptions options;
+        if (string.IsNullOrEmpty(domain))
+        {
+            options = optionsMonitor.Get(FlagdProviderOptions.DefaultName);
+        }
+        else
+        {
+            options = optionsMonitor.Get(domain);
+        }
+        
         var config = options.ToFlagdConfig();
         config.Logger = logger;
 

@@ -74,20 +74,20 @@ public class FeatureBuilderExtensionsTests
             .AddOpenFeature(builder =>
             {
                 // Act
-                builder.AddFlagdProvider(new FlagdProviderOptions
+                builder.AddFlagdProvider(o =>
                 {
-                    Host = "flagdtest",
-                    Port = 1234,
-                    UseTls = true,
-                    CacheEnabled = true,
-                    MaxCacheSize = 500,
-                    CertificatePath = "mycert.pem",
+                    o.Host = "flagdtest";
+                    o.Port = 1234;
+                    o.UseTls = true;
+                    o.CacheEnabled = true;
+                    o.MaxCacheSize = 500;
+                    o.CertificatePath = "mycert.pem";
 #if NET8_0_OR_GREATER
-                    SocketPath = "tmp.sock",
+                    o.SocketPath = "tmp.sock";
 #endif
-                    MaxEventStreamRetries = -1,
-                    ResolverType = ResolverType.IN_PROCESS,
-                    SourceSelector = "source-selector"
+                    o.MaxEventStreamRetries = -1;
+                    o.ResolverType = ResolverType.IN_PROCESS;
+                    o.SourceSelector = "source-selector";
                 });
             })
             .BuildServiceProvider();
@@ -128,20 +128,20 @@ public class FeatureBuilderExtensionsTests
             .AddOpenFeature(builder =>
             {
                 // Act
-                builder.AddFlagdProvider("test-domain", new FlagdProviderOptions
+                builder.AddFlagdProvider("test-domain", o =>
                 {
-                    Host = "flagdtest",
-                    Port = 1234,
-                    UseTls = true,
-                    CacheEnabled = true,
-                    MaxCacheSize = 500,
-                    CertificatePath = "mycert.pem",
+                    o.Host = "flagdtest";
+                    o.Port = 1234;
+                    o.UseTls = true;
+                    o.CacheEnabled = true;
+                    o.MaxCacheSize = 500;
+                    o.CertificatePath = "mycert.pem";
 #if NET8_0_OR_GREATER
-                    SocketPath = "tmp.sock",
+                    o.SocketPath = "tmp.sock";
 #endif
-                    MaxEventStreamRetries = -1,
-                    ResolverType = ResolverType.IN_PROCESS,
-                    SourceSelector = "source-selector"
+                    o.MaxEventStreamRetries = -1;
+                    o.ResolverType = ResolverType.IN_PROCESS;
+                    o.SourceSelector = "source-selector";
                 });
             })
             .BuildServiceProvider();
