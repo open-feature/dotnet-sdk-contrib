@@ -18,7 +18,7 @@
 
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('Test'))">
     <Content
-      Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'DotnetSdkContrib.sln'))\build\xunit.runner.json">
+      Include="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'DotnetSdkContrib.slnx'))\build\xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
