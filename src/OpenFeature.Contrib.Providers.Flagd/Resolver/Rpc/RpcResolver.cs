@@ -30,7 +30,6 @@ internal class RpcResolver : Resolver
     private GrpcChannel _channel;
     private Channel<object> _eventChannel;
     private Model.Metadata _providerMetadata;
-    private Thread _handleEventsThread;
 
     internal RpcResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata)
     {
@@ -57,13 +56,10 @@ internal class RpcResolver : Resolver
         _cache = cache;
     }
 
-    public async Task Init()
+    public Task Init()
     {
-        _handleEventsThread = new Thread(async () => await HandleEvents().ConfigureAwait(false))
-        {
-            IsBackground = true
-        };
-        _handleEventsThread.Start();
+        _ = Task.Run(this.HandleEvents);
+        return Task.CompletedTask;
     }
 
     public async Task Shutdown()

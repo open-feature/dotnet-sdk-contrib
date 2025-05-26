@@ -33,7 +33,6 @@ internal class InProcessResolver : Resolver
     private readonly Mutex _mtx;
     private int _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
     private readonly FlagdConfig _config;
-    private Thread _handleEventsThread;
     private GrpcChannel _channel;
     private Channel<object> _eventChannel;
     private Model.Metadata _providerMetadata;
@@ -67,11 +66,11 @@ internal class InProcessResolver : Resolver
         await _jsonSchemaValidator.InitializeAsync().ConfigureAwait(false);
 
         var latch = new CountdownEvent(1);
-        _handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
+        var handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
         {
             IsBackground = true
         };
-        _handleEventsThread.Start();
+        handleEventsThread.Start();
         await Task.Run(() => latch.Wait()).ConfigureAwait(false);
     }
 
