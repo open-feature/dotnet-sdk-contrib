@@ -8,8 +8,8 @@ Dotnet 8+ is recommended.
 
 1. Create a new library project under `src/`: `dotnet new classlib -o src/OpenFeature.Contrib.MyComponent`
 2. Create a new test project under `test/`: `dotnet new xunit -o test/OpenFeature.Contrib.MyComponent.Test`
-3. Add the library project to the solution: `dotnet sln DotnetSdkContrib.sln add src/OpenFeature.Contrib.MyComponent/OpenFeature.Contrib.MyComponent.csproj`
-4. Add the test project to the solution: `dotnet sln DotnetSdkContrib.sln add test/OpenFeature.Contrib.MyComponent.Test/OpenFeature.Contrib.MyComponent.Test.csproj`
+3. Add the library project to the solution: `dotnet sln DotnetSdkContrib.slnx add src/OpenFeature.Contrib.MyComponent/OpenFeature.Contrib.MyComponent.csproj`
+4. Add the test project to the solution: `dotnet sln DotnetSdkContrib.slnx add test/OpenFeature.Contrib.MyComponent.Test/OpenFeature.Contrib.MyComponent.Test.csproj`
 5. Add the desired properties to your library's `.csproj` file (see example below).
 6. Remove all content besides the root element from your test project's `.csproj` file (all settings will be inherited).
 7. Add the new library project to `release-please-config.json`.

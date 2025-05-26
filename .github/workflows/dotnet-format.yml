@@ -36,4 +36,4 @@ jobs:
         run: dotnet build --no-restore
 
       - name: dotnet format
-        run: dotnet format --verify-no-changes --no-restore DotnetSdkContrib.sln
+        run: dotnet format --verify-no-changes --no-restore DotnetSdkContrib.slnx
