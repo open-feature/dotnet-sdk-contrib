@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OpenFeature.Contrib.Hooks.Otel/OpenFeature.Contrib.Hooks.Otel.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.ConfigCat/OpenFeature.Contrib.Providers.ConfigCat.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.EnvVar/OpenFeature.Contrib.Providers.EnvVar.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.FeatureManagement/OpenFeature.Contrib.Providers.FeatureManagement.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.Flagd/OpenFeature.Contrib.Providers.Flagd.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.Flagsmith/OpenFeature.Contrib.Providers.Flagsmith.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.Flipt/OpenFeature.Contrib.Providers.Flipt.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.GOFeatureFlag/OpenFeature.Contrib.Providers.GOFeatureFlag.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.Statsig/OpenFeature.Contrib.Providers.Statsig.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/OpenFeature.Contrib.Hooks.Otel.Test/OpenFeature.Contrib.Hooks.Otel.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.Flagd.E2e.Common/OpenFeature.Contrib.Providers.Flagd.E2e.Common.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest/OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.Flagd.Test/OpenFeature.Contrib.Providers.Flagd.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.Flagsmith.Test/OpenFeature.Contrib.Providers.Flagsmith.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.Flipt.Test/OpenFeature.Contrib.Providers.Flipt.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.Statsig.Test/OpenFeature.Contrib.Providers.Statsig.Test.csproj" />
+  </Folder>
+</Solution>

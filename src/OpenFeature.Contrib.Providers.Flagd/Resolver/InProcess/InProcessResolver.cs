@@ -33,7 +33,6 @@ internal class InProcessResolver : Resolver
     private readonly Mutex _mtx;
     private int _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
     private readonly FlagdConfig _config;
-    private Thread _handleEventsThread;
     private GrpcChannel _channel;
     private Channel<object> _eventChannel;
     private Model.Metadata _providerMetadata;
@@ -66,29 +65,29 @@ internal class InProcessResolver : Resolver
     {
         await _jsonSchemaValidator.InitializeAsync().ConfigureAwait(false);
 
-        await Task.Run(() =>
+        var latch = new CountdownEvent(1);
+        var handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
         {
-            var latch = new CountdownEvent(1);
-            _handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
-            {
-                IsBackground = true
-            };
-            _handleEventsThread.Start();
-            latch.Wait();
-        }).ContinueWith((task) =>
-        {
-            if (task.IsFaulted) throw task.Exception;
-        }).ConfigureAwait(false);
+            IsBackground = true
+        };
+        handleEventsThread.Start();
+        await Task.Run(() => latch.Wait()).ConfigureAwait(false);
     }
 
-    public Task Shutdown()
+    public async Task Shutdown()
     {
         _cancellationTokenSource.Cancel();
-        return _channel?.ShutdownAsync().ContinueWith((t) =>
+        try
         {
-            _channel.Dispose();
-            if (t.IsFaulted) throw t.Exception;
-        });
+            if (_channel != null)
+            {
+                await _channel.ShutdownAsync().ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            _channel?.Dispose();
+        }
     }
 
     public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
@@ -205,7 +204,8 @@ internal class InProcessResolver : Resolver
                     var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 
 #if NET8_0_OR_GREATER
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) =>
+                    {
                         // the the custom cert to the chain, Build returns a bool if valid.
                         chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
                         chain.ChainPolicy.CustomTrustStore.Add(certificate);
@@ -284,7 +284,8 @@ internal class InProcessResolver : Resolver
                 {
                     var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 #if NET5_0_OR_GREATER
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) => {
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, _) =>
+                    {
                         // the the custom cert to the chain, Build returns a bool if valid.
                         chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
                         chain.ChainPolicy.CustomTrustStore.Add(certificate);
