@@ -42,8 +42,8 @@ public abstract class EvaluationStepDefinitionsBase
         _scenarioContext = scenarioContext;
     }
 
-    [Given(@"a provider is registered")]
-    public void Givenaproviderisregistered()
+    [Given(@"a stable provider")]
+    public void Givenastableprovider()
     {
         // done in sub-classes
     }
