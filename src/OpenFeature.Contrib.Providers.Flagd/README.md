@@ -13,19 +13,23 @@ The flagd Flag provider allows you to connect to your flagd instance.
 We will first install the **OpenFeature SDK** and the **flagd provider**.
 
 ### .NET Cli
+
 ```shell
 dotnet add package OpenFeature.Contrib.Providers.Flagd
 ```
+
 ### Package Manager
 
 ```shell
 NuGet\Install-Package OpenFeature.Contrib.Providers.Flagd
 ```
+
 ### Package Reference
 
 ```xml
 <PackageReference Include="OpenFeature.Contrib.Providers.Flagd" />
 ```
+
 ### Packet cli
 
 ```shell
@@ -71,6 +75,80 @@ namespace OpenFeatureTestApp
 
             // Print the value of the 'myBoolFlag' feature flag
             System.Console.WriteLine(val.Result.ToString());
+        }
+    }
+}
+```
+
+## Using the flagd Provider with the OpenFeature SDK and Dependency Injection
+
+You can also use the flagd Provider with the OpenFeature SDK and Dependency Injection. The following example shows how to do this using Microsoft.Extensions.DependencyInjection:
+
+Before you start, make sure you have the `OpenFeature.Hosting` NuGet package installed:
+
+```shell
+dotnet add package OpenFeature.Hosting
+```
+
+Or with Package Manager:
+
+```shell
+NuGet\Install-Package OpenFeature.Hosting
+```
+
+Now you can set up Dependency Injection with OpenFeature and the flagd Provider in your `Program.cs` file. When not specifying any configuration options, the flagd Provider will use the default values for the variables as described below.
+
+```csharp
+using OpenFeature;
+using OpenFeature.DependencyInjection.Providers.Flagd;
+
+namespace OpenFeatureTestApp
+{
+    class Hello {
+        static void Main(string[] args) {
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddOpenFeature(config =>
+            {
+                config.AddHostedFeatureLifecycle()
+                    .AddFlagdProvider();
+            });
+
+            var app = builder.Build();
+
+            // ... ommitted for brevity
+        }
+    }
+}
+```
+
+You can override the default configuration options by specifying properties on the `FlagdProviderOptions` on the `AddFlagdProvider` method.
+
+```csharp
+using OpenFeature;
+using OpenFeature.DependencyInjection.Providers.Flagd;
+
+namespace OpenFeatureTestApp
+{
+    class Hello {
+        static void Main(string[] args) {
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddOpenFeature(config =>
+            {
+                config.AddHostedFeatureLifecycle()
+                    .AddFlagdProvider(o =>
+                    {
+                        o.Host = builder.Configuration["FlagdProviderOptions:Host"];
+                        o.Port = int.Parse(builder.Configuration["FlagdProviderOptions:Port"] ?? "8013");
+
+                        // other configurations can be set here
+                    });
+            });
+
+            var app = builder.Build();
+
+            // ... ommitted for brevity
         }
     }
 }
