@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.FeatureManagement-v0.1.0...OpenFeature.Contrib.Providers.FeatureManagement-v0.1.1) (2025-05-30)
+
+
+### ✨ New Features
+
+* Add support for basic flags in Feature Management ([#350](https://github.com/open-feature/dotnet-sdk-contrib/issues/350)) ([cfe5e57](https://github.com/open-feature/dotnet-sdk-contrib/commit/cfe5e5739edc0e812d3efcc01b740ecaad88d8a3))
+
+
+### 🧹 Chore
+
+* Add .editorconfig and cleanup code ([#375](https://github.com/open-feature/dotnet-sdk-contrib/issues/375)) ([683a392](https://github.com/open-feature/dotnet-sdk-contrib/commit/683a392604aca6c9a92b1f64fa30bc9e3e069b4f))
+* **deps:** Upgrading to 4.0.0 of Microsoft.FeatureManagement ([#303](https://github.com/open-feature/dotnet-sdk-contrib/issues/303)) ([686cafc](https://github.com/open-feature/dotnet-sdk-contrib/commit/686cafc2c3b240736b61d0e32eec65b8449396c7))
+* relax doc requirements for test projects ([e204e16](https://github.com/open-feature/dotnet-sdk-contrib/commit/e204e168ee8ccda34f46de325d45447e3ef85f73))
+
 ## [0.1.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.FeatureManagement-v0.0.4...OpenFeature.Contrib.Providers.FeatureManagement-v0.1.0) (2024-08-22)
 
 
