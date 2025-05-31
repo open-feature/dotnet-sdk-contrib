@@ -11,9 +11,7 @@ public class BulkEvaluationResponse
     /// A list containing the evaluation results for each requested flag.
     /// </summary>
     [JsonPropertyName("flags")]
-    public List<BulkEvaluationFlag> Flags { get; set; } =
-        new List<BulkEvaluationFlag>(); // Initialize to avoid null
-
+    public List<BulkEvaluationFlag> Flags { get; set; } = new(); // Initialize to avoid null
 
     /// <summary>
     /// Optional metadata associated with the bulk evaluation response itself.

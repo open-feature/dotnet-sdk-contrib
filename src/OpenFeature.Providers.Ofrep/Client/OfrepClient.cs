@@ -248,8 +248,8 @@ internal sealed partial class OfrepClient : IOfrepClient
             throw new ArgumentNullException(nameof(handler));
         }
 
-        _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
-        _getConfigurationRetryPolicy = Policy
+        this._logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+        this._getConfigurationRetryPolicy = Policy
             .Handle<HttpRequestException>()
             .WaitAndRetryAsync(
                 retryCount: 5,
@@ -257,15 +257,15 @@ internal sealed partial class OfrepClient : IOfrepClient
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt - 1)),
                 onRetry: (exception, timespan, retryAttempt, _) =>
                 {
-                    LogRetrying(exception.GetType().Name, retryAttempt);
+                    this.LogRetrying(exception.GetType().Name, retryAttempt);
                 });
-        _cache = new MemoryCache(new MemoryCacheOptions
+        this._cache = new MemoryCache(new MemoryCacheOptions
         {
             SizeLimit = configuration.MaxCacheSize > 0 ? (int?)configuration.MaxCacheSize : null
         });
-        _cacheDuration = configuration.CacheDuration;
-        _enableAbsoluteExpiration = configuration.EnableAbsoluteExpiration;
-        _httpClient = new HttpClient(handler, disposeHandler: true)
+        this._cacheDuration = configuration.CacheDuration;
+        this._enableAbsoluteExpiration = configuration.EnableAbsoluteExpiration;
+        this._httpClient = new HttpClient(handler, disposeHandler: true)
         {
             BaseAddress = new Uri(configuration.BaseUrl),
             Timeout = TimeSpan.FromSeconds(5)
@@ -274,13 +274,13 @@ internal sealed partial class OfrepClient : IOfrepClient
         {
             foreach (var header in configuration.Headers)
             {
-                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+                this._httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
             }
         }
 
         if (!string.IsNullOrEmpty(configuration.AuthorizationHeader))
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
+            this._httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", configuration.AuthorizationHeader);
         }
     }
@@ -310,18 +310,18 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         var cacheKey = $"flag:{flagKey};type:{type};ctx:{(context ?? EvaluationContext.Empty).GenerateETag()}";
         var etagCacheKey = $"etag:{cacheKey}";
-        if (_cache.TryGetValue(cacheKey, out object? cachedResponseObject))
+        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject))
         {
             if (cachedResponseObject is OfrepResponse<T> cachedResponse)
             {
-                LogCacheHit(cacheKey);
+                this.LogCacheHit(cacheKey);
                 return cachedResponse;
             }
         }
 
-        LogCacheMiss(cacheKey);
+        this.LogCacheMiss(cacheKey);
         string? cachedETag = null;
-        if (_cache.TryGetValue(etagCacheKey, out object? cachedETagObject))
+        if (this._cache.TryGetValue(etagCacheKey, out object? cachedETagObject))
         {
             if (cachedETagObject is string eTagValue)
             {
@@ -346,29 +346,29 @@ internal sealed partial class OfrepClient : IOfrepClient
                 request.Headers.IfNoneMatch.Add(
                     new EntityTagHeaderValue(cachedETag, isWeak: true)
                 );
-                LogSendingRequestWithETag(flagKey, cachedETag);
+                this.LogSendingRequestWithETag(flagKey, cachedETag);
             }
             else
             {
-                LogSendingRequestWithoutETag(flagKey);
+                this.LogSendingRequestWithoutETag(flagKey);
             }
 
             HttpResponseMessage response =
-                await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             // Handle 304 Not Modified - re-check cache for the response object
             if (response.StatusCode == HttpStatusCode.NotModified)
             {
-                if (_cache.TryGetValue(cacheKey, out object? notModifiedResponseObject))
+                if (this._cache.TryGetValue(cacheKey, out object? notModifiedResponseObject))
                 {
                     if (notModifiedResponseObject is OfrepResponse<T> notModifiedResponse)
                     {
-                        LogNotModified(flagKey);
+                        this.LogNotModified(flagKey);
                         return notModifiedResponse;
                     }
                 }
 
                 // If cache check fails after 304 (unlikely but possible), log and fall through
-                LogNotModifiedNoCache(flagKey);
+                this.LogNotModifiedNoCache(flagKey);
             }
 
             response
@@ -377,7 +377,7 @@ internal sealed partial class OfrepClient : IOfrepClient
                 .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
             if (evaluationResponse == null)
             {
-                LogNullResponse(flagKey);
+                this.LogNullResponse(flagKey);
                 return new OfrepResponse<T>(defaultValue)
                 {
                     ErrorCode = ErrorCodeParsingError,
@@ -392,60 +392,60 @@ internal sealed partial class OfrepClient : IOfrepClient
             var cacheEntryOptions = new MemoryCacheEntryOptions().SetSize(1);
             var etagCacheEntryOptions = new MemoryCacheEntryOptions().SetSize(1);
             // Configure expiration for both
-            if (_cacheDuration > TimeSpan.Zero)
+            if (this._cacheDuration > TimeSpan.Zero)
             {
-                cacheEntryOptions.SetSlidingExpiration(_cacheDuration);
-                etagCacheEntryOptions.SetSlidingExpiration(_cacheDuration); // ETag should expire with response
-                if (_enableAbsoluteExpiration)
+                cacheEntryOptions.SetSlidingExpiration(this._cacheDuration);
+                etagCacheEntryOptions.SetSlidingExpiration(this._cacheDuration); // ETag should expire with response
+                if (this._enableAbsoluteExpiration)
                 {
                     var absoluteExpiration =
-                        TimeSpan.FromTicks((long)(_cacheDuration.Ticks * AbsoluteExpirationFactor));
+                        TimeSpan.FromTicks((long)(this._cacheDuration.Ticks * AbsoluteExpirationFactor));
                     cacheEntryOptions.SetAbsoluteExpiration(absoluteExpiration);
                     etagCacheEntryOptions.SetAbsoluteExpiration(absoluteExpiration);
                 }
             }
 
             // Set cache entries
-            _cache.Set(cacheKey, evaluationResponse, cacheEntryOptions);
+            this._cache.Set(cacheKey, evaluationResponse, cacheEntryOptions);
             if (responseETag != null)
             {
-                _cache.Set(etagCacheKey, responseETag, etagCacheEntryOptions);
+                this._cache.Set(etagCacheKey, responseETag, etagCacheEntryOptions);
             }
             else
             {
-                _cache.Remove(etagCacheKey);
+                this._cache.Remove(etagCacheKey);
             }
 
-            LogCacheMetrics(flagKey, cacheKey, responseETag ?? "N/A", _cacheDuration.TotalMilliseconds);
+            this.LogCacheMetrics(flagKey, cacheKey, responseETag ?? "N/A", this._cacheDuration.TotalMilliseconds);
             return evaluationResponse;
         }
         catch (HttpRequestException ex)
         {
-            LogHttpRequestFailed(flagKey, ex.Message, ex);
-            return HandleEvaluationError(ex, cacheKey, defaultValue);
+            this.LogHttpRequestFailed(flagKey, ex.Message, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (JsonException ex)
         {
             // Failed to parse the JSON response
-            LogJsonParseError(flagKey, ex.Message, ex);
-            return HandleEvaluationError(ex, cacheKey, defaultValue);
+            this.LogJsonParseError(flagKey, ex.Message, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
         {
             // Request was cancelled by the caller
-            LogRequestCancelled(flagKey, ex);
-            return HandleEvaluationError(ex, cacheKey, defaultValue);
+            this.LogRequestCancelled(flagKey, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (OperationCanceledException ex)
         {
             // Request timed out
-            LogRequestTimeout(flagKey, ex.Message, ex);
-            return HandleEvaluationError(ex, cacheKey, defaultValue);
+            this.LogRequestTimeout(flagKey, ex.Message, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
         {
-            LogCacheOperationError(flagKey, ex.Message, ex);
-            return HandleEvaluationError(ex, cacheKey, defaultValue);
+            this.LogCacheOperationError(flagKey, ex.Message, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
         }
     }
 
@@ -456,14 +456,14 @@ internal sealed partial class OfrepClient : IOfrepClient
         // Generate cache key using the extension method
         var cacheKey = $"bulk;ctx:{(context ?? EvaluationContext.Empty).GenerateETag()}";
         // Try to get from cache first
-        if (_cache.TryGetValue(cacheKey, out object? cachedEntry) && cachedEntry != null)
+        if (this._cache.TryGetValue(cacheKey, out object? cachedEntry) && cachedEntry != null)
         {
             var typedEntry = ((BulkEvaluationResponse, string))cachedEntry;
-            LogCacheHit(cacheKey);
+            this.LogCacheHit(cacheKey);
             return typedEntry.Item1;
         }
 
-        LogCacheMiss(cacheKey);
+        this.LogCacheMiss(cacheKey);
         string? cachedETag = null;
         try
         {
@@ -477,7 +477,7 @@ internal sealed partial class OfrepClient : IOfrepClient
                     }, options: JsonOptions)
                 };
             // Re-fetch ETag just before the request if needed for If-None-Match
-            if (_cache.TryGetValue(cacheKey, out object? currentCachedDataObject) && currentCachedDataObject != null)
+            if (this._cache.TryGetValue(cacheKey, out object? currentCachedDataObject) && currentCachedDataObject != null)
             {
                 var currentCachedData = ((BulkEvaluationResponse, string))currentCachedDataObject;
                 if (!string.IsNullOrEmpty(currentCachedData.Item2))
@@ -486,31 +486,31 @@ internal sealed partial class OfrepClient : IOfrepClient
                     request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(cachedETag,
                         isWeak: true));
 
-                    LogBulkRequestWithETag("BulkEvaluate", cachedETag, cacheKey);
+                    this.LogBulkRequestWithETag("BulkEvaluate", cachedETag, cacheKey);
                 }
             }
             else
             {
-                LogBulkRequestWithoutETag("BulkEvaluate", cacheKey);
+                this.LogBulkRequestWithoutETag("BulkEvaluate", cacheKey);
             }
 
-            var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             // Handle 304 Not Modified - return the previously cached response
             if (response.StatusCode == HttpStatusCode.NotModified)
             {
                 // We need to re-fetch from cache here as the initial TryGetValue was only a check
-                if (_cache.TryGetValue(cacheKey, out object? entryFor304Object) && entryFor304Object != null)
+                if (this._cache.TryGetValue(cacheKey, out object? entryFor304Object) && entryFor304Object != null)
                 {
                     var entryFor304 = ((BulkEvaluationResponse, string))entryFor304Object;
                     if (entryFor304.Item1 != null)
                     {
-                        LogBulkNotModified("BulkEvaluate", cacheKey);
+                        this.LogBulkNotModified("BulkEvaluate", cacheKey);
                         return entryFor304.Item1;
                     }
                 }
 
                 // This case is unlikely if ETag logic is correct, but handle defensively
-                LogBulkNotModifiedNoCache("BulkEvaluate", cacheKey);
+                this.LogBulkNotModifiedNoCache("BulkEvaluate", cacheKey);
             }
 
             response
@@ -520,7 +520,7 @@ internal sealed partial class OfrepClient : IOfrepClient
                 .ReadFromJsonAsync<BulkEvaluationResponse>(JsonOptions, cancellationToken).ConfigureAwait(false);
             if (evaluationResponse == null)
             {
-                LogBulkNullResponse("BulkEvaluate");
+                this.LogBulkNullResponse("BulkEvaluate");
                 throw new OfrepConfigurationException(
                     "Received null or empty response from server for bulk evaluation.", null);
             }
@@ -531,30 +531,29 @@ internal sealed partial class OfrepClient : IOfrepClient
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetSize(1);
             // Configure expiration
-            if (_cacheDuration > TimeSpan.Zero)
+            if (this._cacheDuration > TimeSpan.Zero)
             {
-                cacheEntryOptions.SetSlidingExpiration(_cacheDuration);
-                if (_enableAbsoluteExpiration)
+                cacheEntryOptions.SetSlidingExpiration(this._cacheDuration);
+                if (this._enableAbsoluteExpiration)
                 {
                     cacheEntryOptions.SetAbsoluteExpiration(
-                        TimeSpan.FromTicks((long)(_cacheDuration.Ticks * AbsoluteExpirationFactor)));
+                        TimeSpan.FromTicks((long)(this._cacheDuration.Ticks * AbsoluteExpirationFactor)));
                 }
             }
 
-            _cache.Set(cacheKey, (evaluationResponse, responseETag), cacheEntryOptions);
-            LogBulkCacheMetrics("BulkEvaluate", cacheKey, responseETag ?? "N/A",
-                _cacheDuration.TotalMilliseconds);
+            this._cache.Set(cacheKey, (evaluationResponse, responseETag), cacheEntryOptions);
+            this.LogBulkCacheMetrics("BulkEvaluate", cacheKey, responseETag ?? "N/A", this._cacheDuration.TotalMilliseconds);
             return evaluationResponse;
         }
         catch (Exception ex) when (ex is HttpRequestException || ex is JsonException ||
                                    ex is OperationCanceledException
                                    || ex is ArgumentNullException)
         {
-            LogBulkRequestFailed("BulkEvaluate", ex.GetType().Name, ex.Message, ex);
-            if (_cache.TryGetValue(cacheKey, out object? staleEntryObject) && staleEntryObject != null)
+            this.LogBulkRequestFailed("BulkEvaluate", ex.GetType().Name, ex.Message, ex);
+            if (this._cache.TryGetValue(cacheKey, out object? staleEntryObject) && staleEntryObject != null)
             {
                 var staleEntry = ((BulkEvaluationResponse, string))staleEntryObject;
-                LogBulkStaleCacheReturn(cacheKey, ex.GetType().Name, "BulkEvaluate", ex);
+                this.LogBulkStaleCacheReturn(cacheKey, ex.GetType().Name, "BulkEvaluate", ex);
                 return staleEntry.Item1;
             }
 
@@ -568,11 +567,11 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// </summary>
     private OfrepResponse<T> HandleEvaluationError<T>(Exception ex, string cacheKey, T defaultValue)
     {
-        if (_cache.TryGetValue(cacheKey, out object? cachedResponseObject))
+        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject))
         {
             if (cachedResponseObject is OfrepResponse<T> staleResponse)
             {
-                LogStaleCacheReturn(cacheKey, ex.GetType().Name);
+                this.LogStaleCacheReturn(cacheKey, ex.GetType().Name);
                 return staleResponse;
             }
         }
@@ -596,11 +595,11 @@ internal sealed partial class OfrepClient : IOfrepClient
         try
         {
             // Execute the HTTP GET request within the retry policy
-            var response = await _getConfigurationRetryPolicy.ExecuteAsync(async ct =>
+            var response = await this._getConfigurationRetryPolicy.ExecuteAsync(async ct =>
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, OfrepConfigurationPath))
                 {
-                    var httpResponse = await _httpClient.SendAsync(request, ct).ConfigureAwait(false);
+                    var httpResponse = await this._httpClient.SendAsync(request, ct).ConfigureAwait(false);
                     httpResponse.EnsureSuccessStatusCode();
                     return httpResponse;
                 }
@@ -608,17 +607,17 @@ internal sealed partial class OfrepClient : IOfrepClient
             var configurationResponse =
                 await response.Content.ReadFromJsonAsync<ConfigurationResponse>(JsonOptions, cancellationToken)
                     .ConfigureAwait(false);
-            LogConfigurationSuccess();
+            this.LogConfigurationSuccess();
             return configurationResponse;
         }
         catch (Exception ex) when (ex is HttpRequestException || ex is JsonException ||
                                    ex is OperationCanceledException
                                    || ex is ArgumentNullException)
         {
-            LogConfigurationError(ex.GetType().Name, ex.Message,
-                $"{_httpClient.BaseAddress}{OfrepConfigurationPath}", ex);
+            this.LogConfigurationError(ex.GetType().Name, ex.Message,
+                $"{this._httpClient.BaseAddress}{OfrepConfigurationPath}", ex);
             throw new OfrepConfigurationException(
-                $"Failed to retrieve OFREP provider configuration from {_httpClient.BaseAddress}{OfrepConfigurationPath}.",
+                $"Failed to retrieve OFREP provider configuration from {this._httpClient.BaseAddress}{OfrepConfigurationPath}.",
                 ex);
         }
     }
@@ -663,35 +662,35 @@ internal sealed partial class OfrepClient : IOfrepClient
                 "Cache duration must be non-negative and not excessively long (e.g., <= 1 day).");
         }
 
-        LogCacheDurationChange(duration);
-        _cacheDuration = duration;
+        this.LogCacheDurationChange(duration);
+        this._cacheDuration = duration;
     }
 
     public void Dispose()
     {
-        Dispose(true);
+        this.Dispose(true);
         // ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
         GC.SuppressFinalize(this);
     }
 
     private void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (!this._disposed)
         {
             if (disposing)
             {
-                if (_httpClient != null)
+                if (this._httpClient != null)
                 {
-                    _httpClient.Dispose();
+                    this._httpClient.Dispose();
                 }
 
-                if (_cache != null)
+                if (this._cache != null)
                 {
-                    _cache.Dispose();
+                    this._cache.Dispose();
                 }
             }
 
-            _disposed = true;
+            this._disposed = true;
         }
     }
 }

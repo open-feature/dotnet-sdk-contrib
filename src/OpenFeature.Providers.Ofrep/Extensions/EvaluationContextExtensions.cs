@@ -11,7 +11,7 @@ namespace OpenFeature.Providers.Ofrep.Extensions;
 public static class EvaluationContextExtensions
 {
     // Dedicated options for ETag generation to avoid creating new instances
-    private static readonly JsonSerializerOptions EtagJsonOptions = new JsonSerializerOptions
+    private static readonly JsonSerializerOptions EtagJsonOptions = new()
     {
         PropertyNamingPolicy = null,
         WriteIndented = false,
@@ -61,7 +61,7 @@ public static class EvaluationContextExtensions
     {
         return context.AsDictionary().ToDictionary(
             kvp => kvp.Key,
-            kvp => kvp.Value?.AsObject
+            kvp => kvp.Value.AsObject
         );
     }
 }
