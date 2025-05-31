@@ -378,9 +378,8 @@ internal sealed partial class OfrepClient : IOfrepClient
             if (evaluationResponse == null)
             {
                 LogNullResponse(flagKey);
-                return new OfrepResponse<T>
+                return new OfrepResponse<T>(defaultValue)
                 {
-                    Value = defaultValue,
                     ErrorCode = ErrorCodeParsingError,
                     ErrorMessage = "Received null or empty response from server."
                 };
@@ -578,9 +577,8 @@ internal sealed partial class OfrepClient : IOfrepClient
             }
         }
 
-        return new OfrepResponse<T>
+        return new OfrepResponse<T>(defaultValue)
         {
-            Value = defaultValue,
             ErrorCode = MapExceptionToErrorCode(ex),
             Reason = "ERROR",
             ErrorMessage = ex.Message

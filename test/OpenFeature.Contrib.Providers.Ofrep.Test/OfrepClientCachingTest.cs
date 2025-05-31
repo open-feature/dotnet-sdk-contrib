@@ -73,7 +73,7 @@ public class OfrepClientCachingTest : IDisposable
     public async Task EvaluateFlagShouldUseCacheWhenCalledMultipleTimesWithSameParameters()
     {
         // Arrange
-        var expectedResponse = new OfrepResponse<bool> { Value = true };
+        var expectedResponse = new OfrepResponse<bool>(true);
         var jsonContent = new StringContent(JsonSerializer.Serialize(expectedResponse, _jsonOptions));
         SetupMockResponse(HttpStatusCode.OK, jsonContent, "\"etag123\"");
 
@@ -100,7 +100,7 @@ public class OfrepClientCachingTest : IDisposable
     public async Task EvaluateFlagShouldWorkWithNormalizedCacheKeys()
     {
         // Arrange
-        var expectedResponse = new OfrepResponse<bool> { Value = true };
+        var expectedResponse = new OfrepResponse<bool>(true);
         var jsonContent = new StringContent(JsonSerializer.Serialize(expectedResponse, _jsonOptions));
 
         // Create a new mock handler for this test
@@ -148,7 +148,7 @@ public class OfrepClientCachingTest : IDisposable
     public async Task EvaluateFlagShouldFallbackToCacheDataWhenRequestFails()
     {
         // Arrange
-        var expectedResponse = new OfrepResponse<bool> { Value = true };
+        var expectedResponse = new OfrepResponse<bool>(true);
         var jsonContent = new StringContent(JsonSerializer.Serialize(expectedResponse, _jsonOptions));
 
         // Create a new mock handler for this test

@@ -72,7 +72,7 @@ public class OfrepClientTest : IDisposable
     public async Task EvaluateFlagShouldCacheResponseWhenFirstRequest()
     {
         // Arrange
-        var expectedResponse = new OfrepResponse<bool> { Value = true };
+        var expectedResponse = new OfrepResponse<bool>(true);
         var jsonContent = new StringContent(JsonSerializer.Serialize(expectedResponse, _jsonOptions));
         SetupMockResponse(HttpStatusCode.OK, jsonContent, "\"etag123\"");
 
