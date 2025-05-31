@@ -40,15 +40,11 @@ public sealed class OfrepProvider : FeatureProvider,
                         },
 
                     FlagEvaluation =
-                        new ProviderFlagEvaluation
-                        {
-                            SupportedTypes = new[]
+                        new ProviderFlagEvaluation(new[]
                             {
                                 "boolean", "string", "integer",
                                 "double", "object"
-                            },
-                        },
-
+                            }),
                     Caching =
                         new ProviderCaching { Enabled = false, TimeTolive = 60000 }
                 }

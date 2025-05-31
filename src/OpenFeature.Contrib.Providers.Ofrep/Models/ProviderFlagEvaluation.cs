@@ -12,4 +12,13 @@ public class ProviderFlagEvaluation
     /// </summary>
     [JsonPropertyName("supportedTypes")]
     public string[] SupportedTypes { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProviderFlagEvaluation"/> class with the specified supported types.
+    /// </summary>
+    /// <param name="supportedTypes">An array of strings representing the types supported by this provider flag evaluation.</param>
+    public ProviderFlagEvaluation(string[] supportedTypes)
+    {
+        SupportedTypes = supportedTypes;
+    }
 }
