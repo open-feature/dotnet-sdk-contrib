@@ -37,12 +37,14 @@ public class OfrepConfigurationException : Exception
 /// </summary>
 internal sealed partial class OfrepClient : IOfrepClient
 {
+    // OFREP API paths
     private const string OfrepEvaluatePathPrefix = "/ofrep/v1/evaluate/flags/";
     private const string OfrepBulkEvaluatePath = "/ofrep/v1/evaluate/flags";
     private const string OfrepConfigurationPath = "/ofrep/v1/configuration";
+
+    // Error codes
     private const string ErrorCodeProviderNotReady = "provider_not_ready";
     private const string ErrorCodeParsingError = "parsing_error";
-
     private const string ErrorCodeGeneralError = "general_error";
 
     // Factor for absolute expiration based on sliding expiration. Consider making configurable if needed.
@@ -50,10 +52,527 @@ internal sealed partial class OfrepClient : IOfrepClient
     private readonly HttpClient _httpClient;
     private readonly MemoryCache _cache;
     private readonly ILogger _logger;
+    private readonly bool _enableAbsoluteExpiration;
     private bool _disposed;
     private TimeSpan _cacheDuration;
 
-    private readonly bool _enableAbsoluteExpiration;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    };
+
+    private readonly Polly.Retry.AsyncRetryPolicy _getConfigurationRetryPolicy;
+
+    /// <summary>
+    /// Creates a new instance of <see cref="OfrepClient"/>.
+    /// </summary>
+    /// <param name="configuration">The OFREP configuration.</param>
+    /// <param name="logger">The logger for the client.</param>
+    public OfrepClient(OfrepConfiguration configuration, ILogger? logger = null)
+        : this(configuration, CreateDefaultHandler(), logger) // Use helper for default handler
+    {
+    }
+
+    /// <summary>
+    /// Internal constructor for testing purposes.
+    /// </summary>
+    /// <param name="configuration">The OFREP configuration.</param>
+    /// <param name="handler">The HTTP message handler.</param>
+    /// <param name="logger">The logger for the client.</param>
+    internal OfrepClient(OfrepConfiguration configuration, HttpMessageHandler handler, ILogger? logger = null)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(configuration);
+        ArgumentNullException.ThrowIfNull(handler);
+#else
+        if (configuration == null)
+        {
+            throw new ArgumentNullException(nameof(configuration));
+        }
+
+        if (handler == null)
+        {
+            throw new ArgumentNullException(nameof(handler));
+        }
+#endif
+
+        this._logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+        this._getConfigurationRetryPolicy = Policy
+            .Handle<HttpRequestException>()
+            .WaitAndRetryAsync(
+                retryCount: 5,
+                sleepDurationProvider: retryAttempt =>
+                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt - 1)),
+                onRetry: (exception, _, retryAttempt, _) =>
+                {
+                    this.LogRetrying(exception.GetType().Name, retryAttempt);
+                });
+        this._cache = new MemoryCache(new MemoryCacheOptions
+        {
+            SizeLimit = configuration.MaxCacheSize > 0 ? configuration.MaxCacheSize : null
+        });
+        this._cacheDuration = configuration.CacheDuration;
+        this._enableAbsoluteExpiration = configuration.EnableAbsoluteExpiration;
+        this._httpClient = new HttpClient(handler, disposeHandler: true)
+        {
+            BaseAddress = new Uri(configuration.BaseUrl), Timeout = TimeSpan.FromSeconds(5)
+        };
+        if (configuration.Headers != null)
+        {
+            foreach (var header in configuration.Headers)
+            {
+                this._httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(configuration.AuthorizationHeader))
+        {
+            this._httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", configuration.AuthorizationHeader);
+        }
+    }
+
+    private static HttpClientHandler CreateDefaultHandler()
+    {
+        return new HttpClientHandler
+        {
+            UseProxy = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        };
+    }
+
+    /// <inheritdoc/>
+    public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, string type, T defaultValue,
+        EvaluationContext? context, CancellationToken cancellationToken = default)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrWhiteSpace(flagKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(type);
+#else
+        if (string.IsNullOrWhiteSpace(flagKey))
+        {
+            throw new ArgumentException("Flag key cannot be null or whitespace", nameof(flagKey));
+        }
+
+        if (string.IsNullOrWhiteSpace(type))
+        {
+            throw new ArgumentException("Type cannot be null or whitespace", nameof(type));
+        }
+#endif
+
+        var cacheKey = $"flag:{flagKey};type:{type};ctx:{(context ?? EvaluationContext.Empty).GenerateETag()}";
+
+        // Check cache first
+        if (this.TryGetCachedResponse<T>(cacheKey, out var cachedResponse) && cachedResponse != null)
+        {
+            this.LogCacheHit(cacheKey);
+            return cachedResponse;
+        }
+
+        this.LogCacheMiss(cacheKey);
+
+        try
+        {
+            var request = this.CreateEvaluationRequest(flagKey, context, cacheKey);
+            var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+            // Handle 304 Not Modified
+            if (response.StatusCode == HttpStatusCode.NotModified)
+            {
+                return this.HandleNotModified<T>(cacheKey, flagKey);
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            var evaluationResponse = await response.Content
+                .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
+            if (evaluationResponse == null)
+            {
+                this.LogNullResponse(flagKey);
+                return new OfrepResponse<T>(defaultValue)
+                {
+                    ErrorCode = ErrorCodeParsingError, ErrorMessage = "Received null or empty response from server."
+                };
+            }
+
+            this.CacheResponse(cacheKey, evaluationResponse, response.Headers.ETag?.Tag);
+            this.LogCacheMetrics(flagKey, cacheKey, response.Headers.ETag?.Tag ?? "N/A",
+                this._cacheDuration.TotalMilliseconds);
+
+            return evaluationResponse;
+        }
+        catch (HttpRequestException ex)
+        {
+            this.LogHttpRequestFailed(flagKey, ex.Message, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
+        }
+        catch (JsonException ex)
+        {
+            this.LogJsonParseError(flagKey, ex.Message, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
+        }
+        catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
+        {
+            this.LogRequestCancelled(flagKey, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
+        }
+        catch (OperationCanceledException ex)
+        {
+            this.LogRequestTimeout(flagKey, ex.Message, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
+        {
+            this.LogCacheOperationError(flagKey, ex.Message, ex);
+            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task<BulkEvaluationResponse> BulkEvaluate(EvaluationContext context,
+        CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"bulk;ctx:{context.GenerateETag()}";
+
+        // Check cache first
+        if (this.TryGetBulkCachedResponse(cacheKey, out var cachedResponse) && cachedResponse != null)
+        {
+            this.LogCacheHit(cacheKey);
+            return cachedResponse;
+        }
+
+        this.LogCacheMiss(cacheKey);
+
+        try
+        {
+            var request = this.CreateBulkEvaluationRequest(context, cacheKey);
+            var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+            // Handle 304 Not Modified
+            if (response.StatusCode == HttpStatusCode.NotModified)
+            {
+                return this.HandleBulkNotModified(cacheKey);
+            }
+
+            response.EnsureSuccessStatusCode();
+            var evaluationResponse = await response.Content
+                .ReadFromJsonAsync<BulkEvaluationResponse>(JsonOptions, cancellationToken).ConfigureAwait(false);
+            if (evaluationResponse == null)
+            {
+                this.LogBulkNullResponse("BulkEvaluate");
+                throw new OfrepConfigurationException(
+                    "Received null or empty response from server for bulk evaluation.", null);
+            }
+
+            this.CacheBulkResponse(cacheKey, evaluationResponse, response.Headers.ETag?.Tag);
+            this.LogBulkCacheMetrics("BulkEvaluate", cacheKey, response.Headers.ETag?.Tag ?? "N/A",
+                this._cacheDuration.TotalMilliseconds);
+
+            return evaluationResponse;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or JsonException or OperationCanceledException
+                                       or ArgumentNullException)
+        {
+            return this.HandleBulkEvaluationError(ex, cacheKey);
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the OFREP provider configuration.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the operation</param>
+    /// <returns></returns>
+    /// <exception cref="OfrepConfigurationException"></exception>
+    public async Task<ConfigurationResponse?> GetConfiguration(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Execute the HTTP GET request within the retry policy
+            var response = await this._getConfigurationRetryPolicy.ExecuteAsync(async ct =>
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Get, OfrepConfigurationPath);
+                var httpResponse = await this._httpClient.SendAsync(request, ct).ConfigureAwait(false);
+                httpResponse.EnsureSuccessStatusCode();
+                return httpResponse;
+            }, cancellationToken).ConfigureAwait(false);
+            var configurationResponse =
+                await response.Content.ReadFromJsonAsync<ConfigurationResponse>(JsonOptions, cancellationToken)
+                    .ConfigureAwait(false);
+            this.LogConfigurationSuccess();
+            return configurationResponse;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or JsonException or OperationCanceledException
+                                       or ArgumentNullException)
+        {
+            this.LogConfigurationError(ex.GetType().Name, ex.Message,
+                $"{this._httpClient.BaseAddress}{OfrepConfigurationPath}", ex);
+            throw new OfrepConfigurationException(
+                $"Failed to retrieve OFREP provider configuration from {this._httpClient.BaseAddress}{OfrepConfigurationPath}.",
+                ex);
+        }
+    }
+
+    /// <summary>
+    /// Sets the cache duration for evaluation responses. Use TimeSpan.Zero to disable expiration.
+    /// </summary>
+    /// <param name="duration">New cache duration. Must be non-negative and reasonable (e.g., less than or equal to 1 day).</param>
+    public void SetCacheDuration(TimeSpan duration)
+    {
+        if (duration < TimeSpan.Zero || duration.TotalDays > 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(duration),
+                "Cache duration must be non-negative and not excessively long (e.g., <= 1 day).");
+        }
+
+        this.LogCacheDurationChange(duration);
+        this._cacheDuration = duration;
+    }
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+        // ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!this._disposed)
+        {
+            if (disposing)
+            {
+                this._httpClient.Dispose();
+                this._cache.Dispose();
+            }
+
+            this._disposed = true;
+        }
+    }
+
+    /// <summary>
+    /// Try to get a cached response for the given cache key
+    /// </summary>
+    private bool TryGetCachedResponse<T>(string cacheKey, out OfrepResponse<T>? cachedResponse)
+    {
+        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject) &&
+            cachedResponseObject is OfrepResponse<T> response)
+        {
+            cachedResponse = response;
+            return true;
+        }
+
+        cachedResponse = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Create an HTTP request for flag evaluation
+    /// </summary>
+    private HttpRequestMessage CreateEvaluationRequest(string flagKey, EvaluationContext? context, string cacheKey)
+    {
+        string path = $"{OfrepEvaluatePathPrefix}{Uri.EscapeDataString(flagKey)}";
+        var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
+        var request = new HttpRequestMessage(HttpMethod.Post, path)
+        {
+            Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
+        };
+
+        // Add If-None-Match header if we have a cached ETag
+        var etagCacheKey = $"etag:{cacheKey}";
+        if (this._cache.TryGetValue(etagCacheKey, out object? cachedETagObject) &&
+            cachedETagObject is string cachedETag && !string.IsNullOrEmpty(cachedETag))
+        {
+            request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(cachedETag, isWeak: true));
+            this.LogSendingRequestWithETag(flagKey, cachedETag);
+        }
+        else
+        {
+            this.LogSendingRequestWithoutETag(flagKey);
+        }
+
+        return request;
+    }
+
+    /// <summary>
+    /// Handle 304 Not Modified response
+    /// </summary>
+    private OfrepResponse<T> HandleNotModified<T>(string cacheKey, string flagKey)
+    {
+        if (this.TryGetCachedResponse<T>(cacheKey, out var notModifiedResponse) && notModifiedResponse != null)
+        {
+            this.LogNotModified(flagKey);
+            return notModifiedResponse;
+        }
+
+        // If cache check fails after 304 (unlikely but possible), log and fall through
+        this.LogNotModifiedNoCache(flagKey);
+        throw new InvalidOperationException("Received 304 Not Modified but no cached response available");
+    }
+
+    /// <summary>
+    /// Cache the response and ETag
+    /// </summary>
+    private void CacheResponse<T>(string cacheKey, OfrepResponse<T> response, string? responseETag)
+    {
+        var cacheEntryOptions = this.CreateCacheEntryOptions();
+        this._cache.Set(cacheKey, response, cacheEntryOptions);
+
+        var etagCacheKey = $"etag:{cacheKey}";
+        if (responseETag != null)
+        {
+            this._cache.Set(etagCacheKey, responseETag, cacheEntryOptions);
+        }
+        else
+        {
+            this._cache.Remove(etagCacheKey);
+        }
+    }
+
+    /// <summary>
+    /// Create cache entry options with configured expiration
+    /// </summary>
+    private MemoryCacheEntryOptions CreateCacheEntryOptions()
+    {
+        var options = new MemoryCacheEntryOptions().SetSize(1);
+
+        if (this._cacheDuration > TimeSpan.Zero)
+        {
+            options.SetSlidingExpiration(this._cacheDuration);
+
+            if (this._enableAbsoluteExpiration)
+            {
+                var absoluteExpiration =
+                    TimeSpan.FromTicks((long)(this._cacheDuration.Ticks * AbsoluteExpirationFactor));
+                options.SetAbsoluteExpiration(absoluteExpiration);
+            }
+        }
+
+        return options;
+    }
+
+    /// <summary>
+    /// Try to get a cached bulk evaluation response for the given cache key
+    /// </summary>
+    private bool TryGetBulkCachedResponse(string cacheKey, out BulkEvaluationResponse? cachedResponse)
+    {
+        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject) &&
+            cachedResponseObject is ValueTuple<BulkEvaluationResponse, string> tuple)
+        {
+            cachedResponse = tuple.Item1;
+            return true;
+        }
+
+        cachedResponse = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Create an HTTP request for bulk evaluation
+    /// </summary>
+    private HttpRequestMessage CreateBulkEvaluationRequest(EvaluationContext context, string cacheKey)
+    {
+        var evaluationContextDict = context.ToDictionary();
+        var request = new HttpRequestMessage(HttpMethod.Post, OfrepBulkEvaluatePath)
+        {
+            Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
+        };
+
+        // Add If-None-Match header if we have a cached ETag
+        var etagCacheKey = $"etag:{cacheKey}";
+        if (this._cache.TryGetValue(etagCacheKey, out object? cachedETagObject) &&
+            cachedETagObject is string cachedETag && !string.IsNullOrEmpty(cachedETag))
+        {
+            request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(cachedETag, isWeak: true));
+            this.LogBulkRequestWithETag("BulkEvaluate", cachedETag, cacheKey);
+        }
+        else
+        {
+            this.LogBulkRequestWithoutETag("BulkEvaluate", cacheKey);
+        }
+
+        return request;
+    }
+
+    /// <summary>
+    /// Handle 304 Not Modified response for bulk evaluation
+    /// </summary>
+    private BulkEvaluationResponse HandleBulkNotModified(string cacheKey)
+    {
+        if (this.TryGetBulkCachedResponse(cacheKey, out var notModifiedResponse) && notModifiedResponse != null)
+        {
+            this.LogBulkNotModified("BulkEvaluate", cacheKey);
+            return notModifiedResponse;
+        }
+
+        // If cache check fails after 304 (unlikely but possible), log and throw
+        this.LogBulkNotModifiedNoCache("BulkEvaluate", cacheKey);
+        throw new InvalidOperationException("Received 304 Not Modified but no cached response available");
+    }
+
+    /// <summary>
+    /// Cache the bulk evaluation response and ETag
+    /// </summary>
+    private void CacheBulkResponse(string cacheKey, BulkEvaluationResponse response, string? responseETag)
+    {
+        var cacheEntryOptions = this.CreateCacheEntryOptions();
+        this._cache.Set(cacheKey, (response, responseETag ?? string.Empty), cacheEntryOptions);
+
+        var etagCacheKey = $"etag:{cacheKey}";
+        if (responseETag != null)
+        {
+            this._cache.Set(etagCacheKey, responseETag, cacheEntryOptions);
+        }
+        else
+        {
+            this._cache.Remove(etagCacheKey);
+        }
+    }
+
+    /// <summary>
+    /// Handle errors during bulk evaluation, attempting to return stale cache if available
+    /// </summary>
+    private BulkEvaluationResponse HandleBulkEvaluationError(Exception ex, string cacheKey)
+    {
+        if (this.TryGetBulkCachedResponse(cacheKey, out var staleResponse) && staleResponse != null)
+        {
+            this.LogBulkStaleCacheReturn(cacheKey, ex.GetType().Name, "BulkEvaluate", ex);
+            return staleResponse;
+        }
+
+        throw new OfrepConfigurationException(
+            $"Failed during OFREP bulk evaluation request to {OfrepBulkEvaluatePath}.", ex);
+    }
+
+    /// <summary>
+    /// Helper to handle errors during flag evaluation, attempting to return stale cache if available.
+    /// </summary>
+    private OfrepResponse<T> HandleEvaluationError<T>(Exception ex, string cacheKey, T defaultValue)
+    {
+        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject) &&
+            cachedResponseObject is OfrepResponse<T> staleResponse)
+        {
+            this.LogStaleCacheReturn(cacheKey, ex.GetType().Name);
+            return staleResponse;
+        }
+
+        return new OfrepResponse<T>(defaultValue)
+        {
+            ErrorCode = MapExceptionToErrorCode(ex), Reason = "ERROR", ErrorMessage = ex.Message
+        };
+    }
+
+    private static string MapExceptionToErrorCode(Exception ex)
+    {
+        return ex switch
+        {
+            HttpRequestException => ErrorCodeProviderNotReady,
+            JsonException => ErrorCodeParsingError,
+            OperationCanceledException => ErrorCodeProviderNotReady,
+            ArgumentNullException => ErrorCodeParsingError,
+            _ => ErrorCodeGeneralError
+        };
+    }
+
 
     // Define high-performance logging delegates using source generators
     [LoggerMessage(
@@ -214,536 +733,4 @@ internal sealed partial class OfrepClient : IOfrepClient
         Level = LogLevel.Debug,
         Message = "Setting cache duration to: {Duration}")]
     partial void LogCacheDurationChange(TimeSpan duration);
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-    };
-
-    private readonly Polly.Retry.AsyncRetryPolicy _getConfigurationRetryPolicy;
-
-    /// <summary>
-    /// Creates a new instance of <see cref="OfrepClient"/>.
-    /// </summary>
-    /// <param name="configuration">The OFREP configuration.</param>
-    /// <param name="logger">The logger for the client.</param>
-    public OfrepClient(OfrepConfiguration configuration, ILogger? logger = null)
-        : this(configuration, CreateDefaultHandler(), logger) // Use helper for default handler
-    {
-    }
-
-    /// <summary>
-    /// Internal constructor for testing purposes.
-    /// </summary>
-    /// <param name="configuration">The OFREP configuration.</param>
-    /// <param name="handler">The HTTP message handler.</param>
-    /// <param name="logger">The logger for the client.</param>
-    internal OfrepClient(OfrepConfiguration configuration, HttpMessageHandler handler, ILogger? logger = null)
-    {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(configuration);
-        ArgumentNullException.ThrowIfNull(handler);
-#else
-        if (configuration == null)
-        {
-            throw new ArgumentNullException(nameof(configuration));
-        }
-
-        if (handler == null)
-        {
-            throw new ArgumentNullException(nameof(handler));
-        }
-#endif
-
-        this._logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
-        this._getConfigurationRetryPolicy = Policy
-            .Handle<HttpRequestException>()
-            .WaitAndRetryAsync(
-                retryCount: 5,
-                sleepDurationProvider: retryAttempt =>
-                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt - 1)),
-                onRetry: (exception, _, retryAttempt, _) =>
-                {
-                    this.LogRetrying(exception.GetType().Name, retryAttempt);
-                });
-        this._cache = new MemoryCache(new MemoryCacheOptions
-        {
-            SizeLimit = configuration.MaxCacheSize > 0 ? configuration.MaxCacheSize : null
-        });
-        this._cacheDuration = configuration.CacheDuration;
-        this._enableAbsoluteExpiration = configuration.EnableAbsoluteExpiration;
-        this._httpClient = new HttpClient(handler, disposeHandler: true)
-        {
-            BaseAddress = new Uri(configuration.BaseUrl),
-            Timeout = TimeSpan.FromSeconds(5)
-        };
-        if (configuration.Headers != null)
-        {
-            foreach (var header in configuration.Headers)
-            {
-                this._httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
-            }
-        }
-
-        if (!string.IsNullOrEmpty(configuration.AuthorizationHeader))
-        {
-            this._httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", configuration.AuthorizationHeader);
-        }
-    }
-
-    private static HttpClientHandler CreateDefaultHandler()
-    {
-        return new HttpClientHandler
-        {
-            UseProxy = true,
-            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-        };
-    }
-
-    /// <inheritdoc/>
-    public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, string type, T defaultValue,
-        EvaluationContext? context, CancellationToken cancellationToken = default)
-    {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrWhiteSpace(flagKey);
-        ArgumentException.ThrowIfNullOrWhiteSpace(type);
-#else
-        if (string.IsNullOrWhiteSpace(flagKey))
-        {
-            throw new ArgumentException("Flag key cannot be null or whitespace", nameof(flagKey));
-        }
-
-        if (string.IsNullOrWhiteSpace(type))
-        {
-            throw new ArgumentException("Type cannot be null or whitespace", nameof(type));
-        }
-#endif
-
-        var cacheKey = $"flag:{flagKey};type:{type};ctx:{(context ?? EvaluationContext.Empty).GenerateETag()}";
-
-        // Check cache first
-        if (this.TryGetCachedResponse<T>(cacheKey, out var cachedResponse) && cachedResponse != null)
-        {
-            this.LogCacheHit(cacheKey);
-            return cachedResponse;
-        }
-
-        this.LogCacheMiss(cacheKey);
-
-        try
-        {
-            var request = this.CreateEvaluationRequest(flagKey, context, cacheKey);
-            var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-
-            // Handle 304 Not Modified
-            if (response.StatusCode == HttpStatusCode.NotModified)
-            {
-                return this.HandleNotModified<T>(cacheKey, flagKey);
-            }
-
-            response.EnsureSuccessStatusCode();
-
-            var evaluationResponse = await response.Content.ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
-            if (evaluationResponse == null)
-            {
-                this.LogNullResponse(flagKey);
-                return new OfrepResponse<T>(defaultValue)
-                {
-                    ErrorCode = ErrorCodeParsingError,
-                    ErrorMessage = "Received null or empty response from server."
-                };
-            }
-
-            this.CacheResponse(cacheKey, evaluationResponse, response.Headers.ETag?.Tag);
-            this.LogCacheMetrics(flagKey, cacheKey, response.Headers.ETag?.Tag ?? "N/A", this._cacheDuration.TotalMilliseconds);
-
-            return evaluationResponse;
-        }
-        catch (HttpRequestException ex)
-        {
-            this.LogHttpRequestFailed(flagKey, ex.Message, ex);
-            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
-        }
-        catch (JsonException ex)
-        {
-            this.LogJsonParseError(flagKey, ex.Message, ex);
-            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
-        }
-        catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
-        {
-            this.LogRequestCancelled(flagKey, ex);
-            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
-        }
-        catch (OperationCanceledException ex)
-        {
-            this.LogRequestTimeout(flagKey, ex.Message, ex);
-            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
-        }
-        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
-        {
-            this.LogCacheOperationError(flagKey, ex.Message, ex);
-            return this.HandleEvaluationError(ex, cacheKey, defaultValue);
-        }
-    }
-
-    /// <inheritdoc/>
-    public async Task<BulkEvaluationResponse> BulkEvaluate(EvaluationContext context,
-        CancellationToken cancellationToken = default)
-    {
-        var cacheKey = $"bulk;ctx:{context.GenerateETag()}";
-
-        // Check cache first
-        if (this.TryGetBulkCachedResponse(cacheKey, out var cachedResponse) && cachedResponse != null)
-        {
-            this.LogCacheHit(cacheKey);
-            return cachedResponse;
-        }
-
-        this.LogCacheMiss(cacheKey);
-
-        try
-        {
-            var request = this.CreateBulkEvaluationRequest(context, cacheKey);
-            var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-
-            // Handle 304 Not Modified
-            if (response.StatusCode == HttpStatusCode.NotModified)
-            {
-                return this.HandleBulkNotModified(cacheKey);
-            }
-
-            response.EnsureSuccessStatusCode();
-            var evaluationResponse = await response.Content.ReadFromJsonAsync<BulkEvaluationResponse>(JsonOptions, cancellationToken).ConfigureAwait(false);
-            if (evaluationResponse == null)
-            {
-                this.LogBulkNullResponse("BulkEvaluate");
-                throw new OfrepConfigurationException(
-                    "Received null or empty response from server for bulk evaluation.", null);
-            }
-
-            this.CacheBulkResponse(cacheKey, evaluationResponse, response.Headers.ETag?.Tag);
-            this.LogBulkCacheMetrics("BulkEvaluate", cacheKey, response.Headers.ETag?.Tag ?? "N/A", this._cacheDuration.TotalMilliseconds);
-
-            return evaluationResponse;
-        }
-        catch (Exception ex) when (ex is HttpRequestException or JsonException or OperationCanceledException or ArgumentNullException)
-        {
-            return this.HandleBulkEvaluationError(ex, cacheKey);
-        }
-    }
-
-    /// <summary>
-    /// Helper to handle errors during flag evaluation, attempting to return stale cache if available.
-    /// </summary>
-    private OfrepResponse<T> HandleEvaluationError<T>(Exception ex, string cacheKey, T defaultValue)
-    {
-        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject) &&
-            cachedResponseObject is OfrepResponse<T> staleResponse)
-        {
-            this.LogStaleCacheReturn(cacheKey, ex.GetType().Name);
-            return staleResponse;
-        }
-
-        return new OfrepResponse<T>(defaultValue)
-        {
-            ErrorCode = MapExceptionToErrorCode(ex),
-            Reason = "ERROR",
-            ErrorMessage = ex.Message
-        };
-    }
-
-    /// <summary>
-    /// Retrieves the OFREP provider configuration.
-    /// </summary>
-    /// <param name="cancellationToken">A token to cancel the operation</param>
-    /// <returns></returns>
-    /// <exception cref="OfrepConfigurationException"></exception>
-    public async Task<ConfigurationResponse?> GetConfiguration(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            // Execute the HTTP GET request within the retry policy
-            var response = await this._getConfigurationRetryPolicy.ExecuteAsync(async ct =>
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Get, OfrepConfigurationPath);
-                var httpResponse = await this._httpClient.SendAsync(request, ct).ConfigureAwait(false);
-                httpResponse.EnsureSuccessStatusCode();
-                return httpResponse;
-            }, cancellationToken).ConfigureAwait(false);
-            var configurationResponse =
-                await response.Content.ReadFromJsonAsync<ConfigurationResponse>(JsonOptions, cancellationToken)
-                    .ConfigureAwait(false);
-            this.LogConfigurationSuccess();
-            return configurationResponse;
-        }
-        catch (Exception ex) when (ex is HttpRequestException or JsonException or OperationCanceledException
-                                       or ArgumentNullException)
-        {
-            this.LogConfigurationError(ex.GetType().Name, ex.Message,
-                $"{this._httpClient.BaseAddress}{OfrepConfigurationPath}", ex);
-            throw new OfrepConfigurationException(
-                $"Failed to retrieve OFREP provider configuration from {this._httpClient.BaseAddress}{OfrepConfigurationPath}.",
-                ex);
-        }
-    }
-
-    private static string MapExceptionToErrorCode(Exception ex)
-    {
-        if (ex is HttpRequestException)
-        {
-            return ErrorCodeProviderNotReady;
-        }
-        else if (ex is JsonException)
-        {
-            return ErrorCodeParsingError;
-        }
-        else if (ex is OperationCanceledException)
-        {
-            return ErrorCodeProviderNotReady;
-        }
-        else if (ex is ArgumentNullException)
-        {
-            return ErrorCodeParsingError;
-        }
-        else if (ex is InvalidOperationException || ex is ArgumentException || ex is OfrepConfigurationException)
-        {
-            return ErrorCodeGeneralError;
-        }
-        else
-        {
-            return ErrorCodeGeneralError;
-        }
-    }
-
-    /// <summary>
-    /// Sets the cache duration for evaluation responses. Use TimeSpan.Zero to disable expiration.
-    /// </summary>
-    /// <param name="duration">New cache duration. Must be non-negative and reasonable (e.g., less than or equal to 1 day).</param>
-    public void SetCacheDuration(TimeSpan duration)
-    {
-        if (duration < TimeSpan.Zero || duration.TotalDays > 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(duration),
-                "Cache duration must be non-negative and not excessively long (e.g., <= 1 day).");
-        }
-
-        this.LogCacheDurationChange(duration);
-        this._cacheDuration = duration;
-    }
-
-    public void Dispose()
-    {
-        this.Dispose(true);
-        // ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (!this._disposed)
-        {
-            if (disposing)
-            {
-                this._httpClient.Dispose();
-                this._cache.Dispose();
-            }
-
-            this._disposed = true;
-        }
-    }
-
-    /// <summary>
-    /// Try to get a cached response for the given cache key
-    /// </summary>
-    private bool TryGetCachedResponse<T>(string cacheKey, out OfrepResponse<T>? cachedResponse)
-    {
-        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject) &&
-            cachedResponseObject is OfrepResponse<T> response)
-        {
-            cachedResponse = response;
-            return true;
-        }
-
-        cachedResponse = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Create an HTTP request for flag evaluation
-    /// </summary>
-    private HttpRequestMessage CreateEvaluationRequest(string flagKey, EvaluationContext? context, string cacheKey)
-    {
-        string path = $"{OfrepEvaluatePathPrefix}{Uri.EscapeDataString(flagKey)}";
-        var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
-        var request = new HttpRequestMessage(HttpMethod.Post, path)
-        {
-            Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
-        };
-
-        // Add If-None-Match header if we have a cached ETag
-        var etagCacheKey = $"etag:{cacheKey}";
-        if (this._cache.TryGetValue(etagCacheKey, out object? cachedETagObject) &&
-            cachedETagObject is string cachedETag && !string.IsNullOrEmpty(cachedETag))
-        {
-            request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(cachedETag, isWeak: true));
-            this.LogSendingRequestWithETag(flagKey, cachedETag);
-        }
-        else
-        {
-            this.LogSendingRequestWithoutETag(flagKey);
-        }
-
-        return request;
-    }
-
-    /// <summary>
-    /// Handle 304 Not Modified response
-    /// </summary>
-    private OfrepResponse<T> HandleNotModified<T>(string cacheKey, string flagKey)
-    {
-        if (this.TryGetCachedResponse<T>(cacheKey, out var notModifiedResponse) && notModifiedResponse != null)
-        {
-            this.LogNotModified(flagKey);
-            return notModifiedResponse;
-        }
-
-        // If cache check fails after 304 (unlikely but possible), log and fall through
-        this.LogNotModifiedNoCache(flagKey);
-        throw new InvalidOperationException("Received 304 Not Modified but no cached response available");
-    }
-
-    /// <summary>
-    /// Cache the response and ETag
-    /// </summary>
-    private void CacheResponse<T>(string cacheKey, OfrepResponse<T> response, string? responseETag)
-    {
-        var cacheEntryOptions = this.CreateCacheEntryOptions();
-        this._cache.Set(cacheKey, response, cacheEntryOptions);
-
-        var etagCacheKey = $"etag:{cacheKey}";
-        if (responseETag != null)
-        {
-            this._cache.Set(etagCacheKey, responseETag, cacheEntryOptions);
-        }
-        else
-        {
-            this._cache.Remove(etagCacheKey);
-        }
-    }
-
-    /// <summary>
-    /// Create cache entry options with configured expiration
-    /// </summary>
-    private MemoryCacheEntryOptions CreateCacheEntryOptions()
-    {
-        var options = new MemoryCacheEntryOptions().SetSize(1);
-
-        if (this._cacheDuration > TimeSpan.Zero)
-        {
-            options.SetSlidingExpiration(this._cacheDuration);
-
-            if (this._enableAbsoluteExpiration)
-            {
-                var absoluteExpiration = TimeSpan.FromTicks((long)(this._cacheDuration.Ticks * AbsoluteExpirationFactor));
-                options.SetAbsoluteExpiration(absoluteExpiration);
-            }
-        }
-
-        return options;
-    }
-
-    /// <summary>
-    /// Try to get a cached bulk evaluation response for the given cache key
-    /// </summary>
-    private bool TryGetBulkCachedResponse(string cacheKey, out BulkEvaluationResponse? cachedResponse)
-    {
-        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject) &&
-            cachedResponseObject is ValueTuple<BulkEvaluationResponse, string> tuple)
-        {
-            cachedResponse = tuple.Item1;
-            return true;
-        }
-
-        cachedResponse = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Create an HTTP request for bulk evaluation
-    /// </summary>
-    private HttpRequestMessage CreateBulkEvaluationRequest(EvaluationContext context, string cacheKey)
-    {
-        var evaluationContextDict = context.ToDictionary();
-        var request = new HttpRequestMessage(HttpMethod.Post, OfrepBulkEvaluatePath)
-        {
-            Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
-        };
-
-        // Add If-None-Match header if we have a cached ETag
-        var etagCacheKey = $"etag:{cacheKey}";
-        if (this._cache.TryGetValue(etagCacheKey, out object? cachedETagObject) &&
-            cachedETagObject is string cachedETag && !string.IsNullOrEmpty(cachedETag))
-        {
-            request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(cachedETag, isWeak: true));
-            this.LogBulkRequestWithETag("BulkEvaluate", cachedETag, cacheKey);
-        }
-        else
-        {
-            this.LogBulkRequestWithoutETag("BulkEvaluate", cacheKey);
-        }
-
-        return request;
-    }
-
-    /// <summary>
-    /// Handle 304 Not Modified response for bulk evaluation
-    /// </summary>
-    private BulkEvaluationResponse HandleBulkNotModified(string cacheKey)
-    {
-        if (this.TryGetBulkCachedResponse(cacheKey, out var notModifiedResponse) && notModifiedResponse != null)
-        {
-            this.LogBulkNotModified("BulkEvaluate", cacheKey);
-            return notModifiedResponse;
-        }
-
-        // If cache check fails after 304 (unlikely but possible), log and throw
-        this.LogBulkNotModifiedNoCache("BulkEvaluate", cacheKey);
-        throw new InvalidOperationException("Received 304 Not Modified but no cached response available");
-    }
-
-    /// <summary>
-    /// Cache the bulk evaluation response and ETag
-    /// </summary>
-    private void CacheBulkResponse(string cacheKey, BulkEvaluationResponse response, string? responseETag)
-    {
-        var cacheEntryOptions = this.CreateCacheEntryOptions();
-        this._cache.Set(cacheKey, (response, responseETag ?? string.Empty), cacheEntryOptions);
-
-        var etagCacheKey = $"etag:{cacheKey}";
-        if (responseETag != null)
-        {
-            this._cache.Set(etagCacheKey, responseETag, cacheEntryOptions);
-        }
-        else
-        {
-            this._cache.Remove(etagCacheKey);
-        }
-    }
-
-    /// <summary>
-    /// Handle errors during bulk evaluation, attempting to return stale cache if available
-    /// </summary>
-    private BulkEvaluationResponse HandleBulkEvaluationError(Exception ex, string cacheKey)
-    {
-        if (this.TryGetBulkCachedResponse(cacheKey, out var staleResponse) && staleResponse != null)
-        {
-            this.LogBulkStaleCacheReturn(cacheKey, ex.GetType().Name, "BulkEvaluate", ex);
-            return staleResponse;
-        }
-
-        throw new OfrepConfigurationException(
-            $"Failed during OFREP bulk evaluation request to {OfrepBulkEvaluatePath}.", ex);
-    }
 }
