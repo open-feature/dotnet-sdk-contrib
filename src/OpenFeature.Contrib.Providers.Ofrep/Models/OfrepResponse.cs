@@ -10,6 +10,14 @@ namespace OpenFeature.Contrib.Providers.Ofrep.Models;
 public class OfrepResponse<T> : OfrepEvaluationBase<T>
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OfrepResponse{T}"/> class with the specified value.
+    /// </summary>
+    /// <param name="value">The value to be wrapped in the OFREP response.</param>
+    public OfrepResponse(T value) : base(value)
+    {
+    }
+
+    /// <summary>
     /// An error code indicating the reason for evaluation failure, if any.
     /// </summary>
     [JsonPropertyName("errorCode")]

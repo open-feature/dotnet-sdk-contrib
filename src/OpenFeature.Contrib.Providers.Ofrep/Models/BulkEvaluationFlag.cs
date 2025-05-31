@@ -10,11 +10,18 @@ namespace OpenFeature.Contrib.Providers.Ofrep.Models;
 public class BulkEvaluationFlag : OfrepEvaluationBase<object>
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="BulkEvaluationFlag"/> class with the specified value.
+    /// </summary>
+    /// <param name="value">The value to be wrapped in the bulk evaluation flag.</param>
+    public BulkEvaluationFlag(object value) : base(value)
+    {
+    }
+
+    /// <summary>
     /// The unique key of the evaluated flag.
     /// </summary>
     [JsonPropertyName("key")]
     public string Key { get; set; } = string.Empty; // Initialize to avoid null warnings
-
 
     /// <summary>
     /// Optional metadata associated with the flag evaluation.
