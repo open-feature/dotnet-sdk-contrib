@@ -17,7 +17,6 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     /// Default configuration for the OFREP provider.
     /// </summary>
 
-    // ReSharper disable once InconsistentNaming
     private static readonly ConfigurationResponse DefaultConfiguration =
         new()
         {
