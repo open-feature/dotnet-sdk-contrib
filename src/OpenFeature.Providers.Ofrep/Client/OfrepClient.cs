@@ -23,11 +23,6 @@ namespace OpenFeature.Providers.Ofrep.Client;
 /// </summary>
 internal sealed partial class OfrepClient : IOfrepClient
 {
-    // Error codes
-    private const string ErrorCodeProviderNotReady = "provider_not_ready";
-    private const string ErrorCodeParsingError = "parsing_error";
-    private const string ErrorCodeGeneralError = "general_error";
-
     // Factor for absolute expiration based on sliding expiration. Consider making configurable if needed.
     private const double AbsoluteExpirationFactor = 5.0;
     private readonly HttpClient _httpClient;
@@ -172,7 +167,7 @@ internal sealed partial class OfrepClient : IOfrepClient
                 this.LogNullResponse(flagKey);
                 return new OfrepResponse<T>(defaultValue)
                 {
-                    ErrorCode = ErrorCodeParsingError, ErrorMessage = "Received null or empty response from server."
+                    ErrorCode = ErrorCodes.ParsingError, ErrorMessage = "Received null or empty response from server."
                 };
             }
 
@@ -546,11 +541,11 @@ internal sealed partial class OfrepClient : IOfrepClient
     {
         return ex switch
         {
-            HttpRequestException => ErrorCodeProviderNotReady,
-            JsonException => ErrorCodeParsingError,
-            OperationCanceledException => ErrorCodeProviderNotReady,
-            ArgumentNullException => ErrorCodeParsingError,
-            _ => ErrorCodeGeneralError
+            HttpRequestException => ErrorCodes.ProviderNotReady,
+            JsonException => ErrorCodes.ParsingError,
+            OperationCanceledException => ErrorCodes.ProviderNotReady,
+            ArgumentNullException => ErrorCodes.ParsingError,
+            _ => ErrorCodes.GeneralError
         };
     }
 
