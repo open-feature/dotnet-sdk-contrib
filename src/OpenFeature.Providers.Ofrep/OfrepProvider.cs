@@ -62,10 +62,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         }
 #endif
 
-        // Get the logger from the internal provider
-        var clientLogger = DevLoggerProvider.CreateLogger<IOfrepClient>();
-
-        this._client = new OfrepClient(configuration, clientLogger);
+        this._client = new OfrepClient(configuration);
     }
 
     /// <inheritdoc/>

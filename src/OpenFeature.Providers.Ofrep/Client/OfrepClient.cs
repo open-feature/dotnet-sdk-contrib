@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Extensions;
 using OpenFeature.Providers.Ofrep.Models;
@@ -70,7 +71,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
 #endif
 
-        this._logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+        this._logger = logger ?? NullLogger<OfrepClient>.Instance;
 
         this._cache = new MemoryCache(new MemoryCacheOptions
         {
