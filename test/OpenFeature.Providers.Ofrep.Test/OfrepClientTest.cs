@@ -1,9 +1,5 @@
-using System;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Moq;
 using Moq.Protected;
 using OpenFeature.Providers.Ofrep.Client;
