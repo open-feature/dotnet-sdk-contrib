@@ -36,7 +36,7 @@ public class OfrepConfigurationException : Exception
 /// <summary>
 /// Implementation of the OFREP HTTP client.
 /// </summary>
-internal sealed class OfrepClient : IOfrepClient
+internal sealed partial class OfrepClient : IOfrepClient
 {
     private const string OfrepEvaluatePathPrefix = "/ofrep/v1/evaluate/flags/";
     private const string OfrepBulkEvaluatePath = "/ofrep/v1/evaluate/flags";
@@ -56,162 +56,162 @@ internal sealed class OfrepClient : IOfrepClient
 
     private readonly bool _enableAbsoluteExpiration;
 
-    // Define high-performance logging delegates
-    private static readonly Action<ILogger, string, Exception> LogCacheHit =
-        LoggerMessage.Define<string>(
-            LogLevel.Debug,
-            new EventId(1001, nameof(LogCacheHit)),
-            "Cache hit for key: {CacheKey}");
+    // Define high-performance logging delegates using source generators
+    [LoggerMessage(
+        EventId = 1001,
+        Level = LogLevel.Debug,
+        Message = "Cache hit for key: {CacheKey}")]
+    partial void LogCacheHit(string cacheKey);
 
-    private static readonly Action<ILogger, string, Exception> LogCacheMiss =
-        LoggerMessage.Define<string>(
-            LogLevel.Trace,
-            new EventId(1002, nameof(LogCacheMiss)),
-            "Cache miss for key: {CacheKey}");
+    [LoggerMessage(
+        EventId = 1002,
+        Level = LogLevel.Trace,
+        Message = "Cache miss for key: {CacheKey}")]
+    partial void LogCacheMiss(string cacheKey);
 
-    private static readonly Action<ILogger, string, string, Exception> LogSendingRequestWithETag =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Trace,
-            new EventId(1003, nameof(LogSendingRequestWithETag)),
-            "Sending request for {FlagKey} with If-None-Match: {ETag}");
+    [LoggerMessage(
+        EventId = 1003,
+        Level = LogLevel.Trace,
+        Message = "Sending request for {FlagKey} with If-None-Match: {ETag}")]
+    partial void LogSendingRequestWithETag(string flagKey, string eTag);
 
-    private static readonly Action<ILogger, string, Exception> LogSendingRequestWithoutETag =
-        LoggerMessage.Define<string>(
-            LogLevel.Trace,
-            new EventId(1004, nameof(LogSendingRequestWithoutETag)),
-            "Sending request for {FlagKey} without If-None-Match header");
+    [LoggerMessage(
+        EventId = 1004,
+        Level = LogLevel.Trace,
+        Message = "Sending request for {FlagKey} without If-None-Match header")]
+    partial void LogSendingRequestWithoutETag(string flagKey);
 
-    private static readonly Action<ILogger, string, Exception> LogNotModified =
-        LoggerMessage.Define<string>(
-            LogLevel.Debug,
-            new EventId(1005, nameof(LogNotModified)),
-            "Received 304 Not Modified for {FlagKey}. Returning cached value");
+    [LoggerMessage(
+        EventId = 1005,
+        Level = LogLevel.Debug,
+        Message = "Received 304 Not Modified for {FlagKey}. Returning cached value")]
+    partial void LogNotModified(string flagKey);
 
-    private static readonly Action<ILogger, string, Exception> LogNotModifiedNoCache =
-        LoggerMessage.Define<string>(
-            LogLevel.Warning,
-            new EventId(1006, nameof(LogNotModifiedNoCache)),
-            "Received 304 Not Modified for {FlagKey} but no data in cache entry. Proceeding as failure");
+    [LoggerMessage(
+        EventId = 1006,
+        Level = LogLevel.Warning,
+        Message = "Received 304 Not Modified for {FlagKey} but no data in cache entry. Proceeding as failure")]
+    partial void LogNotModifiedNoCache(string flagKey);
 
-    private static readonly Action<ILogger, string, Exception> LogNullResponse =
-        LoggerMessage.Define<string>(
-            LogLevel.Error,
-            new EventId(1007, nameof(LogNullResponse)),
-            "Received null response body from server for flag {FlagKey}");
+    [LoggerMessage(
+        EventId = 1007,
+        Level = LogLevel.Error,
+        Message = "Received null response body from server for flag {FlagKey}")]
+    partial void LogNullResponse(string flagKey);
 
-    private static readonly Action<ILogger, string, string, string, double, Exception> LogCacheMetrics =
-        LoggerMessage.Define<string, string, string, double>(
-            LogLevel.Debug,
-            new EventId(1008, nameof(LogCacheMetrics)),
-            "Cached evaluation for {FlagKey}. Key: {CacheKey}, ETag: {ETag}, Duration: {DurationMs}ms");
+    [LoggerMessage(
+        EventId = 1008,
+        Level = LogLevel.Debug,
+        Message = "Cached evaluation for {FlagKey}. Key: {CacheKey}, ETag: {ETag}, Duration: {DurationMs}ms")]
+    partial void LogCacheMetrics(string flagKey, string cacheKey, string eTag, double durationMs);
 
-    private static readonly Action<ILogger, string, string, Exception> LogHttpRequestFailed =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Error,
-            new EventId(1009, nameof(LogHttpRequestFailed)),
-            "HTTP request failed for flag {FlagKey}: {Message}");
+    [LoggerMessage(
+        EventId = 1009,
+        Level = LogLevel.Error,
+        Message = "HTTP request failed for flag {FlagKey}: {Message}")]
+    partial void LogHttpRequestFailed(string flagKey, string message, Exception ex);
 
-    private static readonly Action<ILogger, string, string, Exception> LogJsonParseError =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Error,
-            new EventId(1010, nameof(LogJsonParseError)),
-            "Failed to parse JSON response for flag {FlagKey}: {Message}");
+    [LoggerMessage(
+        EventId = 1010,
+        Level = LogLevel.Error,
+        Message = "Failed to parse JSON response for flag {FlagKey}: {Message}")]
+    partial void LogJsonParseError(string flagKey, string message, Exception ex);
 
-    private static readonly Action<ILogger, string, Exception> LogRequestCancelled =
-        LoggerMessage.Define<string>(
-            LogLevel.Warning,
-            new EventId(1011, nameof(LogRequestCancelled)),
-            "Request cancelled for flag {FlagKey}");
+    [LoggerMessage(
+        EventId = 1011,
+        Level = LogLevel.Warning,
+        Message = "Request cancelled for flag {FlagKey}")]
+    partial void LogRequestCancelled(string flagKey, Exception ex);
 
-    private static readonly Action<ILogger, string, string, Exception> LogRequestTimeout =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Error,
-            new EventId(1012, nameof(LogRequestTimeout)),
-            "Request timed out for flag {FlagKey}: {Message}");
+    [LoggerMessage(
+        EventId = 1012,
+        Level = LogLevel.Error,
+        Message = "Request timed out for flag {FlagKey}: {Message}")]
+    partial void LogRequestTimeout(string flagKey, string message, Exception ex);
 
-    private static readonly Action<ILogger, string, string, Exception> LogCacheOperationError =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Error,
-            new EventId(1013, nameof(LogCacheOperationError)),
-            "Cache operation error for flag {FlagKey}: {Message}");
+    [LoggerMessage(
+        EventId = 1013,
+        Level = LogLevel.Error,
+        Message = "Cache operation error for flag {FlagKey}: {Message}")]
+    partial void LogCacheOperationError(string flagKey, string message, Exception ex);
 
-    private static readonly Action<ILogger, string, string, Exception> LogStaleCacheReturn =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Warning,
-            new EventId(1014, nameof(LogStaleCacheReturn)),
-            "Returning stale cache data for key {CacheKey} due to error: {ErrorType}");
+    [LoggerMessage(
+        EventId = 1014,
+        Level = LogLevel.Warning,
+        Message = "Returning stale cache data for key {CacheKey} due to error: {ErrorType}")]
+    partial void LogStaleCacheReturn(string cacheKey, string errorType);
 
-    private static readonly Action<ILogger, string, string, string, Exception> LogBulkRequestWithETag =
-        LoggerMessage.Define<string, string, string>(
-            LogLevel.Trace,
-            new EventId(1015, nameof(LogBulkRequestWithETag)),
-            "Sending bulk request for {Operation} with If-None-Match: {ETag}, Key: {CacheKey}");
+    [LoggerMessage(
+        EventId = 1015,
+        Level = LogLevel.Trace,
+        Message = "Sending bulk request for {Operation} with If-None-Match: {ETag}, Key: {CacheKey}")]
+    partial void LogBulkRequestWithETag(string operation, string eTag, string cacheKey);
 
-    private static readonly Action<ILogger, string, string, Exception> LogBulkRequestWithoutETag =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Trace,
-            new EventId(1016, nameof(LogBulkRequestWithoutETag)),
-            "Sending bulk request for {Operation} without If-None-Match header, Key: {CacheKey}");
+    [LoggerMessage(
+        EventId = 1016,
+        Level = LogLevel.Trace,
+        Message = "Sending bulk request for {Operation} without If-None-Match header, Key: {CacheKey}")]
+    partial void LogBulkRequestWithoutETag(string operation, string cacheKey);
 
-    private static readonly Action<ILogger, string, string, Exception> LogBulkNotModified =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Debug,
-            new EventId(1017, nameof(LogBulkNotModified)),
-            "Received 304 Not Modified for bulk evaluation {Operation}. Key: {CacheKey}, returning cached value");
+    [LoggerMessage(
+        EventId = 1017,
+        Level = LogLevel.Debug,
+        Message = "Received 304 Not Modified for bulk evaluation {Operation}. Key: {CacheKey}, returning cached value")]
+    partial void LogBulkNotModified(string operation, string cacheKey);
 
-    private static readonly Action<ILogger, string, string, Exception> LogBulkNotModifiedNoCache =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Warning,
-            new EventId(1018, nameof(LogBulkNotModifiedNoCache)),
-            "Received 304 Not Modified for bulk evaluation {Operation} but no data in cache entry. Key: {CacheKey}, proceeding as failure");
+    [LoggerMessage(
+        EventId = 1018,
+        Level = LogLevel.Warning,
+        Message = "Received 304 Not Modified for bulk evaluation {Operation} but no data in cache entry. Key: {CacheKey}, proceeding as failure")]
+    partial void LogBulkNotModifiedNoCache(string operation, string cacheKey);
 
-    private static readonly Action<ILogger, string, Exception> LogBulkNullResponse =
-        LoggerMessage.Define<string>(
-            LogLevel.Error,
-            new EventId(1019, nameof(LogBulkNullResponse)),
-            "Received null response body from server for bulk evaluation {Operation}");
+    [LoggerMessage(
+        EventId = 1019,
+        Level = LogLevel.Error,
+        Message = "Received null response body from server for bulk evaluation {Operation}")]
+    partial void LogBulkNullResponse(string operation);
 
-    private static readonly Action<ILogger, string, string, string, double, Exception> LogBulkCacheMetrics =
-        LoggerMessage.Define<string, string, string, double>(
-            LogLevel.Debug,
-            new EventId(1020, nameof(LogBulkCacheMetrics)),
-            "Cached bulk evaluation {Operation}. Key: {CacheKey}, ETag: {ETag}, Duration: {DurationMs}ms");
+    [LoggerMessage(
+        EventId = 1020,
+        Level = LogLevel.Debug,
+        Message = "Cached bulk evaluation {Operation}. Key: {CacheKey}, ETag: {ETag}, Duration: {DurationMs}ms")]
+    partial void LogBulkCacheMetrics(string operation, string cacheKey, string eTag, double durationMs);
 
-    private static readonly Action<ILogger, string, string, string, Exception> LogBulkRequestFailed =
-        LoggerMessage.Define<string, string, string>(
-            LogLevel.Error,
-            new EventId(1021, nameof(LogBulkRequestFailed)),
-            "Request or parsing failed for bulk evaluation {Operation}: {ErrorType} - {Message}");
+    [LoggerMessage(
+        EventId = 1021,
+        Level = LogLevel.Error,
+        Message = "Request or parsing failed for bulk evaluation {Operation}: {ErrorType} - {Message}")]
+    partial void LogBulkRequestFailed(string operation, string errorType, string message, Exception ex);
 
-    private static readonly Action<ILogger, string, string, string, Exception> LogBulkStaleCacheReturn =
-        LoggerMessage.Define<string, string, string>(
-            LogLevel.Warning,
-            new EventId(1022, nameof(LogBulkStaleCacheReturn)),
-            "Returning stale cache data for bulk key {CacheKey} due to error: {ErrorType}, Operation: {Operation}");
+    [LoggerMessage(
+        EventId = 1022,
+        Level = LogLevel.Warning,
+        Message = "Returning stale cache data for bulk key {CacheKey} due to error: {ErrorType}, Operation: {Operation}")]
+    partial void LogBulkStaleCacheReturn(string cacheKey, string errorType, string operation, Exception ex);
 
-    private static readonly Action<ILogger, string, string, string, Exception> LogConfigurationError =
-        LoggerMessage.Define<string, string, string>(
-            LogLevel.Error,
-            new EventId(1023, nameof(LogConfigurationError)),
-            "Failed to get configuration after retries (if applicable). Error: {ErrorType}, Message: {Message}, Endpoint: {Endpoint}");
+    [LoggerMessage(
+        EventId = 1023,
+        Level = LogLevel.Error,
+        Message = "Failed to get configuration after retries (if applicable). Error: {ErrorType}, Message: {Message}, Endpoint: {Endpoint}")]
+    partial void LogConfigurationError(string errorType, string message, string endpoint, Exception ex);
 
-    private static readonly Action<ILogger, string, int, Exception> LogRetrying =
-        LoggerMessage.Define<string, int>(
-            LogLevel.Information,
-            new EventId(1024, nameof(LogRetrying)),
-            "Retrying GetConfiguration due to {ExceptionType}. Attempt: {RetryAttempt}");
+    [LoggerMessage(
+        EventId = 1024,
+        Level = LogLevel.Information,
+        Message = "Retrying GetConfiguration due to {ExceptionType}. Attempt: {RetryAttempt}")]
+    partial void LogRetrying(string exceptionType, int retryAttempt);
 
-    private static readonly Action<ILogger, Exception> LogConfigurationSuccess =
-        LoggerMessage.Define(
-            LogLevel.Information,
-            new EventId(1025, nameof(LogConfigurationSuccess)),
-            "Successfully retrieved OFREP configuration");
+    [LoggerMessage(
+        EventId = 1025,
+        Level = LogLevel.Information,
+        Message = "Successfully retrieved OFREP configuration")]
+    partial void LogConfigurationSuccess();
 
-    private static readonly Action<ILogger, TimeSpan, Exception> LogCacheDurationChange =
-        LoggerMessage.Define<TimeSpan>(
-            LogLevel.Debug,
-            new EventId(1026, nameof(LogCacheDurationChange)),
-            "Setting cache duration to: {Duration}");
+    [LoggerMessage(
+        EventId = 1026,
+        Level = LogLevel.Debug,
+        Message = "Setting cache duration to: {Duration}")]
+    partial void LogCacheDurationChange(TimeSpan duration);
 
     private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
     {
@@ -260,7 +260,7 @@ internal sealed class OfrepClient : IOfrepClient
                     TimeSpan.FromSeconds(Math.Pow(2, retryAttempt - 1)),
                 onRetry: (exception, timespan, retryAttempt, _) =>
                 {
-                    LogRetrying(_logger, exception.GetType().Name, retryAttempt, null);
+                    LogRetrying(exception.GetType().Name, retryAttempt);
                 });
         _cache = new MemoryCache(new MemoryCacheOptions
         {
@@ -317,12 +317,12 @@ internal sealed class OfrepClient : IOfrepClient
         {
             if (cachedResponseObject is OfrepResponse<T> cachedResponse)
             {
-                LogCacheHit(_logger, cacheKey, null);
+                LogCacheHit(cacheKey);
                 return cachedResponse;
             }
         }
 
-        LogCacheMiss(_logger, cacheKey, null);
+        LogCacheMiss(cacheKey);
         string cachedETag = null;
         if (_cache.TryGetValue(etagCacheKey, out object cachedETagObject))
         {
@@ -349,11 +349,11 @@ internal sealed class OfrepClient : IOfrepClient
                 request.Headers.IfNoneMatch.Add(
                     new EntityTagHeaderValue(cachedETag, isWeak: true)
                 );
-                LogSendingRequestWithETag(_logger, flagKey, cachedETag, null);
+                LogSendingRequestWithETag(flagKey, cachedETag);
             }
             else
             {
-                LogSendingRequestWithoutETag(_logger, flagKey, null);
+                LogSendingRequestWithoutETag(flagKey);
             }
 
             HttpResponseMessage response =
@@ -365,13 +365,13 @@ internal sealed class OfrepClient : IOfrepClient
                 {
                     if (notModifiedResponseObject is OfrepResponse<T> notModifiedResponse)
                     {
-                        LogNotModified(_logger, flagKey, null);
+                        LogNotModified(flagKey);
                         return notModifiedResponse;
                     }
                 }
 
                 // If cache check fails after 304 (unlikely but possible), log and fall through
-                LogNotModifiedNoCache(_logger, flagKey, null);
+                LogNotModifiedNoCache(flagKey);
             }
 
             response
@@ -380,7 +380,7 @@ internal sealed class OfrepClient : IOfrepClient
                 .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
             if (evaluationResponse == null)
             {
-                LogNullResponse(_logger, flagKey, null);
+                LogNullResponse(flagKey);
                 return new OfrepResponse<T>
                 {
                     Value = defaultValue,
@@ -420,36 +420,35 @@ internal sealed class OfrepClient : IOfrepClient
                 _cache.Remove(etagCacheKey);
             }
 
-            LogCacheMetrics(_logger, flagKey, cacheKey, responseETag ?? "N/A", _cacheDuration.TotalMilliseconds,
-                null);
+            LogCacheMetrics(flagKey, cacheKey, responseETag ?? "N/A", _cacheDuration.TotalMilliseconds);
             return evaluationResponse;
         }
         catch (HttpRequestException ex)
         {
-            LogHttpRequestFailed(_logger, flagKey, ex.Message, ex);
+            LogHttpRequestFailed(flagKey, ex.Message, ex);
             return HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (JsonException ex)
         {
             // Failed to parse the JSON response
-            LogJsonParseError(_logger, flagKey, ex.Message, ex);
+            LogJsonParseError(flagKey, ex.Message, ex);
             return HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
         {
             // Request was cancelled by the caller
-            LogRequestCancelled(_logger, flagKey, ex);
+            LogRequestCancelled(flagKey, ex);
             return HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (OperationCanceledException ex)
         {
             // Request timed out
-            LogRequestTimeout(_logger, flagKey, ex.Message, ex);
+            LogRequestTimeout(flagKey, ex.Message, ex);
             return HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
         {
-            LogCacheOperationError(_logger, flagKey, ex.Message, ex);
+            LogCacheOperationError(flagKey, ex.Message, ex);
             return HandleEvaluationError(ex, cacheKey, defaultValue);
         }
     }
@@ -464,11 +463,11 @@ internal sealed class OfrepClient : IOfrepClient
         if (_cache.TryGetValue(cacheKey, out object cachedEntry))
         {
             var typedEntry = ((BulkEvaluationResponse, string))cachedEntry;
-            LogCacheHit(_logger, cacheKey, null);
+            LogCacheHit(cacheKey);
             return typedEntry.Item1;
         }
 
-        LogCacheMiss(_logger, cacheKey, null);
+        LogCacheMiss(cacheKey);
         string cachedETag = null;
         try
         {
@@ -491,12 +490,12 @@ internal sealed class OfrepClient : IOfrepClient
                     request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(cachedETag,
                         isWeak: true));
 
-                    LogBulkRequestWithETag(_logger, "BulkEvaluate", cachedETag, cacheKey, null);
+                    LogBulkRequestWithETag("BulkEvaluate", cachedETag, cacheKey);
                 }
             }
             else
             {
-                LogBulkRequestWithoutETag(_logger, "BulkEvaluate", cacheKey, null);
+                LogBulkRequestWithoutETag("BulkEvaluate", cacheKey);
             }
 
             var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
@@ -509,13 +508,13 @@ internal sealed class OfrepClient : IOfrepClient
                     var entryFor304 = ((BulkEvaluationResponse, string))entryFor304Object;
                     if (entryFor304.Item1 != null)
                     {
-                        LogBulkNotModified(_logger, "BulkEvaluate", cacheKey, null);
+                        LogBulkNotModified("BulkEvaluate", cacheKey);
                         return entryFor304.Item1;
                     }
                 }
 
                 // This case is unlikely if ETag logic is correct, but handle defensively
-                LogBulkNotModifiedNoCache(_logger, "BulkEvaluate", cacheKey, null);
+                LogBulkNotModifiedNoCache("BulkEvaluate", cacheKey);
             }
 
             response
@@ -525,7 +524,7 @@ internal sealed class OfrepClient : IOfrepClient
                 .ReadFromJsonAsync<BulkEvaluationResponse>(JsonOptions, cancellationToken).ConfigureAwait(false);
             if (evaluationResponse == null)
             {
-                LogBulkNullResponse(_logger, "BulkEvaluate", null);
+                LogBulkNullResponse("BulkEvaluate");
                 throw new OfrepConfigurationException(
                     "Received null or empty response from server for bulk evaluation.", null);
             }
@@ -547,19 +546,19 @@ internal sealed class OfrepClient : IOfrepClient
             }
 
             _cache.Set(cacheKey, (evaluationResponse, responseETag), cacheEntryOptions);
-            LogBulkCacheMetrics(_logger, "BulkEvaluate", cacheKey, responseETag ?? "N/A",
-                _cacheDuration.TotalMilliseconds, null);
+            LogBulkCacheMetrics("BulkEvaluate", cacheKey, responseETag ?? "N/A",
+                _cacheDuration.TotalMilliseconds);
             return evaluationResponse;
         }
         catch (Exception ex) when (ex is HttpRequestException || ex is JsonException ||
                                    ex is OperationCanceledException
                                    || ex is ArgumentNullException)
         {
-            LogBulkRequestFailed(_logger, "BulkEvaluate", ex.GetType().Name, ex.Message, ex);
+            LogBulkRequestFailed("BulkEvaluate", ex.GetType().Name, ex.Message, ex);
             if (_cache.TryGetValue(cacheKey, out object staleEntryObject))
             {
                 var staleEntry = ((BulkEvaluationResponse, string))staleEntryObject;
-                LogBulkStaleCacheReturn(_logger, cacheKey, ex.GetType().Name, "BulkEvaluate", ex);
+                LogBulkStaleCacheReturn(cacheKey, ex.GetType().Name, "BulkEvaluate", ex);
                 return staleEntry.Item1;
             }
 
@@ -577,7 +576,7 @@ internal sealed class OfrepClient : IOfrepClient
         {
             if (cachedResponseObject is OfrepResponse<T> staleResponse)
             {
-                LogStaleCacheReturn(_logger, cacheKey, ex.GetType().Name, ex);
+                LogStaleCacheReturn(cacheKey, ex.GetType().Name);
                 return staleResponse;
             }
         }
@@ -614,14 +613,14 @@ internal sealed class OfrepClient : IOfrepClient
             var configurationResponse =
                 await response.Content.ReadFromJsonAsync<ConfigurationResponse>(JsonOptions, cancellationToken)
                     .ConfigureAwait(false);
-            LogConfigurationSuccess(_logger, null);
+            LogConfigurationSuccess();
             return configurationResponse;
         }
         catch (Exception ex) when (ex is HttpRequestException || ex is JsonException ||
                                    ex is OperationCanceledException
                                    || ex is ArgumentNullException)
         {
-            LogConfigurationError(_logger, ex.GetType().Name, ex.Message,
+            LogConfigurationError(ex.GetType().Name, ex.Message,
                 $"{_httpClient.BaseAddress}{OfrepConfigurationPath}", ex);
             throw new OfrepConfigurationException(
                 $"Failed to retrieve OFREP provider configuration from {_httpClient.BaseAddress}{OfrepConfigurationPath}.",
@@ -669,7 +668,7 @@ internal sealed class OfrepClient : IOfrepClient
                 "Cache duration must be non-negative and not excessively long (e.g., <= 1 day).");
         }
 
-        LogCacheDurationChange(_logger, duration, null);
+        LogCacheDurationChange(duration);
         _cacheDuration = duration;
     }
 
