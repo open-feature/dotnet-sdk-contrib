@@ -1,6 +1,6 @@
 using System.Text.Json;
-using OpenFeature.Providers.Ofrep.Models;
 using OpenFeature.Model;
+using OpenFeature.Providers.Ofrep.Models;
 
 namespace OpenFeature.Providers.Ofrep.Client;
 

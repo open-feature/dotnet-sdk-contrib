@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
+using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Models;
-using OpenFeature.Model;
 
 namespace OpenFeature.Providers.Ofrep;
 

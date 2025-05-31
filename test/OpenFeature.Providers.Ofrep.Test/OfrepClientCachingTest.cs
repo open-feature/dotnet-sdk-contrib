@@ -1,15 +1,11 @@
-using System;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Moq;
 using Moq.Protected;
+using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Models;
-using OpenFeature.Model;
 using Xunit;
 using static Moq.It;
 
