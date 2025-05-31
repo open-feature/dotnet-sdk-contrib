@@ -1,16 +1,15 @@
 using System.Text.Json.Serialization;
 
-namespace OpenFeature.Contrib.Providers.Ofrep.Models
+namespace OpenFeature.Contrib.Providers.Ofrep.Models;
+
+/// <summary>
+/// Represents the flag evaluation capabilities of the provider.
+/// </summary>
+public class ProviderFlagEvaluation
 {
     /// <summary>
-    /// Represents the flag evaluation capabilities of the provider.
+    /// Gets or sets the array of supported flag types.
     /// </summary>
-    public class ProviderFlagEvaluation
-    {
-        /// <summary>
-        /// Gets or sets the array of supported flag types.
-        /// </summary>
-        [JsonPropertyName("supportedTypes")]
-        public string[] SupportedTypes { get; set; }
-    }
+    [JsonPropertyName("supportedTypes")]
+    public string[] SupportedTypes { get; set; }
 }
