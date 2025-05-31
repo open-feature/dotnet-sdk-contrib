@@ -14,7 +14,6 @@ using OpenFeature.Providers.Ofrep.Models;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client.Constants;
 using OpenFeature.Providers.Ofrep.Client.Exceptions;
-using Polly;
 
 namespace OpenFeature.Providers.Ofrep.Client;
 
@@ -37,8 +36,6 @@ internal sealed partial class OfrepClient : IOfrepClient
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
-
-    private readonly Polly.Retry.AsyncRetryPolicy _getConfigurationRetryPolicy;
 
     /// <summary>
     /// Creates a new instance of <see cref="OfrepClient"/>.
@@ -74,16 +71,7 @@ internal sealed partial class OfrepClient : IOfrepClient
 #endif
 
         this._logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
-        this._getConfigurationRetryPolicy = Policy
-            .Handle<HttpRequestException>()
-            .WaitAndRetryAsync(
-                retryCount: 5,
-                sleepDurationProvider: retryAttempt =>
-                    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt - 1)),
-                onRetry: (exception, _, retryAttempt, _) =>
-                {
-                    this.LogRetrying(exception.GetType().Name, retryAttempt);
-                });
+
         this._cache = new MemoryCache(new MemoryCacheOptions
         {
             SizeLimit = configuration.MaxCacheSize > 0 ? configuration.MaxCacheSize : null
@@ -107,14 +95,6 @@ internal sealed partial class OfrepClient : IOfrepClient
             this._httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", configuration.AuthorizationHeader);
         }
-    }
-
-    private static HttpClientHandler CreateDefaultHandler()
-    {
-        return new HttpClientHandler
-        {
-            UseProxy = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-        };
     }
 
     /// <inheritdoc/>
@@ -167,7 +147,8 @@ internal sealed partial class OfrepClient : IOfrepClient
                 this.LogNullResponse(flagKey);
                 return new OfrepResponse<T>(defaultValue)
                 {
-                    ErrorCode = ErrorCodes.ParsingError, ErrorMessage = "Received null or empty response from server."
+                    ErrorCode = ErrorCodes.ParsingError,
+                    ErrorMessage = "Received null or empty response from server."
                 };
             }
 
@@ -250,41 +231,6 @@ internal sealed partial class OfrepClient : IOfrepClient
                                        or ArgumentNullException)
         {
             return this.HandleBulkEvaluationError(ex, cacheKey);
-        }
-    }
-
-    /// <summary>
-    /// Retrieves the OFREP provider configuration.
-    /// </summary>
-    /// <param name="cancellationToken">A token to cancel the operation</param>
-    /// <returns></returns>
-    /// <exception cref="OfrepConfigurationException"></exception>
-    public async Task<ConfigurationResponse?> GetConfiguration(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            // Execute the HTTP GET request within the retry policy
-            var response = await this._getConfigurationRetryPolicy.ExecuteAsync(async ct =>
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Get, OfrepPaths.Configuration);
-                var httpResponse = await this._httpClient.SendAsync(request, ct).ConfigureAwait(false);
-                httpResponse.EnsureSuccessStatusCode();
-                return httpResponse;
-            }, cancellationToken).ConfigureAwait(false);
-            var configurationResponse =
-                await response.Content.ReadFromJsonAsync<ConfigurationResponse>(JsonOptions, cancellationToken)
-                    .ConfigureAwait(false);
-            this.LogConfigurationSuccess();
-            return configurationResponse;
-        }
-        catch (Exception ex) when (ex is HttpRequestException or JsonException or OperationCanceledException
-                                       or ArgumentNullException)
-        {
-            this.LogConfigurationError(ex.GetType().Name, ex.Message,
-                $"{this._httpClient.BaseAddress}{OfrepPaths.Configuration}", ex);
-            throw new OfrepConfigurationException(
-                $"Failed to retrieve OFREP provider configuration from {this._httpClient.BaseAddress}{OfrepPaths.Configuration}.",
-                ex);
         }
     }
 
@@ -549,6 +495,13 @@ internal sealed partial class OfrepClient : IOfrepClient
         };
     }
 
+    private static HttpClientHandler CreateDefaultHandler()
+    {
+        return new HttpClientHandler
+        {
+            UseProxy = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        };
+    }
 
     // Define high-performance logging delegates using source generators
     [LoggerMessage(

@@ -1,5 +1,3 @@
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client;
@@ -31,17 +29,12 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
                         new ProviderCacheInvalidation
                         {
                             Polling =
-                                new FeatureCacheInvalidationPolling
-                                {
-                                    Enabled = false,
-                                    MinPollingIntervalMs = 60000
-                                }
+                                new FeatureCacheInvalidationPolling { Enabled = false, MinPollingIntervalMs = 60000 }
                         },
-
                     FlagEvaluation =
                         new ProviderFlagEvaluation([
                             "boolean", "string", "integer",
-                                "double", "object"
+                            "double", "object"
                         ]),
                     Caching =
                         new ProviderCaching { Enabled = false, TimeTolive = 60000 }
@@ -49,11 +42,9 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         };
 
     private readonly OfrepClient _client;
-    private readonly ILogger<OfrepProvider> _logger;
 
     private const string Name = "OpenFeature Remote Evaluation Protocol Server";
-    private ProviderCapabilities? _capabilities =
-        DefaultConfiguration.Capabilities;
+    private readonly ProviderCapabilities? _capabilities = DefaultConfiguration.Capabilities;
     private bool _disposed;
 
     /// <summary>
@@ -62,12 +53,14 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     /// <param name="configuration">The OFREP provider configuration.</param>
     public OfrepProvider(OfrepConfiguration configuration)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(configuration);
+#else
         if (configuration == null)
         {
             throw new ArgumentNullException(nameof(configuration));
         }
-
-        this._logger = DevLoggerProvider.CreateLogger<OfrepProvider>();
+#endif
 
         // Get the logger from the internal provider
         var clientLogger = DevLoggerProvider.CreateLogger<IOfrepClient>();
@@ -75,59 +68,8 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         this._client = new OfrepClient(configuration, clientLogger);
     }
 
-    /// <summary>
-    /// Updates the provider configuration based on the capabilities received
-    /// from the OFREP server.
-    /// </summary>
-    /// <param name="capabilities">The capabilities supported by the OFREP
-    /// server</param>
-    private void UpdateProviderConfiguration(
-        ProviderCapabilities? capabilities)
-    {
-        if (capabilities == null)
-        {
-            return;
-        }
-
-        this._capabilities = capabilities;
-
-        // If the caching capabilities are defined, and caching is Enabled
-        // ensure the client is configured with the correct cache settings.
-        if (capabilities.Caching is { Enabled: true })
-        {
-            this._logger.LogDebug("Configuring cache configuration for http client");
-        }
-    }
-
     /// <inheritdoc/>
-    public override async Task
-        InitializeAsync(EvaluationContext context,
-            CancellationToken cancellationToken = default)
-    {
-        // As part of initialization, we fetch the configuration from the OFREP
-        // server
-
-        try
-        {
-            var config = await this._client.GetConfiguration(cancellationToken).ConfigureAwait(false);
-            this.UpdateProviderConfiguration(config?.Capabilities);
-
-            // Log the configuration received from the server
-            this._logger.LogDebug(
-                "Configuration received from OFREP server: {Configuration}",
-                JsonSerializer.Serialize(config));
-        }
-        catch
-        {
-            // If the server is unreachable, we log the error and continue,
-            // and use the default configuration instead.
-            this.UpdateProviderConfiguration(DefaultConfiguration.Capabilities);
-        }
-    }
-
-    /// <inheritdoc/>
-    public override Task
-        ShutdownAsync(CancellationToken cancellationToken = default)
+    public override Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
         this.Dispose();
 
@@ -189,10 +131,14 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             CancellationToken cancellationToken = default)
 
     {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrWhiteSpace(flagKey);
+#else
         if (flagKey == null)
         {
             throw new ArgumentNullException(nameof(flagKey));
         }
+#endif
 
         this.ValidateFlagTypeIsSupported("object");
 
