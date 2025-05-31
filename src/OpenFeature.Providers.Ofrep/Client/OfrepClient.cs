@@ -12,6 +12,7 @@ using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Extensions;
 using OpenFeature.Providers.Ofrep.Models;
 using OpenFeature.Model;
+using OpenFeature.Providers.Ofrep.Client.Constants;
 using OpenFeature.Providers.Ofrep.Client.Exceptions;
 using Polly;
 
@@ -22,11 +23,6 @@ namespace OpenFeature.Providers.Ofrep.Client;
 /// </summary>
 internal sealed partial class OfrepClient : IOfrepClient
 {
-    // OFREP API paths
-    private const string OfrepEvaluatePathPrefix = "/ofrep/v1/evaluate/flags/";
-    private const string OfrepBulkEvaluatePath = "/ofrep/v1/evaluate/flags";
-    private const string OfrepConfigurationPath = "/ofrep/v1/configuration";
-
     // Error codes
     private const string ErrorCodeProviderNotReady = "provider_not_ready";
     private const string ErrorCodeParsingError = "parsing_error";
@@ -275,7 +271,7 @@ internal sealed partial class OfrepClient : IOfrepClient
             // Execute the HTTP GET request within the retry policy
             var response = await this._getConfigurationRetryPolicy.ExecuteAsync(async ct =>
             {
-                using var request = new HttpRequestMessage(HttpMethod.Get, OfrepConfigurationPath);
+                using var request = new HttpRequestMessage(HttpMethod.Get, OfrepPaths.Configuration);
                 var httpResponse = await this._httpClient.SendAsync(request, ct).ConfigureAwait(false);
                 httpResponse.EnsureSuccessStatusCode();
                 return httpResponse;
@@ -290,9 +286,9 @@ internal sealed partial class OfrepClient : IOfrepClient
                                        or ArgumentNullException)
         {
             this.LogConfigurationError(ex.GetType().Name, ex.Message,
-                $"{this._httpClient.BaseAddress}{OfrepConfigurationPath}", ex);
+                $"{this._httpClient.BaseAddress}{OfrepPaths.Configuration}", ex);
             throw new OfrepConfigurationException(
-                $"Failed to retrieve OFREP provider configuration from {this._httpClient.BaseAddress}{OfrepConfigurationPath}.",
+                $"Failed to retrieve OFREP provider configuration from {this._httpClient.BaseAddress}{OfrepPaths.Configuration}.",
                 ex);
         }
     }
@@ -355,7 +351,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// </summary>
     private HttpRequestMessage CreateEvaluationRequest(string flagKey, EvaluationContext? context, string cacheKey)
     {
-        string path = $"{OfrepEvaluatePathPrefix}{Uri.EscapeDataString(flagKey)}";
+        string path = $"{OfrepPaths.Evaluate}{Uri.EscapeDataString(flagKey)}";
         var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
         var request = new HttpRequestMessage(HttpMethod.Post, path)
         {
@@ -457,7 +453,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     private HttpRequestMessage CreateBulkEvaluationRequest(EvaluationContext context, string cacheKey)
     {
         var evaluationContextDict = context.ToDictionary();
-        var request = new HttpRequestMessage(HttpMethod.Post, OfrepBulkEvaluatePath)
+        var request = new HttpRequestMessage(HttpMethod.Post, OfrepPaths.BulkEvaluate)
         {
             Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
         };
@@ -525,7 +521,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
 
         throw new OfrepConfigurationException(
-            $"Failed during OFREP bulk evaluation request to {OfrepBulkEvaluatePath}.", ex);
+            $"Failed during OFREP bulk evaluation request to {OfrepPaths.BulkEvaluate}.", ex);
     }
 
     /// <summary>
