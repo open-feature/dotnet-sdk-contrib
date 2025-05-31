@@ -94,14 +94,14 @@
         "OpenFeature.Contrib.Providers.EnvVar.csproj"
       ]
     },
-    "src/OpenFeature.Contrib.Providers.Ofrep": {
-      "package-name": "OpenFeature.Contrib.Providers.Ofrep",
+    "src/OpenFeature.Providers.Ofrep": {
+      "package-name": "OpenFeature.Providers.Ofrep",
       "release-type": "simple",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
       "extra-files": [
-        "OpenFeature.Contrib.Providers.Ofrep.csproj"
+        "OpenFeature.Providers.Ofrep.csproj"
       ]
     }
   },

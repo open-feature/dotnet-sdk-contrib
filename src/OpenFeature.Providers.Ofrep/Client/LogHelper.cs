@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace OpenFeature.Contrib.Providers.Ofrep.Client;
+namespace OpenFeature.Providers.Ofrep.Client;
 
 /// <summary>
 /// Provides ILogger instances for internal development debugging purposes only.

@@ -1,12 +1,12 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.Ofrep.Client;
-using OpenFeature.Contrib.Providers.Ofrep.Configuration;
-using OpenFeature.Contrib.Providers.Ofrep.Models;
+using OpenFeature.Providers.Ofrep.Client;
+using OpenFeature.Providers.Ofrep.Configuration;
+using OpenFeature.Providers.Ofrep.Models;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.Ofrep;
+namespace OpenFeature.Providers.Ofrep;
 
 /// <summary>
 /// OFREPProvider is the .NET provider implementation for the OpenFeature REST

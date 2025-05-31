@@ -8,13 +8,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using OpenFeature.Contrib.Providers.Ofrep.Configuration;
-using OpenFeature.Contrib.Providers.Ofrep.Extensions;
-using OpenFeature.Contrib.Providers.Ofrep.Models;
+using OpenFeature.Providers.Ofrep.Configuration;
+using OpenFeature.Providers.Ofrep.Extensions;
+using OpenFeature.Providers.Ofrep.Models;
 using OpenFeature.Model;
 using Polly;
 
-namespace OpenFeature.Contrib.Providers.Ofrep.Client;
+namespace OpenFeature.Providers.Ofrep.Client;
 
 /// <summary>
 /// Exception thrown when there is a configuration error in the OFREP client.

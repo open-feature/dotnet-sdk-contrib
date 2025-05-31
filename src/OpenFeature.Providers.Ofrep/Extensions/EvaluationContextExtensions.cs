@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.Ofrep.Extensions;
+namespace OpenFeature.Providers.Ofrep.Extensions;
 
 /// <summary>
 /// Extension methods for EvaluationContext class
