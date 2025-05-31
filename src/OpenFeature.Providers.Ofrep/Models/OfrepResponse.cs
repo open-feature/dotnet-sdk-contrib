@@ -1,0 +1,31 @@
+using System.Text.Json.Serialization;
+
+namespace OpenFeature.Providers.Ofrep.Models;
+
+/// <summary>
+/// Represents a response from the OFREP API for a single flag evaluation.
+/// Inherits common evaluation properties from <see cref="OfrepEvaluationBase{T}"/>.
+/// </summary>
+/// <typeparam name="T">The type of the flag value.</typeparam>
+public class OfrepResponse<T> : OfrepEvaluationBase<T>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OfrepResponse{T}"/> class with the specified value.
+    /// </summary>
+    /// <param name="value">The value to be wrapped in the OFREP response.</param>
+    public OfrepResponse(T value) : base(value)
+    {
+    }
+
+    /// <summary>
+    /// An error code indicating the reason for evaluation failure, if any.
+    /// </summary>
+    [JsonPropertyName("errorCode")]
+    public string? ErrorCode { get; set; }
+
+    /// <summary>
+    /// A detailed error message accompanying the error code, if any.
+    /// </summary>
+    [JsonPropertyName("errorMessage")]
+    public string? ErrorMessage { get; set; }
+}
