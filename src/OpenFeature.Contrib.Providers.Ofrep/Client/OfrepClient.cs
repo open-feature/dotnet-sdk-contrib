@@ -26,7 +26,7 @@ public class OfrepConfigurationException : Exception
     /// </summary>
     /// <param name="message">The error message that explains the reason for the exception.</param>
     /// <param name="innerException">The exception that is the cause of the current exception.</param>
-    public OfrepConfigurationException(string message, Exception innerException)
+    public OfrepConfigurationException(string message, Exception? innerException)
         : base(message, innerException)
     {
     }
@@ -72,7 +72,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         EventId = 1003,
         Level = LogLevel.Trace,
         Message = "Sending request for {FlagKey} with If-None-Match: {ETag}")]
-    partial void LogSendingRequestWithETag(string flagKey, string eTag);
+    partial void LogSendingRequestWithETag(string flagKey, string? eTag);
 
     [LoggerMessage(
         EventId = 1004,
@@ -225,7 +225,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// </summary>
     /// <param name="configuration">The OFREP configuration.</param>
     /// <param name="logger">The logger for the client.</param>
-    public OfrepClient(OfrepConfiguration configuration, ILogger logger = null)
+    public OfrepClient(OfrepConfiguration configuration, ILogger? logger = null)
         : this(configuration, CreateDefaultHandler(), logger) // Use helper for default handler
     {
     }
@@ -236,7 +236,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// <param name="configuration">The OFREP configuration.</param>
     /// <param name="handler">The HTTP message handler.</param>
     /// <param name="logger">The logger for the client.</param>
-    internal OfrepClient(OfrepConfiguration configuration, HttpMessageHandler handler, ILogger logger = null)
+    internal OfrepClient(OfrepConfiguration configuration, HttpMessageHandler handler, ILogger? logger = null)
     {
         if (configuration == null)
         {
@@ -247,8 +247,6 @@ internal sealed partial class OfrepClient : IOfrepClient
         {
             throw new ArgumentNullException(nameof(handler));
         }
-
-        configuration.Validate();
 
         _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         _getConfigurationRetryPolicy = Policy
@@ -298,7 +296,7 @@ internal sealed partial class OfrepClient : IOfrepClient
 
     /// <inheritdoc/>
     public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, string type, T defaultValue,
-        EvaluationContext context, CancellationToken cancellationToken)
+        EvaluationContext? context, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(flagKey))
         {
@@ -312,7 +310,7 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         var cacheKey = $"flag:{flagKey};type:{type};ctx:{(context ?? EvaluationContext.Empty).GenerateETag()}";
         var etagCacheKey = $"etag:{cacheKey}";
-        if (_cache.TryGetValue(cacheKey, out object cachedResponseObject))
+        if (_cache.TryGetValue(cacheKey, out object? cachedResponseObject))
         {
             if (cachedResponseObject is OfrepResponse<T> cachedResponse)
             {
@@ -322,8 +320,8 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
 
         LogCacheMiss(cacheKey);
-        string cachedETag = null;
-        if (_cache.TryGetValue(etagCacheKey, out object cachedETagObject))
+        string? cachedETag = null;
+        if (_cache.TryGetValue(etagCacheKey, out object? cachedETagObject))
         {
             if (cachedETagObject is string eTagValue)
             {
@@ -360,7 +358,7 @@ internal sealed partial class OfrepClient : IOfrepClient
             // Handle 304 Not Modified - re-check cache for the response object
             if (response.StatusCode == HttpStatusCode.NotModified)
             {
-                if (_cache.TryGetValue(cacheKey, out object notModifiedResponseObject))
+                if (_cache.TryGetValue(cacheKey, out object? notModifiedResponseObject))
                 {
                     if (notModifiedResponseObject is OfrepResponse<T> notModifiedResponse)
                     {
@@ -459,7 +457,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         // Generate cache key using the extension method
         var cacheKey = $"bulk;ctx:{(context ?? EvaluationContext.Empty).GenerateETag()}";
         // Try to get from cache first
-        if (_cache.TryGetValue(cacheKey, out object cachedEntry))
+        if (_cache.TryGetValue(cacheKey, out object? cachedEntry) && cachedEntry != null)
         {
             var typedEntry = ((BulkEvaluationResponse, string))cachedEntry;
             LogCacheHit(cacheKey);
@@ -467,7 +465,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
 
         LogCacheMiss(cacheKey);
-        string cachedETag = null;
+        string? cachedETag = null;
         try
         {
             var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
@@ -480,7 +478,7 @@ internal sealed partial class OfrepClient : IOfrepClient
                     }, options: JsonOptions)
                 };
             // Re-fetch ETag just before the request if needed for If-None-Match
-            if (_cache.TryGetValue(cacheKey, out object currentCachedDataObject))
+            if (_cache.TryGetValue(cacheKey, out object? currentCachedDataObject) && currentCachedDataObject != null)
             {
                 var currentCachedData = ((BulkEvaluationResponse, string))currentCachedDataObject;
                 if (!string.IsNullOrEmpty(currentCachedData.Item2))
@@ -502,7 +500,7 @@ internal sealed partial class OfrepClient : IOfrepClient
             if (response.StatusCode == HttpStatusCode.NotModified)
             {
                 // We need to re-fetch from cache here as the initial TryGetValue was only a check
-                if (_cache.TryGetValue(cacheKey, out object entryFor304Object))
+                if (_cache.TryGetValue(cacheKey, out object? entryFor304Object) && entryFor304Object != null)
                 {
                     var entryFor304 = ((BulkEvaluationResponse, string))entryFor304Object;
                     if (entryFor304.Item1 != null)
@@ -554,7 +552,7 @@ internal sealed partial class OfrepClient : IOfrepClient
                                    || ex is ArgumentNullException)
         {
             LogBulkRequestFailed("BulkEvaluate", ex.GetType().Name, ex.Message, ex);
-            if (_cache.TryGetValue(cacheKey, out object staleEntryObject))
+            if (_cache.TryGetValue(cacheKey, out object? staleEntryObject) && staleEntryObject != null)
             {
                 var staleEntry = ((BulkEvaluationResponse, string))staleEntryObject;
                 LogBulkStaleCacheReturn(cacheKey, ex.GetType().Name, "BulkEvaluate", ex);
@@ -571,7 +569,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// </summary>
     private OfrepResponse<T> HandleEvaluationError<T>(Exception ex, string cacheKey, T defaultValue)
     {
-        if (_cache.TryGetValue(cacheKey, out object cachedResponseObject))
+        if (_cache.TryGetValue(cacheKey, out object? cachedResponseObject))
         {
             if (cachedResponseObject is OfrepResponse<T> staleResponse)
             {
@@ -595,7 +593,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// <param name="cancellationToken">A token to cancel the operation</param>
     /// <returns></returns>
     /// <exception cref="OfrepConfigurationException"></exception>
-    public async Task<ConfigurationResponse> GetConfiguration(CancellationToken cancellationToken)
+    public async Task<ConfigurationResponse?> GetConfiguration(CancellationToken cancellationToken)
     {
         try
         {

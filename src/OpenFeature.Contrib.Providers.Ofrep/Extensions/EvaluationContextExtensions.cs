@@ -30,11 +30,11 @@ public static class EvaluationContextExtensions
         if (contextDict.Count == 0)
         {
             // Initialize with the correct nullable type if empty
-            contextDict = new Dictionary<string, object>();
+            contextDict = new Dictionary<string, object?>();
         }
 
         // 1. Canonicalize by sorting keys and reserializing
-        var sortedContext = new SortedDictionary<string, object>(contextDict, StringComparer.Ordinal);
+        var sortedContext = new SortedDictionary<string, object?>(contextDict, StringComparer.Ordinal);
 
         // Use the cached serialization options for ETag generation
         string canonicalJson = JsonSerializer.Serialize(sortedContext, EtagJsonOptions);
@@ -57,24 +57,11 @@ public static class EvaluationContextExtensions
     /// </summary>
     /// <param name="context">the evaluation context</param>
     /// <returns>A dictionary representation of the evaluation context.</returns>
-    public static Dictionary<string, object> ToDictionary(this EvaluationContext context)
+    public static Dictionary<string, object?> ToDictionary(this EvaluationContext context)
     {
         return context.AsDictionary().ToDictionary(
             kvp => kvp.Key,
-            // Switch on the Value object itself using property patterns
-            kvp =>
-            {
-                if (kvp.Value == null) return null;
-
-                // Using if-else statements instead of switch expression
-                if (kvp.Value.IsString) return (object)kvp.Value.AsString;
-                else if (kvp.Value.IsNumber) return (object)kvp.Value.AsInteger;
-                else if (kvp.Value.IsBoolean) return (object)kvp.Value.AsBoolean;
-                else if (kvp.Value.IsDateTime) return (object)kvp.Value.AsDateTime;
-                else if (kvp.Value.IsList) return (object)kvp.Value.AsList;
-                else if (kvp.Value.IsStructure) return (object)kvp.Value.AsStructure;
-                else return null;
-            }
+            kvp => kvp.Value?.AsObject
         );
     }
 }

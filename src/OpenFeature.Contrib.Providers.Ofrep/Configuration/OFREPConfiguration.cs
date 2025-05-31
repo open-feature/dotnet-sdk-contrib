@@ -23,14 +23,14 @@ public class OfrepConfiguration
     /// Gets or sets additional HTTP headers to include in requests.
     /// </summary>
     [JsonPropertyName("headers")]
-    public Dictionary<string, string> Headers { get; set; }
+    public Dictionary<string, string>? Headers { get; set; }
 
     /// <summary>
     /// Gets or sets the authorization header value.
     /// </summary>
     [JsonPropertyName("authorizationHeader")]
 
-    public string AuthorizationHeader { get; set; }
+    public string? AuthorizationHeader { get; set; }
     /// <summary>
     /// Gets or sets the cache duration for evaluation responses. Default is 1000ms.
     /// </summary>
@@ -51,20 +51,23 @@ public class OfrepConfiguration
     public bool EnableAbsoluteExpiration { get; set; } = false;
 
     /// <summary>
-    /// Validates the configuration.
+    /// Initializes a new instance of the <see cref="OfrepConfiguration"/> class with the specified base URL.
     /// </summary>
-    /// <exception cref="ArgumentException">Thrown when BaseUrl is null or empty.</exception>
-    public void Validate()
+    /// <param name="baseUrl">The base URL for the OFREP (OpenFeature Remote Evaluation Protocol) endpoint. Must be a valid absolute URI.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="baseUrl"/> is null, empty, or not a valid absolute URI.</exception>
+    public OfrepConfiguration(string baseUrl)
     {
-        if (string.IsNullOrEmpty(BaseUrl))
+        if (string.IsNullOrEmpty(baseUrl))
         {
-            throw new ArgumentException("BaseUrl is required", nameof(BaseUrl));
+            throw new ArgumentException("BaseUrl is required", nameof(baseUrl));
         }
 
 
-        if (!Uri.TryCreate(BaseUrl, UriKind.Absolute, out _))
+        if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out _))
         {
-            throw new ArgumentException("BaseUrl must be a valid absolute URI", nameof(BaseUrl));
+            throw new ArgumentException("BaseUrl must be a valid absolute URI", nameof(baseUrl));
         }
+
+        this.BaseUrl = baseUrl;
     }
 }

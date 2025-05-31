@@ -30,9 +30,8 @@ public class OfrepClientCachingTest : IDisposable
     public OfrepClientCachingTest()
     {
         _mockHandler = new Mock<HttpMessageHandler>();
-        _defaultConfiguration = new OfrepConfiguration
+        _defaultConfiguration = new OfrepConfiguration("http://localhost:8080")
         {
-            BaseUrl = "http://localhost:8080",
             CacheDuration = TimeSpan.FromMilliseconds(1000)
         };
     }
