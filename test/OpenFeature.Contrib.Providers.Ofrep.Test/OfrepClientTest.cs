@@ -18,7 +18,7 @@ public class OfrepClientTest : IDisposable
 {
     private readonly Mock<HttpMessageHandler> _mockHandler;
     private readonly OfrepConfiguration _defaultConfiguration;
-    private OfrepClient _client;
+    private OfrepClient _client = null!;
 
     private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
     {
@@ -45,7 +45,7 @@ public class OfrepClientTest : IDisposable
         _client = new OfrepClient(_defaultConfiguration, _mockHandler.Object);
     }
 
-    private void SetupMockResponse(HttpStatusCode statusCode, HttpContent content = null, string eTag = null)
+    private void SetupMockResponse(HttpStatusCode statusCode, HttpContent? content = null, string? eTag = null)
     {
         var response = new HttpResponseMessage
         {
