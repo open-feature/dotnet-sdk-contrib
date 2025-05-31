@@ -1,10 +1,6 @@
-using System;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using OpenFeature.Contrib.Providers.Ofrep.Models;
 using OpenFeature.Model;
-
 
 namespace OpenFeature.Contrib.Providers.Ofrep.Client;
 

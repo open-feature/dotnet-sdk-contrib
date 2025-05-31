@@ -1,7 +1,4 @@
-using System;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Ofrep.Client;
