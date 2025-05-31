@@ -48,7 +48,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     // Factor for absolute expiration based on sliding expiration. Consider making configurable if needed.
     private const double AbsoluteExpirationFactor = 5.0;
     private readonly HttpClient _httpClient;
-    private readonly IMemoryCache _cache;
+    private readonly MemoryCache _cache;
     private readonly ILogger _logger;
     private bool _disposed;
     private TimeSpan _cacheDuration;
@@ -306,6 +306,10 @@ internal sealed partial class OfrepClient : IOfrepClient
     public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, string type, T defaultValue,
         EvaluationContext? context, CancellationToken cancellationToken = default)
     {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrWhiteSpace(flagKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(type);
+#else
         if (string.IsNullOrWhiteSpace(flagKey))
         {
             throw new ArgumentException("Flag key cannot be null or whitespace", nameof(flagKey));
@@ -315,113 +319,42 @@ internal sealed partial class OfrepClient : IOfrepClient
         {
             throw new ArgumentException("Type cannot be null or whitespace", nameof(type));
         }
+#endif
 
-        var cacheKey = $"flag:{flagKey};type:{type};ctx:{(context ?? EvaluationContext.Empty).GenerateETag()}";
-        var etagCacheKey = $"etag:{cacheKey}";
-        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject))
+        var cacheKey = GenerateCacheKey(flagKey, type, context);
+
+        // Check cache first
+        if (this.TryGetCachedResponse<T>(cacheKey, out var cachedResponse) && cachedResponse != null)
         {
-            if (cachedResponseObject is OfrepResponse<T> cachedResponse)
-            {
-                this.LogCacheHit(cacheKey);
-                return cachedResponse;
-            }
+            this.LogCacheHit(cacheKey);
+            return cachedResponse;
         }
 
         this.LogCacheMiss(cacheKey);
-        string? cachedETag = null;
-        if (this._cache.TryGetValue(etagCacheKey, out object? cachedETagObject))
-        {
-            if (cachedETagObject is string eTagValue)
-            {
-                cachedETag = eTagValue;
-            }
-        }
 
         try
         {
-            string path = $"{OfrepEvaluatePathPrefix}{Uri.EscapeDataString(flagKey)}";
-            var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
-            var request = new HttpRequestMessage(HttpMethod.Post, path)
-            {
-                Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict, },
-                    options: JsonOptions)
-            };
-            // Add If-None-Match header if we have a cached ETag from the initial check
-            if (!string.IsNullOrEmpty(cachedETag))
-            {
-                request.Headers.IfNoneMatch.Add(
-                    new EntityTagHeaderValue(cachedETag, isWeak: true)
-                );
-                this.LogSendingRequestWithETag(flagKey, cachedETag);
-            }
-            else
-            {
-                this.LogSendingRequestWithoutETag(flagKey);
-            }
+            var request = this.CreateEvaluationRequest(flagKey, context, cacheKey);
+            var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-            HttpResponseMessage response =
-                await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            // Handle 304 Not Modified - re-check cache for the response object
+            // Handle 304 Not Modified
             if (response.StatusCode == HttpStatusCode.NotModified)
             {
-                if (this._cache.TryGetValue(cacheKey, out object? notModifiedResponseObject))
-                {
-                    if (notModifiedResponseObject is OfrepResponse<T> notModifiedResponse)
-                    {
-                        this.LogNotModified(flagKey);
-                        return notModifiedResponse;
-                    }
-                }
-
-                // If cache check fails after 304 (unlikely but possible), log and fall through
-                this.LogNotModifiedNoCache(flagKey);
+                return this.HandleNotModified<T>(cacheKey, flagKey);
             }
 
             response.EnsureSuccessStatusCode();
-            var evaluationResponse = await response.Content
-                .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
+            var evaluationResponse = await this.DeserializeResponse<T>(response, cancellationToken).ConfigureAwait(false);
+
             if (evaluationResponse == null)
             {
                 this.LogNullResponse(flagKey);
-                return new OfrepResponse<T>(defaultValue)
-                {
-                    ErrorCode = ErrorCodeParsingError,
-                    ErrorMessage = "Received null or empty response from server."
-                };
+                return this.CreateErrorResponse(defaultValue, ErrorCodeParsingError, "Received null or empty response from server.");
             }
 
-            // Get ETag from response if available
-            var responseETag = response.Headers.ETag?.Tag;
+            this.CacheResponse(cacheKey, evaluationResponse, response.Headers.ETag?.Tag);
+            this.LogCacheMetrics(flagKey, cacheKey, response.Headers.ETag?.Tag ?? "N/A", this._cacheDuration.TotalMilliseconds);
 
-            // Cache the successful response and ETag separately
-            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSize(1);
-            var etagCacheEntryOptions = new MemoryCacheEntryOptions().SetSize(1);
-            // Configure expiration for both
-            if (this._cacheDuration > TimeSpan.Zero)
-            {
-                cacheEntryOptions.SetSlidingExpiration(this._cacheDuration);
-                etagCacheEntryOptions.SetSlidingExpiration(this._cacheDuration); // ETag should expire with response
-                if (this._enableAbsoluteExpiration)
-                {
-                    var absoluteExpiration =
-                        TimeSpan.FromTicks((long)(this._cacheDuration.Ticks * AbsoluteExpirationFactor));
-                    cacheEntryOptions.SetAbsoluteExpiration(absoluteExpiration);
-                    etagCacheEntryOptions.SetAbsoluteExpiration(absoluteExpiration);
-                }
-            }
-
-            // Set cache entries
-            this._cache.Set(cacheKey, evaluationResponse, cacheEntryOptions);
-            if (responseETag != null)
-            {
-                this._cache.Set(etagCacheKey, responseETag, etagCacheEntryOptions);
-            }
-            else
-            {
-                this._cache.Remove(etagCacheKey);
-            }
-
-            this.LogCacheMetrics(flagKey, cacheKey, responseETag ?? "N/A", this._cacheDuration.TotalMilliseconds);
             return evaluationResponse;
         }
         catch (HttpRequestException ex)
@@ -431,23 +364,20 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
         catch (JsonException ex)
         {
-            // Failed to parse the JSON response
             this.LogJsonParseError(flagKey, ex.Message, ex);
             return this.HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
         {
-            // Request was cancelled by the caller
             this.LogRequestCancelled(flagKey, ex);
             return this.HandleEvaluationError(ex, cacheKey, defaultValue);
         }
         catch (OperationCanceledException ex)
         {
-            // Request timed out
             this.LogRequestTimeout(flagKey, ex.Message, ex);
             return this.HandleEvaluationError(ex, cacheKey, defaultValue);
         }
-        catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
         {
             this.LogCacheOperationError(flagKey, ex.Message, ex);
             return this.HandleEvaluationError(ex, cacheKey, defaultValue);
@@ -679,5 +609,133 @@ internal sealed partial class OfrepClient : IOfrepClient
 
             this._disposed = true;
         }
+    }
+
+    /// <summary>
+    /// Generate a cache key for flag evaluation
+    /// </summary>
+    private static string GenerateCacheKey(string flagKey, string type, EvaluationContext? context)
+    {
+        return $"flag:{flagKey};type:{type};ctx:{(context ?? EvaluationContext.Empty).GenerateETag()}";
+    }
+
+    /// <summary>
+    /// Try to get a cached response for the given cache key
+    /// </summary>
+    private bool TryGetCachedResponse<T>(string cacheKey, out OfrepResponse<T>? cachedResponse)
+    {
+        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject) &&
+            cachedResponseObject is OfrepResponse<T> response)
+        {
+            cachedResponse = response;
+            return true;
+        }
+
+        cachedResponse = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Create an HTTP request for flag evaluation
+    /// </summary>
+    private HttpRequestMessage CreateEvaluationRequest(string flagKey, EvaluationContext? context, string cacheKey)
+    {
+        string path = $"{OfrepEvaluatePathPrefix}{Uri.EscapeDataString(flagKey)}";
+        var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
+        var request = new HttpRequestMessage(HttpMethod.Post, path)
+        {
+            Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
+        };
+
+        // Add If-None-Match header if we have a cached ETag
+        var etagCacheKey = $"etag:{cacheKey}";
+        if (this._cache.TryGetValue(etagCacheKey, out object? cachedETagObject) &&
+            cachedETagObject is string cachedETag && !string.IsNullOrEmpty(cachedETag))
+        {
+            request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(cachedETag, isWeak: true));
+            this.LogSendingRequestWithETag(flagKey, cachedETag);
+        }
+        else
+        {
+            this.LogSendingRequestWithoutETag(flagKey);
+        }
+
+        return request;
+    }
+
+    /// <summary>
+    /// Handle 304 Not Modified response
+    /// </summary>
+    private OfrepResponse<T> HandleNotModified<T>(string cacheKey, string flagKey)
+    {
+        if (this.TryGetCachedResponse<T>(cacheKey, out var notModifiedResponse) && notModifiedResponse != null)
+        {
+            this.LogNotModified(flagKey);
+            return notModifiedResponse;
+        }
+
+        // If cache check fails after 304 (unlikely but possible), log and fall through
+        this.LogNotModifiedNoCache(flagKey);
+        throw new InvalidOperationException("Received 304 Not Modified but no cached response available");
+    }
+
+    /// <summary>
+    /// Deserialize the HTTP response content to OfrepResponse
+    /// </summary>
+    private async Task<OfrepResponse<T>?> DeserializeResponse<T>(HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        return await response.Content.ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Create an error response with the given parameters
+    /// </summary>
+    private OfrepResponse<T> CreateErrorResponse<T>(T defaultValue, string errorCode, string errorMessage)
+    {
+        return new OfrepResponse<T>(defaultValue)
+        {
+            ErrorCode = errorCode,
+            ErrorMessage = errorMessage
+        };
+    }
+
+    /// <summary>
+    /// Cache the response and ETag
+    /// </summary>
+    private void CacheResponse<T>(string cacheKey, OfrepResponse<T> response, string? responseETag)
+    {
+        var cacheEntryOptions = this.CreateCacheEntryOptions();
+        this._cache.Set(cacheKey, response, cacheEntryOptions);
+
+        var etagCacheKey = $"etag:{cacheKey}";
+        if (responseETag != null)
+        {
+            this._cache.Set(etagCacheKey, responseETag, cacheEntryOptions);
+        }
+        else
+        {
+            this._cache.Remove(etagCacheKey);
+        }
+    }
+
+    /// <summary>
+    /// Create cache entry options with configured expiration
+    /// </summary>
+    private MemoryCacheEntryOptions CreateCacheEntryOptions()
+    {
+        var options = new MemoryCacheEntryOptions().SetSize(1);
+
+        if (this._cacheDuration > TimeSpan.Zero)
+        {
+            options.SetSlidingExpiration(this._cacheDuration);
+
+            if (this._enableAbsoluteExpiration)
+            {
+                var absoluteExpiration = TimeSpan.FromTicks((long)(this._cacheDuration.Ticks * AbsoluteExpirationFactor));
+                options.SetAbsoluteExpiration(absoluteExpiration);
+            }
+        }
+
+        return options;
     }
 }
