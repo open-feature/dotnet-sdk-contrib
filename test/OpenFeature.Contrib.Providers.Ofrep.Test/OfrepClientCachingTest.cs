@@ -85,8 +85,8 @@ public class OfrepClientCachingTest : IDisposable
         var result2 = await _client.EvaluateFlag("flagKey", "boolean", false, null, CancellationToken.None);
 
         // Assert
-        result1.Value.Should().BeTrue();
-        result2.Value.Should().BeTrue();
+        Assert.True(result1.Value);
+        Assert.True(result2.Value);
 
         // Verify HTTP call happened exactly once (second call should use cache)
         _mockHandler.Protected().Verify(
@@ -133,8 +133,8 @@ public class OfrepClientCachingTest : IDisposable
         var result2 = await client.EvaluateFlag("flagKey", "boolean", false, evaluationContext, CancellationToken.None);
 
         // Assert
-        result1.Value.Should().BeTrue();
-        result2.Value.Should().BeTrue();
+        Assert.True(result1.Value);
+        Assert.True(result2.Value);
 
         // Verify HTTP call happened exactly once (second call should use cache even with empty vs null context)
         mockHandler.Protected().Verify(
@@ -192,8 +192,8 @@ public class OfrepClientCachingTest : IDisposable
         var result2 = await client.EvaluateFlag("flagKey", "boolean", false, null, CancellationToken.None);
 
         // Assert
-        result1.Value.Should().BeTrue();
-        result2.Value.Should().BeTrue(); // Should return cached value
+        Assert.True(result1.Value);
+        Assert.True(result2.Value); // Should return cached value
 
         // Verify both calls were attempted
         mockHandler.Protected().Verify(

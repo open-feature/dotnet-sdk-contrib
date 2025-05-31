@@ -83,7 +83,7 @@ public class OfrepClientTest : IDisposable
         var result = await _client.EvaluateFlag("flagKey", "boolean", false, null, CancellationToken.None);
 
         // Assert
-        result.Value.Should().BeTrue();
+        Assert.True(result.Value);
     }
 
     [Fact]
@@ -97,8 +97,8 @@ public class OfrepClientTest : IDisposable
         var result = await _client.EvaluateFlag("flagKey", "boolean", true, null, CancellationToken.None);
 
         // Assert
-        result.Value.Should().BeTrue();
-        result.ErrorCode.Should().NotBeNull();
+        Assert.True(result.Value);
+        Assert.NotNull(result.ErrorCode);
     }
 
     private void SetupMockException<TException>(TException exception) where TException : Exception
