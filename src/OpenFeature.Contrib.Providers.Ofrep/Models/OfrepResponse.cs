@@ -13,11 +13,11 @@ public class OfrepResponse<T> : OfrepEvaluationBase<T>
     /// An error code indicating the reason for evaluation failure, if any.
     /// </summary>
     [JsonPropertyName("errorCode")]
-    public string ErrorCode { get; set; }
+    public string? ErrorCode { get; set; }
 
     /// <summary>
     /// A detailed error message accompanying the error code, if any.
     /// </summary>
     [JsonPropertyName("errorMessage")]
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 }
