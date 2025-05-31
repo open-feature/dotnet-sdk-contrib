@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OpenFeature.Contrib.Providers.Ofrep.Configuration;

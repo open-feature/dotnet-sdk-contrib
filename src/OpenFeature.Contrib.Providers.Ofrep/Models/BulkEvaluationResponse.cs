@@ -1,9 +1,6 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-
 namespace OpenFeature.Contrib.Providers.Ofrep.Models;
-
 
 /// <summary>
 /// Represents the overall response from the OFREP bulk evaluation endpoint (/ofrep/v1/evaluate/flags).
