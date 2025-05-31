@@ -10,13 +10,13 @@ internal static class DevLoggerProvider
 {
 #if DEBUG
     // In DEBUG builds, create a real LoggerFactory
-    private static readonly ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+    private static readonly ILoggerFactory LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
     {
         builder.SetMinimumLevel(LogLevel.Debug); // Capture Debug level and above
     });
 
-    public static ILogger<T> CreateLogger<T>() => _loggerFactory.CreateLogger<T>();
-    public static ILogger CreateLogger(string categoryName) => _loggerFactory.CreateLogger(categoryName);
+    public static ILogger<T> CreateLogger<T>() => LoggerFactory.CreateLogger<T>();
+    public static ILogger CreateLogger(string categoryName) => LoggerFactory.CreateLogger(categoryName);
 #else
     // In RELEASE builds, provide NullLogger instances which perform no operations.
     public static ILogger<T> CreateLogger<T>() => Microsoft.Extensions.Logging.Abstractions.NullLogger<T>.Instance;

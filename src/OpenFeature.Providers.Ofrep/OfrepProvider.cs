@@ -12,9 +12,7 @@ namespace OpenFeature.Providers.Ofrep;
 /// OFREPProvider is the .NET provider implementation for the OpenFeature REST
 /// Evaluation Protocol.
 /// </summary>
-public sealed class OfrepProvider : FeatureProvider,
-    IDisposable
-
+public sealed class OfrepProvider : FeatureProvider, IDisposable
 {
     /// <summary>
     /// Default configuration for the OFREP provider.
@@ -22,7 +20,7 @@ public sealed class OfrepProvider : FeatureProvider,
 
     // ReSharper disable once InconsistentNaming
     private static readonly ConfigurationResponse DefaultConfiguration =
-        new ConfigurationResponse
+        new()
         {
             Name = "OpenFeature Remote Evaluation Protocol Server",
             Capabilities =
@@ -40,25 +38,21 @@ public sealed class OfrepProvider : FeatureProvider,
                         },
 
                     FlagEvaluation =
-                        new ProviderFlagEvaluation(new[]
-                            {
-                                "boolean", "string", "integer",
+                        new ProviderFlagEvaluation([
+                            "boolean", "string", "integer",
                                 "double", "object"
-                            }),
+                        ]),
                     Caching =
                         new ProviderCaching { Enabled = false, TimeTolive = 60000 }
                 }
         };
 
-    private const string Name = "OpenFeature Remote Evaluation Protocol Server";
-
     private readonly OfrepClient _client;
-
     private readonly ILogger<OfrepProvider> _logger;
 
+    private const string Name = "OpenFeature Remote Evaluation Protocol Server";
     private ProviderCapabilities? _capabilities =
         DefaultConfiguration.Capabilities;
-
     private bool _disposed;
 
     /// <summary>
@@ -72,12 +66,12 @@ public sealed class OfrepProvider : FeatureProvider,
             throw new ArgumentNullException(nameof(configuration));
         }
 
-        _logger = DevLoggerProvider.CreateLogger<OfrepProvider>();
+        this._logger = DevLoggerProvider.CreateLogger<OfrepProvider>();
 
         // Get the logger from the internal provider
         var clientLogger = DevLoggerProvider.CreateLogger<IOfrepClient>();
 
-        _client = new OfrepClient(configuration, clientLogger);
+        this._client = new OfrepClient(configuration, clientLogger);
     }
 
     /// <summary>
@@ -94,20 +88,13 @@ public sealed class OfrepProvider : FeatureProvider,
             return;
         }
 
-        _capabilities = capabilities;
-
-        if (_client == null)
-        {
-            _logger.LogDebug(
-                "OFREP client is null. Cannot update provider configuration.");
-            return;
-        }
+        this._capabilities = capabilities;
 
         // If the caching capabilities are defined, and caching is Enabled
         // ensure the client is configured with the correct cache settings.
-        if (capabilities.Caching != null && capabilities.Caching.Enabled)
+        if (capabilities.Caching is { Enabled: true })
         {
-            _logger.LogDebug("Configuring cache configuration for http client");
+            this._logger.LogDebug("Configuring cache configuration for http client");
         }
     }
 
@@ -121,11 +108,11 @@ public sealed class OfrepProvider : FeatureProvider,
 
         try
         {
-            var config = await _client.GetConfiguration(cancellationToken).ConfigureAwait(false);
-            UpdateProviderConfiguration(config?.Capabilities);
+            var config = await this._client.GetConfiguration(cancellationToken).ConfigureAwait(false);
+            this.UpdateProviderConfiguration(config?.Capabilities);
 
             // Log the configuration received from the server
-            _logger.LogDebug(
+            this._logger.LogDebug(
                 "Configuration received from OFREP server: {Configuration}",
                 JsonSerializer.Serialize(config));
         }
@@ -133,7 +120,7 @@ public sealed class OfrepProvider : FeatureProvider,
         {
             // If the server is unreachable, we log the error and continue,
             // and use the default configuration instead.
-            UpdateProviderConfiguration(DefaultConfiguration.Capabilities);
+            this.UpdateProviderConfiguration(DefaultConfiguration.Capabilities);
         }
     }
 
@@ -141,28 +128,28 @@ public sealed class OfrepProvider : FeatureProvider,
     public override Task
         ShutdownAsync(CancellationToken cancellationToken = default)
     {
-        Dispose();
+        this.Dispose();
 
         return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public override Metadata GetMetadata() => new Metadata(Name);
+    public override Metadata GetMetadata() => new(Name);
 
     /// <summary>
     /// Disposes the OFREP provider and releases any resources.
     /// </summary>
     public void Dispose()
     {
-        if (_disposed)
+        if (this._disposed)
         {
             return;
         }
 
-        _client.Dispose();
+        this._client.Dispose();
+        this._disposed = true;
 
-        _disposed = true;
-
+        // ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
         GC.SuppressFinalize(this);
     }
 
@@ -170,28 +157,28 @@ public sealed class OfrepProvider : FeatureProvider,
     public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(
         string flagKey, bool defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        ResolveFlag(flagKey, "boolean", defaultValue, context,
+        this.ResolveFlag(flagKey, "boolean", defaultValue, context,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<string>> ResolveStringValueAsync(
         string flagKey, string defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        ResolveFlag(flagKey, "string", defaultValue, context,
+        this.ResolveFlag(flagKey, "string", defaultValue, context,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(
         string flagKey, int defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        ResolveFlag(flagKey, "integer", defaultValue, context,
+        this.ResolveFlag(flagKey, "integer", defaultValue, context,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(
         string flagKey, double defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        ResolveFlag(flagKey, "double", defaultValue, context,
+        this.ResolveFlag(flagKey, "double", defaultValue, context,
             cancellationToken);
 
     /// <inheritdoc/>
@@ -206,10 +193,10 @@ public sealed class OfrepProvider : FeatureProvider,
             throw new ArgumentNullException(nameof(flagKey));
         }
 
-        ValidateFlagTypeIsSupported("object");
+        this.ValidateFlagTypeIsSupported("object");
 
         var response =
-            await _client.EvaluateFlag(flagKey, "object", defaultValue?.AsObject,
+            await this._client.EvaluateFlag(flagKey, "object", defaultValue.AsObject,
                 context, cancellationToken).ConfigureAwait(false);
 
         return new ResolutionDetails<Value>(
@@ -229,14 +216,14 @@ public sealed class OfrepProvider : FeatureProvider,
     /// type is not supported.</exception>
     private void ValidateFlagTypeIsSupported(string type)
     {
-        if (_capabilities?.FlagEvaluation == null)
+        if (this._capabilities?.FlagEvaluation == null)
         {
             // If capabilities are null, we cannot validate the flag type. Assume
             // it's supported.
             return;
         }
 
-        if (Array.IndexOf(_capabilities.FlagEvaluation.SupportedTypes, type) <
+        if (Array.IndexOf(this._capabilities.FlagEvaluation.SupportedTypes, type) <
             0)
         {
             throw new ArgumentException(
@@ -260,6 +247,10 @@ public sealed class OfrepProvider : FeatureProvider,
         string flagKey, string type, T defaultValue, EvaluationContext? context,
         CancellationToken cancellationToken)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(flagKey);
+        ArgumentNullException.ThrowIfNull(type);
+#else
         if (flagKey == null)
         {
             throw new ArgumentNullException(nameof(flagKey));
@@ -269,10 +260,10 @@ public sealed class OfrepProvider : FeatureProvider,
         {
             throw new ArgumentNullException(nameof(type));
         }
+#endif
+        this.ValidateFlagTypeIsSupported(type);
 
-        ValidateFlagTypeIsSupported(type);
-
-        var response = await _client.EvaluateFlag(flagKey, type, defaultValue,
+        var response = await this._client.EvaluateFlag(flagKey, type, defaultValue,
             context, cancellationToken).ConfigureAwait(false);
 
         return new ResolutionDetails<T>(
@@ -291,28 +282,14 @@ public sealed class OfrepProvider : FeatureProvider,
     {
         var code = errorCode.ToLowerInvariant();
 
-        ErrorType result;
-
-        if (code == "flag_not_found")
+        ErrorType result = code switch
         {
-            result = ErrorType.FlagNotFound;
-        }
-        else if (code == "type_mismatch")
-        {
-            result = ErrorType.TypeMismatch;
-        }
-        else if (code == "parsing_error")
-        {
-            result = ErrorType.ParseError;
-        }
-        else if (code == "provider_not_ready")
-        {
-            result = ErrorType.ProviderNotReady;
-        }
-        else
-        {
-            result = ErrorType.None;
-        }
+            "flag_not_found" => ErrorType.FlagNotFound,
+            "type_mismatch" => ErrorType.TypeMismatch,
+            "parsing_error" => ErrorType.ParseError,
+            "provider_not_ready" => ErrorType.ProviderNotReady,
+            _ => ErrorType.None
+        };
 
         return result;
     }

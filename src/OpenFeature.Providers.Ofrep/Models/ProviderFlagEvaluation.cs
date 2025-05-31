@@ -19,6 +19,6 @@ public class ProviderFlagEvaluation
     /// <param name="supportedTypes">An array of strings representing the types supported by this provider flag evaluation.</param>
     public ProviderFlagEvaluation(string[] supportedTypes)
     {
-        SupportedTypes = supportedTypes;
+        this.SupportedTypes = supportedTypes;
     }
 }

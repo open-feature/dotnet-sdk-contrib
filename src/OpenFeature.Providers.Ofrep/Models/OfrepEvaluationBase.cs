@@ -9,6 +9,15 @@ namespace OpenFeature.Providers.Ofrep.Models;
 public abstract class OfrepEvaluationBase<TValue>
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OfrepEvaluationBase{TValue}"/> class with the specified value.
+    /// </summary>
+    /// <param name="value">The evaluation result value.</param>
+    protected OfrepEvaluationBase(TValue value)
+    {
+        this.Value = value;
+    }
+
+    /// <summary>
     /// The evaluated value of the flag.
     /// </summary>
     [JsonPropertyName("value")]
@@ -25,13 +34,4 @@ public abstract class OfrepEvaluationBase<TValue>
     /// </summary>
     [JsonPropertyName("variant")]
     public string? Variant { get; set; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="OfrepEvaluationBase{TValue}"/> class with the specified value.
-    /// </summary>
-    /// <param name="value">The evaluation result value.</param>
-    public OfrepEvaluationBase(TValue value)
-    {
-        Value = value;
-    }
 }
