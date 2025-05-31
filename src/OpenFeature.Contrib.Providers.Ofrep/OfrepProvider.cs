@@ -91,7 +91,7 @@ public sealed class OfrepProvider : FeatureProvider,
     /// <param name="capabilities">The capabilities supported by the OFREP
     /// server</param>
     private void UpdateProviderConfiguration(
-        ProviderCapabilities capabilities)
+        ProviderCapabilities? capabilities)
     {
         if (capabilities == null)
         {
@@ -172,28 +172,28 @@ public sealed class OfrepProvider : FeatureProvider,
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(
-        string flagKey, bool defaultValue, EvaluationContext context = null,
+        string flagKey, bool defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
         ResolveFlag(flagKey, "boolean", defaultValue, context,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<string>> ResolveStringValueAsync(
-        string flagKey, string defaultValue, EvaluationContext context = null,
+        string flagKey, string defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
         ResolveFlag(flagKey, "string", defaultValue, context,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(
-        string flagKey, int defaultValue, EvaluationContext context = null,
+        string flagKey, int defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
         ResolveFlag(flagKey, "integer", defaultValue, context,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(
-        string flagKey, double defaultValue, EvaluationContext context = null,
+        string flagKey, double defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
         ResolveFlag(flagKey, "double", defaultValue, context,
             cancellationToken);
@@ -201,7 +201,7 @@ public sealed class OfrepProvider : FeatureProvider,
     /// <inheritdoc/>
     public override async Task<ResolutionDetails<Value>>
         ResolveStructureValueAsync(string flagKey, Value defaultValue,
-            EvaluationContext context = null,
+            EvaluationContext? context = null,
             CancellationToken cancellationToken = default)
 
     {
@@ -261,7 +261,7 @@ public sealed class OfrepProvider : FeatureProvider,
     /// <returns>Resolution details containing the flag value and
     /// metadata</returns>
     private async Task<ResolutionDetails<T>> ResolveFlag<T>(
-        string flagKey, string type, T defaultValue, EvaluationContext context,
+        string flagKey, string type, T defaultValue, EvaluationContext? context,
         CancellationToken cancellationToken)
     {
         if (flagKey == null)

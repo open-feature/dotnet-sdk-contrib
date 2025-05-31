@@ -19,5 +19,5 @@ public class BulkEvaluationResponse
     /// Optional metadata associated with the bulk evaluation response itself.
     /// </summary>
     [JsonPropertyName("metadata")]
-    public Dictionary<string, object> Metadata { get; set; }
+    public Dictionary<string, object>? Metadata { get; set; }
 }

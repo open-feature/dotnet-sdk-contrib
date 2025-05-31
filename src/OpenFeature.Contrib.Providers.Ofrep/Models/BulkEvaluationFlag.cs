@@ -20,5 +20,5 @@ public class BulkEvaluationFlag : OfrepEvaluationBase<object>
     /// Optional metadata associated with the flag evaluation.
     /// </summary>
     [JsonPropertyName("metadata")]
-    public Dictionary<string, object> Metadata { get; set; }
+    public Dictionary<string, object>? Metadata { get; set; }
 }
