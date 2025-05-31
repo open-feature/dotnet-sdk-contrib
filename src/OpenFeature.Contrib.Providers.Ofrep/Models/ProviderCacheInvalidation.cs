@@ -11,5 +11,5 @@ public class ProviderCacheInvalidation
     /// Gets or sets the polling configuration for cache invalidation.
     /// </summary>
     [JsonPropertyName("polling")]
-    public FeatureCacheInvalidationPolling Polling { get; set; }
+    public FeatureCacheInvalidationPolling? Polling { get; set; }
 }

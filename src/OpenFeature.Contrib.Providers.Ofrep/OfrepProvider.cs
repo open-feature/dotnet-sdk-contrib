@@ -56,7 +56,7 @@ public sealed class OfrepProvider : FeatureProvider,
 
     private readonly ILogger<OfrepProvider> _logger;
 
-    private ProviderCapabilities _capabilities =
+    private ProviderCapabilities? _capabilities =
         DefaultConfiguration.Capabilities;
 
     private bool _disposed;
