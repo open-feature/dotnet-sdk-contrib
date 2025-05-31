@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client;
+using OpenFeature.Providers.Ofrep.Client.Constants;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Models;
 
@@ -284,10 +285,10 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
 
         ErrorType result = code switch
         {
-            "flag_not_found" => ErrorType.FlagNotFound,
-            "type_mismatch" => ErrorType.TypeMismatch,
-            "parsing_error" => ErrorType.ParseError,
-            "provider_not_ready" => ErrorType.ProviderNotReady,
+            ErrorCodes.FlagNotFound => ErrorType.FlagNotFound,
+            ErrorCodes.TypeMismatch => ErrorType.TypeMismatch,
+            ErrorCodes.ParsingError => ErrorType.ParseError,
+            ErrorCodes.ProviderNotReady => ErrorType.ProviderNotReady,
             _ => ErrorType.None
         };
 
