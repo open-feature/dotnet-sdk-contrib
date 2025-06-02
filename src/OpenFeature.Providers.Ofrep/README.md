@@ -7,7 +7,6 @@ evaluate feature flags through a REST API that follows the OFREP specification.
 
 -   Full implementation of the OpenFeature REST Evaluation Protocol
 -   Support for all standard flag types (boolean, string, integer, double, object)
--   Advanced caching with ETag support to minimize API calls
 
 ## Installation
 
@@ -18,35 +17,6 @@ Add the package to your project:
 ```shell
 dotnet add package OpenFeature.Providers.Ofrep
 ```
-
-### Package Manager
-
-```shell
-NuGet\Install-Package OpenFeature.Providers.Ofrep
-```
-
-### Package Reference
-
-```xml
-<PackageReference Include="OpenFeature.Providers.Ofrep" />
-```
-
-### Packet cli
-
-```shell
-packet add OpenFeature.Providers.Ofrep
-```
-
-### Cake
-
-````shell
-// Install OpenFeature.Providers.Ofrep as a Cake Addin
-#addin nuget:?package=OpenFeature.Providers.Ofrep
-
-// Install OpenFeature.Providers.Ofrep as a Cake Tool
-#tool nuget:?package=OpenFeature.Providers.Ofrep
-
-
 ## Basic Usage
 
 ```csharp
@@ -89,10 +59,7 @@ var config = new OfrepConfiguration("https://feature-flags.example.com")
         ["Custom-Header"] = "value",
         ["Api-Version"] = "v1"
     },
-    AuthorizationHeader = "Bearer your-auth-token",
-    CacheDuration = TimeSpan.FromSeconds(30),
-    MaxCacheSize = 2000,
-    EnableAbsoluteExpiration = true
+    AuthorizationHeader = "Bearer your-auth-token"
 };
 
 // Create and register the provider
@@ -108,9 +75,6 @@ The `OfrepConfiguration` class supports the following options:
 -   `Timeout` (optional): HTTP client timeout
 -   `Headers` (optional): Additional HTTP headers to include in requests
 -   `AuthorizationHeader` (optional): Authorization header value
--   `CacheDuration` (optional): Cache duration for evaluation responses (default: 1000ms)
--   `MaxCacheSize` (optional): Maximum number of items to cache (default: 1000)
--   `EnableAbsoluteExpiration` (optional): Whether to use absolute expiration (default: false)
 
 ## Contributing
 
