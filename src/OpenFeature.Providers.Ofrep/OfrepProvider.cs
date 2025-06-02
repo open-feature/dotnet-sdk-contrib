@@ -3,7 +3,6 @@ using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client;
 using OpenFeature.Providers.Ofrep.Client.Constants;
 using OpenFeature.Providers.Ofrep.Configuration;
-using OpenFeature.Providers.Ofrep.Models;
 
 namespace OpenFeature.Providers.Ofrep;
 
@@ -13,29 +12,9 @@ namespace OpenFeature.Providers.Ofrep;
 /// </summary>
 public sealed class OfrepProvider : FeatureProvider, IDisposable
 {
-    /// <summary>
-    /// Default configuration for the OFREP provider.
-    /// </summary>
-
-    private static readonly ConfigurationResponse DefaultConfiguration =
-        new()
-        {
-            Name = "OpenFeature Remote Evaluation Protocol Server",
-            Capabilities =
-                new ProviderCapabilities
-                {
-                    FlagEvaluation =
-                        new ProviderFlagEvaluation([
-                            "boolean", "string", "integer",
-                            "double", "object"
-                        ])
-                }
-        };
-
     private readonly IOfrepClient _client;
 
     private const string Name = "OpenFeature Remote Evaluation Protocol Server";
-    private readonly ProviderCapabilities? _capabilities = DefaultConfiguration.Capabilities;
     private bool _disposed;
 
     /// <summary>
@@ -128,8 +107,6 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         }
 #endif
 
-        this.ValidateFlagTypeIsSupported("object");
-
         var response =
             await this._client.EvaluateFlag(flagKey, "object", defaultValue.AsObject,
                 context, cancellationToken).ConfigureAwait(false);
@@ -144,42 +121,21 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     }
 
     /// <summary>
-    /// Validates if the specified flag type is supported by the provider.
-    /// </summary>
-    /// <param name="type">The type of the flag as a string (e.g., "boolean",
-    /// "string")</param> <exception cref="ArgumentException">Thrown if the flag
-    /// type is not supported.</exception>
-    private void ValidateFlagTypeIsSupported(string type)
-    {
-        if (this._capabilities?.FlagEvaluation == null)
-        {
-            // If capabilities are null, we cannot validate the flag type. Assume
-            // it's supported.
-            return;
-        }
-
-        if (Array.IndexOf(this._capabilities.FlagEvaluation.SupportedTypes, type) <
-            0)
-        {
-            throw new ArgumentException(
-                $"Flag type '{type}' is not supported by the provider.");
-        }
-    }
-
-    /// <summary>
     /// Resolves a flag of the specified type using the OFREP client.
     /// </summary>
     /// <typeparam name="T">The type of the flag value</typeparam>
     /// <param name="flagKey">The unique identifier for the flag</param>
-    /// <param name="type">The type of the flag as a string (e.g., "boolean",
-    /// "string")</param> <param name="defaultValue">The default value to return
-    /// if the flag cannot be resolved</param> <param name="context">Optional
-    /// evaluation context with targeting information</param> <param
-    /// name="cancellationToken">A token to cancel the operation</param>
+    /// <param name="type">The type of the flag as a string (e.g., "boolean", "string")</param>
+    /// <param name="defaultValue">The default value to return if the flag cannot be resolved</param>
+    /// <param name="context">Optional evaluation context with targeting information</param>
+    /// <param name="cancellationToken">A token to cancel the operation</param>
     /// <returns>Resolution details containing the flag value and
     /// metadata</returns>
     private async Task<ResolutionDetails<T>> ResolveFlag<T>(
-        string flagKey, string type, T defaultValue, EvaluationContext? context,
+        string flagKey,
+        string type,
+        T defaultValue,
+        EvaluationContext? context,
         CancellationToken cancellationToken)
     {
 #if NET8_0_OR_GREATER
@@ -196,8 +152,6 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             throw new ArgumentNullException(nameof(type));
         }
 #endif
-        this.ValidateFlagTypeIsSupported(type);
-
         var response = await this._client.EvaluateFlag(flagKey, type, defaultValue,
             context, cancellationToken).ConfigureAwait(false);
 
