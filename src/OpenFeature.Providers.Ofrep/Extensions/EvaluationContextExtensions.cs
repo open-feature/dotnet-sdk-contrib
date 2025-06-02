@@ -13,8 +13,7 @@ public static class EvaluationContextExtensions
     // Dedicated options for ETag generation to avoid creating new instances
     private static readonly JsonSerializerOptions EtagJsonOptions = new()
     {
-        PropertyNamingPolicy = null,
-        WriteIndented = false,
+        PropertyNamingPolicy = null, WriteIndented = false,
     };
 
     /// <summary>
@@ -41,11 +40,12 @@ public static class EvaluationContextExtensions
 
         // 2. Cryptographic Hash (SHA-256 recommended)
         byte[] jsonBytes = Encoding.UTF8.GetBytes(canonicalJson);
-        byte[] hashBytes;
-        using (var sha256 = SHA256.Create())
-        {
-            hashBytes = sha256.ComputeHash(jsonBytes);
-        }
+#if NETFRAMEWORK || NETSTANDARD2_0
+        using var sha256 = SHA256.Create();
+        var hashBytes = sha256.ComputeHash(jsonBytes);
+#else
+        var hashBytes = SHA256.HashData(jsonBytes);
+#endif
 
         // 3. Format as ETag (Base64, enclosed in quotes for a 'strong' ETag)
         string base64Hash = Convert.ToBase64String(hashBytes);
