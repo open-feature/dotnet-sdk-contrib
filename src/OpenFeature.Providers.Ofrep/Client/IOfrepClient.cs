@@ -6,7 +6,7 @@ namespace OpenFeature.Providers.Ofrep.Client;
 /// <summary>
 /// Interface for the OFREP HTTP client.
 /// </summary>
-public interface IOfrepClient : IDisposable
+internal interface IOfrepClient : IDisposable
 {
     /// <summary>
     /// Evaluates a flag value using the OFREP API.
