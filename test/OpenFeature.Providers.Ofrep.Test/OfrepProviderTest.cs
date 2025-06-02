@@ -195,7 +195,7 @@ public class OfrepProviderTest : IDisposable
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public async Task ResolveStructureValueAsync_ShouldThrowArgumentNullException_WhenFlagKeyIsNull(string flagKey)
+    public async Task ResolveStructureValueAsync_ShouldThrowArgumentException_WhenFlagKeyIsNull(string flagKey)
     {
         // Arrange
         this._provider = new OfrepProvider(this._defaultConfiguration);
@@ -206,7 +206,7 @@ public class OfrepProviderTest : IDisposable
         await Assert.ThrowsAsync<ArgumentException>(async () =>
             await this._provider.ResolveStructureValueAsync(flagKey, defaultValue));
 #else
-        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+        await Assert.ThrowsAsync<ArgumentException>(async () =>
             await _provider.ResolveStructureValueAsync(flagKey, defaultValue));
 #endif
     }
