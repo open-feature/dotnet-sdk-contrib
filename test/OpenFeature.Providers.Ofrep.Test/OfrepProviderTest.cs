@@ -81,7 +81,7 @@ public class OfrepProviderTest : IDisposable
         const bool defaultValue = false;
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var expectedResponse = new OfrepResponse<bool>(expectedValue)
+        var expectedResponse = new OfrepResponse<bool>(flagKey, expectedValue)
         {
             Variant = "enabled"
         };
@@ -111,7 +111,7 @@ public class OfrepProviderTest : IDisposable
         const string defaultValue = "default";
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var expectedResponse = new OfrepResponse<string>(expectedValue)
+        var expectedResponse = new OfrepResponse<string>(flagKey, expectedValue)
         {
             Variant = "variant1"
         };
@@ -141,7 +141,7 @@ public class OfrepProviderTest : IDisposable
         const int defaultValue = 0;
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var expectedResponse = new OfrepResponse<int>(expectedValue)
+        var expectedResponse = new OfrepResponse<int>(flagKey, expectedValue)
         {
             Variant = "high"
         };
@@ -171,7 +171,7 @@ public class OfrepProviderTest : IDisposable
         const double defaultValue = 0.0;
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var expectedResponse = new OfrepResponse<double>(expectedValue)
+        var expectedResponse = new OfrepResponse<double>(flagKey, expectedValue)
         {
             Variant = "pi"
         };
@@ -219,7 +219,7 @@ public class OfrepProviderTest : IDisposable
         var defaultValue = new Value("default");
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var expectedResponse = new OfrepResponse<object?>(123)
+        var expectedResponse = new OfrepResponse<object?>(flagKey, 123)
         {
             Variant = "object1"
         };
@@ -248,7 +248,7 @@ public class OfrepProviderTest : IDisposable
         var defaultValue = new Value("default");
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var expectedResponse = new OfrepResponse<object?>(null!)
+        var expectedResponse = new OfrepResponse<object?>(flagKey, null!)
         {
             Variant = "null"
         };
@@ -277,7 +277,7 @@ public class OfrepProviderTest : IDisposable
         const bool defaultValue = false;
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var errorResponse = new OfrepResponse<bool>(defaultValue)
+        var errorResponse = new OfrepResponse<bool>(flagKey, defaultValue)
         {
             ErrorCode = ErrorCodes.FlagNotFound,
             ErrorMessage = "Flag not found"
@@ -312,7 +312,7 @@ public class OfrepProviderTest : IDisposable
         const string flagKey = "test-flag";
         const string defaultValue = "default";
 
-        var errorResponse = new OfrepResponse<string>(defaultValue)
+        var errorResponse = new OfrepResponse<string>(flagKey, defaultValue)
         {
             ErrorCode = errorCode,
             ErrorMessage = "Test error"
@@ -354,7 +354,7 @@ public class OfrepProviderTest : IDisposable
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
         var cancellationToken = CancellationToken.None;
 
-        var expectedResponse = new OfrepResponse<bool>(true);
+        var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
         this._mockClient
             .EvaluateFlag(flagKey, "boolean", defaultValue, context, cancellationToken)
@@ -378,7 +378,7 @@ public class OfrepProviderTest : IDisposable
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
         var cancellationToken = CancellationToken.None;
 
-        var expectedResponse = new OfrepResponse<string>("value");
+        var expectedResponse = new OfrepResponse<string>(flagKey, "value");
 
         this._mockClient
             .EvaluateFlag(flagKey, "string", defaultValue, context, cancellationToken)
@@ -402,7 +402,7 @@ public class OfrepProviderTest : IDisposable
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
         var cancellationToken = CancellationToken.None;
 
-        var expectedResponse = new OfrepResponse<int>(42);
+        var expectedResponse = new OfrepResponse<int>(flagKey, 42);
 
         this._mockClient
             .EvaluateFlag(flagKey, "integer", defaultValue, context, cancellationToken)
@@ -426,7 +426,7 @@ public class OfrepProviderTest : IDisposable
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
         var cancellationToken = CancellationToken.None;
 
-        var expectedResponse = new OfrepResponse<double>(3.14);
+        var expectedResponse = new OfrepResponse<double>(flagKey, 3.14);
 
         this._mockClient
             .EvaluateFlag(flagKey, "double", defaultValue, context, cancellationToken)
@@ -450,7 +450,7 @@ public class OfrepProviderTest : IDisposable
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
         var cancellationToken = CancellationToken.None;
 
-        var expectedResponse = new OfrepResponse<object?>("value");
+        var expectedResponse = new OfrepResponse<object?>(flagKey, "value");
 
         this._mockClient
             .EvaluateFlag(flagKey, "object", defaultValue.AsObject, context, cancellationToken)
@@ -472,7 +472,7 @@ public class OfrepProviderTest : IDisposable
         const string flagKey = "test-flag";
         const bool defaultValue = false;
 
-        var expectedResponse = new OfrepResponse<bool>(true);
+        var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
         this._mockClient
             .EvaluateFlag(flagKey, "boolean", defaultValue, null, Arg.Any<CancellationToken>())
@@ -496,7 +496,7 @@ public class OfrepProviderTest : IDisposable
         const string flagKey = "test-flag";
         var defaultValue = new Value("default");
 
-        var expectedResponse = new OfrepResponse<object?>("value");
+        var expectedResponse = new OfrepResponse<object?>(flagKey, "value");
 
         this._mockClient
             .EvaluateFlag(flagKey, "object", defaultValue.AsObject, null, Arg.Any<CancellationToken>())

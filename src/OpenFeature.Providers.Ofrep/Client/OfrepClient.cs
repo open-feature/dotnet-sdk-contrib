@@ -117,48 +117,48 @@ internal sealed partial class OfrepClient : IOfrepClient
             {
                 HttpStatusCode.OK => await this
                     .ProcessOkResponseAsync(flagKey, defaultValue, response, cancellationToken).ConfigureAwait(false),
-                HttpStatusCode.BadRequest => ProcessBadRequestResponse(defaultValue),
-                HttpStatusCode.NotFound => ProcessNotFoundResponse(defaultValue),
-                HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => ProcessAuthenticationErrorResponse(
+                HttpStatusCode.BadRequest => ProcessBadRequestResponse(flagKey, defaultValue),
+                HttpStatusCode.NotFound => ProcessNotFoundResponse(flagKey, defaultValue),
+                HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => ProcessAuthenticationErrorResponse(flagKey,
                     defaultValue),
 #if NET8_0_OR_GREATER
-                HttpStatusCode.TooManyRequests => ProcessTooManyRequestsResponse(defaultValue),
+                HttpStatusCode.TooManyRequests => ProcessTooManyRequestsResponse(flagKey, defaultValue),
 #else
-                (HttpStatusCode)429 => ProcessTooManyRequestsResponse(defaultValue),
+                (HttpStatusCode)429 => ProcessTooManyRequestsResponse(flagKey, defaultValue),
 #endif
-                _ => ProcessNotMappedErrorResponse(defaultValue)
+                _ => ProcessNotMappedErrorResponse(flagKey, defaultValue)
             };
         }
         catch (HttpRequestException ex)
         {
             this.LogHttpRequestFailed(flagKey, ex.Message, ex);
-            return HandleEvaluationError(ex, defaultValue);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
         }
         catch (JsonException ex)
         {
             this.LogJsonParseError(flagKey, ex.Message, ex);
-            return HandleEvaluationError(ex, defaultValue);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
         }
         catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
         {
             this.LogRequestCancelled(flagKey, ex);
-            return HandleEvaluationError(ex, defaultValue);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
         }
         catch (OperationCanceledException ex)
         {
             this.LogRequestTimeout(flagKey, ex.Message, ex);
-            return HandleEvaluationError(ex, defaultValue);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
         }
         catch (Exception ex)
         {
             this.LogOperationError(flagKey, ex.Message, ex);
-            return HandleEvaluationError(ex, defaultValue);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
         }
     }
 
-    private static OfrepResponse<T> ProcessNotMappedErrorResponse<T>(T defaultValue)
+    private static OfrepResponse<T> ProcessNotMappedErrorResponse<T>(string key, T defaultValue)
     {
-        return new OfrepResponse<T>(defaultValue)
+        return new OfrepResponse<T>(key, defaultValue)
         {
             ErrorCode = ErrorCodes.GeneralError,
             Reason = Reason.Error,
@@ -166,9 +166,9 @@ internal sealed partial class OfrepClient : IOfrepClient
         };
     }
 
-    private static OfrepResponse<T> ProcessTooManyRequestsResponse<T>(T defaultValue)
+    private static OfrepResponse<T> ProcessTooManyRequestsResponse<T>(string key, T defaultValue)
     {
-        return new OfrepResponse<T>(defaultValue)
+        return new OfrepResponse<T>(key, defaultValue)
         {
             ErrorCode = ErrorCodes.ProviderNotReady,
             Reason = Reason.Error,
@@ -176,9 +176,9 @@ internal sealed partial class OfrepClient : IOfrepClient
         };
     }
 
-    private static OfrepResponse<T> ProcessNotFoundResponse<T>(T defaultValue)
+    private static OfrepResponse<T> ProcessNotFoundResponse<T>(string key, T defaultValue)
     {
-        return new OfrepResponse<T>(defaultValue)
+        return new OfrepResponse<T>(key, defaultValue)
         {
             ErrorCode = ErrorCodes.FlagNotFound,
             Reason = Reason.Error,
@@ -186,9 +186,9 @@ internal sealed partial class OfrepClient : IOfrepClient
         };
     }
 
-    private static OfrepResponse<T> ProcessAuthenticationErrorResponse<T>(T defaultValue)
+    private static OfrepResponse<T> ProcessAuthenticationErrorResponse<T>(string key, T defaultValue)
     {
-        return new OfrepResponse<T>(defaultValue)
+        return new OfrepResponse<T>(key, defaultValue)
         {
             ErrorCode = ErrorCodes.ProviderNotReady,
             Reason = Reason.Error,
@@ -196,9 +196,9 @@ internal sealed partial class OfrepClient : IOfrepClient
         };
     }
 
-    private static OfrepResponse<T> ProcessBadRequestResponse<T>(T defaultValue)
+    private static OfrepResponse<T> ProcessBadRequestResponse<T>(string key, T defaultValue)
     {
-        return new OfrepResponse<T>(defaultValue)
+        return new OfrepResponse<T>(key, defaultValue)
         {
             ErrorCode = ErrorCodes.ParsingError,
             Reason = Reason.Error,
@@ -214,7 +214,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         if (evaluationResponse == null)
         {
             this.LogNullResponse(flagKey);
-            return new OfrepResponse<T>(defaultValue)
+            return new OfrepResponse<T>(flagKey, defaultValue)
             {
                 ErrorCode = ErrorCodes.ParsingError,
                 ErrorMessage = "Received null or empty response from server."
@@ -262,9 +262,9 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// <summary>
     /// Helper to handle errors during flag evaluation.
     /// </summary>
-    private static OfrepResponse<T> HandleEvaluationError<T>(Exception ex, T defaultValue)
+    private static OfrepResponse<T> HandleEvaluationError<T>(string key, Exception ex, T defaultValue)
     {
-        return new OfrepResponse<T>(defaultValue)
+        return new OfrepResponse<T>(key, defaultValue)
         {
             ErrorCode = ErrorCodes.GeneralError,
             Reason = Reason.Error,
