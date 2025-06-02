@@ -1,4 +1,7 @@
 using System.Net;
+#if NETFRAMEWORK
+using System.Net.Http;
+#endif
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -239,7 +242,11 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
+#if NETFRAMEWORK
+        cts.Cancel();
+#else
         await cts.CancelAsync();
+#endif
         var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty, cts.Token);
 
         // Assert
