@@ -81,7 +81,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         this._httpClient = new HttpClient(handler, disposeHandler: true)
         {
             BaseAddress = new Uri(configuration.BaseUrl),
-            Timeout = TimeSpan.FromSeconds(5)
+            Timeout = configuration.Timeout
         };
         if (configuration.Headers != null)
         {
