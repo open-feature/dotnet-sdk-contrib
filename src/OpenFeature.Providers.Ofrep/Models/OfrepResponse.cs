@@ -59,5 +59,5 @@ public class OfrepResponse<T>
     /// Additional metadata associated with the evaluation result.
     /// </summary>
     [JsonPropertyName("metadata")]
-    public Dictionary<string, object?>? Metadata { get; set; }
+    public Dictionary<string, object>? Metadata { get; set; }
 }

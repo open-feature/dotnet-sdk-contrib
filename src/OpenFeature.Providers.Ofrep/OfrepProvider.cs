@@ -117,7 +117,8 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             MapErrorType(response.ErrorCode ?? string.Empty),
             reason: string.Empty,
             variant: response.Variant,
-            errorMessage: response.ErrorMessage);
+            errorMessage: response.ErrorMessage,
+            flagMetadata: response.Metadata != null ? new ImmutableMetadata(response.Metadata) : null);
     }
 
     /// <summary>
@@ -161,7 +162,8 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             MapErrorType(response.ErrorCode ?? string.Empty),
             reason: string.Empty,
             variant: response.Variant,
-            errorMessage: response.ErrorMessage);
+            errorMessage: response.ErrorMessage,
+            flagMetadata: response.Metadata != null ? new ImmutableMetadata(response.Metadata) : null);
     }
 
     /// <summary>
