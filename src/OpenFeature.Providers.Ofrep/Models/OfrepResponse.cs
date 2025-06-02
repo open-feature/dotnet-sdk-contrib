@@ -54,4 +54,10 @@ public class OfrepResponse<T>
     /// </summary>
     [JsonPropertyName("variant")]
     public string? Variant { get; set; }
+
+    /// <summary>
+    /// Additional metadata associated with the evaluation result.
+    /// </summary>
+    [JsonPropertyName("metadata")]
+    public Dictionary<string, object?>? Metadata { get; set; }
 }
