@@ -17,5 +17,5 @@ public class ProviderCaching
     /// Gets or sets the time-to-live for cached items in milliseconds.
     /// </summary>
     [JsonPropertyName("ttl")]
-    public int TimeTolive { get; set; }
+    public int TimeToLive { get; set; }
 }
