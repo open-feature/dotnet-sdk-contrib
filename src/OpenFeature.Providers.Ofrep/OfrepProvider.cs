@@ -24,19 +24,11 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             Capabilities =
                 new ProviderCapabilities
                 {
-                    CacheInvalidation =
-                        new ProviderCacheInvalidation
-                        {
-                            Polling =
-                                new FeatureCacheInvalidationPolling { Enabled = false, MinPollingIntervalMs = 60000 }
-                        },
                     FlagEvaluation =
                         new ProviderFlagEvaluation([
                             "boolean", "string", "integer",
                             "double", "object"
-                        ]),
-                    Caching =
-                        new ProviderCaching { Enabled = false, TimeToLive = 60000 }
+                        ])
                 }
         };
 

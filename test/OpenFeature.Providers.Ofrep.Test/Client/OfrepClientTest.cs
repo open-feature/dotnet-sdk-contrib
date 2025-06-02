@@ -18,12 +18,7 @@ public class OfrepClientTest : IDisposable
 {
     private readonly ILogger<OfrepClient> _mockLogger = NullLogger<OfrepClient>.Instance;
     private readonly TestHttpMessageHandler _mockHandler = new();
-
-    private readonly OfrepConfiguration _configuration = new("https://api.example.com/")
-    {
-        CacheDuration = TimeSpan.FromMinutes(5),
-        MaxCacheSize = 100
-    };
+    private readonly OfrepConfiguration _configuration = new("https://api.example.com/");
 
     private readonly JsonSerializerOptions _jsonSerializerCamelCase = new()
     {
@@ -37,38 +32,6 @@ public class OfrepClientTest : IDisposable
     }
 
     #region Constructor Tests
-
-    [Fact]
-    public void Constructor_WithAbsoluteExpirationEnabled_ShouldSetupCacheCorrectly()
-    {
-        // Arrange
-        var configWithAbsoluteExpiration = new OfrepConfiguration("https://api.example.com/")
-        {
-            CacheDuration = TimeSpan.FromMinutes(5),
-            EnableAbsoluteExpiration = true,
-            MaxCacheSize = 50
-        };
-
-        // Act
-        using var client = new OfrepClient(configWithAbsoluteExpiration, this._mockHandler, this._mockLogger);
-
-        // Assert
-        Assert.NotNull(client);
-    }
-
-    [Fact]
-    public void Constructor_WithZeroCacheSize_ShouldSetupCacheWithoutSizeLimit()
-    {
-        // Arrange
-        var configWithZeroCacheSize = new OfrepConfiguration("https://api.example.com/") { MaxCacheSize = 0 };
-
-        // Act
-        using var client = new OfrepClient(configWithZeroCacheSize, this._mockHandler, this._mockLogger);
-
-        // Assert
-        Assert.NotNull(client);
-    }
-
     [Fact]
     public void Constructor_WithCustomHttpTimeout_ShouldUseConfiguredTimeout()
     {
@@ -319,35 +282,6 @@ public class OfrepClientTest : IDisposable
     }
 
     [Fact]
-    public async Task EvaluateFlag_WithNotModifiedResponse_ShouldReturnCachedValue()
-    {
-        // Arrange
-        const string flagKey = "test-flag";
-        const string type = "boolean";
-        const bool defaultValue = false;
-        var expectedResponse = new OfrepResponse<bool>(true);
-
-        // First request - successful response with ETag
-        this._mockHandler.SetupResponse(HttpStatusCode.OK,
-            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase), "\"test-etag\"");
-
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // First call to populate cache
-        var firstResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Second request - 304 Not Modified
-        this._mockHandler.SetupResponse(HttpStatusCode.NotModified, "");
-
-        // Act
-        var secondResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Assert
-        Assert.NotNull(secondResult);
-        Assert.Equal(firstResult.Value, secondResult.Value);
-    }
-
-    [Fact]
     public async Task EvaluateFlag_WithEvaluationContext_ShouldIncludeContextInRequest()
     {
         // Arrange
@@ -442,37 +376,6 @@ public class OfrepClientTest : IDisposable
     }
 
     [Fact]
-    public async Task EvaluateFlag_WithStaleCache_ShouldReturnStaleCacheOnError()
-    {
-        // Arrange
-        const string flagKey = "test-flag";
-        const string type = "boolean";
-        const bool defaultValue = false;
-        var expectedResponse = new OfrepResponse<bool>(true) { Reason = "TARGETING_MATCH", Variant = "on" };
-
-        // First request - successful response
-        this._mockHandler.SetupResponse(HttpStatusCode.OK,
-            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
-
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // First call to populate cache
-        var firstResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Second request - error, should return stale cache
-        this._mockHandler.SetupException(new HttpRequestException("Network error"));
-
-        // Act
-        var secondResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Assert
-        Assert.NotNull(secondResult);
-        Assert.Equal(firstResult.Value, secondResult.Value);
-        Assert.Equal(firstResult.Reason, secondResult.Reason);
-        Assert.Equal(firstResult.Variant, secondResult.Variant);
-    }
-
-    [Fact]
     public async Task EvaluateFlag_WithInvalidHttpStatus_ShouldThrowHttpRequestException()
     {
         // Arrange
@@ -492,59 +395,6 @@ public class OfrepClientTest : IDisposable
         Assert.Equal(defaultValue, result.Value);
         Assert.Equal("provider_not_ready", result.ErrorCode);
         Assert.Equal("ERROR", result.Reason);
-    }
-
-    [Fact]
-    public async Task EvaluateFlag_WithNotModifiedButNoCache_ShouldReturnGeneralError()
-    {
-        // Arrange
-        const string flagKey = "test-flag";
-        const string type = "boolean";
-        const bool defaultValue = false;
-
-        // Setup 304 Not Modified response without any cached data
-        this._mockHandler.SetupResponse(HttpStatusCode.NotModified, "");
-
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Assert - The InvalidOperationException is caught and handled as a general error
-        Assert.NotNull(result);
-        Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("general_error", result.ErrorCode);
-        Assert.Equal("ERROR", result.Reason);
-        Assert.Contains("Received 304 Not Modified but no cached response available", result.ErrorMessage);
-    }
-
-    [Fact]
-    public async Task EvaluateFlag_WithEmptyETag_ShouldNotIncludeIfNoneMatchHeader()
-    {
-        // Arrange
-        const string flagKey = "test-flag";
-        const string type = "boolean";
-        const bool defaultValue = false;
-        var expectedResponse = new OfrepResponse<bool>(true);
-
-        // First request - response without ETag
-        this._mockHandler.SetupResponse(HttpStatusCode.OK,
-            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
-
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // First call to populate cache without ETag
-        await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Second call - should not include If-None-Match header
-        var secondResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Assert
-        Assert.NotNull(secondResult);
-        Assert.Equal(expectedResponse.Value, secondResult.Value);
-
-        // Should still make one request since the cache should hit
-        Assert.Single(this._mockHandler.Requests);
     }
 
     [Fact]
@@ -615,56 +465,6 @@ public class OfrepClientTest : IDisposable
 
     #endregion
 
-    #region SetCacheDuration Tests
-
-    [Fact]
-    public void SetCacheDuration_WithValidDuration_ShouldUpdateCacheDuration()
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-        var newDuration = TimeSpan.FromMinutes(10);
-
-        // Act
-        client.SetCacheDuration(newDuration);
-
-        // Assert - No exception should be thrown
-        Assert.True(true);
-    }
-
-    [Fact]
-    public void SetCacheDuration_WithZeroDuration_ShouldBeValid()
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act & Assert - Should not throw
-        client.SetCacheDuration(TimeSpan.Zero);
-    }
-
-    [Fact]
-    public void SetCacheDuration_WithNegativeDuration_ShouldThrowArgumentOutOfRangeException()
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            client.SetCacheDuration(TimeSpan.FromMinutes(-1)));
-    }
-
-    [Fact]
-    public void SetCacheDuration_WithExcessivelyLongDuration_ShouldThrowArgumentOutOfRangeException()
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            client.SetCacheDuration(TimeSpan.FromDays(2)));
-    }
-
-    #endregion
-
     #region Dispose Tests
 
     [Fact]
@@ -690,122 +490,58 @@ public class OfrepClientTest : IDisposable
     }
 
     #endregion
-
-    #region Cache Tests
-
-    [Fact]
-    public async Task EvaluateFlag_CacheHit_ShouldReturnCachedValue()
-    {
-        // Arrange
-        const string flagKey = "test-flag";
-        const string type = "boolean";
-        const bool defaultValue = false;
-        var expectedResponse = new OfrepResponse<bool>(true);
-
-        this._mockHandler.SetupResponse(HttpStatusCode.OK,
-            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
-
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act - First call
-        var firstResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Act - Second call (should hit cache)
-        var secondResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Assert
-        Assert.Equal(firstResult.Value, secondResult.Value);
-        // Should only have made one HTTP request
-        Assert.Single(this._mockHandler.Requests);
-    }
-
-    [Fact]
-    public async Task EvaluateFlag_DifferentContext_ShouldMakeSeparateRequests()
-    {
-        // Arrange
-        const string flagKey = "test-flag";
-        const string type = "boolean";
-        const bool defaultValue = false;
-        var context1 = EvaluationContext.Builder().Set("userId", "user1").Build();
-        var context2 = EvaluationContext.Builder().Set("userId", "user2").Build();
-
-        var expectedResponse = new OfrepResponse<bool>(true);
-        this._mockHandler.SetupResponse(HttpStatusCode.OK,
-            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
-
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act
-        await client.EvaluateFlag(flagKey, type, defaultValue, context1);
-        await client.EvaluateFlag(flagKey, type, defaultValue, context2);
-
-        // Assert - Should make two separate requests due to different contexts
-        Assert.Equal(2, this._mockHandler.Requests.Count);
-    }
-
-    #endregion
-
-    #region Cache Eviction and Memory Tests
-
-    [Fact]
-    public async Task EvaluateFlag_WithCacheDurationZero_ShouldStillCacheWithoutExpiration()
-    {
-        // Arrange
-        var configWithNoCache = new OfrepConfiguration("https://api.example.com/") { CacheDuration = TimeSpan.Zero };
-
-        const string flagKey = "test-flag";
-        const string type = "boolean";
-        const bool defaultValue = false;
-        var expectedResponse = new OfrepResponse<bool>(true);
-
-        this._mockHandler.SetupResponse(HttpStatusCode.OK,
-            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
-
-        using var client = new OfrepClient(configWithNoCache, this._mockHandler, this._mockLogger);
-
-        // Act - Make multiple calls
-        await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-        await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-
-        // Assert - Cache duration zero means no expiration but still caches
-        // So we should only make one request since cache still works
-        Assert.Single(this._mockHandler.Requests);
-    }
-
-    [Fact]
-    public void SetCacheDuration_WithMaximumAllowedDuration_ShouldSucceed()
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-        var maxDuration = TimeSpan.FromDays(1); // Maximum allowed
-
-        // Act & Assert
-        client.SetCacheDuration(maxDuration);
-        // Should not throw
-    }
-
-    [Fact]
-    public void SetCacheDuration_WithExactlyOneDayDuration_ShouldSucceed()
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-        var exactlyOneDay = TimeSpan.FromDays(1);
-
-        // Act & Assert
-        client.SetCacheDuration(exactlyOneDay);
-        // Should not throw
-    }
-
-    [Fact]
-    public void SetCacheDuration_WithSlightlyOverOneDayDuration_ShouldThrow()
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-        var slightlyOverOneDay = TimeSpan.FromDays(1).Add(TimeSpan.FromMinutes(1));
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => client.SetCacheDuration(slightlyOverOneDay));
-    }
-
-    #endregion
+    //
+    // #region Cache Tests
+    //
+    // [Fact]
+    // public async Task EvaluateFlag_CacheHit_ShouldReturnCachedValue()
+    // {
+    //     // Arrange
+    //     const string flagKey = "test-flag";
+    //     const string type = "boolean";
+    //     const bool defaultValue = false;
+    //     var expectedResponse = new OfrepResponse<bool>(true);
+    //
+    //     this._mockHandler.SetupResponse(HttpStatusCode.OK,
+    //         JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
+    //
+    //     using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
+    //
+    //     // Act - First call
+    //     var firstResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+    //
+    //     // Act - Second call (should hit cache)
+    //     var secondResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+    //
+    //     // Assert
+    //     Assert.Equal(firstResult.Value, secondResult.Value);
+    //     // Should only have made one HTTP request
+    //     Assert.Single(this._mockHandler.Requests);
+    // }
+    //
+    // [Fact]
+    // public async Task EvaluateFlag_DifferentContext_ShouldMakeSeparateRequests()
+    // {
+    //     // Arrange
+    //     const string flagKey = "test-flag";
+    //     const string type = "boolean";
+    //     const bool defaultValue = false;
+    //     var context1 = EvaluationContext.Builder().Set("userId", "user1").Build();
+    //     var context2 = EvaluationContext.Builder().Set("userId", "user2").Build();
+    //
+    //     var expectedResponse = new OfrepResponse<bool>(true);
+    //     this._mockHandler.SetupResponse(HttpStatusCode.OK,
+    //         JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
+    //
+    //     using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
+    //
+    //     // Act
+    //     await client.EvaluateFlag(flagKey, type, defaultValue, context1);
+    //     await client.EvaluateFlag(flagKey, type, defaultValue, context2);
+    //
+    //     // Assert - Should make two separate requests due to different contexts
+    //     Assert.Equal(2, this._mockHandler.Requests.Count);
+    // }
+    //
+    // #endregion
 }

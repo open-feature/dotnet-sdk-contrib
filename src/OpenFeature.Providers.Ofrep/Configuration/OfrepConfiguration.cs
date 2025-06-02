@@ -29,26 +29,7 @@ public class OfrepConfiguration
     /// Gets or sets the authorization header value.
     /// </summary>
     [JsonPropertyName("authorizationHeader")]
-
     public string? AuthorizationHeader { get; set; }
-    /// <summary>
-    /// Gets or sets the cache duration for evaluation responses. Default is 1000ms.
-    /// </summary>
-
-    [JsonPropertyName("cacheDuration")]
-    public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMilliseconds(1000);
-
-    /// <summary>
-    /// Gets or sets the maximum number of items to cache. Default is 1000.
-    /// </summary>
-    [JsonPropertyName("maxCacheSize")]
-    public int MaxCacheSize { get; set; } = 1000;
-
-    /// <summary>
-    /// Gets or sets whether to use absolute expiration in addition to sliding expiration.
-    /// </summary>
-    [JsonPropertyName("enableAbsoluteExpiration")]
-    public bool EnableAbsoluteExpiration { get; set; } = false;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OfrepConfiguration"/> class with the specified base URL.
