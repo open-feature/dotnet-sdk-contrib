@@ -20,7 +20,7 @@ public interface IOfrepClient : IDisposable
     /// <param name="context">The evaluation context.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>The evaluated flag response.</returns>
-    Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, string type, T defaultValue, EvaluationContext context,
+    Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, string type, T defaultValue, EvaluationContext? context,
         CancellationToken cancellationToken);
 
 
