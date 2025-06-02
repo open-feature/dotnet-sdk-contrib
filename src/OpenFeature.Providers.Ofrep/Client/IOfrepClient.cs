@@ -1,6 +1,4 @@
-using System.Text.Json;
 using OpenFeature.Model;
-using OpenFeature.Providers.Ofrep.Client.Exceptions;
 using OpenFeature.Providers.Ofrep.Models;
 
 namespace OpenFeature.Providers.Ofrep.Client;
@@ -22,16 +20,4 @@ public interface IOfrepClient : IDisposable
     /// <returns>The evaluated flag response.</returns>
     Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, string type, T defaultValue, EvaluationContext? context,
         CancellationToken cancellationToken);
-
-
-    /// <summary>
-    /// Evaluates all flags for a given context using the OFREP bulk evaluation API.
-    /// </summary>
-    /// <param name="context">The evaluation context.</param>
-    /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The bulk evaluation response containing all evaluated flags.</returns>
-    /// <exception cref="OfrepConfigurationException">Thrown if the request fails due to configuration or network issues and no stale cache is available.</exception>
-    /// <exception cref="JsonException">Thrown if the response cannot be parsed and no stale cache is available.</exception>
-    /// <exception cref="OperationCanceledException">Thrown if the operation is cancelled or times out.</exception>
-    Task<BulkEvaluationResponse> BulkEvaluate(EvaluationContext context, CancellationToken cancellationToken);
 }
