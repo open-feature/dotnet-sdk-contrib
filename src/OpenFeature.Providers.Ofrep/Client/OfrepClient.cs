@@ -23,6 +23,7 @@ namespace OpenFeature.Providers.Ofrep.Client;
 internal sealed partial class OfrepClient : IOfrepClient
 {
     private readonly HttpClient _httpClient;
+    private DateTimeOffset? _retryAfterDate;
     private readonly ILogger _logger;
     private bool _disposed;
 
@@ -104,6 +105,14 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
 #endif
 
+        if (this._retryAfterDate.HasValue && this._retryAfterDate.Value > DateTimeOffset.UtcNow)
+        {
+            return new OfrepResponse<T>(flagKey, defaultValue)
+            {
+                ErrorCode = ErrorCodes.ProviderNotReady, Reason = Reason.Error, ErrorMessage = "Rate limit exceeded."
+            };
+        }
+
         try
         {
             var request = CreateEvaluationRequest(flagKey, context);
@@ -124,9 +133,9 @@ internal sealed partial class OfrepClient : IOfrepClient
                 HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => ProcessAuthenticationErrorResponse(flagKey,
                     defaultValue),
 #if NET8_0_OR_GREATER
-                HttpStatusCode.TooManyRequests => ProcessTooManyRequestsResponse(flagKey, defaultValue),
+                HttpStatusCode.TooManyRequests => ProcessTooManyRequestsResponse(flagKey, defaultValue, response),
 #else
-                (HttpStatusCode)429 => ProcessTooManyRequestsResponse(flagKey, defaultValue),
+                (HttpStatusCode)429 => ProcessTooManyRequestsResponse(flagKey, defaultValue, response),
 #endif
                 _ => ProcessNotMappedErrorResponse(flagKey, defaultValue)
             };
@@ -168,8 +177,22 @@ internal sealed partial class OfrepClient : IOfrepClient
         };
     }
 
-    private static OfrepResponse<T> ProcessTooManyRequestsResponse<T>(string key, T defaultValue)
+    private OfrepResponse<T> ProcessTooManyRequestsResponse<T>(string key, T defaultValue, HttpResponseMessage response)
     {
+        var retryAfter = response.Headers.RetryAfter;
+        if (retryAfter?.Delta.HasValue == true)
+        {
+            this._retryAfterDate = DateTimeOffset.UtcNow.Add(retryAfter.Delta.Value);
+        }
+        else if (retryAfter?.Date.HasValue == true)
+        {
+            this._retryAfterDate = retryAfter.Date.Value;
+        }
+        else
+        {
+            this._retryAfterDate = DateTimeOffset.UtcNow.AddMinutes(1);
+        }
+
         return new OfrepResponse<T>(key, defaultValue)
         {
             ErrorCode = ErrorCodes.ProviderNotReady, Reason = Reason.Error, ErrorMessage = "Rate limit exceeded."
