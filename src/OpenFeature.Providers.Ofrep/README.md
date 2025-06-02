@@ -55,38 +55,34 @@ using OpenFeature.Providers.Ofrep;
 using OpenFeature.Providers.Ofrep.Configuration;
 
 // Configure the provider
-var config = new OfrepConfiguration
-{
-    BaseUrl = "https://zconfig.company.com/"
-};
+var config = new OfrepConfiguration("https://zconfig.company.com/");
 
 // Create and register the provider
 var provider = new OfrepProvider(config);
-Api.Instance.SetProvider(provider);
+await Api.Instance.SetProviderAsync(provider);
 
 // Use feature flags
 var client = Api.Instance.GetClient();
 
 // Boolean flag
-var boolFlag = await client.GetBooleanValue("my-flag", false);
+var boolFlag = await client.GetBooleanValueAsync("my-flag", false);
 
 // String flag
-var stringFlag = await client.GetStringValue("greeting", "Hello");
+var stringFlag = await client.GetStringValueAsync("greeting", "Hello");
 
 // Integer flag
-var intFlag = await client.GetIntegerValue("max-retries", 3);
+var intFlag = await client.GetIntegerValueAsync("max-retries", 3);
 
 // Double flag
-var doubleFlag = await client.GetDoubleValue("sample-rate", 0.1);
+var doubleFlag = await client.GetDoubleValueAsync("sample-rate", 0.1);
 ````
 
 ## Advanced Configuration
 
 ```csharp
 // Advanced configuration
-var config = new OfrepConfiguration
+var config = new OfrepConfiguration("https://feature-flags.example.com")
 {
-    BaseUrl = "https://feature-flags.example.com",
     Timeout = TimeSpan.FromSeconds(10),
     Headers = new Dictionary<string, string>
     {
@@ -101,7 +97,7 @@ var config = new OfrepConfiguration
 
 // Create and register the provider
 var provider = new OfrepProvider(config);
-Api.Instance.SetProvider(provider);
+await Api.Instance.SetProviderAsync(provider);
 ```
 
 ## Configuration Options
