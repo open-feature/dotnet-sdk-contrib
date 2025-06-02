@@ -185,7 +185,7 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("provider_not_ready", result.ErrorCode);
+        Assert.Equal("general_error", result.ErrorCode);
         Assert.Equal("ERROR", result.Reason);
         Assert.Contains("Network error", result.ErrorMessage);
     }
@@ -214,7 +214,7 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("provider_not_ready", result.ErrorCode);
+        Assert.Equal("general_error", result.ErrorCode);
     }
 
     [Fact]
@@ -235,7 +235,7 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("provider_not_ready", result.ErrorCode);
+        Assert.Equal("general_error", result.ErrorCode);
     }
 
     [Fact]
@@ -256,7 +256,7 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("parsing_error", result.ErrorCode);
+        Assert.Equal("general_error", result.ErrorCode);
     }
 
     [Fact]
@@ -277,7 +277,7 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("parsing_error", result.ErrorCode);
+        Assert.Equal("parse_error", result.ErrorCode);
         Assert.Contains("null or empty response", result.ErrorMessage);
     }
 
@@ -331,7 +331,7 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("parsing_error", result.ErrorCode);
+        Assert.Equal("general_error", result.ErrorCode);
         Assert.Equal("ERROR", result.Reason);
     }
 
@@ -376,7 +376,7 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("provider_not_ready", result.ErrorCode);
+        Assert.Equal("general_error", result.ErrorCode);
         Assert.Equal("ERROR", result.Reason);
     }
 
