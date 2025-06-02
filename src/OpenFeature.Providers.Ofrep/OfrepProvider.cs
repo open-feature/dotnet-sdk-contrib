@@ -115,7 +115,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             flagKey,
             response.Value != null ? new Value(response.Value) : new Value(String.Empty),
             MapErrorType(response.ErrorCode ?? string.Empty),
-            reason: string.Empty,
+            reason: response.Reason,
             variant: response.Variant,
             errorMessage: response.ErrorMessage,
             flagMetadata: response.Metadata != null ? new ImmutableMetadata(response.Metadata) : null);
@@ -160,7 +160,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             flagKey,
             response.Value != null ? response.Value : defaultValue,
             MapErrorType(response.ErrorCode ?? string.Empty),
-            reason: string.Empty,
+            reason: response.Reason,
             variant: response.Variant,
             errorMessage: response.ErrorMessage,
             flagMetadata: response.Metadata != null ? new ImmutableMetadata(response.Metadata) : null);
