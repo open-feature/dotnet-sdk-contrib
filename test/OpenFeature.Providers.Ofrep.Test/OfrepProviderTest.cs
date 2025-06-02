@@ -302,7 +302,7 @@ public class OfrepProviderTest : IDisposable
     [Theory]
     [InlineData(ErrorCodes.FlagNotFound, ErrorType.FlagNotFound)]
     [InlineData(ErrorCodes.TypeMismatch, ErrorType.TypeMismatch)]
-    [InlineData(ErrorCodes.ParsingError, ErrorType.ParseError)]
+    [InlineData(ErrorCodes.ParseError, ErrorType.ParseError)]
     [InlineData(ErrorCodes.ProviderNotReady, ErrorType.ProviderNotReady)]
     [InlineData("unknown_error", ErrorType.None)]
     [InlineData("", ErrorType.None)]
