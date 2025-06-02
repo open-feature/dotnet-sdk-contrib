@@ -40,7 +40,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
                 }
         };
 
-    private readonly OfrepClient _client;
+    private readonly IOfrepClient _client;
 
     private const string Name = "OpenFeature Remote Evaluation Protocol Server";
     private readonly ProviderCapabilities? _capabilities = DefaultConfiguration.Capabilities;
@@ -144,11 +144,11 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
 
         return new ResolutionDetails<Value>(
             flagKey,
-            response.Value != null
-                ? new Value(response.Value)
-                : new Value(String.Empty),
+            response.Value != null ? new Value(response.Value) : new Value(String.Empty),
             MapErrorType(response.ErrorCode ?? string.Empty),
-            response.ErrorMessage, response.Variant);
+            reason: string.Empty,
+            variant: response.Variant,
+            errorMessage: response.ErrorMessage);
     }
 
     /// <summary>
@@ -210,9 +210,12 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             context, cancellationToken).ConfigureAwait(false);
 
         return new ResolutionDetails<T>(
-            flagKey, response.Value != null ? response.Value : defaultValue,
+            flagKey,
+            response.Value != null ? response.Value : defaultValue,
             MapErrorType(response.ErrorCode ?? string.Empty),
-            response.ErrorMessage, response.Variant);
+            reason: string.Empty,
+            variant: response.Variant,
+            errorMessage: response.ErrorMessage);
     }
 
     /// <summary>
