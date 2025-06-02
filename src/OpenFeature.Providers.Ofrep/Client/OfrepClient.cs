@@ -14,7 +14,6 @@ using OpenFeature.Providers.Ofrep.Extensions;
 using OpenFeature.Providers.Ofrep.Models;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client.Constants;
-using OpenFeature.Providers.Ofrep.Client.Exceptions;
 
 namespace OpenFeature.Providers.Ofrep.Client;
 
@@ -187,55 +186,6 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
     }
 
-    /// <inheritdoc/>
-    public async Task<BulkEvaluationResponse> BulkEvaluate(EvaluationContext context,
-        CancellationToken cancellationToken = default)
-    {
-        var cacheKey = $"bulk;ctx:{context.GenerateETag()}";
-
-        // Check cache first
-        if (this.TryGetBulkCachedResponse(cacheKey, out var cachedResponse) && cachedResponse != null)
-        {
-            this.LogCacheHit(cacheKey);
-            return cachedResponse;
-        }
-
-        this.LogCacheMiss(cacheKey);
-
-        try
-        {
-            var request = this.CreateBulkEvaluationRequest(context, cacheKey);
-            var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-
-            // Handle 304 Not Modified
-            if (response.StatusCode == HttpStatusCode.NotModified)
-            {
-                return this.HandleBulkNotModified(cacheKey);
-            }
-
-            response.EnsureSuccessStatusCode();
-            var evaluationResponse = await response.Content
-                .ReadFromJsonAsync<BulkEvaluationResponse>(JsonOptions, cancellationToken).ConfigureAwait(false);
-            if (evaluationResponse == null)
-            {
-                this.LogBulkNullResponse("BulkEvaluate");
-                throw new OfrepConfigurationException(
-                    "Received null or empty response from server for bulk evaluation.", null);
-            }
-
-            this.CacheBulkResponse(cacheKey, evaluationResponse, response.Headers.ETag?.Tag);
-            this.LogBulkCacheMetrics("BulkEvaluate", cacheKey, response.Headers.ETag?.Tag ?? "N/A",
-                this._cacheDuration.TotalMilliseconds);
-
-            return evaluationResponse;
-        }
-        catch (Exception ex) when (ex is HttpRequestException or JsonException or OperationCanceledException
-                                       or ArgumentNullException)
-        {
-            return this.HandleBulkEvaluationError(ex, cacheKey);
-        }
-    }
-
     /// <summary>
     /// Sets the cache duration for evaluation responses. Use TimeSpan.Zero to disable expiration.
     /// </summary>
@@ -375,99 +325,6 @@ internal sealed partial class OfrepClient : IOfrepClient
     }
 
     /// <summary>
-    /// Try to get a cached bulk evaluation response for the given cache key
-    /// </summary>
-    private bool TryGetBulkCachedResponse(string cacheKey, out BulkEvaluationResponse? cachedResponse)
-    {
-        if (this._cache.TryGetValue(cacheKey, out object? cachedResponseObject) &&
-            cachedResponseObject is ValueTuple<BulkEvaluationResponse, string> tuple)
-        {
-            cachedResponse = tuple.Item1;
-            return true;
-        }
-
-        cachedResponse = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Create an HTTP request for bulk evaluation
-    /// </summary>
-    private HttpRequestMessage CreateBulkEvaluationRequest(EvaluationContext context, string cacheKey)
-    {
-        var evaluationContextDict = context.ToDictionary();
-        var request = new HttpRequestMessage(HttpMethod.Post, OfrepPaths.BulkEvaluate)
-        {
-            Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
-        };
-
-        // Add If-None-Match header if we have a cached ETag
-        var etagCacheKey = $"etag:{cacheKey}";
-        if (this._cache.TryGetValue(etagCacheKey, out object? cachedETagObject) &&
-            cachedETagObject is string cachedETag && !string.IsNullOrEmpty(cachedETag))
-        {
-            request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(cachedETag, isWeak: true));
-            this.LogBulkRequestWithETag("BulkEvaluate", cachedETag, cacheKey);
-        }
-        else
-        {
-            this.LogBulkRequestWithoutETag("BulkEvaluate", cacheKey);
-        }
-
-        return request;
-    }
-
-    /// <summary>
-    /// Handle 304 Not Modified response for bulk evaluation
-    /// </summary>
-    private BulkEvaluationResponse HandleBulkNotModified(string cacheKey)
-    {
-        if (this.TryGetBulkCachedResponse(cacheKey, out var notModifiedResponse) && notModifiedResponse != null)
-        {
-            this.LogBulkNotModified("BulkEvaluate", cacheKey);
-            return notModifiedResponse;
-        }
-
-        // If cache check fails after 304 (unlikely but possible), log and throw
-        this.LogBulkNotModifiedNoCache("BulkEvaluate", cacheKey);
-        throw new InvalidOperationException("Received 304 Not Modified but no cached response available");
-    }
-
-    /// <summary>
-    /// Cache the bulk evaluation response and ETag
-    /// </summary>
-    private void CacheBulkResponse(string cacheKey, BulkEvaluationResponse response, string? responseETag)
-    {
-        var cacheEntryOptions = this.CreateCacheEntryOptions();
-        this._cache.Set(cacheKey, (response, responseETag ?? string.Empty), cacheEntryOptions);
-
-        var etagCacheKey = $"etag:{cacheKey}";
-        if (responseETag != null)
-        {
-            this._cache.Set(etagCacheKey, responseETag, cacheEntryOptions);
-        }
-        else
-        {
-            this._cache.Remove(etagCacheKey);
-        }
-    }
-
-    /// <summary>
-    /// Handle errors during bulk evaluation, attempting to return stale cache if available
-    /// </summary>
-    private BulkEvaluationResponse HandleBulkEvaluationError(Exception ex, string cacheKey)
-    {
-        if (this.TryGetBulkCachedResponse(cacheKey, out var staleResponse) && staleResponse != null)
-        {
-            this.LogBulkStaleCacheReturn(cacheKey, ex.GetType().Name, "BulkEvaluate", ex);
-            return staleResponse;
-        }
-
-        throw new OfrepConfigurationException(
-            $"Failed during OFREP bulk evaluation request to {OfrepPaths.BulkEvaluate}.", ex);
-    }
-
-    /// <summary>
     /// Helper to handle errors during flag evaluation, attempting to return stale cache if available.
     /// </summary>
     private OfrepResponse<T> HandleEvaluationError<T>(Exception ex, string cacheKey, T defaultValue)
@@ -595,75 +452,6 @@ internal sealed partial class OfrepClient : IOfrepClient
 
     [LoggerMessage(
         EventId = 1015,
-        Level = LogLevel.Trace,
-        Message = "Sending bulk request for {Operation} with If-None-Match: {ETag}, Key: {CacheKey}")]
-    partial void LogBulkRequestWithETag(string operation, string eTag, string cacheKey);
-
-    [LoggerMessage(
-        EventId = 1016,
-        Level = LogLevel.Trace,
-        Message = "Sending bulk request for {Operation} without If-None-Match header, Key: {CacheKey}")]
-    partial void LogBulkRequestWithoutETag(string operation, string cacheKey);
-
-    [LoggerMessage(
-        EventId = 1017,
-        Level = LogLevel.Debug,
-        Message = "Received 304 Not Modified for bulk evaluation {Operation}. Key: {CacheKey}, returning cached value")]
-    partial void LogBulkNotModified(string operation, string cacheKey);
-
-    [LoggerMessage(
-        EventId = 1018,
-        Level = LogLevel.Warning,
-        Message =
-            "Received 304 Not Modified for bulk evaluation {Operation} but no data in cache entry. Key: {CacheKey}, proceeding as failure")]
-    partial void LogBulkNotModifiedNoCache(string operation, string cacheKey);
-
-    [LoggerMessage(
-        EventId = 1019,
-        Level = LogLevel.Error,
-        Message = "Received null response body from server for bulk evaluation {Operation}")]
-    partial void LogBulkNullResponse(string operation);
-
-    [LoggerMessage(
-        EventId = 1020,
-        Level = LogLevel.Debug,
-        Message = "Cached bulk evaluation {Operation}. Key: {CacheKey}, ETag: {ETag}, Duration: {DurationMs}ms")]
-    partial void LogBulkCacheMetrics(string operation, string cacheKey, string eTag, double durationMs);
-
-    [LoggerMessage(
-        EventId = 1021,
-        Level = LogLevel.Error,
-        Message = "Request or parsing failed for bulk evaluation {Operation}: {ErrorType} - {Message}")]
-    partial void LogBulkRequestFailed(string operation, string errorType, string message, Exception ex);
-
-    [LoggerMessage(
-        EventId = 1022,
-        Level = LogLevel.Warning,
-        Message =
-            "Returning stale cache data for bulk key {CacheKey} due to error: {ErrorType}, Operation: {Operation}")]
-    partial void LogBulkStaleCacheReturn(string cacheKey, string errorType, string operation, Exception ex);
-
-    [LoggerMessage(
-        EventId = 1023,
-        Level = LogLevel.Error,
-        Message =
-            "Failed to get configuration after retries (if applicable). Error: {ErrorType}, Message: {Message}, Endpoint: {Endpoint}")]
-    partial void LogConfigurationError(string errorType, string message, string endpoint, Exception ex);
-
-    [LoggerMessage(
-        EventId = 1024,
-        Level = LogLevel.Information,
-        Message = "Retrying GetConfiguration due to {ExceptionType}. Attempt: {RetryAttempt}")]
-    partial void LogRetrying(string exceptionType, int retryAttempt);
-
-    [LoggerMessage(
-        EventId = 1025,
-        Level = LogLevel.Information,
-        Message = "Successfully retrieved OFREP configuration")]
-    partial void LogConfigurationSuccess();
-
-    [LoggerMessage(
-        EventId = 1026,
         Level = LogLevel.Debug,
         Message = "Setting cache duration to: {Duration}")]
     partial void LogCacheDurationChange(TimeSpan duration);
