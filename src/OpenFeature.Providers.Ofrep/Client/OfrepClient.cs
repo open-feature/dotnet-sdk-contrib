@@ -81,7 +81,8 @@ internal sealed partial class OfrepClient : IOfrepClient
         this._enableAbsoluteExpiration = configuration.EnableAbsoluteExpiration;
         this._httpClient = new HttpClient(handler, disposeHandler: true)
         {
-            BaseAddress = new Uri(configuration.BaseUrl), Timeout = TimeSpan.FromSeconds(5)
+            BaseAddress = new Uri(configuration.BaseUrl),
+            Timeout = TimeSpan.FromSeconds(5)
         };
         if (configuration.Headers != null)
         {
@@ -480,7 +481,9 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         return new OfrepResponse<T>(defaultValue)
         {
-            ErrorCode = MapExceptionToErrorCode(ex), Reason = "ERROR", ErrorMessage = ex.Message
+            ErrorCode = MapExceptionToErrorCode(ex),
+            Reason = "ERROR",
+            ErrorMessage = ex.Message
         };
     }
 
@@ -500,7 +503,8 @@ internal sealed partial class OfrepClient : IOfrepClient
     {
         return new HttpClientHandler
         {
-            UseProxy = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            UseProxy = true,
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
         };
     }
 
