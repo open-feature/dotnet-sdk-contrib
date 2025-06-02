@@ -1,4 +1,7 @@
 using System.Net;
+#if NETFRAMEWORK
+using System.Net.Http;
+#endif
 using System.Text;
 
 namespace OpenFeature.Providers.Ofrep.Test.Helpers;
@@ -27,10 +30,14 @@ internal class TestHttpMessageHandler : HttpMessageHandler
     {
         this._requests.Add(request);
 
+#if NETFRAMEWORK
+        var response = this._responses.Count > 0 ? this._responses.Dequeue() : (HttpStatusCode.OK, "{}", null, null);
+#else
         if (!this._responses.TryDequeue(out var response))
         {
             response = (HttpStatusCode.OK, "{}", null, null);
         }
+#endif
 
         if (response.exception != null)
         {
