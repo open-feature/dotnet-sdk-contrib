@@ -180,8 +180,12 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         {
             ErrorCodes.FlagNotFound => ErrorType.FlagNotFound,
             ErrorCodes.TypeMismatch => ErrorType.TypeMismatch,
-            ErrorCodes.ParsingError => ErrorType.ParseError,
+            ErrorCodes.ParseError => ErrorType.ParseError,
             ErrorCodes.ProviderNotReady => ErrorType.ProviderNotReady,
+            ErrorCodes.InvalidContext => ErrorType.InvalidContext,
+            ErrorCodes.TargetingKeyMissing => ErrorType.TargetingKeyMissing,
+            ErrorCodes.ProviderFatal => ErrorType.ProviderFatal,
+            ErrorCodes.General => ErrorType.General,
             _ => ErrorType.None
         };
 

@@ -34,7 +34,7 @@ public class OfrepResponse<T>
     /// <summary>
     /// A detailed error message accompanying the error code, if any.
     /// </summary>
-    [JsonPropertyName("errorMessage")]
+    [JsonPropertyName("errorDetails")]
     public string? ErrorMessage { get; set; }
 
     /// <summary>
