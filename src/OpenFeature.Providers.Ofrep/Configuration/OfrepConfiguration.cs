@@ -14,10 +14,10 @@ public class OfrepConfiguration
     public string BaseUrl { get; set; }
 
     /// <summary>
-    /// Gets or sets the timeout for HTTP requests. Default is 5 seconds.
+    /// Gets or sets the timeout for HTTP requests. Default is 10 seconds.
     /// </summary>
     [JsonPropertyName("timeout")]
-    public TimeSpan Timeout { get; set; }
+    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(10);
 
     /// <summary>
     /// Gets or sets additional HTTP headers to include in requests.
