@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using OpenFeature.Constant;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Extensions;
 using OpenFeature.Providers.Ofrep.Models;
@@ -109,21 +110,24 @@ internal sealed partial class OfrepClient : IOfrepClient
             var request = CreateEvaluationRequest(flagKey, context);
             var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-            response.EnsureSuccessStatusCode();
+            // Get Status Code
+            var statusCode = response.StatusCode;
 
-            var evaluationResponse = await response.Content
-                .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
-            if (evaluationResponse == null)
+            return statusCode switch
             {
-                this.LogNullResponse(flagKey);
-                return new OfrepResponse<T>(defaultValue)
-                {
-                    ErrorCode = ErrorCodes.ParsingError,
-                    ErrorMessage = "Received null or empty response from server."
-                };
-            }
-
-            return evaluationResponse;
+                HttpStatusCode.OK => await this
+                    .ProcessOkResponseAsync(flagKey, defaultValue, response, cancellationToken).ConfigureAwait(false),
+                HttpStatusCode.BadRequest => ProcessBadRequestResponse(defaultValue),
+                HttpStatusCode.NotFound => ProcessNotFoundResponse(defaultValue),
+                HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => ProcessAuthenticationErrorResponse(
+                    defaultValue),
+#if NET8_0_OR_GREATER
+                HttpStatusCode.TooManyRequests => ProcessTooManyRequestsResponse(defaultValue),
+#else
+                (HttpStatusCode)429 => ProcessTooManyRequestsResponse(defaultValue),
+#endif
+                _ => ProcessNotMappedErrorResponse(defaultValue)
+            };
         }
         catch (HttpRequestException ex)
         {
@@ -145,11 +149,79 @@ internal sealed partial class OfrepClient : IOfrepClient
             this.LogRequestTimeout(flagKey, ex.Message, ex);
             return HandleEvaluationError(ex, defaultValue);
         }
-        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
+        catch (Exception ex)
         {
             this.LogOperationError(flagKey, ex.Message, ex);
             return HandleEvaluationError(ex, defaultValue);
         }
+    }
+
+    private static OfrepResponse<T> ProcessNotMappedErrorResponse<T>(T defaultValue)
+    {
+        return new OfrepResponse<T>(defaultValue)
+        {
+            ErrorCode = ErrorCodes.GeneralError,
+            Reason = Reason.Error,
+            ErrorMessage = "General error during flag evaluation."
+        };
+    }
+
+    private static OfrepResponse<T> ProcessTooManyRequestsResponse<T>(T defaultValue)
+    {
+        return new OfrepResponse<T>(defaultValue)
+        {
+            ErrorCode = ErrorCodes.ProviderNotReady,
+            Reason = Reason.Error,
+            ErrorMessage = "Rate limit exceeded."
+        };
+    }
+
+    private static OfrepResponse<T> ProcessNotFoundResponse<T>(T defaultValue)
+    {
+        return new OfrepResponse<T>(defaultValue)
+        {
+            ErrorCode = ErrorCodes.FlagNotFound,
+            Reason = Reason.Error,
+            ErrorMessage = "Flag not found."
+        };
+    }
+
+    private static OfrepResponse<T> ProcessAuthenticationErrorResponse<T>(T defaultValue)
+    {
+        return new OfrepResponse<T>(defaultValue)
+        {
+            ErrorCode = ErrorCodes.ProviderNotReady,
+            Reason = Reason.Error,
+            ErrorMessage = "Unauthorized access to flag evaluation."
+        };
+    }
+
+    private static OfrepResponse<T> ProcessBadRequestResponse<T>(T defaultValue)
+    {
+        return new OfrepResponse<T>(defaultValue)
+        {
+            ErrorCode = ErrorCodes.ParsingError,
+            Reason = Reason.Error,
+            ErrorMessage = "Error during flag evaluation."
+        };
+    }
+
+    private async Task<OfrepResponse<T>> ProcessOkResponseAsync<T>(string flagKey, T defaultValue,
+        HttpResponseMessage response, CancellationToken cancellationToken = default)
+    {
+        var evaluationResponse = await response.Content
+            .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
+        if (evaluationResponse == null)
+        {
+            this.LogNullResponse(flagKey);
+            return new OfrepResponse<T>(defaultValue)
+            {
+                ErrorCode = ErrorCodes.ParsingError,
+                ErrorMessage = "Received null or empty response from server."
+            };
+        }
+
+        return evaluationResponse;
     }
 
     public void Dispose()
@@ -188,27 +260,15 @@ internal sealed partial class OfrepClient : IOfrepClient
     }
 
     /// <summary>
-    /// Helper to handle errors during flag evaluation, attempting to return stale cache if available.
+    /// Helper to handle errors during flag evaluation.
     /// </summary>
     private static OfrepResponse<T> HandleEvaluationError<T>(Exception ex, T defaultValue)
     {
         return new OfrepResponse<T>(defaultValue)
         {
-            ErrorCode = MapExceptionToErrorCode(ex),
-            Reason = "ERROR",
+            ErrorCode = ErrorCodes.GeneralError,
+            Reason = Reason.Error,
             ErrorMessage = ex.Message
-        };
-    }
-
-    private static string MapExceptionToErrorCode(Exception ex)
-    {
-        return ex switch
-        {
-            HttpRequestException => ErrorCodes.ProviderNotReady,
-            JsonException => ErrorCodes.ParsingError,
-            OperationCanceledException => ErrorCodes.ProviderNotReady,
-            ArgumentNullException => ErrorCodes.ParsingError,
-            _ => ErrorCodes.GeneralError
         };
     }
 
