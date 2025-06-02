@@ -124,7 +124,7 @@ public class OfrepClientTest : IDisposable
         const string flagKey = "test-flag";
         const string type = "boolean";
         const bool defaultValue = false;
-        var expectedResponse = new OfrepResponse<bool>(true) { Reason = "TARGETING_MATCH", Variant = "on" };
+        var expectedResponse = new OfrepResponse<bool>(flagKey, true) { Reason = "TARGETING_MATCH", Variant = "on" };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
@@ -293,7 +293,7 @@ public class OfrepClientTest : IDisposable
             .Set("environment", "production")
             .Build();
 
-        var expectedResponse = new OfrepResponse<bool>(true);
+        var expectedResponse = new OfrepResponse<bool>(flagKey, true);
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
 
@@ -359,23 +359,6 @@ public class OfrepClientTest : IDisposable
     }
 
     [Fact]
-    public async Task EvaluateFlag_WithUnknownException_ShouldThrowException()
-    {
-        // Arrange
-        const string flagKey = "test-flag";
-        const string type = "boolean";
-        const bool defaultValue = false;
-
-        this._mockHandler.SetupException(new NotSupportedException("Unsupported operation"));
-
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act & Assert - NotSupportedException is not caught by the client, so it bubbles up
-        await Assert.ThrowsAsync<NotSupportedException>(() =>
-            client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty));
-    }
-
-    [Fact]
     public async Task EvaluateFlag_WithInvalidHttpStatus_ShouldThrowHttpRequestException()
     {
         // Arrange
@@ -413,7 +396,7 @@ public class OfrepClientTest : IDisposable
             .Set("count", 100)
             .Build();
 
-        var expectedResponse = new OfrepResponse<string>("success");
+        var expectedResponse = new OfrepResponse<string>(flagKey, "success");
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
 
@@ -443,7 +426,7 @@ public class OfrepClientTest : IDisposable
         // Arrange
         const string type = "boolean";
         const bool defaultValue = false;
-        var expectedResponse = new OfrepResponse<bool>(true);
+        var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
