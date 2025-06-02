@@ -19,7 +19,8 @@ public class OfrepClientTest : IDisposable
 
     private readonly OfrepConfiguration _configuration = new("https://api.example.com/")
     {
-        CacheDuration = TimeSpan.FromMinutes(5), MaxCacheSize = 100
+        CacheDuration = TimeSpan.FromMinutes(5),
+        MaxCacheSize = 100
     };
 
     private readonly JsonSerializerOptions _jsonSerializerCamelCase = new()
@@ -41,7 +42,9 @@ public class OfrepClientTest : IDisposable
         // Arrange
         var configWithAbsoluteExpiration = new OfrepConfiguration("https://api.example.com/")
         {
-            CacheDuration = TimeSpan.FromMinutes(5), EnableAbsoluteExpiration = true, MaxCacheSize = 50
+            CacheDuration = TimeSpan.FromMinutes(5),
+            EnableAbsoluteExpiration = true,
+            MaxCacheSize = 50
         };
 
         // Act
