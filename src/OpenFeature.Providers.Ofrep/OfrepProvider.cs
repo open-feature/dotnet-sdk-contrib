@@ -36,7 +36,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
                             "double", "object"
                         ]),
                     Caching =
-                        new ProviderCaching { Enabled = false, TimeTolive = 60000 }
+                        new ProviderCaching { Enabled = false, TimeToLive = 60000 }
                 }
         };
 
