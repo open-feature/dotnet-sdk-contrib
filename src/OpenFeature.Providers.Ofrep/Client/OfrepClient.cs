@@ -104,7 +104,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         {
             return new OfrepResponse<T>(flagKey, defaultValue)
             {
-                ErrorCode = ErrorCodes.ProviderNotReady,
+                ErrorCode = ErrorCodes.GeneralError,
                 Reason = Reason.Error,
                 ErrorMessage = "Rate limit exceeded."
             };
@@ -130,9 +130,9 @@ internal sealed partial class OfrepClient : IOfrepClient
                 HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => ProcessAuthenticationErrorResponse(flagKey,
                     defaultValue),
 #if NET8_0_OR_GREATER
-                HttpStatusCode.TooManyRequests => ProcessTooManyRequestsResponse(flagKey, defaultValue, response),
+                HttpStatusCode.TooManyRequests => this.ProcessTooManyRequestsResponse(flagKey, defaultValue, response),
 #else
-                (HttpStatusCode)429 => ProcessTooManyRequestsResponse(flagKey, defaultValue, response),
+                (HttpStatusCode)429 => this.ProcessTooManyRequestsResponse(flagKey, defaultValue, response),
 #endif
                 _ => ProcessNotMappedErrorResponse(flagKey, defaultValue)
             };
@@ -192,7 +192,7 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         return new OfrepResponse<T>(key, defaultValue)
         {
-            ErrorCode = ErrorCodes.ProviderNotReady,
+            ErrorCode = ErrorCodes.GeneralError,
             Reason = Reason.Error,
             ErrorMessage = "Rate limit exceeded."
         };
