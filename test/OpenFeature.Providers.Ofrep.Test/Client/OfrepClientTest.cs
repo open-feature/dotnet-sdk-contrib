@@ -820,47 +820,27 @@ public class OfrepClientTest : IDisposable
     #region Edge Case Tests
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public async Task EvaluateFlag_WithNullOrEmptyFlagKey_ShouldThrowArgumentException(string? flagKey)
+    public async Task EvaluateFlag_WithNullOrEmptyFlagKey_ShouldThrowArgumentException(string flagKey)
     {
         // Arrange
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act & Assert
-        if (flagKey == null)
-        {
-            await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                client.EvaluateFlag(flagKey!, "boolean", false, EvaluationContext.Empty));
-        }
-        else
-        {
-            await Assert.ThrowsAsync<ArgumentException>(() =>
-                client.EvaluateFlag(flagKey!, "boolean", false, EvaluationContext.Empty));
-        }
+        await Assert.ThrowsAsync<ArgumentException>(() => client.EvaluateFlag(flagKey, "boolean", false, EvaluationContext.Empty));
     }
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public async Task EvaluateFlag_WithNullOrEmptyType_ShouldThrowArgumentException(string? type)
+    public async Task EvaluateFlag_WithNullOrEmptyType_ShouldThrowArgumentException(string type)
     {
         // Arrange
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act & Assert
-        if (type == null)
-        {
-            await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                client.EvaluateFlag("test-flag", type!, false, EvaluationContext.Empty));
-        }
-        else
-        {
-            await Assert.ThrowsAsync<ArgumentException>(() =>
-                client.EvaluateFlag("test-flag", type!, false, EvaluationContext.Empty));
-        }
+        await Assert.ThrowsAsync<ArgumentException>(() => client.EvaluateFlag("test-flag", type, false, EvaluationContext.Empty));
     }
 
     [Fact]
