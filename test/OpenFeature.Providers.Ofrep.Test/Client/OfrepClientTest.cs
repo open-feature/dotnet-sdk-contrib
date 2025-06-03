@@ -632,7 +632,7 @@ public class OfrepClientTest : IDisposable
     }
 
     [Fact]
-    public async Task EvaluateFlag_WithTooManyRequestsStatus_ShouldReturnProviderNotReadyError()
+    public async Task EvaluateFlag_WithTooManyRequestsStatus_ShouldReturnGeneralError()
     {
         // Arrange
         const string flagKey = "rate-limited-flag";
@@ -654,7 +654,7 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal("provider_not_ready", result.ErrorCode);
+        Assert.Equal("general_error", result.ErrorCode);
         Assert.Equal("ERROR", result.Reason);
         Assert.Equal("Rate limit exceeded.", result.ErrorMessage);
     }
@@ -696,7 +696,7 @@ public class OfrepClientTest : IDisposable
     #region Rate Limiting Tests
 
     [Fact]
-    public async Task EvaluateFlag_WithRetryAfterSet_ShouldReturnProviderNotReadyForSubsequentRequests()
+    public async Task EvaluateFlag_WithRetryAfterSet_ShouldReturnGeneralErrorForSubsequentRequests()
     {
         // Arrange
         const string flagKey = "rate-limited-flag";
@@ -716,10 +716,10 @@ public class OfrepClientTest : IDisposable
 
         // Assert
         Assert.NotNull(firstResult);
-        Assert.Equal("provider_not_ready", firstResult.ErrorCode);
+        Assert.Equal("general_error", firstResult.ErrorCode);
 
         Assert.NotNull(secondResult);
-        Assert.Equal("provider_not_ready", secondResult.ErrorCode);
+        Assert.Equal("general_error", secondResult.ErrorCode);
         Assert.Equal("Rate limit exceeded.", secondResult.ErrorMessage);
     }
 
