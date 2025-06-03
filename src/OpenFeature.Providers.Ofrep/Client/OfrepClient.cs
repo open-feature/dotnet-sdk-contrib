@@ -88,21 +88,15 @@ internal sealed partial class OfrepClient : IOfrepClient
     }
 
     /// <inheritdoc/>
-    public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, string type, T defaultValue,
+    public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, T defaultValue,
         EvaluationContext? context, CancellationToken cancellationToken = default)
     {
 #if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrWhiteSpace(flagKey);
-        ArgumentException.ThrowIfNullOrWhiteSpace(type);
 #else
         if (string.IsNullOrWhiteSpace(flagKey))
         {
             throw new ArgumentException("Flag key cannot be null or whitespace", nameof(flagKey));
-        }
-
-        if (string.IsNullOrWhiteSpace(type))
-        {
-            throw new ArgumentException("Type cannot be null or whitespace", nameof(type));
         }
 #endif
 
