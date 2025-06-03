@@ -122,7 +122,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
         var expectedResponse = new OfrepResponse<bool>(flagKey, true) { Reason = "TARGETING_MATCH", Variant = "on" };
 
@@ -132,7 +131,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -151,20 +150,7 @@ public class OfrepClientTest : IDisposable
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            client.EvaluateFlag(invalidFlagKey, "boolean", false, EvaluationContext.Empty));
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    public async Task EvaluateFlag_WithInvalidType_ShouldThrowArgumentException(string invalidType)
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() =>
-            client.EvaluateFlag("test-flag", invalidType, false, EvaluationContext.Empty));
+            client.EvaluateFlag(invalidFlagKey, false, EvaluationContext.Empty));
     }
 
     [Fact]
@@ -172,7 +158,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupException(new HttpRequestException("Network error"));
@@ -180,7 +165,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -195,7 +180,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
         var cts = new CancellationTokenSource();
 
@@ -209,7 +193,7 @@ public class OfrepClientTest : IDisposable
 #else
         await cts.CancelAsync();
 #endif
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty, cts.Token);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty, cts.Token);
 
         // Assert
         Assert.NotNull(result);
@@ -222,7 +206,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupException(new OperationCanceledException("Request timed out"));
@@ -230,7 +213,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -243,7 +226,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK, "invalid json");
@@ -251,7 +233,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -264,7 +246,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK, "null");
@@ -272,7 +253,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -286,7 +267,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
         var context = EvaluationContext.Builder()
             .Set("userId", "user123")
@@ -300,7 +280,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, context);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, context);
 
         // Assert
         Assert.NotNull(result);
@@ -318,7 +298,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupException(new ArgumentNullException());
@@ -326,7 +305,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -340,7 +319,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupException(new InvalidOperationException("Test invalid operation"));
@@ -348,7 +326,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -363,7 +341,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
@@ -371,7 +348,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -385,7 +362,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "complex-flag";
-        const string type = "string";
         const string defaultValue = "default";
 
         var complexContext = EvaluationContext.Builder()
@@ -403,7 +379,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, complexContext);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, complexContext);
 
         // Assert
         Assert.NotNull(result);
@@ -424,7 +400,6 @@ public class OfrepClientTest : IDisposable
     public async Task EvaluateFlag_WithSpecialCharactersInFlagKey_ShouldEscapeCorrectly(string flagKey)
     {
         // Arrange
-        const string type = "boolean";
         const bool defaultValue = false;
         var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
@@ -434,7 +409,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -499,7 +474,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "string-flag";
-        const string type = "string";
         const string defaultValue = "default";
         const string expectedValue = "test-string-value";
 
@@ -515,7 +489,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -529,7 +503,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "integer-flag";
-        const string type = "integer";
         const int defaultValue = 0;
         const int expectedValue = 42;
 
@@ -545,7 +518,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -559,7 +532,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "double-flag";
-        const string type = "number";
         const double defaultValue = 0.0;
         const double expectedValue = 3.14159;
 
@@ -574,7 +546,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -587,7 +559,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "object-flag";
-        const string type = "object";
         var defaultValue = new { test = "default" };
         var expectedValue = new { name = "test", value = 123, enabled = true };
 
@@ -602,7 +573,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -619,7 +590,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "missing-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupResponse(HttpStatusCode.NotFound, "Flag not found");
@@ -627,7 +597,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -644,7 +614,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "auth-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupResponse(statusCode, "Authentication failed");
@@ -652,7 +621,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -667,7 +636,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "rate-limited-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var response = new HttpResponseMessage((HttpStatusCode)429)
@@ -681,7 +649,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -696,7 +664,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "bad-request-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var errorResponse = new
@@ -714,7 +681,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -733,7 +700,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "rate-limited-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         // First request - rate limited
@@ -745,8 +711,8 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var firstResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
-        var secondResult = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var firstResult = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+        var secondResult = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(firstResult);
@@ -766,7 +732,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "null-context-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
         var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
@@ -776,7 +741,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, null);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, null);
 
         // Assert
         Assert.NotNull(result);
@@ -789,7 +754,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "nested-context-flag";
-        const string type = "string";
         const string defaultValue = "default";
 
         var complexContext = EvaluationContext.Builder()
@@ -807,7 +771,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, complexContext);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, complexContext);
 
         // Assert
         Assert.NotNull(result);
@@ -828,19 +792,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => client.EvaluateFlag(flagKey, "boolean", false, EvaluationContext.Empty));
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public async Task EvaluateFlag_WithNullOrEmptyType_ShouldThrowArgumentException(string type)
-    {
-        // Arrange
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => client.EvaluateFlag("test-flag", type, false, EvaluationContext.Empty));
+        await Assert.ThrowsAsync<ArgumentException>(() => client.EvaluateFlag(flagKey, false, EvaluationContext.Empty));
     }
 
     [Fact]
@@ -848,7 +800,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "empty-response-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK, "");
@@ -856,7 +807,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -869,7 +820,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "malformed-json-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK, "{ invalid json structure");
@@ -877,7 +827,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -891,7 +841,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "task-cancelled-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupException(new TaskCanceledException("Task was cancelled"));
@@ -899,7 +848,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -914,7 +863,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "generic-exception-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupException(new InvalidDataException("Generic error occurred"));
@@ -922,7 +870,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -941,7 +889,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "concurrent-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
         const int concurrentRequests = 10;
 
@@ -958,7 +905,7 @@ public class OfrepClientTest : IDisposable
 
         // Act
         var tasks = Enumerable.Range(0, concurrentRequests)
-            .Select(_ => client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty))
+            .Select(_ => client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty))
             .ToArray();
 
         var results = await Task.WhenAll(tasks);
@@ -982,7 +929,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "url-test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
         var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
@@ -992,7 +938,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.Single(this._mockHandler.Requests);
@@ -1007,7 +953,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "context-body-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var context = EvaluationContext.Builder()
@@ -1023,7 +968,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        await client.EvaluateFlag(flagKey, type, defaultValue, context);
+        await client.EvaluateFlag(flagKey, defaultValue, context);
 
         // Assert
         Assert.Single(this._mockHandler.Requests);
@@ -1046,7 +991,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "metadata-flag";
-        const string type = "string";
         const string defaultValue = "default";
 
         var expectedResponse = new OfrepResponse<string>(flagKey, "metadata-value")
@@ -1066,7 +1010,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1081,7 +1025,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "minimal-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         // Minimal response with only required fields
@@ -1093,7 +1036,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1113,7 +1056,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "type-mismatch-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var errorResponse = new
@@ -1131,7 +1073,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1146,7 +1088,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "targeting-key-missing-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var errorResponse = new
@@ -1164,7 +1105,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1184,7 +1125,6 @@ public class OfrepClientTest : IDisposable
         // Arrange
         const string flagKey1 = "sequential-flag-1";
         const string flagKey2 = "sequential-flag-2";
-        const string type = "string";
         const string defaultValue = "default";
 
         var response1 = new OfrepResponse<string>(flagKey1, "value1") { Reason = "STATIC" };
@@ -1198,8 +1138,8 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result1 = await client.EvaluateFlag(flagKey1, type, defaultValue, EvaluationContext.Empty);
-        var result2 = await client.EvaluateFlag(flagKey2, type, defaultValue, EvaluationContext.Empty);
+        var result1 = await client.EvaluateFlag(flagKey1, defaultValue, EvaluationContext.Empty);
+        var result2 = await client.EvaluateFlag(flagKey2, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result1);
@@ -1219,7 +1159,6 @@ public class OfrepClientTest : IDisposable
         // Arrange
         const string successFlagKey = "success-flag";
         const string errorFlagKey = "error-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var successResponse = new OfrepResponse<bool>(successFlagKey, true) { Reason = "TARGETING_MATCH" };
@@ -1231,8 +1170,8 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var successResult = await client.EvaluateFlag(successFlagKey, type, defaultValue, EvaluationContext.Empty);
-        var errorResult = await client.EvaluateFlag(errorFlagKey, type, defaultValue, EvaluationContext.Empty);
+        var successResult = await client.EvaluateFlag(successFlagKey, defaultValue, EvaluationContext.Empty);
+        var errorResult = await client.EvaluateFlag(errorFlagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(successResult);
@@ -1283,7 +1222,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         var longFlagKey = new string('a', 1000); // Very long flag key
-        const string type = "boolean";
         const bool defaultValue = false;
         var expectedResponse = new OfrepResponse<bool>(longFlagKey, true);
 
@@ -1293,7 +1231,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(longFlagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(longFlagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1306,7 +1244,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "flag-🚀-测试-🎯";
-        const string type = "string";
         const string defaultValue = "default";
         var expectedResponse = new OfrepResponse<string>(flagKey, "unicode-value");
 
@@ -1316,7 +1253,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1333,7 +1270,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "large-context-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var contextBuilder = EvaluationContext.Builder();
@@ -1355,7 +1291,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, largeContext);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, largeContext);
 
         // Assert
         Assert.NotNull(result);
@@ -1364,14 +1300,14 @@ public class OfrepClientTest : IDisposable
     }
 
     [Theory]
-    [InlineData("boolean", true)]
-    [InlineData("boolean", false)]
-    [InlineData("string", "")]
-    [InlineData("string", "test-value")]
-    [InlineData("number", 0)]
-    [InlineData("number", 42)]
-    [InlineData("number", -123.456)]
-    public async Task EvaluateFlag_WithVariousDefaultValues_ShouldReturnDefaultOnError<T>(string type, T defaultValue)
+    [InlineData(true)]
+    [InlineData(false)]
+    [InlineData("")]
+    [InlineData("test-value")]
+    [InlineData(0)]
+    [InlineData(42)]
+    [InlineData(-123.456)]
+    public async Task EvaluateFlag_WithVariousDefaultValues_ShouldReturnDefaultOnError<T>(T defaultValue)
     {
         // Arrange
         const string flagKey = "error-flag";
@@ -1381,7 +1317,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1399,7 +1335,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "header-test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var configWithHeaders = new OfrepConfiguration("https://api.example.com/")
@@ -1419,7 +1354,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(configWithHeaders, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1436,7 +1371,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "auth-test-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         var configWithAuth = new OfrepConfiguration("https://api.example.com/")
@@ -1451,7 +1385,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(configWithAuth, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1472,7 +1406,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "slow-response-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
         var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
@@ -1482,7 +1415,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
@@ -1494,7 +1427,6 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "socket-error-flag";
-        const string type = "boolean";
         const bool defaultValue = false;
 
         this._mockHandler.SetupException(new System.Net.Sockets.SocketException(10061)); // Connection refused
@@ -1502,7 +1434,7 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, type, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
