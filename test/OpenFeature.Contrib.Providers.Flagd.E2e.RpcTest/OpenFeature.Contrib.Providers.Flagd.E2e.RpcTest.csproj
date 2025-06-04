@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reqnroll.xUnit" Version="2.4.0" />
+    <PackageReference Include="Reqnroll.xUnit" Version="2.4.1" />
     <PackageReference Include="Testcontainers" Version="4.4.0" />
   </ItemGroup>
 
