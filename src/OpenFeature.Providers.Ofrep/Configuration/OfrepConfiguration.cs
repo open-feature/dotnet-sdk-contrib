@@ -26,12 +26,6 @@ public class OfrepConfiguration
     public Dictionary<string, string>? Headers { get; set; }
 
     /// <summary>
-    /// Gets or sets the authorization header value.
-    /// </summary>
-    [JsonPropertyName("authorizationHeader")]
-    public string? AuthorizationHeader { get; set; }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="OfrepConfiguration"/> class with the specified base URL.
     /// </summary>
     /// <param name="baseUrl">The base URL for the OFREP (OpenFeature Remote Evaluation Protocol) endpoint. Must be a valid absolute URI.</param>

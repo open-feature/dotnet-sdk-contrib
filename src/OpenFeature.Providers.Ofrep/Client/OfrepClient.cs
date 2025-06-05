@@ -2,7 +2,6 @@ using System.Net;
 #if NETFRAMEWORK
 using System.Net.Http;
 #endif
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -78,12 +77,6 @@ internal sealed partial class OfrepClient : IOfrepClient
             {
                 this._httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
             }
-        }
-
-        if (!string.IsNullOrEmpty(configuration.AuthorizationHeader))
-        {
-            this._httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", configuration.AuthorizationHeader);
         }
     }
 

@@ -58,8 +58,7 @@ var config = new OfrepConfiguration("https://feature-flags.example.com")
     {
         ["Custom-Header"] = "value",
         ["Api-Version"] = "v1"
-    },
-    AuthorizationHeader = "Bearer your-auth-token"
+    }
 };
 
 // Create and register the provider
@@ -74,7 +73,6 @@ The `OfrepConfiguration` class supports the following options:
 -   `BaseUrl` (required): The base URL for the OFREP API endpoint
 -   `Timeout` (optional): HTTP client timeout
 -   `Headers` (optional): Additional HTTP headers to include in requests
--   `AuthorizationHeader` (optional): Authorization header value
 
 ## Contributing
 

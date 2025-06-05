@@ -79,22 +79,6 @@ public class OfrepClientTest : IDisposable
     }
 
     [Fact]
-    public void Constructor_WithAuthorizationHeader_ShouldSetBearerToken()
-    {
-        // Arrange
-        var configWithAuth = new OfrepConfiguration("https://api.example.com/")
-        {
-            AuthorizationHeader = "test-token-123"
-        };
-
-        // Act
-        using var client = new OfrepClient(configWithAuth, this._mockHandler, this._mockLogger);
-
-        // Assert - Check that client was created successfully
-        Assert.NotNull(client);
-    }
-
-    [Fact]
     public void Constructor_WithCustomHeaders_ShouldSetHeaders()
     {
         // Arrange
@@ -1364,37 +1348,6 @@ public class OfrepClientTest : IDisposable
         var request = this._mockHandler.Requests[0];
         // Note: In a real scenario, we'd check the headers were set, but our mock handler doesn't expose them
         // This test ensures the client can be created and used with custom headers without errors
-    }
-
-    [Fact]
-    public async Task EvaluateFlag_WithAuthorizationHeader_ShouldIncludeInRequest()
-    {
-        // Arrange
-        const string flagKey = "auth-test-flag";
-        const bool defaultValue = false;
-
-        var configWithAuth = new OfrepConfiguration("https://api.example.com/")
-        {
-            AuthorizationHeader = "my-secret-token"
-        };
-
-        var expectedResponse = new OfrepResponse<bool>(flagKey, true);
-        this._mockHandler.SetupResponse(HttpStatusCode.OK,
-            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
-
-        using var client = new OfrepClient(configWithAuth, this._mockHandler, this._mockLogger);
-
-        // Act
-        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.True(result.Value);
-        Assert.Single(this._mockHandler.Requests);
-
-        var request = this._mockHandler.Requests[0];
-        // Note: In a real scenario, we'd verify the Authorization header was set correctly
-        // This test ensures the client works with authorization headers without errors
     }
 
     #endregion
