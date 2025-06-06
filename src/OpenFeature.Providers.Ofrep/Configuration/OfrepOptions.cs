@@ -5,7 +5,7 @@ namespace OpenFeature.Providers.Ofrep.Configuration;
 /// <summary>
 /// Configuration options for the OFREP provider.
 /// </summary>
-public class OfrepConfiguration
+public class OfrepOptions
 {
     /// <summary>
     /// Gets or sets the base URL for the OFREP API.
@@ -26,11 +26,11 @@ public class OfrepConfiguration
     public Dictionary<string, string>? Headers { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="OfrepConfiguration"/> class with the specified base URL.
+    /// Initializes a new instance of the <see cref="OfrepOptions"/> class with the specified base URL.
     /// </summary>
     /// <param name="baseUrl">The base URL for the OFREP (OpenFeature Remote Evaluation Protocol) endpoint. Must be a valid absolute URI.</param>
     /// <exception cref="ArgumentException">Thrown when <paramref name="baseUrl"/> is null, empty, or not a valid absolute URI.</exception>
-    public OfrepConfiguration(string baseUrl)
+    public OfrepOptions(string baseUrl)
     {
         if (string.IsNullOrEmpty(baseUrl))
         {

@@ -17,6 +17,7 @@ Add the package to your project:
 ```shell
 dotnet add package OpenFeature.Providers.Ofrep
 ```
+
 ## Basic Usage
 
 ```csharp
@@ -25,7 +26,7 @@ using OpenFeature.Providers.Ofrep;
 using OpenFeature.Providers.Ofrep.Configuration;
 
 // Configure the provider
-var config = new OfrepConfiguration("https://zconfig.company.com/");
+var config = new OfrepOptions("https://zconfig.company.com/");
 
 // Create and register the provider
 var provider = new OfrepProvider(config);
@@ -45,13 +46,13 @@ var intFlag = await client.GetIntegerValueAsync("max-retries", 3);
 
 // Double flag
 var doubleFlag = await client.GetDoubleValueAsync("sample-rate", 0.1);
-````
+```
 
 ## Advanced Configuration
 
 ```csharp
 // Advanced configuration
-var config = new OfrepConfiguration("https://feature-flags.example.com")
+var config = new OfrepOptions("https://feature-flags.example.com")
 {
     Timeout = TimeSpan.FromSeconds(10),
     Headers = new Dictionary<string, string>
@@ -68,7 +69,7 @@ await Api.Instance.SetProviderAsync(provider);
 
 ## Configuration Options
 
-The `OfrepConfiguration` class supports the following options:
+The `OfrepOptions` class supports the following options:
 
 -   `BaseUrl` (required): The base URL for the OFREP API endpoint
 -   `Timeout` (optional): HTTP client timeout
