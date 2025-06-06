@@ -21,7 +21,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     /// Creates new instance of <see cref="OfrepProvider"/>
     /// </summary>
     /// <param name="configuration">The OFREP provider configuration.</param>
-    public OfrepProvider(OfrepConfiguration configuration)
+    public OfrepProvider(OfrepOptions configuration)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(configuration);

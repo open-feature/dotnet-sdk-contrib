@@ -18,7 +18,7 @@ public class OfrepClientTest : IDisposable
 {
     private readonly ILogger<OfrepClient> _mockLogger = NullLogger<OfrepClient>.Instance;
     private readonly TestHttpMessageHandler _mockHandler = new();
-    private readonly OfrepConfiguration _configuration = new("https://api.example.com/");
+    private readonly OfrepOptions _configuration = new("https://api.example.com/");
 
     private readonly JsonSerializerOptions _jsonSerializerCamelCase = new()
     {
@@ -82,7 +82,7 @@ public class OfrepClientTest : IDisposable
     public void Constructor_WithCustomHeaders_ShouldSetHeaders()
     {
         // Arrange
-        var configWithHeaders = new OfrepConfiguration("https://api.example.com/")
+        var configWithHeaders = new OfrepOptions("https://api.example.com/")
         {
             Headers = new Dictionary<string, string>
             {
@@ -413,9 +413,9 @@ public class OfrepClientTest : IDisposable
     public void Constructor_WithInvalidBaseUrl_ShouldThrowArgumentException()
     {
         // Arrange, Act & Assert
-        Assert.Throws<ArgumentException>(() => new OfrepConfiguration("not-a-valid-url"));
-        Assert.Throws<ArgumentException>(() => new OfrepConfiguration(""));
-        Assert.Throws<ArgumentException>(() => new OfrepConfiguration(null!));
+        Assert.Throws<ArgumentException>(() => new OfrepOptions("not-a-valid-url"));
+        Assert.Throws<ArgumentException>(() => new OfrepOptions(""));
+        Assert.Throws<ArgumentException>(() => new OfrepOptions(null!));
     }
 
     [Fact]
@@ -423,7 +423,7 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         var customTimeout = TimeSpan.FromSeconds(30);
-        var config = new OfrepConfiguration("https://api.example.com/")
+        var config = new OfrepOptions("https://api.example.com/")
         {
             Timeout = customTimeout
         };
@@ -442,7 +442,7 @@ public class OfrepClientTest : IDisposable
     public void Constructor_WithValidBaseUrls_ShouldCreateClient(string baseUrl)
     {
         // Arrange
-        var config = new OfrepConfiguration(baseUrl);
+        var config = new OfrepOptions(baseUrl);
 
         // Act & Assert
         using var client = new OfrepClient(config, this._mockHandler, this._mockLogger);
@@ -1321,7 +1321,7 @@ public class OfrepClientTest : IDisposable
         const string flagKey = "header-test-flag";
         const bool defaultValue = false;
 
-        var configWithHeaders = new OfrepConfiguration("https://api.example.com/")
+        var configWithHeaders = new OfrepOptions("https://api.example.com/")
         {
             Headers = new Dictionary<string, string>
             {

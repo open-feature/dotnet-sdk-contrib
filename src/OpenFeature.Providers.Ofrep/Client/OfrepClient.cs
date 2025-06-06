@@ -37,7 +37,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// </summary>
     /// <param name="configuration">The OFREP configuration.</param>
     /// <param name="logger">The logger for the client.</param>
-    public OfrepClient(OfrepConfiguration configuration, ILogger? logger = null)
+    public OfrepClient(OfrepOptions configuration, ILogger? logger = null)
         : this(configuration, CreateDefaultHandler(), logger) // Use helper for default handler
     {
     }
@@ -48,7 +48,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// <param name="configuration">The OFREP configuration.</param>
     /// <param name="handler">The HTTP message handler.</param>
     /// <param name="logger">The logger for the client.</param>
-    internal OfrepClient(OfrepConfiguration configuration, HttpMessageHandler handler, ILogger? logger = null)
+    internal OfrepClient(OfrepOptions configuration, HttpMessageHandler handler, ILogger? logger = null)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(configuration);

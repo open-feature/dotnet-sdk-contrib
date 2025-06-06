@@ -12,7 +12,7 @@ namespace OpenFeature.Providers.Ofrep.Test;
 public class OfrepProviderTest : IDisposable
 {
     private readonly IOfrepClient _mockClient = Substitute.For<IOfrepClient>();
-    private readonly OfrepConfiguration _defaultConfiguration = new("http://localhost:8080");
+    private readonly OfrepOptions _defaultConfiguration = new("http://localhost:8080");
     private OfrepProvider? _provider;
 
     [Fact]
