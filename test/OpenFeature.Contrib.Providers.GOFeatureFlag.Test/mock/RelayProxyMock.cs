@@ -20,6 +20,7 @@ public class RelayProxyMock
         var mockHttp = new MockHttpMessageHandler();
         this.AddConfigurationMock(mockHttp, mode);
         this.AddDataCollector(mockHttp, mode);
+        this.AddOfrep(mockHttp, mode);
         return mockHttp;
     }
 
@@ -30,6 +31,46 @@ public class RelayProxyMock
         this.RequestCount++;
         return true; // Always return true to allow the mock to respond
     }
+
+    private void AddOfrep(MockHttpMessageHandler mockHttp, string mode)
+    {
+        var prefixEval = baseUrl + "/ofrep/v1/evaluate/flags/";
+        mockHttp.When($"{prefixEval}fail_500").Respond(HttpStatusCode.InternalServerError);
+        mockHttp.When($"{prefixEval}api_key_missing").Respond(HttpStatusCode.BadRequest);
+        mockHttp.When($"{prefixEval}invalid_api_key").Respond(HttpStatusCode.Unauthorized);
+        mockHttp.When($"{prefixEval}flag_not_found").Respond(HttpStatusCode.NotFound);
+        mockHttp.When($"{prefixEval}bool_targeting_match").Respond(mediaType,
+            "{ \"value\":true, \"key\":\"bool_targeting_match\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\" }");
+        mockHttp.When($"{prefixEval}disabled").Respond(mediaType,
+            "{ \"value\":false, \"key\":\"disabled\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\"}");
+        mockHttp.When($"{prefixEval}disabled_double").Respond(mediaType,
+            "{ \"value\":100.25, \"key\":\"disabled_double\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\"}");
+        mockHttp.When($"{prefixEval}disabled_integer").Respond(mediaType,
+            "{ \"value\":100, \"key\":\"disabled_integer\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\"}");
+        mockHttp.When($"{prefixEval}disabled_object").Respond(mediaType,
+            "{ \"value\":null, \"key\":\"disabled_object\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\"}");
+        mockHttp.When($"{prefixEval}disabled_string").Respond(mediaType,
+            "{ \"value\":\"\", \"key\":\"disabled_string\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\"}");
+        mockHttp.When($"{prefixEval}double_key").Respond(mediaType,
+            "{ \"value\":100.25, \"key\":\"double_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\"}");
+        mockHttp.When($"{prefixEval}flag_not_found").Respond(mediaType,
+            "{ \"value\":false, \"key\":\"flag_not_found\", \"reason\":\"FLAG_NOT_FOUND\", \"variant\":\"True\"}");
+        mockHttp.When($"{prefixEval}integer_key").Respond(mediaType,
+            "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\"}");
+        mockHttp.When($"{prefixEval}list_key").Respond(mediaType,
+            "{ \"value\":[\"test\",\"test1\",\"test2\",\"false\",\"test3\"], \"key\":\"list_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\"}");
+        mockHttp.When($"{prefixEval}object_key").Respond(mediaType,
+            "{ \"value\":{\"test\":\"test1\",\"test2\":false,\"test3\":123.3,\"test4\":1,\"test5\":null}, \"key\":\"object_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\"}");
+        mockHttp.When($"{prefixEval}string_key").Respond(mediaType,
+            "{ \"value\":\"CC0000\", \"key\":\"string_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\"}");
+        mockHttp.When($"{prefixEval}unknown_reason").Respond(mediaType,
+            "{ \"value\":\"true\", \"key\":\"unknown_reason\", \"reason\":\"CUSTOM_REASON\", \"variant\":\"True\"}");
+        mockHttp.When($"{prefixEval}does_not_exists").Respond(mediaType,
+            "{ \"value\":\"\", \"key\":\"does_not_exists\", \"errorCode\":\"FLAG_NOT_FOUND\", \"variant\":\"defaultSdk\", \"errorDetails\":\"flag does_not_exists was not found in your configuration\"}");
+        mockHttp.When($"{prefixEval}integer_with_metadata").Respond(mediaType,
+            "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"metadata\":{\"key1\": \"key1\", \"key2\": 1, \"key3\": 1.345, \"key4\": true}}");
+    }
+
 
     private void AddDataCollector(MockHttpMessageHandler mockHttp, string mode)
     {

@@ -4,16 +4,15 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.mock;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.v2.utils;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.api;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.utils;
 using OpenFeature.Model;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.v2.api;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.api;
 
 public class GoFeatureFlagApiTest
 {

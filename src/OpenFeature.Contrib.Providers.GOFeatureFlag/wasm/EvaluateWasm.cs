@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.converters;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.converters;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.wasm.bean;
