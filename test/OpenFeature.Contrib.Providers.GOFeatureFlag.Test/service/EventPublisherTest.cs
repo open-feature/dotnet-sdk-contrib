@@ -1,31 +1,27 @@
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.service;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.mock;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.v2.utils;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.api;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.service;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.utils;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.v2.service;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.service;
 
 public class EventPublisherTests
 {
     private readonly GoFeatureFlagApi _apiMock;
-    private readonly HttpMessageHandler _httpMessageHandler;
     private readonly RelayProxyMock _mockHttp;
     private readonly GoFeatureFlagProviderOptions _options;
 
     public EventPublisherTests()
     {
         this._mockHttp = new RelayProxyMock();
-        this._httpMessageHandler = this._mockHttp.GetRelayProxyMock("");
         this._options = new GoFeatureFlagProviderOptions
         {
             Endpoint = RelayProxyMock.baseUrl,
-            HttpMessageHandler = this._httpMessageHandler,
+            HttpMessageHandler = this._mockHttp.GetRelayProxyMock(""),
             FlushIntervalMs = TimeSpan.FromMilliseconds(100)
         };
         this._apiMock = new GoFeatureFlagApi(this._options);
@@ -36,7 +32,7 @@ public class EventPublisherTests
     {
         var publisher = new EventPublisher(this._apiMock, this._options);
         await publisher.StartAsync();
-// No exception means success, as PeriodicAsyncRunner is internal
+        // No exception means success, as PeriodicAsyncRunner is internal
     }
 
     [Fact]
@@ -45,7 +41,7 @@ public class EventPublisherTests
         var publisher = new EventPublisher(this._apiMock, this._options);
         await publisher.StartAsync();
         await publisher.StopAsync();
-// No exception means success
+        // No exception means success
     }
 
     [Fact]

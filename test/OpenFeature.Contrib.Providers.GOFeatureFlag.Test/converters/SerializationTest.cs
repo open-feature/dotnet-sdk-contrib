@@ -2,35 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.converters;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.models;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
 using OpenFeature.Model;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.converters;
 
-public class OfrepSerializationTest
+public class SerializationTest
 {
-    [Fact]
-    public void OfrepSerializesCorrectly()
-    {
-        var ctx = EvaluationContext.Builder()
-            .Set("targetingKey", "1d1b9238-2591-4a47-94cf-d2bc080892f1")
-            .Set("firstname", "john")
-            .Set("lastname", "doe")
-            .Set("email", "john.doe@gofeatureflag.org")
-            .Set("admin", true)
-            .Set("anonymous", false)
-            .Build();
-
-        var ofrepReq = new OfrepRequest(ctx);
-
-        var want = JObject.Parse(
-            "{\"context\":{\"firstname\":\"john\",\"email\":\"john.doe@gofeatureflag.org\",\"lastname\":\"doe\",\"targetingKey\":\"1d1b9238-2591-4a47-94cf-d2bc080892f1\",\"admin\":true,\"anonymous\":false}}");
-        var got = JObject.Parse(ofrepReq.AsJsonString());
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
-    }
-
     [Fact]
     public void ToStringDictionary_WithEmptyContext_ShouldReturnEmptyDictionary()
     {

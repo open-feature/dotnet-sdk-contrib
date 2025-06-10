@@ -1,668 +1,1060 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Text;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DotNet.Testcontainers.Builders;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v1;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.models;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.mock;
 using OpenFeature.Model;
-using RichardSzalay.MockHttp;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test;
 
 public class GoFeatureFlagProviderTest
 {
-    private static readonly string baseUrl = "http://gofeatureflag.org";
-    private static readonly string prefixEval = baseUrl + "/ofrep/v1/evaluate/flags/";
-    private readonly EvaluationContext _defaultEvaluationCtx = InitDefaultEvaluationCtx();
-    private readonly HttpMessageHandler _mockHttp = InitMock();
+    private static readonly EvaluationContext DefaultEvaluationContext = EvaluationContext.Builder()
+        .SetTargetingKey("d45e303a-38c2-11ed-a261-0242ac120002")
+        .Set("email", "john.doe@gofeatureflag.org")
+        .Set("firstname", "john")
+        .Set("lastname", "doe")
+        .Set("anonymous", false)
+        .Set("professional", true)
+        .Set("rate", 3.14)
+        .Set("age", 30)
+        .Set("company_info",
+            Structure.Builder().Set("name", "my_company").Set("size", 120).Build())
+        .Set("labels",
+            new Value(new List<Value> { new("pro"), new("beta") }))
+        .Build();
 
-    private static HttpMessageHandler InitMock()
-    {
-        const string mediaType = "application/json";
-        var mockHttp = new MockHttpMessageHandler();
-        mockHttp.When($"{prefixEval}fail_500").Respond(HttpStatusCode.InternalServerError);
-        mockHttp.When($"{prefixEval}api_key_missing").Respond(HttpStatusCode.BadRequest);
-        mockHttp.When($"{prefixEval}invalid_api_key").Respond(HttpStatusCode.Unauthorized);
-        mockHttp.When($"{prefixEval}flag_not_found").Respond(HttpStatusCode.NotFound);
-        mockHttp.When($"{prefixEval}bool_targeting_match").Respond(mediaType,
-            "{ \"value\":true, \"key\":\"bool_targeting_match\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true }");
-        mockHttp.When($"{prefixEval}disabled").Respond(mediaType,
-            "{ \"value\":false, \"key\":\"disabled\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}disabled_double").Respond(mediaType,
-            "{ \"value\":100.25, \"key\":\"disabled_double\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}disabled_integer").Respond(mediaType,
-            "{ \"value\":100, \"key\":\"disabled_integer\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}disabled_object").Respond(mediaType,
-            "{ \"value\":null, \"key\":\"disabled_object\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}disabled_string").Respond(mediaType,
-            "{ \"value\":\"\", \"key\":\"disabled_string\", \"reason\":\"DISABLED\", \"variant\":\"defaultSdk\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}double_key").Respond(mediaType,
-            "{ \"value\":100.25, \"key\":\"double_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}flag_not_found").Respond(mediaType,
-            "{ \"value\":false, \"key\":\"flag_not_found\", \"reason\":\"FLAG_NOT_FOUND\", \"variant\":\"True\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}integer_key").Respond(mediaType,
-            "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}list_key").Respond(mediaType,
-            "{ \"value\":[\"test\",\"test1\",\"test2\",\"false\",\"test3\"], \"key\":\"list_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}object_key").Respond(mediaType,
-            "{ \"value\":{\"test\":\"test1\",\"test2\":false,\"test3\":123.3,\"test4\":1,\"test5\":null}, \"key\":\"object_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}string_key").Respond(mediaType,
-            "{ \"value\":\"CC0000\", \"key\":\"string_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}unknown_reason").Respond(mediaType,
-            "{ \"value\":\"true\", \"key\":\"unknown_reason\", \"reason\":\"CUSTOM_REASON\", \"variant\":\"True\", \"cacheable\":true}");
-        mockHttp.When($"{prefixEval}does_not_exists").Respond(mediaType,
-            "{ \"value\":\"\", \"key\":\"does_not_exists\", \"errorCode\":\"FLAG_NOT_FOUND\", \"variant\":\"defaultSdk\", \"cacheable\":true, \"errorDetails\":\"flag does_not_exists was not found in your configuration\"}");
-        mockHttp.When($"{prefixEval}integer_with_metadata").Respond(mediaType,
-            "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true, \"metadata\":{\"key1\": \"key1\", \"key2\": 1, \"key3\": 1.345, \"key4\": true}}");
-        return mockHttp;
-    }
 
-    private static EvaluationContext InitDefaultEvaluationCtx()
+    [Collection("In Process Evaluation")]
+    public class InProcessEvaluationTest
     {
-        return EvaluationContext.Builder()
-            .Set("targetingKey", "d45e303a-38c2-11ed-a261-0242ac120002")
-            .Set("email", "john.doe@gofeatureflag.org")
-            .Set("firstname", "john")
-            .Set("lastname", "doe")
-            .Set("anonymous", false)
-            .Set("professional", true)
-            .Set("rate", 3.14)
-            .Set("age", 30)
-            .Set("company_info",
-                new Value(new Structure(new Dictionary<string, Value>
+        [Fact(DisplayName = "Should use in process evaluation by default")]
+        public async Task ShouldUseInProcessByDefault()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
                 {
-                    { "name", new Value("my_company") }, { "size", new Value(120) }
-                })))
-            .Set("labels", new Value(new List<Value> { new("pro"), new("beta") }))
-            .Build();
-    }
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                }
+            );
 
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            await client.GetBooleanDetailsAsync("bool_targeting_match", false, EvaluationContext.Empty);
+            var want = "/v1/flag/configuration";
+            Assert.Equal(want,
+                mockHttp.LastRequest.RequestUri?.AbsolutePath);
+            // await Api.Instance.ShutdownAsync();
+        }
 
-    [Fact]
-    public async Task getMetadata_validate_name()
-    {
-        var goFeatureFlagProvider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        [Fact(DisplayName = "Should use in process evaluation if option is set")]
+        public async Task ShouldUseInProcessIfOptionIsSet()
         {
-            Timeout = new TimeSpan(19 * TimeSpan.TicksPerHour), Endpoint = baseUrl
-        });
-        await Api.Instance.SetProviderAsync(goFeatureFlagProvider);
-        Assert.Equal("GO Feature Flag Provider", Api.Instance.GetProvider().GetMetadata().Name);
-    }
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
 
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var want = "/v1/flag/configuration";
+            Assert.Equal(want,
+                mockHttp.LastRequest.RequestUri?.AbsolutePath);
+            // await Api.Instance.ShutdownAsync();
+        }
 
-    [Fact]
-    private void constructor_options_null()
-    {
-        Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(null));
-    }
+        // [Fact(DisplayName = "Should throw an error if the endpoint is not available")]
+        // public async Task ShouldThrowAnErrorIfEndpointNotAvailable()
+        // {
+        //     var mockHttp = new RelayProxyMock();
+        //     var provider = new GoFeatureFlagProvider(
+        //         new GoFeatureFlagProviderOptions
+        //         {
+        //             Endpoint = "http://localhost:9999", // Unavailable endpoint
+        //             EvaluationType = EvaluationType.InProcess
+        //         }
+        //     );
+        //     await Assert.ThrowsAsync<ImpossibleToRetrieveConfiguration>(async () =>
+        //         await Api.Instance.SetProviderAsync("client_test", provider)
+        //     );
+        // }
 
-    [Fact]
-    private void constructor_options_empty()
-    {
-        Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions()));
-    }
-
-    [Fact]
-    private void constructor_options_empty_endpoint()
-    {
-        Assert.Throws<InvalidOption>(() =>
-            new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions { Endpoint = "" }));
-    }
-
-    [Fact]
-    private void constructor_options_only_timeout()
-    {
-        Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(
-                new GoFeatureFlagProviderOptions { Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond) }
-            )
-        );
-    }
-
-    [Fact]
-    private void constructor_options_valid_endpoint()
-    {
-        var exception = Record.Exception(() =>
-            new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions { Endpoint = baseUrl }));
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public async Task should_throw_an_error_if_endpoint_not_available()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        [Fact(DisplayName = "Should return FLAG_NOT_FOUND if the flag does not exists")]
+        public async Task ShouldReturnFlagNotFoundIfFlagDoesNotExists()
         {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("fail_500", false, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.False(result.Value);
-        Assert.Equal(ErrorType.General, result.ErrorType);
-        Assert.Equal(Reason.Error, result.Reason);
-    }
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
 
-    [Fact]
-    public async Task should_have_bad_request_if_no_token()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("api_key_missing", false, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.False(result.Value);
-        Assert.Equal(Reason.Error, result.Reason);
-        Assert.Equal(ErrorType.General, result.ErrorType);
-    }
-
-    [Fact]
-    public async Task should_have_unauthorized_if_invalid_token()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
-            ApiKey = "ff877c7a-4594-43b5-89a8-df44c9984bd8"
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("invalid_api_key", false, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.False(result.Value);
-        Assert.Equal(Reason.Error, result.Reason);
-        Assert.Equal(ErrorType.General, result.ErrorType);
-    }
-
-    [Fact]
-    public async Task should_throw_an_error_if_flag_does_not_exists()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("flag_not_found", false, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.False(result.Value);
-        Assert.Equal(ErrorType.FlagNotFound, result.ErrorType);
-        Assert.Equal(Reason.Error, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_throw_an_error_if_we_expect_a_boolean_and_got_another_type()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("string_key", false, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.False(result.Value);
-        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
-        Assert.Equal(Reason.Error, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_resolve_a_valid_boolean_flag_with_TARGETING_MATCH_reason()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("bool_targeting_match", false, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.True(result.Value);
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal(Reason.TargetingMatch, result.Reason);
-        Assert.Equal("True", result.Variant);
-    }
-
-    [Fact]
-    public async Task should_return_custom_reason_if_returned_by_relay_proxy()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("unknown_reason", false, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.True(result.Value);
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal("CUSTOM_REASON", result.Reason);
-        Assert.Equal("True", result.Variant);
-    }
-
-    [Fact]
-    public async Task should_use_boolean_default_value_if_the_flag_is_disabled()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("disabled", false, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.False(result.Value);
-        Assert.Equal(Reason.Disabled, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_throw_an_error_if_we_expect_a_string_and_got_another_type()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetStringDetailsAsync("bool_targeting_match", "default", this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal("default", result.Value);
-        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
-        Assert.Equal(Reason.Error, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_resolve_a_valid_string_flag_with_TARGETING_MATCH_reason()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetStringDetailsAsync("string_key", "defaultValue", this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal("CC0000", result.Value);
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal(Reason.TargetingMatch, result.Reason);
-        Assert.Equal("True", result.Variant);
-    }
-
-    [Fact]
-    public async Task should_use_string_default_value_if_the_flag_is_disabled()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetStringDetailsAsync("disabled_string", "defaultValue", this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal("defaultValue", result.Value);
-        Assert.Equal(Reason.Disabled, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_throw_an_error_if_we_expect_a_integer_and_got_another_type()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("string_key", 200, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(200, result.Value);
-        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
-        Assert.Equal(Reason.Error, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_resolve_a_valid_integer_flag_with_TARGETING_MATCH_reason()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("integer_key", 1200, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(100, result.Value);
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal(Reason.TargetingMatch, result.Reason);
-        Assert.Equal("True", result.Variant);
-    }
-
-    [Fact]
-    public async Task should_use_integer_default_value_if_the_flag_is_disabled()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("disabled_integer", 1225, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(1225, result.Value);
-        Assert.Equal(Reason.Disabled, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_throw_an_error_if_we_expect_a_integer_and_double_type()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("double_key", 200, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(200, result.Value);
-        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
-        Assert.Equal(Reason.Error, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_resolve_a_valid_double_flag_with_TARGETING_MATCH_reason()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetDoubleDetailsAsync("double_key", 1200.25, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(100.25, result.Value);
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal(Reason.TargetingMatch, result.Reason);
-        Assert.Equal("True", result.Variant);
-    }
-
-    [Fact]
-    public async Task should_use_double_default_value_if_the_flag_is_disabled()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetDoubleDetailsAsync("disabled_double", 1225.34, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(1225.34, result.Value);
-        Assert.Equal(Reason.Disabled, result.Reason);
-    }
-
-    [Fact]
-    public async Task should_resolve_a_valid_value_flag_with_TARGETING_MATCH_reason()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetObjectDetailsAsync("object_key", null, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        var want = JsonSerializer.Serialize(new Value(new Structure(new Dictionary<string, Value>
-        {
-            { "test", new Value("test1") },
-            { "test2", new Value(false) },
-            { "test3", new Value(123.3) },
-            { "test4", new Value(1) }
-        })));
-        Assert.Equal(want, JsonSerializer.Serialize(result.Value));
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal(Reason.TargetingMatch, result.Reason);
-        Assert.Equal("True", result.Variant);
-    }
-
-    [Fact]
-    public async Task should_wrap_into_value_if_wrong_type()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetObjectDetailsAsync("string_key", null, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(new Value("CC0000").AsString, result.Value.AsString);
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal(Reason.TargetingMatch, result.Reason);
-        Assert.Equal("True", result.Variant);
-    }
-
-    [Fact]
-    public async Task should_use_object_default_value_if_the_flag_is_disabled()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result =
-            await client.GetObjectDetailsAsync("disabled_object", new Value("default"), this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(new Value("default").AsString, result.Value.AsString);
-        Assert.Equal(Reason.Disabled, result.Reason);
-    }
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetBooleanDetailsAsync("DOES_NOT_EXISTS", false, EvaluationContext.Empty);
+            var want = new FlagEvaluationDetails<bool>(
+                "DOES_NOT_EXISTS",
+                false,
+                ErrorType.FlagNotFound,
+                Reason.Error,
+                "",
+                "Flag with key 'DOES_NOT_EXISTS' not found");
+            Assert.Equivalent(want, got);
+            // await Api.Instance.ShutdownAsync();
+        }
 
 
-    [Fact]
-    public async Task should_throw_an_error_if_no_targeting_key()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        [Fact(DisplayName = "Should error if we expect a boolean and got another type")]
+        public async Task ShouldErrorIfWeExpectABooleanAndGotAnotherType()
         {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetStringDetailsAsync("list_key", "empty", EvaluationContext.Empty);
-        Assert.NotNull(result);
-        Assert.Equal("empty", result.Value);
-        Assert.Equal(ErrorType.InvalidContext, result.ErrorType);
-        Assert.Equal(Reason.Error, result.Reason);
-    }
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
 
-    [Fact]
-    public async Task should_resolve_a_valid_value_flag_with_a_list()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetObjectDetailsAsync("list_key", null, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        var want = JsonSerializer.Serialize(new Value(new List<Value>
-        {
-            new("test"),
-            new("test1"),
-            new("test2"),
-            new("false"),
-            new("test3")
-        }));
-        Assert.Equal(want, JsonSerializer.Serialize(result.Value));
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal(Reason.TargetingMatch, result.Reason);
-        Assert.Equal("True", result.Variant);
-    }
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var evaluationContext = EvaluationContext.Builder().SetTargetingKey("d4a4ed17-83ea-4cbb-a608-ac9e498e0a77")
+                .Build();
+            var got = await client.GetBooleanDetailsAsync("string_key", false, evaluationContext);
+            var want = new FlagEvaluationDetails<bool>(
+                "string_key",
+                false,
+                ErrorType.TypeMismatch,
+                Reason.Error,
+                "",
+                "Flag string_key had unexpected type, expected boolean.");
+            Assert.Equivalent(want, got);
+            // await Api.Instance.ShutdownAsync();
+        }
 
-    [Fact]
-    public async Task should_use_object_default_value_if_flag_not_found()
-    {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        [Fact(DisplayName = "Should resolve a valid boolean flag with TARGETING MATCH reason")]
+        public async Task ShouldResolveAValidBooleanFlagWithTargetingMatchReason()
         {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result =
-            await client.GetObjectDetailsAsync("does_not_exists", new Value("default"), this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(new Value("default").AsString, result.Value.AsString);
-        Assert.Equal(Reason.Error, result.Reason);
-        Assert.Equal(ErrorType.FlagNotFound, result.ErrorType);
-        Assert.Equal("flag does_not_exists was not found in your configuration", result.ErrorMessage);
-    }
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
 
-    [Fact]
-    public async Task should_have_default_exporter_metadata_in_context()
-    {
-        string capturedRequestBody = null;
-        var mock = new MockHttpMessageHandler();
-        var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(async request =>
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetBooleanDetailsAsync("bool_targeting_match", false,
+                DefaultEvaluationContext);
+            var want = new FlagEvaluationDetails<bool>(
+                "bool_targeting_match",
+                true,
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "enabled",
+                null,
+                new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", false } }
+                    .ToImmutableMetadata());
+            Assert.Equivalent(want, got);
+            // await Api.Instance.ShutdownAsync();
+        }
+
+        [Fact(DisplayName = "Should resolve a valid string flag with TARGETING MATCH reason")]
+        public async Task ShouldResolveAValidStringFlagWithTargetingMatchReason()
         {
-            capturedRequestBody = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return new HttpResponseMessage
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetStringDetailsAsync("string_key", "",
+                DefaultEvaluationContext);
+            var want = new FlagEvaluationDetails<string>(
+                "string_key",
+                "CC0002",
+                ErrorType.None,
+                Reason.Static,
+                "color1",
+                null,
+                new Dictionary<string, object>
+                    {
+                        { "description", "this is a test flag" }, { "defaultValue", "CC0000" }
+                    }
+                    .ToImmutableMetadata());
+            Assert.Equivalent(want, got);
+            // await Api.Instance.ShutdownAsync();
+        }
+
+        [Fact(DisplayName = "Should resolve a valid double flag with TARGETING MATCH reason")]
+        public async Task ShouldResolveAValidDoubleFlagWithTargetingMatchReason()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetDoubleDetailsAsync("double_key", 100.10,
+                DefaultEvaluationContext);
+            var want = new FlagEvaluationDetails<double>(
+                "double_key",
+                101.25,
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "medium",
+                null,
+                new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", 100.25 } }
+                    .ToImmutableMetadata());
+            Assert.Equivalent(want, got);
+            // await Api.Instance.ShutdownAsync();
+        }
+
+        [Fact(DisplayName = "Should resolve a valid integer flag with TARGETING MATCH reason")]
+        public async Task ShouldResolveAValidIntegerFlagWithTargetingMatchReason()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetIntegerDetailsAsync("integer_key", 1000,
+                DefaultEvaluationContext);
+            var want = new FlagEvaluationDetails<int>(
+                "integer_key",
+                101,
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "medium",
+                null,
+                new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", 1000 } }
+                    .ToImmutableMetadata());
+            Assert.Equivalent(want, got);
+            // await Api.Instance.ShutdownAsync();
+        }
+
+        [Fact(DisplayName = "Should resolve a valid object flag with TARGETING MATCH reason")]
+        public async Task ShouldResolveAValidObjectFlagWithTargetingMatchReason()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetObjectDetailsAsync("object_key", new Value(), DefaultEvaluationContext);
+            var want = new FlagEvaluationDetails<Value>(
+                "object_key",
+                new Value(Structure.Builder()
+                    .Set("test", "false")
+                    .Build()),
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "varB");
+            Assert.Equivalent(want, got);
+            // await Api.Instance.ShutdownAsync();
+        }
+
+        [Fact(DisplayName = "Should use boolean default value if the flag is disabled")]
+        public async Task ShouldUseBooleanDefaultValueIfTheFlagIsDisabled()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetBooleanDetailsAsync("disabled_bool", false, DefaultEvaluationContext);
+            var want = new FlagEvaluationDetails<bool>(
+                "disabled_bool",
+                false,
+                ErrorType.None,
+                Reason.Disabled,
+                "SdkDefault",
+                null,
+                new ImmutableMetadata());
+            Assert.Equivalent(want, got);
+        }
+
+        [Fact(DisplayName = "Should emit configuration change event, if config has changed")]
+        public async Task ShouldEmitConfigurationChangeEventIfConfigHasChanged()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess,
+                    FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
+                }
+            );
+
+
+            await Api.Instance.SetProviderAsync("client_test_handler", provider);
+            var client = Api.Instance.GetClient("client_test_handler");
+            var handlerCalled = false;
+            client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, _ =>
             {
-                Content = new StringContent(
-                    "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}"
-                    , Encoding.UTF8, "application/json")
-            };
-        });
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-        {
-            Endpoint = baseUrl,
-            HttpMessageHandler = mock,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var res = await client.GetObjectDetailsAsync("integer_key", new Value("default"), this._defaultEvaluationCtx);
-        Assert.Equal(1, mock.GetMatchCount(mockedRequest));
-        await Task.Delay(100); // time to wait to be sure body is extracted
-        var want = JObject.Parse(
-            "{\"context\":{\"labels\":[\"pro\",\"beta\"],\"gofeatureflag\":{\"openfeature\":true,\"provider\":\".NET\"},\"age\":30,\"firstname\":\"john\",\"professional\":true,\"company_info\":{\"name\":\"my_company\",\"size\":120},\"lastname\":\"doe\",\"anonymous\":false,\"rate\":3.14,\"email\":\"john.doe@gofeatureflag.org\",\"targetingKey\":\"d45e303a-38c2-11ed-a261-0242ac120002\"}}");
-        var got = JObject.Parse(capturedRequestBody);
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
-    }
+                handlerCalled = true;
+            });
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
+            Assert.True(handlerCalled);
+        }
 
-    [Fact]
-    public async Task should_have_custom_exporter_metadata_in_context()
-    {
-        string capturedRequestBody = null;
-        var mock = new MockHttpMessageHandler();
-        var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(async request =>
+        [Fact(DisplayName = "Should not emit configuration change event, if config has not changed")]
+        public async Task ShouldNotEmitConfigurationChangeEventIfConfigHasNotChanged()
         {
-            capturedRequestBody = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return new HttpResponseMessage
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("SIMPLE_FLAG_CONFIG"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess,
+                    FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test_handler_no_change", provider);
+            var client = Api.Instance.GetClient("client_test_handler_no_change");
+            var handlerCalled = false;
+            client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, _ =>
             {
-                Content = new StringContent(
-                    "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}"
-                    , Encoding.UTF8, "application/json")
-            };
-        });
-        var exporterMetadata = new ExporterMetadata();
-        exporterMetadata.Add("key1", "value1");
-        exporterMetadata.Add("key2", 1.234);
-        exporterMetadata.Add("key3", 10);
-        exporterMetadata.Add("key4", false);
+                handlerCalled = true;
+            });
+            await Task.Delay(TimeSpan.FromMilliseconds(150));
+            Assert.False(handlerCalled);
+        }
 
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        [Fact(DisplayName = "Should change evaluation details if config has changed")]
+        public async Task ShouldChangeEvaluationDetailsIfConfigHasChanged()
         {
-            Endpoint = baseUrl,
-            HttpMessageHandler = mock,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
-            ExporterMetadata = exporterMetadata
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var res = await client.GetObjectDetailsAsync("integer_key", new Value("default"), this._defaultEvaluationCtx);
-        Assert.Equal(1, mock.GetMatchCount(mockedRequest));
-        await Task.Delay(100); // time to wait to be sure body is extracted
-        var want = JObject.Parse(
-            "{\"context\":{\"labels\":[\"pro\",\"beta\"],\"gofeatureflag\":{\"openfeature\":true,\"provider\":\".NET\",\"key1\":\"value1\",\"key2\":1.234,\"key3\":10,\"key4\":false},\"age\":30,\"firstname\":\"john\",\"professional\":true,\"company_info\":{\"name\":\"my_company\",\"size\":120},\"lastname\":\"doe\",\"anonymous\":false,\"rate\":3.14,\"email\":\"john.doe@gofeatureflag.org\",\"targetingKey\":\"d45e303a-38c2-11ed-a261-0242ac120002\"}}");
-        var got = JObject.Parse(capturedRequestBody);
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess,
+                    FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(500)
+                }
+            );
+            await Api.Instance.SetProviderAsync("client_test_handler_2", provider);
+            var client = Api.Instance.GetClient("client_test_handler_2");
+            var handlerCalled = false;
+            client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, _ =>
+            {
+                handlerCalled = true;
+            });
+            var v1 = await client.GetBooleanDetailsAsync("TEST", false, DefaultEvaluationContext);
+            while (!handlerCalled)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
+            }
 
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+            var v2 = await client.GetBooleanDetailsAsync("TEST", false, DefaultEvaluationContext);
+            Assert.NotEqual(JsonSerializer.Serialize(v1), JsonSerializer.Serialize(v2));
+        }
+
+        [Fact(DisplayName = "Should error if flag configuration endpoint return a 404")]
+        public async Task ShouldErrorIfFlagConfigurationEndpointReturnA404()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("404"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var handlerCalled = false;
+            client.AddHandler(ProviderEventTypes.ProviderError, _ =>
+            {
+                handlerCalled = true;
+            });
+            await Task.Delay(50);
+            Assert.True(handlerCalled);
+        }
+
+        [Fact(DisplayName = "Should error if flag configuration endpoint return a 403")]
+        public async Task ShouldErrorIfFlagConfigurationEndpointReturnA403()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("403"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var handlerCalled = false;
+            client.AddHandler(ProviderEventTypes.ProviderError, _ =>
+            {
+                handlerCalled = true;
+            });
+            await Task.Delay(50);
+            Assert.True(handlerCalled);
+        }
+
+        [Fact(DisplayName = "Should error if flag configuration endpoint return a 401")]
+        public async Task ShouldErrorIfFlagConfigurationEndpointReturnA401()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("401"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var handlerCalled = false;
+            client.AddHandler(ProviderEventTypes.ProviderError, _ =>
+            {
+                handlerCalled = true;
+            });
+            await Task.Delay(50);
+            Assert.True(handlerCalled);
+        }
+
+
+        [Fact(DisplayName = "Should ignore configuration if etag is different by last-modified is older")]
+        public async Task ShouldIgnoreConfigurationIfEtagIsDifferentByLastModifiedIsOlder()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG_LAST_MODIFIED_OLDER"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess,
+                    FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test_handler_no_change_lastmodified", provider);
+            var client = Api.Instance.GetClient("client_test_handler_no_change_lastmodified");
+            var handlerCalled = false;
+            client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, _ =>
+            {
+                handlerCalled = true;
+            });
+            await Task.Delay(TimeSpan.FromMilliseconds(150));
+            Assert.False(handlerCalled);
+        }
+
+        [Fact(DisplayName = "Should apply a scheduled rollout step")]
+        public async Task ShouldApplyAScheduledRolloutStep()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("SCHEDULED_ROLLOUT_FLAG_CONFIG"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetBooleanDetailsAsync("my-flag", false, DefaultEvaluationContext);
+            var want = new FlagEvaluationDetails<bool>(
+                "my-flag",
+                true,
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "enabled",
+                null,
+                new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", false } }
+                    .ToImmutableMetadata());
+            Assert.Equivalent(want, got);
+        }
+
+        [Fact(DisplayName = "Should not apply a scheduled rollout step if the date is in the future")]
+        public async Task ShouldNotApplyAScheduledRolloutStepIfTheDateIsInTheFuture()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock("SCHEDULED_ROLLOUT_FLAG_CONFIG"),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+            var got = await client.GetBooleanDetailsAsync("my-flag-scheduled-in-future", false,
+                DefaultEvaluationContext);
+            var want = new FlagEvaluationDetails<bool>(
+                "my-flag-scheduled-in-future",
+                false,
+                ErrorType.None,
+                Reason.Static,
+                "disabled",
+                null,
+                new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", false } }
+                    .ToImmutableMetadata());
+            Assert.Equivalent(want, got);
+        }
     }
 
-    [Fact]
-    public async Task should_resolve_a_flag_with_metadata()
+    [Collection("Constructor")]
+    public class ConstructorTest
     {
-        var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+        [Fact]
+        public void GetMetadata_ValidateName()
         {
-            Endpoint = baseUrl,
-            HttpMessageHandler = this._mockHttp,
-            Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-        });
-        await Api.Instance.SetProviderAsync(g);
-        var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("integer_with_metadata", 1200, this._defaultEvaluationCtx);
-        Assert.NotNull(result);
-        Assert.Equal(100, result.Value);
-        Assert.Equal(ErrorType.None, result.ErrorType);
-        Assert.Equal(Reason.TargetingMatch, result.Reason);
-        Assert.Equal("True", result.Variant);
-        Assert.NotNull(result.FlagMetadata);
-        Assert.Equal("key1", result.FlagMetadata.GetString("key1"));
-        Assert.Equal(1, result.FlagMetadata.GetInt("key2"));
-        Assert.Equal(1.345, result.FlagMetadata.GetDouble("key3"));
-        Assert.True(result.FlagMetadata.GetBool("key4"));
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions { Endpoint = "https://gofeatureflag.org" }
+            );
+            Assert.Equal("GO Feature Flag Provider", provider.GetMetadata()?.Name);
+        }
+
+        [Fact]
+        public void Constructor_Options_Null()
+        {
+            Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(null));
+        }
+
+        [Fact]
+        public void Constructor_Options_Empty()
+        {
+            Assert.Throws<InvalidOption>(() =>
+                new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions())
+            );
+        }
+
+        [Fact]
+        public void Constructor_Options_EmptyEndpoint()
+        {
+            Assert.Throws<InvalidOption>(() =>
+                new GoFeatureFlagProvider(
+                    new GoFeatureFlagProviderOptions { Endpoint = "" }
+                )
+            );
+        }
+
+        [Fact]
+        public void Constructor_Options_OnlyTimeout()
+        {
+            Assert.Throws<InvalidOption>(() =>
+                new GoFeatureFlagProvider(
+                    new GoFeatureFlagProviderOptions { Timeout = TimeSpan.FromMilliseconds(1000) }
+                )
+            );
+        }
+
+        [Fact]
+        public void Constructor_Options_ValidEndpoint()
+        {
+            var exception = Record.Exception(() =>
+                new GoFeatureFlagProvider(
+                    new GoFeatureFlagProviderOptions { Endpoint = "https://gofeatureflag.org" }
+                )
+            );
+            Assert.Null(exception);
+        }
+
+        [Fact(DisplayName = "Should error if invalid FlagChangePollingIntervalMs set")]
+        public void ShouldErrorIfInvalidFlushIntervalIsSet()
+        {
+            var baseUrl = "http://localhost:1031";
+            Assert.Throws<InvalidOption>(() =>
+                new GoFeatureFlagProvider(
+                    new GoFeatureFlagProviderOptions
+                    {
+                        Endpoint = baseUrl, FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000)
+                    }
+                )
+            );
+        }
+
+        [Fact(DisplayName = "Should error if invalid max pending events is set")]
+        public void ShouldErrorIfInvalidMaxPendingEventsIsSet()
+        {
+            var baseUrl = "http://localhost:1031";
+            Assert.Throws<InvalidOption>(() =>
+                new GoFeatureFlagProvider(
+                    new GoFeatureFlagProviderOptions { Endpoint = baseUrl, MaxPendingEvents = -1 }
+                )
+            );
+        }
+    }
+
+    [Collection("Tracking")]
+    public class TrackingTest
+    {
+        [Fact(DisplayName = "Should commit events if max pending events is reached")]
+        public async Task ShouldCallMultipleTimeTheDataCollectorIfMaxPendingEventsIsReached()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess,
+                    FlushIntervalMs = TimeSpan.FromMilliseconds(10000),
+                    MaxPendingEvents = 1
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+
+            client.Track("my-key", DefaultEvaluationContext,
+                TrackingEventDetails.Builder().Set("revenue", 123).Set("user_id", "123ABC").Build());
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
+            var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
+            var want =
+                "{ \"meta\": {},\"events\": [  {    \"kind\": \"tracking\",    \"evaluationContext\": {      \"email\": \"john.doe@gofeatureflag.org\",      \"labels\": [        \"pro\",        \"beta\"      ],      \"rate\": 3.14,      \"company_info\": {        \"size\": 120,        \"name\": \"my_company\"      },      \"anonymous\": false,      \"targetingKey\": \"d45e303a-38c2-11ed-a261-0242ac120002\",      \"professional\": true,      \"firstname\": \"john\",      \"lastname\": \"doe\",      \"age\": 30    },    \"trackingEventDetails\": {      \"revenue\": 123,      \"user_id\": \"123ABC\"    },    \"creationDate\": 1750679098,    \"contextKind\": \"user\",    \"key\": \"my-key\",    \"userKey\": \"d45e303a-38c2-11ed-a261-0242ac120002\"  }]\n}";
+            var gotJson = JObject.Parse(got);
+            Assert.NotNull(gotJson["events"].First);
+        }
+
+        [Fact(DisplayName = "Should send the evaluation information to the data collector")]
+        public async Task ShouldSendTrackingEventToTheDataCollector()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.InProcess,
+                    FlushIntervalMs = TimeSpan.FromMilliseconds(100)
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var client = Api.Instance.GetClient("client_test");
+
+            client.Track("my-key", DefaultEvaluationContext,
+                TrackingEventDetails.Builder().Set("revenue", 123).Set("user_id", "123ABC").Build());
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
+            var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
+            var gotJson = JObject.Parse(got);
+            Assert.Equal(1, gotJson["events"].Count());
+        }
+    }
+
+    [Collection("DataCollectorHook")]
+    public class DataCollectorHook
+    {
+        [Fact(DisplayName = "Should commit events if max pending events is reached")]
+        public async Task ShouldCommitEventsIfMaxPendingEventsIsReached()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+            {
+                Endpoint = RelayProxyMock.baseUrl,
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                EvaluationType = EvaluationType.InProcess,
+                MaxPendingEvents = 1
+            });
+
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
+            var gotJson = JObject.Parse(got);
+            Assert.Equal(1, gotJson["events"].Count());
+        }
+
+        public async Task ShouldCallMultipleTimeTheDataCollectorIfMaxPendingEventsIsReached()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+            {
+                Endpoint = RelayProxyMock.baseUrl,
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                EvaluationType = EvaluationType.InProcess,
+                MaxPendingEvents = 2
+            });
+
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
+            await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
+            var gotJson = JObject.Parse(got);
+            Assert.Equal(2, gotJson["events"].Count());
+        }
+    }
+
+    // [Collection("EnrichEvaluationContextHook")]
+    // public class EnrichEvaluationContextHook
+    // {
+    //     [Fact(DisplayName = "Should not add gofeatureflag key in exporterMetadata if the exporterMetadata is empty")]
+    //     public async Task ShouldNotAddGofeatureflagKeyInExporterMetadataIfTheExporterMetadataIsEmpty()
+    //     {
+    //         var mockHttp = new RelayProxyMock();
+    //         var provider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
+    //         {
+    //             Endpoint = RelayProxyMock.baseUrl,
+    //             HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+    //             EvaluationType = EvaluationType.Remote
+    //         });
+    //
+    //         await Api.Instance.SetProviderAsync("test-client", provider);
+    //         var client = Api.Instance.GetClient("test-client");
+    //         await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
+    //
+    //         var body = await mockHttp.LastRequest.Content.ReadAsStringAsync();
+    //
+    //         var want = @"{
+    //         ""context"": {
+    //             ""targetingKey"": ""d45e303a-38c2-11ed-a261-0242ac120002"",
+    //             ""rate"": 3.14,
+    //             ""company_info"": { ""size"": 120, ""name"": ""my_company"" },
+    //             ""anonymous"": false,
+    //             ""email"": ""john.doe@gofeatureflag.org"",
+    //             ""lastname"": ""doe"",
+    //             ""firstname"": ""john"",
+    //             ""age"": 30,
+    //             ""professional"": true,
+    //             ""labels"": [""pro"", ""beta""]
+    //         }
+    //     }";
+    //
+    //         AssertUtil.JsonEqual(want, body);
+    //     }
+    // }
+
+    [Collection("Remote Evaluation")]
+    public class RemoteEvaluationTest
+    {
+        [Fact(DisplayName = "Should error if the endpoint is not available")]
+        public async Task ShouldErrorIfEndpointNotAvailable()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = "",
+                    EvaluationType = EvaluationType.Remote
+                }
+            );
+
+            await Api.Instance.SetProviderAsync("client_test", provider);
+            var handlerCalled = false;
+            Api.Instance.AddHandler(ProviderEventTypes.ProviderError, _ =>
+            {
+                handlerCalled = true;
+            });
+            await Task.Delay(100);
+            Assert.True(handlerCalled, "ProviderError event should be called when the endpoint is not available");
+        }
+
+        [Fact(DisplayName = "XXX")]
+        public async Task SXXX()
+        {
+        }
+        // @DisplayName("Should error if the endpoint is not available")
+        // @SneakyThrows
+        // @Test
+        // void shouldErrorIfEndpointNotAvailable() {
+        //     try (val s = new MockWebServer()) {
+        //         val goffAPIMock = new GoffApiMock(GoffApiMock.MockMode.ENDPOINT_ERROR);
+        //         s.setDispatcher(goffAPIMock.dispatcher);
+        //         GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //                 .endpoint(s.url("").toString())
+        //                 .evaluationType(EvaluationType.REMOTE)
+        //                 .timeout(1000)
+        //                 .build());
+        //         OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //         val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //         val got = client.getBooleanDetails("bool_flag", false, TestUtils.defaultEvaluationContext);
+        //         val want = FlagEvaluationDetails.<Boolean>builder()
+        //                 .value(false)
+        //                 .flagKey("bool_flag")
+        //                 .reason(Reason.ERROR.name())
+        //                 .errorCode(ErrorCode.GENERAL)
+        //                 .errorMessage("Unknown error while retrieving flag ")
+        //                 .build();
+        //         assertEquals(want, got);
+        //     }
+        // }
+        //
+        // @DisplayName("Should error if no API Key provided")
+        // @SneakyThrows
+        // @Test
+        // void shouldErrorIfApiKeyIsMissing() {
+        //     try (val s = new MockWebServer()) {
+        //         val goffAPIMock = new GoffApiMock(GoffApiMock.MockMode.API_KEY_MISSING);
+        //         s.setDispatcher(goffAPIMock.dispatcher);
+        //         GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //                 .endpoint(s.url("").toString())
+        //                 .evaluationType(EvaluationType.REMOTE)
+        //                 .timeout(1000)
+        //                 .build());
+        //         OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //         val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //         val got = client.getBooleanDetails("bool_flag", false, TestUtils.defaultEvaluationContext);
+        //         val want = FlagEvaluationDetails.<Boolean>builder()
+        //                 .value(false)
+        //                 .flagKey("bool_flag")
+        //                 .reason(Reason.ERROR.name())
+        //                 .errorCode(ErrorCode.GENERAL)
+        //                 .errorMessage("authentication/authorization error")
+        //                 .build();
+        //         assertEquals(want, got);
+        //     }
+        // }
+        //
+        // @DisplayName("Should error if API Key is invalid")
+        // @SneakyThrows
+        // @Test
+        // void shouldErrorIfApiKeyIsInvalid() {
+        //     try (val s = new MockWebServer()) {
+        //         val goffAPIMock = new GoffApiMock(GoffApiMock.MockMode.INVALID_API_KEY);
+        //         s.setDispatcher(goffAPIMock.dispatcher);
+        //         GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //                 .endpoint(s.url("").toString())
+        //                 .evaluationType(EvaluationType.REMOTE)
+        //                 .apiKey("invalid")
+        //                 .timeout(1000)
+        //                 .build());
+        //         OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //         val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //         val got = client.getBooleanDetails("bool_flag", false, TestUtils.defaultEvaluationContext);
+        //         val want = FlagEvaluationDetails.<Boolean>builder()
+        //                 .value(false)
+        //                 .flagKey("bool_flag")
+        //                 .reason(Reason.ERROR.name())
+        //                 .errorCode(ErrorCode.GENERAL)
+        //                 .errorMessage("authentication/authorization error")
+        //                 .build();
+        //         assertEquals(want, got);
+        //     }
+        // }
+        //
+        // @DisplayName("Should error if the flag is not found")
+        // @SneakyThrows
+        // @Test
+        // void shouldErrorIfFlagNotFound() {
+        //     GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //             .endpoint(baseUrl.toString())
+        //             .evaluationType(EvaluationType.REMOTE)
+        //             .build());
+        //     OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //     val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //     val got = client.getBooleanDetails("does-not-exists", false, TestUtils.defaultEvaluationContext);
+        //     val want = FlagEvaluationDetails.<Boolean>builder()
+        //             .value(false)
+        //             .flagKey("does-not-exists")
+        //             .reason(Reason.ERROR.name())
+        //             .errorCode(ErrorCode.FLAG_NOT_FOUND)
+        //             .errorMessage("Flag does-not-exists not found")
+        //             .build();
+        //     assertEquals(want, got);
+        // }
+        //
+        // @DisplayName("Should error if evaluating the wrong type")
+        // @SneakyThrows
+        // @Test
+        // void shouldErrorIfEvaluatingTheWrongType() {
+        //     GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //             .endpoint(baseUrl.toString())
+        //             .evaluationType(EvaluationType.REMOTE)
+        //             .build());
+        //     OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //     val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //     val got = client.getStringDetails("bool_flag", "default", TestUtils.defaultEvaluationContext);
+        //     val want = FlagEvaluationDetails.<String>builder()
+        //             .value("default")
+        //             .flagKey("bool_flag")
+        //             .reason(Reason.ERROR.name())
+        //             .errorMessage(
+        //                     "Flag value bool_flag had unexpected type class java.lang.Boolean, expected class java.lang.String.")
+        //             .errorCode(ErrorCode.TYPE_MISMATCH)
+        //             .build();
+        //     assertEquals(want, got);
+        // }
+        //
+        // @DisplayName("Should resolve a valid boolean flag")
+        // @SneakyThrows
+        // @Test
+        // void shouldResolveAValidBooleanFlag() {
+        //     GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //             .endpoint(baseUrl.toString())
+        //             .evaluationType(EvaluationType.REMOTE)
+        //             .build());
+        //     OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //     val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //     val got = client.getBooleanDetails("bool_flag", false, TestUtils.defaultEvaluationContext);
+        //     val want = FlagEvaluationDetails.<Boolean>builder()
+        //             .value(true)
+        //             .variant("enabled")
+        //             .flagKey("bool_flag")
+        //             .reason(Reason.TARGETING_MATCH.name())
+        //             .flagMetadata(ImmutableMetadata.builder()
+        //                     .addString("description", "A flag that is always off")
+        //                     .build())
+        //             .build();
+        //     assertEquals(want, got);
+        // }
+        //
+        // @DisplayName("Should resolve a valid string flag")
+        // @SneakyThrows
+        // @Test
+        // void shouldResolveAValidStringFlag() {
+        //     GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //             .endpoint(baseUrl.toString())
+        //             .evaluationType(EvaluationType.REMOTE)
+        //             .build());
+        //     OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //     val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //     val got = client.getStringDetails("string_flag", "false", TestUtils.defaultEvaluationContext);
+        //     val want = FlagEvaluationDetails.<String>builder()
+        //             .value("string value")
+        //             .variant("variantA")
+        //             .flagKey("string_flag")
+        //             .reason(Reason.TARGETING_MATCH.name())
+        //             .flagMetadata(ImmutableMetadata.builder()
+        //                     .addString("description", "A flag that is always off")
+        //                     .build())
+        //             .build();
+        //     assertEquals(want, got);
+        // }
+        //
+        // @DisplayName("Should resolve a valid int flag")
+        // @SneakyThrows
+        // @Test
+        // void shouldResolveAValidIntFlag() {
+        //     GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //             .endpoint(baseUrl.toString())
+        //             .evaluationType(EvaluationType.REMOTE)
+        //             .build());
+        //     OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //     val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //     val got = client.getIntegerDetails("int_flag", 0, TestUtils.defaultEvaluationContext);
+        //     val want = FlagEvaluationDetails.<Integer>builder()
+        //             .value(100)
+        //             .variant("variantA")
+        //             .flagKey("int_flag")
+        //             .reason(Reason.TARGETING_MATCH.name())
+        //             .flagMetadata(ImmutableMetadata.builder()
+        //                     .addString("description", "A flag that is always off")
+        //                     .build())
+        //             .build();
+        //     assertEquals(want, got);
+        // }
+        //
+        // @DisplayName("Should resolve a valid double flag")
+        // @SneakyThrows
+        // @Test
+        // void shouldResolveAValidDoubleFlag() {
+        //     GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //             .endpoint(baseUrl.toString())
+        //             .evaluationType(EvaluationType.REMOTE)
+        //             .build());
+        //     OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //     val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //     val got = client.getDoubleDetails("double_flag", 0.0, TestUtils.defaultEvaluationContext);
+        //     val want = FlagEvaluationDetails.<Double>builder()
+        //             .value(100.11)
+        //             .variant("variantA")
+        //             .flagKey("double_flag")
+        //             .reason(Reason.TARGETING_MATCH.name())
+        //             .flagMetadata(ImmutableMetadata.builder()
+        //                     .addString("description", "A flag that is always off")
+        //                     .build())
+        //             .build();
+        //     assertEquals(want, got);
+        // }
+        //
+        // @DisplayName("Should resolve a valid object flag")
+        // @SneakyThrows
+        // @Test
+        // void shouldResolveAValidObjectFlag() {
+        //     GoFeatureFlagProvider provider = new GoFeatureFlagProvider(GoFeatureFlagProviderOptions.builder()
+        //             .endpoint(baseUrl.toString())
+        //             .evaluationType(EvaluationType.REMOTE)
+        //             .build());
+        //     OpenFeatureAPI.getInstance().setProviderAndWait(testName, provider);
+        //     val client = OpenFeatureAPI.getInstance().getClient(testName);
+        //     val got = client.getObjectDetails("object_flag", new Value("default"), TestUtils.defaultEvaluationContext);
+        //
+        //     val want = FlagEvaluationDetails.<Value>builder()
+        //             .value(new Value(new MutableStructure().add("name", "foo").add("age", 100)))
+        //             .variant("variantA")
+        //             .flagKey("object_flag")
+        //             .reason(Reason.TARGETING_MATCH.name())
+        //             .flagMetadata(ImmutableMetadata.builder()
+        //                     .addString("description", "A flag that is always off")
+        //                     .build())
+        //             .build();
+        //     assertEquals(want, got);
+        // }
     }
 }

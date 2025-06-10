@@ -49,8 +49,7 @@ public class GoFeatureFlagProvider : FeatureProvider
     {
         ValidateInputOptions(options);
         var api = new GoFeatureFlagApi(options);
-        var evaluator = new InProcessEvaluator(
-            api, options, this.EventChannel, this._providerMetadata);
+        var evaluator = this.GetEvaluator(options, api);
         this._evaluationService = new EvaluationService(evaluator);
         this._eventPublisher = new EventPublisher(api, options);
         this._options = options;
@@ -62,6 +61,23 @@ public class GoFeatureFlagProvider : FeatureProvider
     public override Metadata GetMetadata()
     {
         return this._providerMetadata;
+    }
+
+    /// <summary>
+    ///     GetEvaluator is used to get the evaluator based on the evaluation type specified in the options.
+    /// </summary>
+    /// <param name="options">Provider options.</param>
+    /// <param name="api">API layer to access the relay proxy.</param>
+    /// <returns></returns>
+    private IEvaluator GetEvaluator(GoFeatureFlagProviderOptions options, GoFeatureFlagApi api)
+    {
+        if (options.EvaluationType == EvaluationType.Remote)
+        {
+            return new RemoteEvaluator(options);
+        }
+
+        return new InProcessEvaluator(
+            api, options, this.EventChannel, this._providerMetadata);
     }
 
     /// <summary>
@@ -185,6 +201,13 @@ public class GoFeatureFlagProvider : FeatureProvider
             .ConfigureAwait(false);
     }
 
+    /// <summary>
+    ///     Track a user action or application state, usually representing a business objective or outcome. The implementation
+    ///     of this method is optional.
+    /// </summary>
+    /// <param name="trackingEventName">The name associated with this tracking event</param>
+    /// <param name="evaluationContext">The evaluation context used in the evaluation of the flag (optional)</param>
+    /// <param name="trackingEventDetails">Data pertinent to the tracking event (Optional)</param>
     public override void Track(string trackingEventName, EvaluationContext? evaluationContext = default,
         TrackingEventDetails? trackingEventDetails = default)
     {

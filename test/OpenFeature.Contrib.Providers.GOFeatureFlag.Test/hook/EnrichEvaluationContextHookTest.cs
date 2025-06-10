@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.hooks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.hooks;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 using OpenFeature.Model;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.v2.hook;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.hook;
 
 public class EnrichEvaluationContextHookTest
 {
