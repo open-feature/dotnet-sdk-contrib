@@ -71,6 +71,7 @@ internal sealed partial class OfrepClient : IOfrepClient
             BaseAddress = new Uri(configuration.BaseUrl),
             Timeout = configuration.Timeout
         };
+
         if (configuration.Headers != null)
         {
             foreach (var header in configuration.Headers)
@@ -307,37 +308,37 @@ internal sealed partial class OfrepClient : IOfrepClient
 
     // Define high-performance logging delegates using source generators
     [LoggerMessage(
-        EventId = 1000,
+        EventId = 1,
         Level = LogLevel.Error,
         Message = "Received null response body from server for flag {FlagKey}")]
     partial void LogNullResponse(string flagKey);
 
     [LoggerMessage(
-        EventId = 1001,
+        EventId = 2,
         Level = LogLevel.Error,
         Message = "HTTP request failed for flag {FlagKey}: {Message}")]
     partial void LogHttpRequestFailed(string flagKey, string message, Exception ex);
 
     [LoggerMessage(
-        EventId = 1002,
+        EventId = 3,
         Level = LogLevel.Error,
         Message = "Failed to parse JSON response for flag {FlagKey}: {Message}")]
     partial void LogJsonParseError(string flagKey, string message, Exception ex);
 
     [LoggerMessage(
-        EventId = 1003,
+        EventId = 4,
         Level = LogLevel.Warning,
         Message = "Request cancelled for flag {FlagKey}")]
     partial void LogRequestCancelled(string flagKey, Exception ex);
 
     [LoggerMessage(
-        EventId = 1004,
+        EventId = 5,
         Level = LogLevel.Error,
         Message = "Request timed out for flag {FlagKey}: {Message}")]
     partial void LogRequestTimeout(string flagKey, string message, Exception ex);
 
     [LoggerMessage(
-        EventId = 1005,
+        EventId = 6,
         Level = LogLevel.Error,
         Message = "Operation error for flag {FlagKey}: {Message}")]
     partial void LogOperationError(string flagKey, string message, Exception ex);
