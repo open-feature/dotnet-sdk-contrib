@@ -274,10 +274,16 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// </summary>
     private static HttpRequestMessage CreateEvaluationRequest(string flagKey, EvaluationContext? context)
     {
-        string path = $"{OfrepPaths.Evaluate}{Uri.EscapeDataString(flagKey)}";
+        // Ensure proper URL encoding by explicitly encoding the flag key
+        var encodedFlagKey = Uri.EscapeDataString(flagKey);
+        string path = $"{OfrepPaths.Evaluate}{encodedFlagKey}";
+        
         var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
-        var request = new HttpRequestMessage(HttpMethod.Post, path)
+        
+        var request = new HttpRequestMessage()
         {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(path, UriKind.Relative),
             Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
         };
 
