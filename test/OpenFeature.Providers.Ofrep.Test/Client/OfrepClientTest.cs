@@ -279,10 +279,14 @@ public class OfrepClientTest : IDisposable
 
         // Verify the context was included in the request body
         var requestContent = await request.Content!.ReadAsStringAsync();
-        Assert.Contains("user123", requestContent);
-        Assert.Contains("production", requestContent);
-        Assert.Contains("userId", requestContent);
-        Assert.Contains("environment", requestContent);
+        var requestBody = JsonSerializer.Deserialize<JsonElement>(requestContent);
+
+        // Verify the request has the expected structure with context
+        Assert.True(requestBody.TryGetProperty("context", out var contextElement));
+        Assert.True(contextElement.TryGetProperty("userId", out var userIdElement));
+        Assert.Equal("user123", userIdElement.GetString());
+        Assert.True(contextElement.TryGetProperty("environment", out var environmentElement));
+        Assert.Equal("production", environmentElement.GetString());
     }
 
     [Fact]
@@ -1295,7 +1299,13 @@ public class OfrepClientTest : IDisposable
 
         // Verify the unicode characters were properly URL encoded
         var request = this._mockHandler.Requests[0];
-        Assert.Contains("ofrep/v1/evaluate/flags/", request.RequestUri?.ToString());
+        var requestUri = request.RequestUri?.ToString();
+        Assert.Contains("ofrep/v1/evaluate/flags/", requestUri);
+
+        // Verify the URI contains the URL-encoded unicode characters
+        var encodedFlagKey = Uri.EscapeDataString(flagKey);
+        var originalString = request.RequestUri?.OriginalString;
+        Assert.Contains(encodedFlagKey, originalString);
     }
 
     [Fact]
@@ -1402,27 +1412,6 @@ public class OfrepClientTest : IDisposable
     #endregion
 
     #region Network Resilience Tests
-
-    [Fact]
-    public async Task EvaluateFlag_WithSlowResponse_ShouldReturnSuccessfully()
-    {
-        // Arrange
-        const string flagKey = "slow-response-flag";
-        const bool defaultValue = false;
-        var expectedResponse = new OfrepResponse<bool>(flagKey, true);
-
-        this._mockHandler.SetupResponse(HttpStatusCode.OK,
-            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
-
-        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
-
-        // Act
-        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.True(result.Value);
-    }
 
     [Fact]
     public async Task EvaluateFlag_WithSocketException_ShouldReturnGeneralError()
