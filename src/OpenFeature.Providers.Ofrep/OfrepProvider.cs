@@ -23,14 +23,10 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     /// <param name="configuration">The OFREP provider configuration.</param>
     public OfrepProvider(OfrepOptions configuration)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(configuration);
-#else
         if (configuration == null)
         {
             throw new ArgumentNullException(nameof(configuration));
         }
-#endif
 
         this._client = new OfrepClient(configuration);
     }
@@ -98,14 +94,10 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             CancellationToken cancellationToken = default)
 
     {
-#if NET8_0_OR_GREATER
-        ArgumentException.ThrowIfNullOrWhiteSpace(flagKey);
-#else
         if (flagKey == null)
         {
             throw new ArgumentNullException(nameof(flagKey));
         }
-#endif
 
         var response =
             await this._client.EvaluateFlag(flagKey, defaultValue.AsObject,
@@ -137,14 +129,11 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         EvaluationContext? context,
         CancellationToken cancellationToken)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(flagKey);
-#else
         if (flagKey == null)
         {
             throw new ArgumentNullException(nameof(flagKey));
         }
-#endif
+
         var response = await this._client.EvaluateFlag(flagKey, defaultValue,
             context, cancellationToken).ConfigureAwait(false);
 
