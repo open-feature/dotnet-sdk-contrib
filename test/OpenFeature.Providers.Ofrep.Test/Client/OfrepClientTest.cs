@@ -425,13 +425,13 @@ public class OfrepClientTest : IDisposable
         Assert.Single(this._mockHandler.Requests);
         var request = this._mockHandler.Requests[0];
         var requestUri = request.RequestUri?.ToString();
-        
+
         // Also check the raw AbsolutePath and OriginalString to see if encoding is preserved anywhere
         var absolutePath = request.RequestUri?.AbsolutePath ?? "";
         var originalString = request.RequestUri?.OriginalString ?? "";
-        
+
         Assert.Contains("ofrep/v1/evaluate/flags/", requestUri);
-        
+
         // Try checking different URI properties for encoded content
         if (originalString.Contains(expectedEncodedKey))
         {
