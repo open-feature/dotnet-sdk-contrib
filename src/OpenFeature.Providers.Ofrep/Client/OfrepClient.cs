@@ -277,9 +277,9 @@ internal sealed partial class OfrepClient : IOfrepClient
         // Ensure proper URL encoding by explicitly encoding the flag key
         var encodedFlagKey = Uri.EscapeDataString(flagKey);
         string path = $"{OfrepPaths.Evaluate}{encodedFlagKey}";
-        
+
         var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
-        
+
         var request = new HttpRequestMessage()
         {
             Method = HttpMethod.Post,
