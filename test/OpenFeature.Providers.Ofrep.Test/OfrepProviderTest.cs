@@ -261,7 +261,8 @@ public class OfrepProviderTest : IDisposable
 
         var errorResponse = new OfrepResponse<bool>(flagKey, defaultValue)
         {
-            ErrorCode = ErrorCodes.FlagNotFound, ErrorMessage = "Flag not found"
+            ErrorCode = ErrorCodes.FlagNotFound,
+            ErrorMessage = "Flag not found"
         };
 
         this._mockClient
@@ -295,7 +296,8 @@ public class OfrepProviderTest : IDisposable
 
         var errorResponse = new OfrepResponse<string>(flagKey, defaultValue)
         {
-            ErrorCode = errorCode, ErrorMessage = "Test error"
+            ErrorCode = errorCode,
+            ErrorMessage = "Test error"
         };
 
         this._mockClient
