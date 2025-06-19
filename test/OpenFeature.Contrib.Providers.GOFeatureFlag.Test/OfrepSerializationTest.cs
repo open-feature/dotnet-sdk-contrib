@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.converters;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.models;
 using OpenFeature.Model;
 using Xunit;
 
@@ -24,7 +25,8 @@ public class OfrepSerializationTest
 
         var ofrepReq = new OfrepRequest(ctx);
 
-        var want = JObject.Parse("{\"context\":{\"firstname\":\"john\",\"email\":\"john.doe@gofeatureflag.org\",\"lastname\":\"doe\",\"targetingKey\":\"1d1b9238-2591-4a47-94cf-d2bc080892f1\",\"admin\":true,\"anonymous\":false}}");
+        var want = JObject.Parse(
+            "{\"context\":{\"firstname\":\"john\",\"email\":\"john.doe@gofeatureflag.org\",\"lastname\":\"doe\",\"targetingKey\":\"1d1b9238-2591-4a47-94cf-d2bc080892f1\",\"admin\":true,\"anonymous\":false}}");
         var got = JObject.Parse(ofrepReq.AsJsonString());
         Assert.True(JToken.DeepEquals(want, got), "unexpected json");
     }
@@ -49,7 +51,8 @@ public class OfrepSerializationTest
 
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
         var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse("{\"context\":{\"location\":\"somewhere\",\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
+        var want = JObject.Parse(
+            "{\"context\":{\"location\":\"somewhere\",\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
         Assert.True(JToken.DeepEquals(want, got), "unexpected json");
     }
 
@@ -62,7 +65,8 @@ public class OfrepSerializationTest
             .Build();
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
         var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse("{\"context\":{\"age\":23,\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
+        var want = JObject.Parse(
+            "{\"context\":{\"age\":23,\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
         Assert.True(JToken.DeepEquals(want, got), "unexpected json");
     }
 
@@ -71,8 +75,7 @@ public class OfrepSerializationTest
     {
         var testStructure = new Structure(new Dictionary<string, Value>
         {
-            { "config1", new Value("value1") },
-            { "config2", new Value("value2") }
+            { "config1", new Value("value1") }, { "config2", new Value("value2") }
         });
 
         var evaluationContext = EvaluationContext.Builder()
@@ -81,7 +84,8 @@ public class OfrepSerializationTest
             .Build();
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
         var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse("{\"context\":{\"config\":{\"config1\":\"value1\", \"config2\":\"value2\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
+        var want = JObject.Parse(
+            "{\"context\":{\"config\":{\"config1\":\"value1\", \"config2\":\"value2\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
         Assert.True(JToken.DeepEquals(want, got), "unexpected json");
     }
 
@@ -91,9 +95,7 @@ public class OfrepSerializationTest
         var dateTime = new DateTime(2025, 9, 1);
         var testStructure = new Structure(new Dictionary<string, Value>
         {
-            { "config1", new Value(1) },
-            { "config2", new Value("value2") },
-            { "config3", new Value(dateTime) }
+            { "config1", new Value(1) }, { "config2", new Value("value2") }, { "config3", new Value(dateTime) }
         });
 
         var evaluationContext = EvaluationContext.Builder()
@@ -103,7 +105,8 @@ public class OfrepSerializationTest
 
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
         var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse("{\"context\":{\"config\":{\"config3\":\"2025-09-01T00:00:00\",\"config2\":\"value2\",\"config1\":1},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
+        var want = JObject.Parse(
+            "{\"context\":{\"config\":{\"config3\":\"2025-09-01T00:00:00\",\"config2\":\"value2\",\"config1\":1},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
         Assert.True(JToken.DeepEquals(want, got), "unexpected json");
     }
 
@@ -127,7 +130,8 @@ public class OfrepSerializationTest
 
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
         var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse("{\"context\":{\"config\":{\"config2\":[[\"element1-1\",\"element1-2\"],\"element2\",\"element3\"],\"config3\":\"2025-09-01T00:00:00\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
+        var want = JObject.Parse(
+            "{\"context\":{\"config\":{\"config2\":[[\"element1-1\",\"element1-2\"],\"element2\",\"element3\"],\"config3\":\"2025-09-01T00:00:00\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
         Assert.True(JToken.DeepEquals(want, got), "unexpected json");
     }
 
@@ -137,10 +141,8 @@ public class OfrepSerializationTest
         var testStructure = new Structure(new Dictionary<string, Value>
         {
             {
-                "config-value-struct", new Value(new Structure(new Dictionary<string, Value>
-                {
-                    { "nested1", new Value(1) }
-                }))
+                "config-value-struct",
+                new Value(new Structure(new Dictionary<string, Value> { { "nested1", new Value(1) } }))
             },
             { "config-value-value", new Value(new Value(new DateTime(2025, 9, 1))) }
         });
@@ -151,7 +153,8 @@ public class OfrepSerializationTest
             .Build();
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
         var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse("{\"context\":{\"config\":{\"config-value-struct\":{\"nested1\":1},\"config-value-value\":\"2025-09-01T00:00:00\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
+        var want = JObject.Parse(
+            "{\"context\":{\"config\":{\"config-value-struct\":{\"nested1\":1},\"config-value-value\":\"2025-09-01T00:00:00\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
         Assert.True(JToken.DeepEquals(want, got), "unexpected json");
     }
 }
