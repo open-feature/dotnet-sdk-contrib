@@ -68,7 +68,8 @@ internal sealed partial class OfrepClient : IOfrepClient
         this._logger = logger ?? NullLogger<OfrepClient>.Instance;
         this._httpClient = new HttpClient(handler, disposeHandler: true)
         {
-            BaseAddress = new Uri(configuration.BaseUrl), Timeout = configuration.Timeout
+            BaseAddress = new Uri(configuration.BaseUrl),
+            Timeout = configuration.Timeout
         };
 
         if (configuration.Headers != null)
@@ -97,7 +98,9 @@ internal sealed partial class OfrepClient : IOfrepClient
         {
             return new OfrepResponse<T>(flagKey, defaultValue)
             {
-                ErrorCode = ErrorCodes.GeneralError, Reason = Reason.Error, ErrorMessage = "Rate limit exceeded."
+                ErrorCode = ErrorCodes.GeneralError,
+                Reason = Reason.Error,
+                ErrorMessage = "Rate limit exceeded."
             };
         }
 
@@ -183,7 +186,9 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         return new OfrepResponse<T>(key, defaultValue)
         {
-            ErrorCode = ErrorCodes.GeneralError, Reason = Reason.Error, ErrorMessage = "Rate limit exceeded."
+            ErrorCode = ErrorCodes.GeneralError,
+            Reason = Reason.Error,
+            ErrorMessage = "Rate limit exceeded."
         };
     }
 
@@ -191,7 +196,9 @@ internal sealed partial class OfrepClient : IOfrepClient
     {
         return new OfrepResponse<T>(key, defaultValue)
         {
-            ErrorCode = ErrorCodes.FlagNotFound, Reason = Reason.Error, ErrorMessage = "Flag not found."
+            ErrorCode = ErrorCodes.FlagNotFound,
+            Reason = Reason.Error,
+            ErrorMessage = "Flag not found."
         };
     }
 
@@ -216,7 +223,8 @@ internal sealed partial class OfrepClient : IOfrepClient
             this.LogNullResponse(flagKey);
             return new OfrepResponse<T>(flagKey, defaultValue)
             {
-                ErrorCode = ErrorCodes.ParseError, ErrorMessage = "Received null or empty response from server."
+                ErrorCode = ErrorCodes.ParseError,
+                ErrorMessage = "Received null or empty response from server."
             };
         }
 
@@ -233,7 +241,8 @@ internal sealed partial class OfrepClient : IOfrepClient
             this.LogNullResponse(flagKey);
             return new OfrepResponse<T>(flagKey, defaultValue)
             {
-                ErrorCode = ErrorCodes.ParseError, ErrorMessage = "Received null or empty response from server."
+                ErrorCode = ErrorCodes.ParseError,
+                ErrorMessage = "Received null or empty response from server."
             };
         }
 
@@ -282,7 +291,9 @@ internal sealed partial class OfrepClient : IOfrepClient
     {
         return new OfrepResponse<T>(key, defaultValue)
         {
-            ErrorCode = ErrorCodes.GeneralError, Reason = Reason.Error, ErrorMessage = ex.Message
+            ErrorCode = ErrorCodes.GeneralError,
+            Reason = Reason.Error,
+            ErrorMessage = ex.Message
         };
     }
 
@@ -290,7 +301,8 @@ internal sealed partial class OfrepClient : IOfrepClient
     {
         return new HttpClientHandler
         {
-            UseProxy = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            UseProxy = true,
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
         };
     }
 

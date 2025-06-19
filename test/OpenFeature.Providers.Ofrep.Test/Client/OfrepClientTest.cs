@@ -484,7 +484,8 @@ public class OfrepClientTest : IDisposable
 
         var expectedResponse = new OfrepResponse<string>(flagKey, expectedValue)
         {
-            Reason = "TARGETING_MATCH", Variant = "string-variant"
+            Reason = "TARGETING_MATCH",
+            Variant = "string-variant"
         };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
@@ -512,7 +513,8 @@ public class OfrepClientTest : IDisposable
 
         var expectedResponse = new OfrepResponse<int>(flagKey, expectedValue)
         {
-            Reason = "STATIC", Variant = "number-variant"
+            Reason = "STATIC",
+            Variant = "number-variant"
         };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
