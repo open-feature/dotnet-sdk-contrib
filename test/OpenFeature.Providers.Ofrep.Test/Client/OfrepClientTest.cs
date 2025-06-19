@@ -275,6 +275,13 @@ public class OfrepClientTest : IDisposable
         var request = this._mockHandler.Requests[0];
         Assert.Equal(HttpMethod.Post, request.Method);
         Assert.Contains($"ofrep/v1/evaluate/flags/{flagKey}", request.RequestUri?.ToString());
+        
+        // Verify the context was included in the request body
+        var requestContent = await request.Content!.ReadAsStringAsync();
+        Assert.Contains("user123", requestContent);
+        Assert.Contains("production", requestContent);
+        Assert.Contains("userId", requestContent);
+        Assert.Contains("environment", requestContent);
     }
 
     [Fact]
@@ -374,14 +381,27 @@ public class OfrepClientTest : IDisposable
         var request = this._mockHandler.Requests[0];
         Assert.Equal(HttpMethod.Post, request.Method);
         Assert.Contains($"ofrep/v1/evaluate/flags/{flagKey}", request.RequestUri?.ToString());
+        
+        // Verify complex context was properly serialized in the request body
+        var requestContent = await request.Content!.ReadAsStringAsync();
+        Assert.Contains("user123", requestContent);
+        Assert.Contains("true", requestContent); // isAdmin boolean
+        Assert.Contains("42.5", requestContent); // score double
+        Assert.Contains("production", requestContent);
+        Assert.Contains("100", requestContent); // count integer
+        Assert.Contains("userId", requestContent);
+        Assert.Contains("isAdmin", requestContent);
+        Assert.Contains("score", requestContent);
+        Assert.Contains("environment", requestContent);
+        Assert.Contains("count", requestContent);
     }
 
     [Theory]
-    [InlineData("flag-with-special-chars-!@#")]
-    [InlineData("flag with spaces")]
-    [InlineData("flag/with/slashes")]
-    [InlineData("flag%with%encoded")]
-    public async Task EvaluateFlag_WithSpecialCharactersInFlagKey_ShouldEscapeCorrectly(string flagKey)
+    [InlineData("flag-with-special-chars-!@#", "flag-with-special-chars-!%40%23")]
+    [InlineData("flag with spaces", "flag%20with%20spaces")]
+    [InlineData("flag/with/slashes", "flag%2Fwith%2Fslashes")]
+    [InlineData("flag%with%encoded", "flag%25with%25encoded")]
+    public async Task EvaluateFlag_WithSpecialCharactersInFlagKey_ShouldEscapeCorrectly(string flagKey, string expectedEncodedKey)
     {
         // Arrange
         const bool defaultValue = false;
@@ -402,7 +422,9 @@ public class OfrepClientTest : IDisposable
         // Verify the flag key was properly URL escaped in the request
         Assert.Single(this._mockHandler.Requests);
         var request = this._mockHandler.Requests[0];
-        Assert.Contains("ofrep/v1/evaluate/flags/", request.RequestUri?.ToString());
+        var requestUri = request.RequestUri?.ToString();
+        Assert.Contains("ofrep/v1/evaluate/flags/", requestUri);
+        Assert.Contains(expectedEncodedKey, requestUri);
     }
 
     #endregion
@@ -761,6 +783,20 @@ public class OfrepClientTest : IDisposable
         Assert.NotNull(result);
         Assert.Equal("premium-user", result.Value);
         Assert.Single(this._mockHandler.Requests);
+        
+        // Verify nested context was properly serialized in the request body
+        var request = this._mockHandler.Requests[0];
+        var requestContent = await request.Content!.ReadAsStringAsync();
+        Assert.Contains("user123", requestContent);
+        Assert.Contains("true", requestContent); // premium boolean
+        Assert.Contains("us-east-1", requestContent);
+        Assert.Contains("session456", requestContent);
+        Assert.Contains("1800", requestContent); // duration integer
+        Assert.Contains("userId", requestContent);
+        Assert.Contains("premium", requestContent);
+        Assert.Contains("region", requestContent);
+        Assert.Contains("sessionId", requestContent);
+        Assert.Contains("duration", requestContent);
     }
 
     #endregion
