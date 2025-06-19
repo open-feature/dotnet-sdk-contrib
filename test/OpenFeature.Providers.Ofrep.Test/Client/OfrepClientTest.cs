@@ -32,6 +32,7 @@ public class OfrepClientTest : IDisposable
     }
 
     #region Constructor Tests
+
     [Fact]
     public void Constructor_WithCustomHttpTimeout_ShouldUseConfiguredTimeout()
     {
@@ -275,7 +276,7 @@ public class OfrepClientTest : IDisposable
         var request = this._mockHandler.Requests[0];
         Assert.Equal(HttpMethod.Post, request.Method);
         Assert.Contains($"ofrep/v1/evaluate/flags/{flagKey}", request.RequestUri?.ToString());
-        
+
         // Verify the context was included in the request body
         var requestContent = await request.Content!.ReadAsStringAsync();
         Assert.Contains("user123", requestContent);
@@ -381,7 +382,7 @@ public class OfrepClientTest : IDisposable
         var request = this._mockHandler.Requests[0];
         Assert.Equal(HttpMethod.Post, request.Method);
         Assert.Contains($"ofrep/v1/evaluate/flags/{flagKey}", request.RequestUri?.ToString());
-        
+
         // Verify complex context was properly serialized in the request body
         var requestContent = await request.Content!.ReadAsStringAsync();
         Assert.Contains("user123", requestContent);
@@ -401,7 +402,8 @@ public class OfrepClientTest : IDisposable
     [InlineData("flag with spaces", "flag%20with%20spaces")]
     [InlineData("flag/with/slashes", "flag%2Fwith%2Fslashes")]
     [InlineData("flag%with%encoded", "flag%25with%25encoded")]
-    public async Task EvaluateFlag_WithSpecialCharactersInFlagKey_ShouldEscapeCorrectly(string flagKey, string expectedEncodedKey)
+    public async Task EvaluateFlag_WithSpecialCharactersInFlagKey_ShouldEscapeCorrectly(string flagKey,
+        string expectedEncodedKey)
     {
         // Arrange
         const bool defaultValue = false;
@@ -445,10 +447,7 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         var customTimeout = TimeSpan.FromSeconds(30);
-        var config = new OfrepOptions("https://api.example.com/")
-        {
-            Timeout = customTimeout
-        };
+        var config = new OfrepOptions("https://api.example.com/") { Timeout = customTimeout };
 
         // Act
         using var client = new OfrepClient(config, this._mockHandler, this._mockLogger);
@@ -485,8 +484,7 @@ public class OfrepClientTest : IDisposable
 
         var expectedResponse = new OfrepResponse<string>(flagKey, expectedValue)
         {
-            Reason = "TARGETING_MATCH",
-            Variant = "string-variant"
+            Reason = "TARGETING_MATCH", Variant = "string-variant"
         };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
@@ -514,8 +512,7 @@ public class OfrepClientTest : IDisposable
 
         var expectedResponse = new OfrepResponse<int>(flagKey, expectedValue)
         {
-            Reason = "STATIC",
-            Variant = "number-variant"
+            Reason = "STATIC", Variant = "number-variant"
         };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
@@ -541,10 +538,7 @@ public class OfrepClientTest : IDisposable
         const double defaultValue = 0.0;
         const double expectedValue = 3.14159;
 
-        var expectedResponse = new OfrepResponse<double>(flagKey, expectedValue)
-        {
-            Reason = "TARGETING_MATCH"
-        };
+        var expectedResponse = new OfrepResponse<double>(flagKey, expectedValue) { Reason = "TARGETING_MATCH" };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
@@ -568,10 +562,7 @@ public class OfrepClientTest : IDisposable
         var defaultValue = new { test = "default" };
         var expectedValue = new { name = "test", value = 123, enabled = true };
 
-        var expectedResponse = new OfrepResponse<object>(flagKey, expectedValue)
-        {
-            Reason = "DISABLED"
-        };
+        var expectedResponse = new OfrepResponse<object>(flagKey, expectedValue) { Reason = "DISABLED" };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
@@ -647,7 +638,10 @@ public class OfrepClientTest : IDisposable
         var response = new HttpResponseMessage((HttpStatusCode)429)
         {
             Content = new StringContent("Rate limit exceeded"),
-            Headers = { RetryAfter = new System.Net.Http.Headers.RetryConditionHeaderValue(TimeSpan.FromSeconds(60)) }
+            Headers =
+            {
+                RetryAfter = new System.Net.Http.Headers.RetryConditionHeaderValue(TimeSpan.FromSeconds(60))
+            }
         };
 
         this._mockHandler.SetupResponse((HttpStatusCode)429, "Rate limit exceeded");
@@ -783,7 +777,7 @@ public class OfrepClientTest : IDisposable
         Assert.NotNull(result);
         Assert.Equal("premium-user", result.Value);
         Assert.Single(this._mockHandler.Requests);
-        
+
         // Verify nested context was properly serialized in the request body
         var request = this._mockHandler.Requests[0];
         var requestContent = await request.Content!.ReadAsStringAsync();
@@ -1017,11 +1011,7 @@ public class OfrepClientTest : IDisposable
         {
             Reason = "TARGETING_MATCH",
             Variant = "control",
-            Metadata = new Dictionary<string, object>
-            {
-                ["experimentId"] = "exp-123",
-                ["campaignId"] = "camp-456"
-            }
+            Metadata = new Dictionary<string, object> { ["experimentId"] = "exp-123", ["campaignId"] = "camp-456" }
         };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
