@@ -6,7 +6,7 @@ namespace OpenFeature.Providers.Ofrep.Models;
 /// Represents a response from the OFREP API for a single flag evaluation.
 /// </summary>
 /// <typeparam name="T">The type of the flag value.</typeparam>
-public class OfrepResponse<T>
+internal class OfrepResponse<T>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="OfrepResponse{T}"/> class with the specified value.
