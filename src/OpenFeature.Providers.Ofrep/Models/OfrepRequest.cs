@@ -5,7 +5,7 @@ namespace OpenFeature.Providers.Ofrep.Models;
 /// <summary>
 /// Represents a request sent to the OFREP API.
 /// </summary>
-public class OfrepRequest
+internal class OfrepRequest
 {
     /// <summary>
     /// Gets or sets the evaluation context for the request.

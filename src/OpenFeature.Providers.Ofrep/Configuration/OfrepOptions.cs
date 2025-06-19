@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace OpenFeature.Providers.Ofrep.Configuration;
 
 /// <summary>
@@ -10,19 +8,16 @@ public class OfrepOptions
     /// <summary>
     /// Gets or sets the base URL for the OFREP API.
     /// </summary>
-    [JsonPropertyName("baseUrl")]
     public string BaseUrl { get; set; }
 
     /// <summary>
     /// Gets or sets the timeout for HTTP requests. Default is 10 seconds.
     /// </summary>
-    [JsonPropertyName("timeout")]
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(10);
 
     /// <summary>
     /// Gets or sets additional HTTP headers to include in requests.
     /// </summary>
-    [JsonPropertyName("headers")]
     public Dictionary<string, string>? Headers { get; set; }
 
     /// <summary>
