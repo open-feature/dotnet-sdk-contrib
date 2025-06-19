@@ -7,8 +7,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.v1;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.models;
 using OpenFeature.Model;
 using RichardSzalay.MockHttp;
 using Xunit;
@@ -74,16 +75,12 @@ public class GoFeatureFlagProviderTest
             .Set("professional", true)
             .Set("rate", 3.14)
             .Set("age", 30)
-            .Set("company_info", new Value(new Structure(new Dictionary<string, Value>
-            {
-                { "name", new Value("my_company") },
-                { "size", new Value(120) }
-            })))
-            .Set("labels", new Value(new List<Value>
-            {
-                new("pro"),
-                new("beta")
-            }))
+            .Set("company_info",
+                new Value(new Structure(new Dictionary<string, Value>
+                {
+                    { "name", new Value("my_company") }, { "size", new Value(120) }
+                })))
+            .Set("labels", new Value(new List<Value> { new("pro"), new("beta") }))
             .Build();
     }
 
@@ -93,8 +90,7 @@ public class GoFeatureFlagProviderTest
     {
         var goFeatureFlagProvider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
-            Timeout = new TimeSpan(19 * TimeSpan.TicksPerHour),
-            Endpoint = baseUrl
+            Timeout = new TimeSpan(19 * TimeSpan.TicksPerHour), Endpoint = baseUrl
         });
         await Api.Instance.SetProviderAsync(goFeatureFlagProvider);
         Assert.Equal("GO Feature Flag Provider", Api.Instance.GetProvider().GetMetadata().Name);
@@ -116,15 +112,14 @@ public class GoFeatureFlagProviderTest
     [Fact]
     private void constructor_options_empty_endpoint()
     {
-        Assert.Throws<InvalidOption>(
-            () => new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions { Endpoint = "" }));
+        Assert.Throws<InvalidOption>(() =>
+            new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions { Endpoint = "" }));
     }
 
     [Fact]
     private void constructor_options_only_timeout()
     {
-        Assert.Throws<InvalidOption>(
-            () => new GoFeatureFlagProvider(
+        Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions { Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond) }
             )
         );
@@ -144,12 +139,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("fail_500", false, _defaultEvaluationCtx);
+        var result = await client.GetBooleanDetailsAsync("fail_500", false, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.False(result.Value);
         Assert.Equal(ErrorType.General, result.ErrorType);
@@ -162,12 +157,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("api_key_missing", false, _defaultEvaluationCtx);
+        var result = await client.GetBooleanDetailsAsync("api_key_missing", false, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.False(result.Value);
         Assert.Equal(Reason.Error, result.Reason);
@@ -180,13 +175,13 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond),
             ApiKey = "ff877c7a-4594-43b5-89a8-df44c9984bd8"
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("invalid_api_key", false, _defaultEvaluationCtx);
+        var result = await client.GetBooleanDetailsAsync("invalid_api_key", false, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.False(result.Value);
         Assert.Equal(Reason.Error, result.Reason);
@@ -199,12 +194,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("flag_not_found", false, _defaultEvaluationCtx);
+        var result = await client.GetBooleanDetailsAsync("flag_not_found", false, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.False(result.Value);
         Assert.Equal(ErrorType.FlagNotFound, result.ErrorType);
@@ -217,12 +212,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("string_key", false, _defaultEvaluationCtx);
+        var result = await client.GetBooleanDetailsAsync("string_key", false, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.False(result.Value);
         Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
@@ -235,12 +230,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("bool_targeting_match", false, _defaultEvaluationCtx);
+        var result = await client.GetBooleanDetailsAsync("bool_targeting_match", false, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.True(result.Value);
         Assert.Equal(ErrorType.None, result.ErrorType);
@@ -254,12 +249,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("unknown_reason", false, _defaultEvaluationCtx);
+        var result = await client.GetBooleanDetailsAsync("unknown_reason", false, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.True(result.Value);
         Assert.Equal(ErrorType.None, result.ErrorType);
@@ -273,12 +268,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetBooleanDetailsAsync("disabled", false, _defaultEvaluationCtx);
+        var result = await client.GetBooleanDetailsAsync("disabled", false, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.False(result.Value);
         Assert.Equal(Reason.Disabled, result.Reason);
@@ -290,12 +285,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetStringDetailsAsync("bool_targeting_match", "default", _defaultEvaluationCtx);
+        var result = await client.GetStringDetailsAsync("bool_targeting_match", "default", this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal("default", result.Value);
         Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
@@ -308,12 +303,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetStringDetailsAsync("string_key", "defaultValue", _defaultEvaluationCtx);
+        var result = await client.GetStringDetailsAsync("string_key", "defaultValue", this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal("CC0000", result.Value);
         Assert.Equal(ErrorType.None, result.ErrorType);
@@ -327,12 +322,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetStringDetailsAsync("disabled_string", "defaultValue", _defaultEvaluationCtx);
+        var result = await client.GetStringDetailsAsync("disabled_string", "defaultValue", this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal("defaultValue", result.Value);
         Assert.Equal(Reason.Disabled, result.Reason);
@@ -344,12 +339,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("string_key", 200, _defaultEvaluationCtx);
+        var result = await client.GetIntegerDetailsAsync("string_key", 200, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(200, result.Value);
         Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
@@ -362,12 +357,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("integer_key", 1200, _defaultEvaluationCtx);
+        var result = await client.GetIntegerDetailsAsync("integer_key", 1200, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(100, result.Value);
         Assert.Equal(ErrorType.None, result.ErrorType);
@@ -381,12 +376,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("disabled_integer", 1225, _defaultEvaluationCtx);
+        var result = await client.GetIntegerDetailsAsync("disabled_integer", 1225, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(1225, result.Value);
         Assert.Equal(Reason.Disabled, result.Reason);
@@ -398,12 +393,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("double_key", 200, _defaultEvaluationCtx);
+        var result = await client.GetIntegerDetailsAsync("double_key", 200, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(200, result.Value);
         Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
@@ -416,12 +411,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetDoubleDetailsAsync("double_key", 1200.25, _defaultEvaluationCtx);
+        var result = await client.GetDoubleDetailsAsync("double_key", 1200.25, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(100.25, result.Value);
         Assert.Equal(ErrorType.None, result.ErrorType);
@@ -435,12 +430,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetDoubleDetailsAsync("disabled_double", 1225.34, _defaultEvaluationCtx);
+        var result = await client.GetDoubleDetailsAsync("disabled_double", 1225.34, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(1225.34, result.Value);
         Assert.Equal(Reason.Disabled, result.Reason);
@@ -452,16 +447,18 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetObjectDetailsAsync("object_key", null, _defaultEvaluationCtx);
+        var result = await client.GetObjectDetailsAsync("object_key", null, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         var want = JsonSerializer.Serialize(new Value(new Structure(new Dictionary<string, Value>
         {
-            { "test", new Value("test1") }, { "test2", new Value(false) }, { "test3", new Value(123.3) },
+            { "test", new Value("test1") },
+            { "test2", new Value(false) },
+            { "test3", new Value(123.3) },
             { "test4", new Value(1) }
         })));
         Assert.Equal(want, JsonSerializer.Serialize(result.Value));
@@ -476,12 +473,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetObjectDetailsAsync("string_key", null, _defaultEvaluationCtx);
+        var result = await client.GetObjectDetailsAsync("string_key", null, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(new Value("CC0000").AsString, result.Value.AsString);
         Assert.Equal(ErrorType.None, result.ErrorType);
@@ -495,12 +492,13 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetObjectDetailsAsync("disabled_object", new Value("default"), _defaultEvaluationCtx);
+        var result =
+            await client.GetObjectDetailsAsync("disabled_object", new Value("default"), this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(new Value("default").AsString, result.Value.AsString);
         Assert.Equal(Reason.Disabled, result.Reason);
@@ -513,7 +511,7 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
@@ -531,15 +529,21 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetObjectDetailsAsync("list_key", null, _defaultEvaluationCtx);
+        var result = await client.GetObjectDetailsAsync("list_key", null, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         var want = JsonSerializer.Serialize(new Value(new List<Value>
-            { new("test"), new("test1"), new("test2"), new("false"), new("test3") }));
+        {
+            new("test"),
+            new("test1"),
+            new("test2"),
+            new("false"),
+            new("test3")
+        }));
         Assert.Equal(want, JsonSerializer.Serialize(result.Value));
         Assert.Equal(ErrorType.None, result.ErrorType);
         Assert.Equal(Reason.TargetingMatch, result.Reason);
@@ -552,12 +556,13 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetObjectDetailsAsync("does_not_exists", new Value("default"), _defaultEvaluationCtx);
+        var result =
+            await client.GetObjectDetailsAsync("does_not_exists", new Value("default"), this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(new Value("default").AsString, result.Value.AsString);
         Assert.Equal(Reason.Error, result.Reason);
@@ -570,17 +575,16 @@ public class GoFeatureFlagProviderTest
     {
         string capturedRequestBody = null;
         var mock = new MockHttpMessageHandler();
-        var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(
-            async request =>
+        var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(async request =>
+        {
+            capturedRequestBody = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
+            return new HttpResponseMessage
             {
-                capturedRequestBody = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return new HttpResponseMessage
-                {
-                    Content = new StringContent(
-                        "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}"
-                        , Encoding.UTF8, "application/json")
-                };
-            });
+                Content = new StringContent(
+                    "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}"
+                    , Encoding.UTF8, "application/json")
+            };
+        });
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
@@ -589,7 +593,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = await client.GetObjectDetailsAsync("integer_key", new Value("default"), _defaultEvaluationCtx);
+        var res = await client.GetObjectDetailsAsync("integer_key", new Value("default"), this._defaultEvaluationCtx);
         Assert.Equal(1, mock.GetMatchCount(mockedRequest));
         await Task.Delay(100); // time to wait to be sure body is extracted
         var want = JObject.Parse(
@@ -603,17 +607,16 @@ public class GoFeatureFlagProviderTest
     {
         string capturedRequestBody = null;
         var mock = new MockHttpMessageHandler();
-        var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(
-            async request =>
+        var mockedRequest = mock.When($"{prefixEval}integer_key").Respond(async request =>
+        {
+            capturedRequestBody = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
+            return new HttpResponseMessage
             {
-                capturedRequestBody = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return new HttpResponseMessage
-                {
-                    Content = new StringContent(
-                        "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}"
-                        , Encoding.UTF8, "application/json")
-                };
-            });
+                Content = new StringContent(
+                    "{ \"value\":100, \"key\":\"integer_key\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\", \"cacheable\":true}"
+                    , Encoding.UTF8, "application/json")
+            };
+        });
         var exporterMetadata = new ExporterMetadata();
         exporterMetadata.Add("key1", "value1");
         exporterMetadata.Add("key2", 1.234);
@@ -629,7 +632,7 @@ public class GoFeatureFlagProviderTest
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var res = await client.GetObjectDetailsAsync("integer_key", new Value("default"), _defaultEvaluationCtx);
+        var res = await client.GetObjectDetailsAsync("integer_key", new Value("default"), this._defaultEvaluationCtx);
         Assert.Equal(1, mock.GetMatchCount(mockedRequest));
         await Task.Delay(100); // time to wait to be sure body is extracted
         var want = JObject.Parse(
@@ -645,12 +648,12 @@ public class GoFeatureFlagProviderTest
         var g = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
         {
             Endpoint = baseUrl,
-            HttpMessageHandler = _mockHttp,
+            HttpMessageHandler = this._mockHttp,
             Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
         });
         await Api.Instance.SetProviderAsync(g);
         var client = Api.Instance.GetClient("test-client");
-        var result = await client.GetIntegerDetailsAsync("integer_with_metadata", 1200, _defaultEvaluationCtx);
+        var result = await client.GetIntegerDetailsAsync("integer_with_metadata", 1200, this._defaultEvaluationCtx);
         Assert.NotNull(result);
         Assert.Equal(100, result.Value);
         Assert.Equal(ErrorType.None, result.ErrorType);
