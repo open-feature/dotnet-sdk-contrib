@@ -166,7 +166,7 @@ public class OfrepClientTest : IDisposable
         // Arrange
         const string flagKey = "test-flag";
         const bool defaultValue = false;
-        var cts = new CancellationTokenSource();
+        using var cts = new CancellationTokenSource();
 
         this._mockHandler.SetupException(new OperationCanceledException("Request was cancelled", cts.Token));
 
