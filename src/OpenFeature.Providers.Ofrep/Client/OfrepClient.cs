@@ -168,11 +168,11 @@ internal sealed partial class OfrepClient : IOfrepClient
     private OfrepResponse<T> ProcessTooManyRequestsResponse<T>(string key, T defaultValue, HttpResponseMessage response)
     {
         var retryAfter = response.Headers.RetryAfter;
-        if (retryAfter?.Delta.HasValue == true)
+        if (retryAfter?.Delta.HasValue)
         {
             this._retryAfterDate = DateTimeOffset.UtcNow.Add(retryAfter.Delta.Value);
         }
-        else if (retryAfter?.Date.HasValue == true)
+        else if (retryAfter?.Date.HasValue)
         {
             this._retryAfterDate = retryAfter.Date.Value;
         }
