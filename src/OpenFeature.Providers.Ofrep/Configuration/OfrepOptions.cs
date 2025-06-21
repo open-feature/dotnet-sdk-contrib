@@ -18,7 +18,7 @@ public class OfrepOptions
     /// <summary>
     /// Gets or sets additional HTTP headers to include in requests.
     /// </summary>
-    public Dictionary<string, string>? Headers { get; set; }
+    public Dictionary<string, string> Headers { get; set; } = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OfrepOptions"/> class with the specified base URL.
