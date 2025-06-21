@@ -72,12 +72,9 @@ internal sealed partial class OfrepClient : IOfrepClient
             Timeout = configuration.Timeout
         };
 
-        if (configuration.Headers != null)
+        foreach (var header in configuration.Headers)
         {
-            foreach (var header in configuration.Headers)
-            {
-                this._httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
-            }
+            this._httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
         }
     }
 
@@ -141,7 +138,7 @@ internal sealed partial class OfrepClient : IOfrepClient
             this.LogJsonParseError(flagKey, ex.Message, ex);
             return HandleEvaluationError(flagKey, ex, defaultValue);
         }
-        catch (OperationCanceledException ex) when (cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException ex) when (ex.CancellationToken == cancellationToken)
         {
             this.LogRequestCancelled(flagKey, ex);
             return HandleEvaluationError(flagKey, ex, defaultValue);
