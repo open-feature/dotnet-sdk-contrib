@@ -72,7 +72,7 @@ await Api.Instance.SetProviderAsync(provider);
 The `OfrepOptions` class supports the following options:
 
 -   `BaseUrl` (required): The base URL for the OFREP API endpoint
--   `Timeout` (optional): HTTP client timeout
+-   `Timeout` (optional): HTTP client timeout. The default value is 10 seconds.
 -   `Headers` (optional): Additional HTTP headers to include in requests
 
 ## Contributing
