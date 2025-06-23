@@ -170,11 +170,11 @@ internal sealed partial class OfrepClient : IOfrepClient
         var retryAfter = response.Headers.RetryAfter;
         if (retryAfter?.Delta.HasValue == true)
         {
-            this._retryAfterDate = DateTimeOffset.UtcNow.Add(retryAfter.Delta!.Value);
+            this._retryAfterDate = DateTimeOffset.UtcNow.Add(retryAfter.Delta.Value);
         }
         else if (retryAfter?.Date.HasValue == true)
         {
-            this._retryAfterDate = retryAfter.Date!.Value;
+            this._retryAfterDate = retryAfter.Date.Value;
         }
         else
         {
