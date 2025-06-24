@@ -9,6 +9,7 @@
     <Project Path="src/OpenFeature.Contrib.Providers.Flipt/OpenFeature.Contrib.Providers.Flipt.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.GOFeatureFlag/OpenFeature.Contrib.Providers.GOFeatureFlag.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.Statsig/OpenFeature.Contrib.Providers.Statsig.csproj" />
+    <Project Path="src/OpenFeature.Providers.Ofrep/OpenFeature.Providers.Ofrep.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/OpenFeature.Contrib.Hooks.Otel.Test/OpenFeature.Contrib.Hooks.Otel.Test.csproj" />
@@ -23,5 +24,6 @@
     <Project Path="test/OpenFeature.Contrib.Providers.Flipt.Test/OpenFeature.Contrib.Providers.Flipt.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.Statsig.Test/OpenFeature.Contrib.Providers.Statsig.Test.csproj" />
+    <Project Path="test/OpenFeature.Providers.Ofrep.Test/OpenFeature.Providers.Ofrep.Test.csproj" />
   </Folder>
 </Solution>
