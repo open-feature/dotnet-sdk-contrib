@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 
 /// <summary>
 ///     Interface for all events that are sent to the GO Feature Flag server.

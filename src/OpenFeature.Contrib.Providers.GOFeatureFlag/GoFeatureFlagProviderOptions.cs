@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 using Wasmtime;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag;
 
 /// <Summary>
 ///     GoFeatureFlagProviderOptions contains the options to initialise the provider.

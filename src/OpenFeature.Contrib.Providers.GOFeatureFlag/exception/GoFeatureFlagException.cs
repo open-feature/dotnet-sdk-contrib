@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 
 /// <summary>
 ///     GoFeatureFlagException is the root exception of GO Feature Flag provider.
