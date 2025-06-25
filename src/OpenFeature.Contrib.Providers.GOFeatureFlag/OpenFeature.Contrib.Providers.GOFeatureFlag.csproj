@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="OpenFeature" Version="2.2.0"/>
+    <PackageReference Include="OpenFeature.Providers.Ofrep" Version="0.1.0"/>
     <PackageReference Include="Wasmtime" Version="22.0.0"/>
   </ItemGroup>
 

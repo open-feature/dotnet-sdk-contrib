@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.helper;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.helper;
 
 /// <summary>
 ///     A class that encapsulates the logic for running an asynchronous function
@@ -21,6 +21,7 @@ public class PeriodicAsyncRunner
     /// </summary>
     /// <param name="action">The asynchronous function to execute periodically.</param>
     /// <param name="interval">The time interval between executions.</param>
+    /// <param name="logger"></param>
     public PeriodicAsyncRunner(Func<Task> action, TimeSpan interval, ILogger logger)
     {
         this._action = action ?? throw new ArgumentNullException(nameof(action));
@@ -68,8 +69,9 @@ public class PeriodicAsyncRunner
     /// <summary>
     ///     Stops the periodic execution of the async task by cancelling
     /// </summary>
-    public async Task StopAsync()
+    public Task StopAsync()
     {
         this._cancellationTokenSource.Cancel();
+        return Task.CompletedTask;
     }
 }

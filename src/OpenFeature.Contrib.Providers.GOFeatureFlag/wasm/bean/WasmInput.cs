@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
 using System.Text.Json.Serialization;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.wasm.bean;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.wasm.bean;
 
 /// <summary>
 ///     Represents the input to the WASM module, containing the flag key, flag, evaluation context, and flag context.

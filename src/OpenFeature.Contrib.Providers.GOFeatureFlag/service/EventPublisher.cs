@@ -3,11 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.api;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.helper;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.helper;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.service;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.service;
 
 /// <summary>
 ///     EventPublisher is used to collect events and publish them in batch before they are published.
@@ -47,9 +47,10 @@ public class EventPublisher
     /// <summary>
     ///     Starts the periodic runner that publishes events.
     /// </summary>
-    public async Task StartAsync()
+    public Task StartAsync()
     {
         Task.Run(async () => await this._periodicAsyncRunner.StartAsync().ConfigureAwait(false));
+        return Task.CompletedTask;
     }
 
     /// <summary>

@@ -1,18 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.api;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.evaluator;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.extensions;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.hooks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.service;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.hooks;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.ofrep;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.service;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2;
+[assembly: InternalsVisibleTo("OpenFeature.Contrib.Providers.GOFeatureFlag.Test")]
+
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag;
 
 /// <summary>
 ///     GoFeatureFlagProvider is the OpenFeature provider for GO Feature Flag.
@@ -45,15 +49,26 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// <param name="options">Options used while creating the provider</param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="InvalidOption">if no options are provided, or we have a wrong configuration.</exception>
-    public GoFeatureFlagProvider(GoFeatureFlagProviderOptions options)
+    public GoFeatureFlagProvider(GoFeatureFlagProviderOptions options) : this(options, null)
+    {
+        // we don't do anything here, the internal constructor will do the job.
+    }
+
+    /// <summary>
+    ///     This constructor is used to create the provider with a custom OFREP provider.
+    /// </summary>
+    /// <param name="options">Options used while creating the provider</param>
+    /// <param name="ofrepProvider">The OFREP provider should be set only for test purposes</param>
+    internal GoFeatureFlagProvider(GoFeatureFlagProviderOptions options, IOfrepProvider ofrepProvider = null)
     {
         ValidateInputOptions(options);
         var api = new GoFeatureFlagApi(options);
-        var evaluator = this.GetEvaluator(options, api);
+        var evaluator = this.GetEvaluator(options, api, ofrepProvider);
         this._evaluationService = new EvaluationService(evaluator);
         this._eventPublisher = new EventPublisher(api, options);
         this._options = options;
     }
+
 
     /// <summary>
     ///     Return the metadata associated with this provider.
@@ -68,12 +83,14 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// </summary>
     /// <param name="options">Provider options.</param>
     /// <param name="api">API layer to access the relay proxy.</param>
+    /// <param name="ofrepProvider">Optional custom OFREP provider (used for test)</param>
     /// <returns></returns>
-    private IEvaluator GetEvaluator(GoFeatureFlagProviderOptions options, GoFeatureFlagApi api)
+    private IEvaluator GetEvaluator(GoFeatureFlagProviderOptions options, GoFeatureFlagApi api,
+        IOfrepProvider ofrepProvider = null)
     {
         if (options.EvaluationType == EvaluationType.Remote)
         {
-            return new RemoteEvaluator(options);
+            return new RemoteEvaluator(options, ofrepProvider);
         }
 
         return new InProcessEvaluator(

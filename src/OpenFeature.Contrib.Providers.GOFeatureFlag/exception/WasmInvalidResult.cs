@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 
 /// <summary>
 ///     WasmFunctionNotFound is thrown when a WebAssembly export does not return a valid output

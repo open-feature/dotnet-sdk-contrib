@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.evaluator;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.service;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.service;
 
 /// <summary>
 ///     EvaluationService is a service that provides methods to evaluate feature flags.
@@ -26,36 +26,42 @@ public class EvaluationService(IEvaluator evaluator)
         await evaluator.DisposeAsync().ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task<ResolutionDetails<bool>> GetEvaluation(string flagKey, bool defaultValue,
         EvaluationContext evaluationContext)
     {
         return await evaluator.Evaluate(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task<ResolutionDetails<string>> GetEvaluation(string flagKey, string defaultValue,
         EvaluationContext evaluationContext)
     {
         return await evaluator.Evaluate(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task<ResolutionDetails<int>> GetEvaluation(string flagKey, int defaultValue,
         EvaluationContext evaluationContext)
     {
         return await evaluator.Evaluate(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task<ResolutionDetails<double>> GetEvaluation(string flagKey, double defaultValue,
         EvaluationContext evaluationContext)
     {
         return await evaluator.Evaluate(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task<ResolutionDetails<Value>> GetEvaluation(string flagKey, Value defaultValue,
         EvaluationContext evaluationContext)
     {
         return await evaluator.Evaluate(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public bool IsFlagTrackable(string flagKey)
     {
         return evaluator.IsFlagTrackable(flagKey);

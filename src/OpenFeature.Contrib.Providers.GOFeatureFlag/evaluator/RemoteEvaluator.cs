@@ -1,27 +1,34 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.ofrep;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep;
 using OpenFeature.Providers.Ofrep.Configuration;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.evaluator;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
 
 /// <summary>
 ///     RemoteEvaluator is an implementation of IEvaluator that uses the OFREP API to evaluate feature flags.
 /// </summary>
 public class RemoteEvaluator : IEvaluator
 {
-    private readonly OfrepProvider _ofrepProvider;
+    private readonly IOfrepProvider _ofrepProvider;
 
     /// <summary>
     ///     Constructor for RemoteEvaluator.
     /// </summary>
     /// <param name="options">Options of the GOFF Provider</param>
-    public RemoteEvaluator(GoFeatureFlagProviderOptions options)
+    /// <param name="ofrepProvider">Optional custom OFREP provider (used for test)</param>
+    internal RemoteEvaluator(GoFeatureFlagProviderOptions options, IOfrepProvider ofrepProvider = null)
     {
+        if (ofrepProvider != null)
+        {
+            this._ofrepProvider = ofrepProvider;
+            return;
+        }
+
         var ofrepOptions = new OfrepOptions(options.Endpoint);
 
-        // Set OFREP headers
         var headers = new Dictionary<string, string>();
         headers.Add("Content-Type", "application/json");
         if (options.ApiKey != null)
@@ -32,7 +39,7 @@ public class RemoteEvaluator : IEvaluator
         ofrepOptions.Headers = headers;
         ofrepOptions.Timeout = options.Timeout;
 
-        this._ofrepProvider = new OfrepProvider(ofrepOptions);
+        this._ofrepProvider = new OfrepProviderWrapper(new OfrepProvider(ofrepOptions));
     }
 
     /// <summary>
@@ -40,7 +47,6 @@ public class RemoteEvaluator : IEvaluator
     /// </summary>
     public Task DisposeAsync()
     {
-        this._ofrepProvider.Dispose();
         return Task.CompletedTask;
     }
 

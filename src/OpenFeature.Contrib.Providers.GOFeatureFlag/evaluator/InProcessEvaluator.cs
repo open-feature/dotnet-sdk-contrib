@@ -6,17 +6,17 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.api;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.extensions;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.helper;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.wasm;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.wasm.bean;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.helper;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.wasm;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.wasm.bean;
 using OpenFeature.Error;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.evaluator;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
 
 /// <summary>
 ///     InProcessEvaluator is an implementation of the IEvaluator interface that evaluates feature flags in-process.
@@ -275,7 +275,8 @@ public class InProcessEvaluator : IEvaluator
             EvalContext = evaluationContext.AsDictionary().ToImmutableDictionary(),
             FlagContext = new FlagContext
             {
-                DefaultSdkValue = defaultValue, EvaluationContextEnrichment = this._evaluationContextEnrichment
+                DefaultSdkValue = defaultValue,
+                EvaluationContextEnrichment = this._evaluationContextEnrichment
             },
             Flag = flag
         };
@@ -327,7 +328,8 @@ public class InProcessEvaluator : IEvaluator
         // send an event to the event channel to notify about the configuration change
         this._eventChannel.Writer.TryWrite(new ProviderEventPayload
         {
-            Type = ProviderEventTypes.ProviderConfigurationChanged, ProviderName = this._providerMetadata.Name
+            Type = ProviderEventTypes.ProviderConfigurationChanged,
+            ProviderName = this._providerMetadata.Name
         });
     }
 

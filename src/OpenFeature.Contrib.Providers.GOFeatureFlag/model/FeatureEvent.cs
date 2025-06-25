@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 
 /// <summary>
 ///     This record represents a feature event, used to send evaluation events to the GO Feature Flag server.

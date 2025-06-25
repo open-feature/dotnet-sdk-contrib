@@ -1,4 +1,4 @@
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 
 /// <summary>
 ///     This enum represents the type of evaluation that can be performed.

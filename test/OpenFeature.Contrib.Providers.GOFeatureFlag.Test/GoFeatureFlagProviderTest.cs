@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DotNet.Testcontainers.Builders;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
@@ -728,6 +727,7 @@ public class GoFeatureFlagProviderTest
             Assert.Equal(1, gotJson["events"].Count());
         }
 
+        [Fact(DisplayName = "Should call multiple times the data collector if max pending events is reached")]
         public async Task ShouldCallMultipleTimeTheDataCollectorIfMaxPendingEventsIsReached()
         {
             var mockHttp = new RelayProxyMock();
@@ -750,44 +750,60 @@ public class GoFeatureFlagProviderTest
         }
     }
 
-    // [Collection("EnrichEvaluationContextHook")]
-    // public class EnrichEvaluationContextHook
-    // {
-    //     [Fact(DisplayName = "Should not add gofeatureflag key in exporterMetadata if the exporterMetadata is empty")]
-    //     public async Task ShouldNotAddGofeatureflagKeyInExporterMetadataIfTheExporterMetadataIsEmpty()
-    //     {
-    //         var mockHttp = new RelayProxyMock();
-    //         var provider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-    //         {
-    //             Endpoint = RelayProxyMock.baseUrl,
-    //             HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
-    //             EvaluationType = EvaluationType.Remote
-    //         });
-    //
-    //         await Api.Instance.SetProviderAsync("test-client", provider);
-    //         var client = Api.Instance.GetClient("test-client");
-    //         await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
-    //
-    //         var body = await mockHttp.LastRequest.Content.ReadAsStringAsync();
-    //
-    //         var want = @"{
-    //         ""context"": {
-    //             ""targetingKey"": ""d45e303a-38c2-11ed-a261-0242ac120002"",
-    //             ""rate"": 3.14,
-    //             ""company_info"": { ""size"": 120, ""name"": ""my_company"" },
-    //             ""anonymous"": false,
-    //             ""email"": ""john.doe@gofeatureflag.org"",
-    //             ""lastname"": ""doe"",
-    //             ""firstname"": ""john"",
-    //             ""age"": 30,
-    //             ""professional"": true,
-    //             ""labels"": [""pro"", ""beta""]
-    //         }
-    //     }";
-    //
-    //         AssertUtil.JsonEqual(want, body);
-    //     }
-    // }
+    [Collection("EnrichEvaluationContextHook")]
+    public class EnrichEvaluationContextHook
+    {
+        [Fact(DisplayName = "Should add gofeatureflag key in evaluation context if metadata is set")]
+        public async Task ShouldAddGofeatureflagKeyInEvaluationContextIfMetadataIsSet()
+        {
+            var meta = new ExporterMetadata();
+            meta.Add("test", "this is a test value");
+            meta.Add("test2", 42);
+            var ofrepProvider = new OfrepProviderMock();
+
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.Remote,
+                    ExporterMetadata = meta
+                },
+                ofrepProvider
+            );
+
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            var got = await client.GetStringDetailsAsync("flag", "default", DefaultEvaluationContext);
+            var lastEvaluationContext = ofrepProvider.LastEvaluationContext;
+            lastEvaluationContext.TryGetValue("gofeatureflag", out var goFeatureFlagValue);
+            Assert.NotNull(goFeatureFlagValue);
+        }
+
+        [Fact(DisplayName = "Should not add gofeatureflag key in evaluation context if metadata is set")]
+        public async Task ShouldNotAddGofeatureflagKeyInEvaluationContextIfMetadataIsSet()
+        {
+            var ofrepProvider = new OfrepProviderMock();
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.Remote
+                },
+                ofrepProvider
+            );
+
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            var got = await client.GetStringDetailsAsync("flag", "default", DefaultEvaluationContext);
+            var lastEvaluationContext = ofrepProvider.LastEvaluationContext;
+            lastEvaluationContext.TryGetValue("gofeatureflag", out var goFeatureFlagValue);
+            Assert.Null(goFeatureFlagValue);
+        }
+    }
 
     [Collection("Remote Evaluation")]
     public class RemoteEvaluationTest
@@ -796,28 +812,197 @@ public class GoFeatureFlagProviderTest
         public async Task ShouldErrorIfEndpointNotAvailable()
         {
             var mockHttp = new RelayProxyMock();
+            Assert.Throws<InvalidOption>(() =>
+            {
+                new GoFeatureFlagProvider(
+                    new GoFeatureFlagProviderOptions
+                    {
+                        HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                        Endpoint = "",
+                        EvaluationType = EvaluationType.Remote
+                    }
+                );
+            });
+        }
+
+        [Fact(DisplayName = "Should evaluate a string flag with remote evaluation")]
+        public async Task ShouldEvaluateAStringFlagWithRemoteEvaluation()
+        {
+            var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
                 {
                     HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
-                    Endpoint = "",
+                    Endpoint = RelayProxyMock.baseUrl,
                     EvaluationType = EvaluationType.Remote
-                }
+                },
+                new OfrepProviderMock()
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var handlerCalled = false;
-            Api.Instance.AddHandler(ProviderEventTypes.ProviderError, _ =>
-            {
-                handlerCalled = true;
-            });
-            await Task.Delay(100);
-            Assert.True(handlerCalled, "ProviderError event should be called when the endpoint is not available");
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            var got = await client.GetStringDetailsAsync("flag", "default", DefaultEvaluationContext);
+            var want = new ResolutionDetails<string>(
+                "flag",
+                "this is a test value",
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "enabled",
+                null,
+                new ImmutableMetadata(new Dictionary<string, object>
+                {
+                    { "test", new Value("this is a test value") },
+                    { "test2", new Value(42) },
+                    { "test3", new Value(true) },
+                    { "test4", new Value(3.14) }
+                })
+            );
+
+            Assert.Equivalent(want, got);
         }
 
-        [Fact(DisplayName = "XXX")]
-        public async Task SXXX()
+        [Fact(DisplayName = "Should evaluate a bool flag with remote evaluation")]
+        public async Task ShouldEvaluateABoolFlagWithRemoteEvaluation()
         {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.Remote
+                },
+                new OfrepProviderMock()
+            );
+
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            var got = await client.GetBooleanDetailsAsync("flag", false, DefaultEvaluationContext);
+            var want = new ResolutionDetails<bool>(
+                "flag",
+                true,
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "enabled",
+                null,
+                new ImmutableMetadata(new Dictionary<string, object>
+                {
+                    { "test", new Value("this is a test value") },
+                    { "test2", new Value(42) },
+                    { "test3", new Value(true) },
+                    { "test4", new Value(3.14) }
+                })
+            );
+
+            Assert.Equivalent(want, got);
+        }
+
+        [Fact(DisplayName = "Should evaluate a double flag with remote evaluation")]
+        public async Task ShouldEvaluateADoubleFlagWithRemoteEvaluation()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.Remote
+                },
+                new OfrepProviderMock()
+            );
+
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            var got = await client.GetDoubleDetailsAsync("flag", 1.2, DefaultEvaluationContext);
+            var want = new ResolutionDetails<double>(
+                "flag",
+                12.21,
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "enabled",
+                null,
+                new ImmutableMetadata(new Dictionary<string, object>
+                {
+                    { "test", new Value("this is a test value") },
+                    { "test2", new Value(42) },
+                    { "test3", new Value(true) },
+                    { "test4", new Value(3.14) }
+                })
+            );
+
+            Assert.Equivalent(want, got);
+        }
+
+        [Fact(DisplayName = "Should evaluate an int flag with remote evaluation")]
+        public async Task ShouldEvaluateAIntFlagWithRemoteEvaluation()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.Remote
+                },
+                new OfrepProviderMock()
+            );
+
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            var got = await client.GetIntegerDetailsAsync("flag", 1, DefaultEvaluationContext);
+            var want = new ResolutionDetails<int>(
+                "flag",
+                12,
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "enabled",
+                null,
+                new ImmutableMetadata(new Dictionary<string, object>
+                {
+                    { "test", new Value("this is a test value") },
+                    { "test2", new Value(42) },
+                    { "test3", new Value(true) },
+                    { "test4", new Value(3.14) }
+                })
+            );
+
+            Assert.Equivalent(want, got);
+        }
+
+        [Fact(DisplayName = "Should evaluate a value flag with remote evaluation")]
+        public async Task ShouldEvaluateAValueFlagWithRemoteEvaluation()
+        {
+            var mockHttp = new RelayProxyMock();
+            var provider = new GoFeatureFlagProvider(
+                new GoFeatureFlagProviderOptions
+                {
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl,
+                    EvaluationType = EvaluationType.Remote
+                },
+                new OfrepProviderMock()
+            );
+
+            await Api.Instance.SetProviderAsync("test-client", provider);
+            var client = Api.Instance.GetClient("test-client");
+            var got = await client.GetObjectDetailsAsync("flag", new Value(1), DefaultEvaluationContext);
+            var want = new ResolutionDetails<Value>(
+                "flag",
+                new Value("this is a test value"),
+                ErrorType.None,
+                Reason.TargetingMatch,
+                "enabled",
+                null,
+                new ImmutableMetadata(new Dictionary<string, object>
+                {
+                    { "test", new Value("this is a test value") },
+                    { "test2", new Value(42) },
+                    { "test3", new Value(true) },
+                    { "test4", new Value(3.14) }
+                })
+            );
+
+            Assert.Equivalent(want, got);
         }
         // @DisplayName("Should error if the endpoint is not available")
         // @SneakyThrows

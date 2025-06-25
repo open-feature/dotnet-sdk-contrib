@@ -2,13 +2,13 @@ using System;
 using System.IO;
 using System.Text.Json;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.converters;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.wasm.bean;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.wasm.bean;
 using Wasmtime;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.wasm;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.wasm;
 
 /// <summary>
 ///     EvaluationWasm is a class that represents the evaluation of a feature flag
@@ -81,7 +81,9 @@ public class EvaluateWasm
         {
             return new EvaluationResponse
             {
-                ErrorCode = nameof(ErrorType.General), Reason = Reason.Error, ErrorDetails = ex.Message
+                ErrorCode = nameof(ErrorType.General),
+                Reason = Reason.Error,
+                ErrorDetails = ex.Message
             };
         }
         finally

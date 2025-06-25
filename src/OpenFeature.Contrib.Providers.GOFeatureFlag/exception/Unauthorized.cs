@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 
 /// <summary>
 ///     Unauthorized exception is thrown when the user is not authorized to access a resource.

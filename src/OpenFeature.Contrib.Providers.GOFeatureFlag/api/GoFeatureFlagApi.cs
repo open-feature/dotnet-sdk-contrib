@@ -8,11 +8,11 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v1.converters;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.api;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.api;
 
 /// <summary>
 ///     GoFeatureFlagApi is a class that provides methods to interact with the GO Feature Flag API.

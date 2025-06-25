@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.extensions;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
 
 /// <summary>
 ///     Extensions for GO Feature Flag provider.
@@ -19,6 +19,7 @@ public static class GoFeatureFlagExtensions
         return metadataDictionary != null ? new ImmutableMetadata(metadataDictionary) : null;
     }
 
+    /// <inheritdoc/>
     public static bool IsAnonymous(this EvaluationContext evaluationContext)
     {
         try

@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.extensions;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.v2.service;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.service;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.hooks;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.hooks;
 
 /// <summary>
 ///     DataCollectorHook is a hook that collects data during the evaluation of feature flags.

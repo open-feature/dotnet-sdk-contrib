@@ -2,7 +2,7 @@ using System;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.v2.exception;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 
 /// <summary>
 ///     Exception throw when we have a type that we are not able to convert.
