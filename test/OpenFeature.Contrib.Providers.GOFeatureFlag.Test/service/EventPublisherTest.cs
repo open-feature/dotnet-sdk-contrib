@@ -60,7 +60,7 @@ public class EventPublisherTests
             Version = "1.0.0"
         };
         publisher.AddEvent(eventMock);
-// No exception means event was added
+        // No exception means event was added
     }
 
     [Fact]

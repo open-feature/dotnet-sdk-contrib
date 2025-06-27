@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
@@ -7,6 +7,7 @@ using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.wasm.bean;
 using Wasmtime;
+using Module = Wasmtime.Module;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag.wasm;
 
@@ -16,6 +17,9 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag.wasm;
 /// </summary>
 public class EvaluateWasm
 {
+    private const string resourceName =
+        "OpenFeature.Contrib.Providers.GOFeatureFlag.WasmModules.gofeatureflag-evaluation.wasi";
+
     /// Function to evaluate the feature flag in the WASM module.
     private readonly Function _wasmEvaluate;
 
@@ -33,20 +37,24 @@ public class EvaluateWasm
     /// </summary>
     public EvaluateWasm()
     {
-        // TODO: change the path of the wasm file
-        var wasmFilePath =
-            "/Users/thomas.poignant/dev/thomaspoignant/go-feature-flag/out/bin/gofeatureflag-evaluation.wasi";
-        if (!File.Exists(wasmFilePath))
-        {
-            throw new FileNotFoundException($"Wasm file not found at '{wasmFilePath}'. Please ensure the file exists.");
-        }
-
         var engine = new Engine();
         var linker = new Linker(engine);
         var store = new Store(engine);
 
-        var wasmBytes = File.ReadAllBytes(wasmFilePath);
-        var module = Module.FromBytes(engine, "evaluation", wasmBytes);
+        var assembly = Assembly.GetExecutingAssembly();
+        if (assembly == null)
+        {
+            throw new WasmNotLoaded("Assembly not found. Ensure the WASM module is correctly embedded.");
+        }
+
+        var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
+        {
+            throw new WasmNotLoaded(
+                "WASM module not found. Ensure the resource name is correct and the file is included in the project.");
+        }
+
+        var module = Module.FromStream(engine, "evaluation", stream);
         var wasi = new WasiConfiguration()
             .WithInheritedStandardOutput()
             .WithInheritedStandardError();
@@ -62,7 +70,6 @@ public class EvaluateWasm
     /// <summary>
     ///     Evaluates a feature flag using the WASM module.
     /// </summary>
-    /// <typeparam name="T">Expected type of the feature flag</typeparam>
     /// <returns>A ResolutionDetails of the feature flag</returns>
     /// <exception cref="WasmInvalidResult">If for any reasons we have an issue calling the wasm module.</exception>
     public EvaluationResponse Evaluate(WasmInput wasmInput)
@@ -81,9 +88,7 @@ public class EvaluateWasm
         {
             return new EvaluationResponse
             {
-                ErrorCode = nameof(ErrorType.General),
-                Reason = Reason.Error,
-                ErrorDetails = ex.Message
+                ErrorCode = nameof(ErrorType.General), Reason = Reason.Error, ErrorDetails = ex.Message
             };
         }
         finally

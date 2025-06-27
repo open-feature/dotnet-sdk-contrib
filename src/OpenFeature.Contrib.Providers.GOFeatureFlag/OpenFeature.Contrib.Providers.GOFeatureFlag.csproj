@@ -20,6 +20,10 @@
     <PackageReference Include="OpenFeature" Version="2.2.0"/>
     <PackageReference Include="OpenFeature.Providers.Ofrep" Version="0.1.0"/>
     <PackageReference Include="Wasmtime" Version="22.0.0"/>
+    <EmbeddedResource Include="$(MSBuildProjectDirectory)\WasmModules\gofeatureflag-evaluation.wasi"/>
   </ItemGroup>
 
+  <Target Name="DownloadWasmModule" BeforeTargets="BeforeBuild">
+    <Exec Command="$(MSBuildProjectDirectory)/.scripts/download-wasm.sh" Condition="'$(OS)' != 'Windows_NT'"/>
+  </Target>
 </Project>
