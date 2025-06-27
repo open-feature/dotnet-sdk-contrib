@@ -30,13 +30,13 @@ public class OfrepResponse<T>
     ///     An error code indicating the reason for evaluation failure, if any.
     /// </summary>
     [JsonPropertyName("errorCode")]
-    public string? ErrorCode { get; set; }
+    public string ErrorCode { get; set; }
 
     /// <summary>
     ///     A detailed error message accompanying the error code, if any.
     /// </summary>
     [JsonPropertyName("errorDetails")]
-    public string? ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; }
 
     /// <summary>
     ///     The evaluated value of the flag.
@@ -48,17 +48,17 @@ public class OfrepResponse<T>
     ///     The reason for the evaluation result (e.g., STATIC, TARGETING_MATCH).
     /// </summary>
     [JsonPropertyName("reason")]
-    public string? Reason { get; set; }
+    public string Reason { get; set; }
 
     /// <summary>
     ///     The specific variant of the flag that was evaluated.
     /// </summary>
     [JsonPropertyName("variant")]
-    public string? Variant { get; set; }
+    public string Variant { get; set; }
 
     /// <summary>
     ///     Additional metadata associated with the evaluation result.
     /// </summary>
     [JsonPropertyName("metadata")]
-    public Dictionary<string, object>? Metadata { get; set; }
+    public Dictionary<string, object> Metadata { get; set; }
 }

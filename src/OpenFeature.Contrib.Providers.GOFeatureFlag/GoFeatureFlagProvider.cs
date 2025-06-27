@@ -225,8 +225,8 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// <param name="trackingEventName">The name associated with this tracking event</param>
     /// <param name="evaluationContext">The evaluation context used in the evaluation of the flag (optional)</param>
     /// <param name="trackingEventDetails">Data pertinent to the tracking event (Optional)</param>
-    public override void Track(string trackingEventName, EvaluationContext? evaluationContext = default,
-        TrackingEventDetails? trackingEventDetails = default)
+    public override void Track(string trackingEventName, EvaluationContext evaluationContext = default,
+        TrackingEventDetails trackingEventDetails = default)
     {
         var trackingEvent =
             new TrackingEvent

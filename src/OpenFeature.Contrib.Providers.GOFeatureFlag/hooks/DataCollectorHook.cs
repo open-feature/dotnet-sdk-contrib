@@ -38,7 +38,7 @@ public class DataCollectorHook : Hook
     public override ValueTask AfterAsync<T>(
         HookContext<T> context,
         FlagEvaluationDetails<T> details,
-        IReadOnlyDictionary<string, object>? hints = null,
+        IReadOnlyDictionary<string, object> hints = null,
         CancellationToken cancellationToken = default)
     {
         if (!this._evaluationService.IsFlagTrackable(context.FlagKey))
@@ -72,7 +72,7 @@ public class DataCollectorHook : Hook
     public override ValueTask ErrorAsync<T>(
         HookContext<T> context,
         Exception error,
-        IReadOnlyDictionary<string, object>? hints = null,
+        IReadOnlyDictionary<string, object> hints = null,
         CancellationToken cancellationToken = default)
     {
         if (!this._evaluationService.IsFlagTrackable(context.FlagKey))

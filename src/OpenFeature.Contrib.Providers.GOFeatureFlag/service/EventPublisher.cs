@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -19,7 +18,9 @@ public class EventPublisher
     /// <summary>
     ///     _events is a thread-safe collection of events that will be published.
     /// </summary>
-    private readonly ConcurrentBag<IEvent> _events = new();
+    private readonly List<IEvent> _events = new();
+
+    private readonly object _lock = new();
 
     /// <summary>
     ///     ExporterMetadata contains static information about the exporter that will be sent with the events.
@@ -66,12 +67,21 @@ public class EventPublisher
     /// </summary>
     public void AddEvent(IEvent eventToAdd)
     {
-        if (this._events.Count + 1 >= this._options.MaxPendingEvents)
+        var shouldPublish = false;
+        lock (this._lock)
         {
-            Task.Run(this.PublishEventsAsync);
+            if (this._events.Count + 1 >= this._options.MaxPendingEvents)
+            {
+                shouldPublish = true;
+            }
+
+            this._events.Add(eventToAdd);
         }
 
-        this._events.Add(eventToAdd);
+        if (shouldPublish)
+        {
+            _ = this.PublishEventsAsync();
+        }
     }
 
     /// <summary>
@@ -79,25 +89,29 @@ public class EventPublisher
     /// </summary>
     private async Task PublishEventsAsync()
     {
-        var eventsToPublish = new List<IEvent>();
-        while (this._events.TryTake(out var ev))
+        List<IEvent> eventsToPublish;
+        lock (this._lock)
         {
-            eventsToPublish.Add(ev);
+            if (this._events.Count == 0)
+            {
+                return;
+            }
+
+            eventsToPublish = new List<IEvent>(this._events);
+            this._events.Clear();
         }
 
         try
         {
-            if (eventsToPublish.Count == 0) { return; }
-
             await this._api.SendEventToDataCollector(eventsToPublish, this._options.ExporterMetadata)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             this._options.Logger.LogError(ex, "An error occurred while publishing events: {Message}", ex.Message);
-            foreach (var failedEvent in eventsToPublish)
+            lock (this._lock)
             {
-                this._events.Add(failedEvent);
+                this._events.AddRange(eventsToPublish);
             }
         }
     }
