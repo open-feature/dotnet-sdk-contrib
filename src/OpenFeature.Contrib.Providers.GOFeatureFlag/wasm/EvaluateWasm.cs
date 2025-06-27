@@ -88,7 +88,9 @@ public class EvaluateWasm
         {
             return new EvaluationResponse
             {
-                ErrorCode = nameof(ErrorType.General), Reason = Reason.Error, ErrorDetails = ex.Message
+                ErrorCode = nameof(ErrorType.General),
+                Reason = Reason.Error,
+                ErrorDetails = ex.Message
             };
         }
         finally

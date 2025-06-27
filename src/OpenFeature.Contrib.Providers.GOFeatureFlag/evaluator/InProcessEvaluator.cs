@@ -275,7 +275,8 @@ public class InProcessEvaluator : IEvaluator
             EvalContext = evaluationContext.AsDictionary().ToImmutableDictionary(),
             FlagContext = new FlagContext
             {
-                DefaultSdkValue = defaultValue, EvaluationContextEnrichment = this._evaluationContextEnrichment
+                DefaultSdkValue = defaultValue,
+                EvaluationContextEnrichment = this._evaluationContextEnrichment
             },
             Flag = flag
         };
@@ -327,7 +328,8 @@ public class InProcessEvaluator : IEvaluator
         // send an event to the event channel to notify about the configuration change
         this._eventChannel.Writer.TryWrite(new ProviderEventPayload
         {
-            Type = ProviderEventTypes.ProviderConfigurationChanged, ProviderName = this._providerMetadata.Name
+            Type = ProviderEventTypes.ProviderConfigurationChanged,
+            ProviderName = this._providerMetadata.Name
         });
     }
 
