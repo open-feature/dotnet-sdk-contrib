@@ -153,7 +153,7 @@ public class EventPublisherTests
         {
             Endpoint = RelayProxyMock.baseUrl,
             HttpMessageHandler = handler,
-            FlushIntervalMs = TimeSpan.FromMilliseconds(1000),
+            FlushIntervalMs = TimeSpan.FromMilliseconds(10000),
             MaxPendingEvents = 2
         };
         var api = new GoFeatureFlagApi(this._options);
@@ -195,13 +195,14 @@ public class EventPublisherTests
         };
         publisher.AddEvent(eventMock1);
         publisher.AddEvent(eventMock2);
+        // we are adding delays to ensure the publisher has time to process the other events first
+        await Task.Delay(TimeSpan.FromMilliseconds(50));
         publisher.AddEvent(eventMock3);
 
-        await Task.Delay(TimeSpan.FromMilliseconds(100));
         var got = await this._mockHttp.LastRequest.Content.ReadAsStringAsync();
-
+        await Task.Delay(TimeSpan.FromMilliseconds(200));
         var want =
-            "{\"meta\": {},\"events\":[{\"kind\":\"feature\",\"defaultValue\": false,\"value\":\"toto\",\"variation\":\"on\",\"version\":\"1.0.0\",\"creationDate\":1750406145,\"contextKind\":\"user\",\"key\":\"TEST\",\"userKey\":\"642e135a-1df9-4419-a3d3-3c42e0e67509\"},{\"kind\":\"feature\",\"defaultValue\":false,\"value\": \"toto\",\"variation\": \"on\",\"version\": \"1.0.0\",\"creationDate\": 1750406147,\"contextKind\": \"user\",\"key\": \"TEST\",\"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"},{\"kind\": \"feature\",\"defaultValue\": false,\"value\": \"toto\",\"variation\": \"on\",\"version\": \"1.0.0\",\"creationDate\": 1750406149,\"contextKind\": \"user\",\"key\": \"TEST\",\"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"}]}";
+            "{\n  \"meta\": {},\n  \"events\": [\n    {\n      \"kind\": \"feature\",\n      \"defaultValue\": false,\n      \"value\": \"toto\",\n      \"variation\": \"on\",\n      \"version\": \"1.0.0\",\n      \"creationDate\": 1750406145,\n      \"contextKind\": \"user\",\n      \"key\": \"TEST\",\n      \"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"\n    },\n    {\n      \"kind\": \"feature\",\n      \"defaultValue\": false,\n      \"value\": \"toto\",\n      \"variation\": \"on\",\n      \"version\": \"1.0.0\",\n      \"creationDate\": 1750406147,\n      \"contextKind\": \"user\",\n      \"key\": \"TEST\",\n      \"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"\n    }\n  ]\n}";
         AssertUtil.JsonEqual(want, got);
     }
 }

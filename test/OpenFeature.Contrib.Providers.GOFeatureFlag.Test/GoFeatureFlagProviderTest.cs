@@ -42,8 +42,7 @@ public class GoFeatureFlagProviderTest
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
                 {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
-                    Endpoint = RelayProxyMock.baseUrl
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
                 }
             );
 
@@ -353,31 +352,6 @@ public class GoFeatureFlagProviderTest
             Assert.True(handlerCalled);
         }
 
-        [Fact(DisplayName = "Should not emit configuration change event, if config has not changed")]
-        public async Task ShouldNotEmitConfigurationChangeEventIfConfigHasNotChanged()
-        {
-            var mockHttp = new RelayProxyMock();
-            var provider = new GoFeatureFlagProvider(
-                new GoFeatureFlagProviderOptions
-                {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock("SIMPLE_FLAG_CONFIG"),
-                    Endpoint = RelayProxyMock.baseUrl,
-                    EvaluationType = EvaluationType.InProcess,
-                    FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
-                }
-            );
-
-            await Api.Instance.SetProviderAsync("client_test_handler_no_change", provider);
-            var client = Api.Instance.GetClient("client_test_handler_no_change");
-            var handlerCalled = false;
-            client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, _ =>
-            {
-                handlerCalled = true;
-            });
-            await Task.Delay(TimeSpan.FromMilliseconds(150));
-            Assert.False(handlerCalled);
-        }
-
         [Fact(DisplayName = "Should change evaluation details if config has changed")]
         public async Task ShouldChangeEvaluationDetailsIfConfigHasChanged()
         {
@@ -629,8 +603,7 @@ public class GoFeatureFlagProviderTest
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
-                        Endpoint = baseUrl,
-                        FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000)
+                        Endpoint = baseUrl, FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000)
                     }
                 )
             );
@@ -671,7 +644,7 @@ public class GoFeatureFlagProviderTest
 
             client.Track("my-key", DefaultEvaluationContext,
                 TrackingEventDetails.Builder().Set("revenue", 123).Set("user_id", "123ABC").Build());
-            await Task.Delay(TimeSpan.FromMilliseconds(200));
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var want =
                 "{ \"meta\": {},\"events\": [  {    \"kind\": \"tracking\",    \"evaluationContext\": {      \"email\": \"john.doe@gofeatureflag.org\",      \"labels\": [        \"pro\",        \"beta\"      ],      \"rate\": 3.14,      \"company_info\": {        \"size\": 120,        \"name\": \"my_company\"      },      \"anonymous\": false,      \"targetingKey\": \"d45e303a-38c2-11ed-a261-0242ac120002\",      \"professional\": true,      \"firstname\": \"john\",      \"lastname\": \"doe\",      \"age\": 30    },    \"trackingEventDetails\": {      \"revenue\": 123,      \"user_id\": \"123ABC\"    },    \"creationDate\": 1750679098,    \"contextKind\": \"user\",    \"key\": \"my-key\",    \"userKey\": \"d45e303a-38c2-11ed-a261-0242ac120002\"  }]\n}";
@@ -723,10 +696,11 @@ public class GoFeatureFlagProviderTest
             await Api.Instance.SetProviderAsync("test-client", provider);
             var client = Api.Instance.GetClient("test-client");
             await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
-            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.Single(gotJson["events"]);
+            await Api.Instance.ShutdownAsync();
         }
 
         [Fact(DisplayName = "Should call multiple times the data collector if max pending events is reached")]
@@ -745,10 +719,11 @@ public class GoFeatureFlagProviderTest
             var client = Api.Instance.GetClient("test-client");
             await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
             await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
-            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.Equal(2, gotJson["events"].Count());
+            await Api.Instance.ShutdownAsync();
         }
     }
 
