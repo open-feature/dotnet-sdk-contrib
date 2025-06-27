@@ -26,5 +26,7 @@
   <Target Name="DownloadWasmModule" BeforeTargets="BeforeBuild">
     <Exec Command="$(MSBuildProjectDirectory)/.scripts/download-wasm.sh"
           Condition="'$(OS)' != 'Windows_NT' and !Exists('$(MSBuildProjectDirectory)/WasmModules/gofeatureflag-evaluation.wasi')"/>
+    <Exec Command="$(MSBuildProjectDirectory)/.scripts/download-wasm.ps1"
+          Condition="'$(OS)' == 'Windows_NT' and !Exists('$(MSBuildProjectDirectory)/WasmModules/gofeatureflag-evaluation.wasi')"/>
   </Target>
 </Project>
