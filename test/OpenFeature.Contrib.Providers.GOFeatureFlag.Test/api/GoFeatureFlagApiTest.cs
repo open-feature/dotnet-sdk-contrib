@@ -54,7 +54,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             await api.RetrieveFlagConfiguration(null, null);
@@ -70,7 +71,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             await api.RetrieveFlagConfiguration(null, null);
@@ -86,7 +88,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             await api.RetrieveFlagConfiguration(null, null);
@@ -102,7 +105,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             await api.RetrieveFlagConfiguration("12345", null);
@@ -119,7 +123,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             await api.RetrieveFlagConfiguration(null, new[] { "flag1", "flag2" }.ToList());
@@ -137,7 +142,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("401"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("401"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
 
@@ -151,7 +157,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("403"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("403"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
 
@@ -165,7 +172,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("400"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("400"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
 
@@ -179,7 +187,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("500"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("500"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
 
@@ -257,12 +266,14 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("304"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("304"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             var want = new FlagConfigResponse
             {
-                Etag = "\"123456789\"", LastUpdated = DateTime.Parse("Wed, 21 Oct 2015 07:28:00 GMT")
+                Etag = "\"123456789\"",
+                LastUpdated = DateTime.Parse("Wed, 21 Oct 2015 07:28:00 GMT")
             };
 
             var got = await api.RetrieveFlagConfiguration(null, null);
@@ -299,7 +310,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
@@ -316,7 +328,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
@@ -382,7 +395,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("401"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("401"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
@@ -397,7 +411,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("403"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("403"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
@@ -412,7 +427,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("400"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("400"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
@@ -427,7 +443,8 @@ public class GoFeatureFlagApiTest
             var mockHttp = new RelayProxyMock();
             var options = new GoFeatureFlagProviderOptions
             {
-                HttpMessageHandler = mockHttp.GetRelayProxyMock("500"), Endpoint = RelayProxyMock.baseUrl
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("500"),
+                Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();

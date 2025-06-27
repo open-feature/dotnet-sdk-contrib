@@ -42,7 +42,8 @@ public class GoFeatureFlagProviderTest
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
                 {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl
                 }
             );
 
@@ -628,7 +629,8 @@ public class GoFeatureFlagProviderTest
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
-                        Endpoint = baseUrl, FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000)
+                        Endpoint = baseUrl,
+                        FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000)
                     }
                 )
             );
@@ -699,7 +701,7 @@ public class GoFeatureFlagProviderTest
             await Task.Delay(TimeSpan.FromMilliseconds(200));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
-            Assert.Equal(1, gotJson["events"].Count());
+            Assert.Single(gotJson["events"]);
         }
     }
 
@@ -724,7 +726,7 @@ public class GoFeatureFlagProviderTest
             await Task.Delay(TimeSpan.FromMilliseconds(100));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
-            Assert.Equal(1, gotJson["events"].Count());
+            Assert.Single(gotJson["events"]);
         }
 
         [Fact(DisplayName = "Should call multiple times the data collector if max pending events is reached")]
@@ -809,7 +811,7 @@ public class GoFeatureFlagProviderTest
     public class RemoteEvaluationTest
     {
         [Fact(DisplayName = "Should error if the endpoint is not available")]
-        public async Task ShouldErrorIfEndpointNotAvailable()
+        public Task ShouldErrorIfEndpointNotAvailable()
         {
             var mockHttp = new RelayProxyMock();
             Assert.Throws<InvalidOption>(() =>
@@ -823,6 +825,7 @@ public class GoFeatureFlagProviderTest
                     }
                 );
             });
+            return Task.CompletedTask;
         }
 
         [Fact(DisplayName = "Should evaluate a string flag with remote evaluation")]
