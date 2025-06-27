@@ -223,48 +223,6 @@ namespace OpenFeatureTestApp
 
 After running this example, you should be able to see some metrics being generated into the console.
 
-### Modern Metrics Example (SDK v2.7.0+)
-
-Here's how to achieve the same functionality using the native `MetricsHook` in the OpenFeature SDK:
-
-```csharp
-using OpenFeature.Contrib.Providers.Flagd;
-using OpenFeature;
-using OpenFeature.Hooks; // Use the native SDK hooks
-using OpenTelemetry;
-using OpenTelemetry.Metrics;
-
-namespace OpenFeatureTestApp
-{
-    class Hello {
-        static void Main(string[] args) {
-
-            // set up the OpenTelemetry OTLP exporter
-            var meterProvider = Sdk.CreateMeterProviderBuilder()
-                    .AddMeter("OpenFeature") // Note: different meter name for SDK
-                    .ConfigureResource(r => r.AddService("openfeature-test"))
-                    .AddConsoleExporter()
-                    .Build();
-
-            // add the native SDK MetricsHook to the OpenFeature instance
-            OpenFeature.Api.Instance.AddHooks(new MetricsHook());
-
-            var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
-
-            // Set the flagdProvider as the provider for the OpenFeature SDK
-            OpenFeature.Api.Instance.SetProvider(flagdProvider);
-
-            var client = OpenFeature.Api.Instance.GetClient("my-app");
-
-            var val = client.GetBooleanValueAsync("myBoolFlag", false, null);
-
-            // Print the value of the 'myBoolFlag' feature flag
-            System.Console.WriteLine(val.Result.ToString());
-        }
-    }
-}
-```
-
 ## License
 
 Apache 2.0 - See [LICENSE](./../../LICENSE) for more information.
