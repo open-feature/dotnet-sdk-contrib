@@ -4,7 +4,7 @@
 
 ## Migration Guide
 
-As of OpenFeature .NET SDK version 2.7.0, OpenTelemetry hooks are now included natively in the SDK and this contrib library is no longer needed. Follow these steps to migrate:
+As of OpenFeature .NET SDK version 2.7.0, OpenTelemetry hooks are now included natively in the SDK and this contrib library is no longer needed. The native hooks have also been updated to match the latest version of the OpenTelemetry semantic conventions. Follow these steps to migrate:
 
 ### 1. Update Dependencies
 
