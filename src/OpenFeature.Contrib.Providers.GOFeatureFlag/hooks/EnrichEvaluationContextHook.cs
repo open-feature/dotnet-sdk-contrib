@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag.hooks;
@@ -19,7 +19,13 @@ public class EnrichEvaluationContextHook : Hook
     /// <param name="metadata">metadata to use in order to enrich the evaluation context</param>
     public EnrichEvaluationContextHook(ExporterMetadata metadata)
     {
-        _metadata = metadata.AsStructure();
+        if (metadata == null)
+        {
+            this._metadata = Structure.Empty;
+            return;
+        }
+
+        this._metadata = metadata.AsStructure();
     }
 
     /// <summary>
@@ -34,8 +40,12 @@ public class EnrichEvaluationContextHook : Hook
         IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
     {
         var builder = EvaluationContext.Builder();
+        if (this._metadata != null && this._metadata.Count != 0)
+        {
+            builder.Set("gofeatureflag", this._metadata);
+        }
+
         builder.Merge(context.EvaluationContext);
-        builder.Set("gofeatureflag", _metadata);
         return new ValueTask<EvaluationContext>(builder.Build());
     }
 }

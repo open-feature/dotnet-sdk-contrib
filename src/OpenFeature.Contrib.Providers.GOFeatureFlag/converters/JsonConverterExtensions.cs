@@ -10,14 +10,10 @@ public static class JsonConverterExtensions
     /// <summary>
     ///     JsonConverter serializer settings for GO Feature Flag to OpenFeature model deserialization
     /// </summary>
-    public static readonly JsonSerializerOptions DefaultSerializerSettings = new JsonSerializerOptions
+    public static readonly JsonSerializerOptions DefaultSerializerSettings = new()
     {
         WriteIndented = true,
         AllowTrailingCommas = true,
-        Converters =
-        {
-            new OpenFeatureStructureConverter(),
-            new OpenFeatureValueConverter()
-        }
+        Converters = { new OpenFeatureStructureConverter(), new OpenFeatureValueConverter() }
     };
 }

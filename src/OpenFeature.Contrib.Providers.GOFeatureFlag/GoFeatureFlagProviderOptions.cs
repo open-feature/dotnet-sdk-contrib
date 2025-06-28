@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using Wasmtime;
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag;
 
@@ -10,16 +14,30 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag;
 public class GoFeatureFlagProviderOptions
 {
     /// <Summary>
+    ///     (optional) interval time we poll the proxy to check if the configuration has changed. If the
+    ///     cache is enabled, we will poll the relay-proxy every X milliseconds to check if the
+    ///     configuration has changed. default: 120000
+    /// </Summary>
+    public TimeSpan FlagChangePollingIntervalMs { get; set; } = TimeSpan.FromMilliseconds(120000);
+
+
+    /// <Summary>
     ///     (mandatory) endpoint contains the DNS of your GO Feature Flag relay proxy
     ///     example: https://mydomain.com/gofeatureflagproxy/
     /// </Summary>
     public string Endpoint { get; set; }
 
+    /// <summary>
+    ///     EvaluationType defines how the evaluation is done.
+    ///     Default is InProcess.
+    /// </summary>
+    public EvaluationType EvaluationType { get; set; } = EvaluationType.InProcess;
+
     /// <Summary>
     ///     (optional) timeout we are waiting when calling the go-feature-flag relay proxy API.
     ///     Default: 10000 ms
     /// </Summary>
-    public TimeSpan Timeout { get; set; } = new TimeSpan(10000 * TimeSpan.TicksPerMillisecond);
+    public TimeSpan Timeout { get; set; } = new(10000 * TimeSpan.TicksPerMillisecond);
 
     /// <Summary>
     ///     (optional) If you want to provide your own HttpMessageHandler.
@@ -40,5 +58,38 @@ public class GoFeatureFlagProviderOptions
     ///     (optional) ExporterMetadata are static information you can set that will be available in the
     ///     evaluation data sent to the exporter.
     /// </summary>
-    public ExporterMetadata ExporterMetadata { get; set; }
+    public ExporterMetadata ExporterMetadata { get; set; } = new();
+
+    /// <Summary>
+    ///     (optional) If you are using in process evaluation, by default, we will load in memory all the flags available
+    ///     in the relay proxy. If you want to limit the number of flags loaded in memory, you can use this parameter.
+    ///     By setting this parameter, you will only load the flags available in the list.
+    ///     <p>If null or empty, all the flags available in the relay proxy will be loaded.</p>
+    /// </Summary>
+    public List<string> EvaluationFlagList { get; set; }
+
+    /// <summary>
+    ///     Logger for the provider. When not specified <see cref="Instance" /> is used.
+    /// </summary>
+    public ILogger Logger { get; set; } = NullLogger.Instance;
+
+    /// <summary>
+    ///     (optional) interval time we publish statistics collection data to the proxy. The parameter is
+    ///     used only if the cache is enabled, otherwise the collection of the data is done directly when
+    ///     calling the evaluation API. default: 1000 ms
+    /// </summary>
+    public TimeSpan FlushIntervalMs { get; set; } = TimeSpan.FromMilliseconds(1000);
+
+    /// <summary>
+    ///     (optional) max pending events aggregated before publishing for collection data to the proxy.
+    ///     When an event is added while an events collection is full, the event is omitted. default: 10000
+    /// </summary>
+    public int MaxPendingEvents { get; set; } = 10000;
+
+
+    /// <summary>
+    ///     (optional) disableDataCollection set to true if you don't want to collect the usage of flags retrieved in the
+    ///     cache. default: false
+    /// </summary>
+    public bool DisableDataCollection { get; set; } = false;
 }

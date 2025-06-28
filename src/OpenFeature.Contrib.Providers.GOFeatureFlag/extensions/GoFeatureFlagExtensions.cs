@@ -18,4 +18,22 @@ public static class GoFeatureFlagExtensions
     {
         return metadataDictionary != null ? new ImmutableMetadata(metadataDictionary) : null;
     }
+
+    /// <inheritdoc/>
+    public static bool IsAnonymous(this EvaluationContext evaluationContext)
+    {
+        try
+        {
+            if (evaluationContext == null) { return false; }
+
+            var anonymousField = evaluationContext.GetValue("anonymous");
+            if (anonymousField.AsBoolean == true) { return true; }
+
+            return false;
+        }
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
+    }
 }

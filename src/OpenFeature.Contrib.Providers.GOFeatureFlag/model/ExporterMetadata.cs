@@ -1,9 +1,9 @@
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.models;
+namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 
 /// <summary>
-///     This class represent the exporter metadata that will be sent in your evaluation data collectore
+///     This class represents the exporter metadata that will be sent in your evaluation data collectore
 /// </summary>
 public class ExporterMetadata
 {
@@ -16,7 +16,7 @@ public class ExporterMetadata
     /// <param name="value"></param>
     public void Add(string key, string value)
     {
-        _exporterMetadataBuilder.Set(key, value);
+        this._exporterMetadataBuilder.Set(key, value);
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ public class ExporterMetadata
     /// <param name="value"></param>
     public void Add(string key, bool value)
     {
-        _exporterMetadataBuilder.Set(key, value);
+        this._exporterMetadataBuilder.Set(key, value);
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class ExporterMetadata
     /// <param name="value"></param>
     public void Add(string key, double value)
     {
-        _exporterMetadataBuilder.Set(key, value);
+        this._exporterMetadataBuilder.Set(key, value);
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public class ExporterMetadata
     /// <param name="value"></param>
     public void Add(string key, int value)
     {
-        _exporterMetadataBuilder.Set(key, value);
+        this._exporterMetadataBuilder.Set(key, value);
     }
 
     /// <summary>
@@ -55,6 +55,6 @@ public class ExporterMetadata
     /// <returns></returns>
     public Structure AsStructure()
     {
-        return _exporterMetadataBuilder.Build();
+        return this._exporterMetadataBuilder.Build();
     }
 }

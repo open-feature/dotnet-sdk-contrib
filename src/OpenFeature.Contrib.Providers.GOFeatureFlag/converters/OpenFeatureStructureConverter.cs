@@ -7,7 +7,7 @@ using OpenFeature.Model;
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
 
 /// <summary>
-/// OpenFeatureStructureConverter
+///     OpenFeatureStructureConverter
 /// </summary>
 public class OpenFeatureStructureConverter : JsonConverter<Structure>
 {

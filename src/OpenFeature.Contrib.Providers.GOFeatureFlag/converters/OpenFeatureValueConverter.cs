@@ -25,13 +25,21 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
             case JsonTokenType.False:
                 return new Value(reader.GetBoolean());
             case JsonTokenType.Number:
-                if (reader.TryGetInt32(out var intValue)) return new Value(intValue);
-                if (reader.TryGetDouble(out var dblValue)) return new Value(dblValue);
+                if (reader.TryGetInt32(out var intValue))
+                {
+                    return new Value(intValue);
+                }
+
+                if (reader.TryGetDouble(out var dblValue))
+                {
+                    return new Value(dblValue);
+                }
+
                 break;
             case JsonTokenType.StartArray:
-                return new Value(GenerateValueArray(ref reader, typeToConvert, options));
+                return new Value(this.GenerateValueArray(ref reader, typeToConvert, options));
             case JsonTokenType.StartObject:
-                return new Value(GetStructure(ref reader, typeToConvert, options));
+                return new Value(this.GetStructure(ref reader, typeToConvert, options));
         }
 
         return value;
@@ -47,11 +55,14 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
             {
                 var key = reader.GetString();
                 reader.Read();
-                var val = Read(ref reader, typeToConvert, options);
+                var val = this.Read(ref reader, typeToConvert, options);
                 structureDictionary[key ?? string.Empty] = val;
             }
 
-            if (reader.TokenType == JsonTokenType.EndObject && reader.CurrentDepth == startDepth) break;
+            if (reader.TokenType == JsonTokenType.EndObject && reader.CurrentDepth == startDepth)
+            {
+                break;
+            }
         }
 
         return new Structure(structureDictionary);
@@ -65,14 +76,16 @@ public class OpenFeatureValueConverter : JsonConverter<Value>
         var startDepth = reader.CurrentDepth;
 
         while (reader.Read())
+        {
             switch (reader.TokenType)
             {
                 case JsonTokenType.EndArray when reader.CurrentDepth == startDepth:
                     return valuesArray;
                 default:
-                    valuesArray.Add(Read(ref reader, typeToConvert, options));
+                    valuesArray.Add(this.Read(ref reader, typeToConvert, options));
                     break;
             }
+        }
 
         return valuesArray;
     }

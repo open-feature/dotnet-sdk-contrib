@@ -1,21 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Globalization;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.hooks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.models;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.ofrep;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.service;
 using OpenFeature.Model;
+
+[assembly: InternalsVisibleTo("OpenFeature.Contrib.Providers.GOFeatureFlag.Test")]
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag;
 
@@ -24,19 +23,78 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag;
 /// </summary>
 public class GoFeatureFlagProvider : FeatureProvider
 {
-    private const string ApplicationJson = "application/json";
-    private ExporterMetadata _exporterMetadata;
-    private HttpClient _httpClient;
+    /// <summary>
+    ///     EvaluationService is the service used to evaluate feature flags.
+    /// </summary>
+    private readonly EvaluationService _evaluationService;
+
+    /// <summary>
+    ///     EventPublisher is used to collect events and publish them in batch before they are published.
+    /// </summary>
+    private readonly EventPublisher _eventPublisher;
+
+    private readonly GoFeatureFlagProviderOptions _options;
+
+    /// <summary>
+    ///     Metadata associated with this provider.
+    /// </summary>
+    private readonly Metadata _providerMetadata = new("GO Feature Flag Provider");
+
+
+    private IImmutableList<Hook> _hooks = ImmutableArray.Create<Hook>();
 
     /// <summary>
     ///     Constructor of the provider.
-    ///     <param name="options">Options used while creating the provider</param>
-    ///     <exception cref="InvalidOption">if no options are provided or we have a wrong configuration.</exception>
     /// </summary>
-    public GoFeatureFlagProvider(GoFeatureFlagProviderOptions options)
+    /// <param name="options">Options used while creating the provider</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="InvalidOption">if no options are provided, or we have a wrong configuration.</exception>
+    public GoFeatureFlagProvider(GoFeatureFlagProviderOptions options) : this(options, null)
+    {
+        // we don't do anything here, the internal constructor will do the job.
+    }
+
+    /// <summary>
+    ///     This constructor is used to create the provider with a custom OFREP provider.
+    /// </summary>
+    /// <param name="options">Options used while creating the provider</param>
+    /// <param name="ofrepProvider">The OFREP provider should be set only for test purposes</param>
+    internal GoFeatureFlagProvider(GoFeatureFlagProviderOptions options, IOfrepProvider ofrepProvider = null)
     {
         ValidateInputOptions(options);
-        InitializeProvider(options);
+        var api = new GoFeatureFlagApi(options);
+        var evaluator = this.GetEvaluator(options, api, ofrepProvider);
+        this._evaluationService = new EvaluationService(evaluator);
+        this._eventPublisher = new EventPublisher(api, options);
+        this._options = options;
+    }
+
+
+    /// <summary>
+    ///     Return the metadata associated with this provider.
+    /// </summary>
+    public override Metadata GetMetadata()
+    {
+        return this._providerMetadata;
+    }
+
+    /// <summary>
+    ///     GetEvaluator is used to get the evaluator based on the evaluation type specified in the options.
+    /// </summary>
+    /// <param name="options">Provider options.</param>
+    /// <param name="api">API layer to access the relay proxy.</param>
+    /// <param name="ofrepProvider">Optional custom OFREP provider (used for test)</param>
+    /// <returns></returns>
+    private IEvaluator GetEvaluator(GoFeatureFlagProviderOptions options, GoFeatureFlagApi api,
+        IOfrepProvider ofrepProvider = null)
+    {
+        if (options.EvaluationType == EvaluationType.Remote)
+        {
+            return new RemoteEvaluator(options, ofrepProvider);
+        }
+
+        return new InProcessEvaluator(
+            api, options, this.EventChannel, this._providerMetadata);
     }
 
     /// <summary>
@@ -45,318 +103,180 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// <returns></returns>
     public override IImmutableList<Hook> GetProviderHooks()
     {
-        var hooks = ImmutableArray.CreateBuilder<Hook>();
-        hooks.Add(new EnrichEvaluationContextHook(_exporterMetadata));
-        return hooks.ToImmutable();
+        return this._hooks.ToImmutableList();
+    }
+
+    /// <summary>
+    ///     InitializeAsync is called to initialize the provider.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cancellationToken"></param>
+    public override async Task InitializeAsync(
+        EvaluationContext context,
+        CancellationToken cancellationToken = default)
+    {
+        this._hooks = this._hooks.Add(new EnrichEvaluationContextHook(this._options.ExporterMetadata));
+        await this._evaluationService.InitializeAsync().ConfigureAwait(false);
+        await this._eventPublisher.StartAsync().ConfigureAwait(false);
+
+        // In case of remote evaluation, we don't need to send the data to the collector
+        // because the relay-proxy will collect events directly server side.
+        if (!this._options.DisableDataCollection && this._options.EvaluationType == EvaluationType.InProcess)
+        {
+            this._hooks = this._hooks.Add(new DataCollectorHook(this._evaluationService, this._eventPublisher));
+        }
+    }
+
+    /// <summary>
+    ///     ShutdownAsync is called to shut down the provider and release resources.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    public override async Task ShutdownAsync(CancellationToken cancellationToken = default)
+    {
+        await this._evaluationService.DisposeAsync().ConfigureAwait(false);
+        await this._eventPublisher.StopAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Resolves a boolean feature flag
+    /// </summary>
+    /// <param name="flagKey">Feature flag key</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="context">EvaluationContext</param>
+    /// <param name="cancellationToken">The CancellationToken.</param>
+    /// <returns>ResolutionDetails</returns>
+    public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
+        EvaluationContext context = null,
+        CancellationToken cancellationToken = new())
+    {
+        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Resolves a string feature flag
+    /// </summary>
+    /// <param name="flagKey">Feature flag key</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="context">EvaluationContext</param>
+    /// <param name="cancellationToken">The CancellationToken.</param>
+    /// <returns>ResolutionDetails</returns>
+    public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
+        EvaluationContext context = null,
+        CancellationToken cancellationToken = new())
+    {
+        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Resolves an int feature flag
+    /// </summary>
+    /// <param name="flagKey">Feature flag key</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="context">EvaluationContext</param>
+    /// <param name="cancellationToken">The CancellationToken.</param>
+    /// <returns>ResolutionDetails</returns>
+    public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue,
+        EvaluationContext context = null,
+        CancellationToken cancellationToken = new())
+    {
+        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+            .ConfigureAwait(false);
+    }
+
+
+    /// <summary>
+    ///     Resolves a double feature flag
+    /// </summary>
+    /// <param name="flagKey">Feature flag key</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="context">EvaluationContext</param>
+    /// <param name="cancellationToken">The CancellationToken.</param>
+    /// <returns>ResolutionDetails</returns>
+    public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
+        EvaluationContext context = null,
+        CancellationToken cancellationToken = new())
+    {
+        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Resolves an object feature flag
+    /// </summary>
+    /// <param name="flagKey">Feature flag key</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="context">EvaluationContext</param>
+    /// <param name="cancellationToken">The CancellationToken.</param>
+    /// <returns>ResolutionDetails</returns>
+    public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
+        EvaluationContext context = null,
+        CancellationToken cancellationToken = new())
+    {
+        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Track a user action or application state, usually representing a business objective or outcome. The implementation
+    ///     of this method is optional.
+    /// </summary>
+    /// <param name="trackingEventName">The name associated with this tracking event</param>
+    /// <param name="evaluationContext">The evaluation context used in the evaluation of the flag (optional)</param>
+    /// <param name="trackingEventDetails">Data pertinent to the tracking event (Optional)</param>
+    public override void Track(string trackingEventName, EvaluationContext evaluationContext = default,
+        TrackingEventDetails trackingEventDetails = default)
+    {
+        var trackingEvent =
+            new TrackingEvent
+            {
+                EvaluationContext = evaluationContext?.AsDictionary(),
+                UserKey = evaluationContext != null ? evaluationContext.TargetingKey : "undefined-targetingKey",
+                ContextKind = evaluationContext.IsAnonymous() ? "anonymousUser" : "user",
+                Key = trackingEventName,
+                TrackingEventDetails = trackingEventDetails?.AsDictionary() ??
+                                       new Dictionary<string, Value>().ToImmutableDictionary(),
+                CreationDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            };
+        this._eventPublisher.AddEvent(trackingEvent);
     }
 
     /// <summary>
     ///     validateInputOptions is validating the different options provided when creating the provider.
     /// </summary>
     /// <param name="options">Options used while creating the provider</param>
-    /// <exception cref="InvalidOption">if no options are provided or we have a wrong configuration.</exception>
-    private void ValidateInputOptions(GoFeatureFlagProviderOptions options)
+    /// <exception cref="InvalidOption">if no options are provided, or we have a wrong configuration.</exception>
+    private static void ValidateInputOptions(GoFeatureFlagProviderOptions options)
     {
-        if (options is null) throw new InvalidOption("No options provided");
+        if (options is null)
+        {
+            throw new InvalidOption("No options provided");
+        }
 
         if (string.IsNullOrEmpty(options.Endpoint))
+        {
             throw new InvalidOption("endpoint is a mandatory field when initializing the provider");
-    }
-
-    /// <summary>
-    ///     initializeProvider is initializing the different class element used by the provider.
-    /// </summary>
-    /// <param name="options">Options used while creating the provider</param>
-    private void InitializeProvider(GoFeatureFlagProviderOptions options)
-    {
-        _exporterMetadata = options.ExporterMetadata ?? new ExporterMetadata();
-        _exporterMetadata.Add("provider", ".NET");
-        _exporterMetadata.Add("openfeature", true);
-
-        _httpClient = options.HttpMessageHandler != null
-            ? new HttpClient(options.HttpMessageHandler)
-            : new HttpClient
-            {
-                Timeout = options.Timeout.Ticks.Equals(0)
-                    ? new TimeSpan(10000 * TimeSpan.TicksPerMillisecond)
-                    : options.Timeout
-            };
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApplicationJson));
-        _httpClient.BaseAddress = new Uri(options.Endpoint);
-
-        if (options.ApiKey != null)
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", options.ApiKey);
-    }
-
-    /// <summary>
-    ///     Return the metadata associated to this provider.
-    /// </summary>
-    public override Metadata GetMetadata()
-    {
-        return new Metadata("GO Feature Flag Provider");
-    }
-
-    /// <summary>
-    ///     ResolveBooleanValueAsync resolve the value for a Boolean Flag.
-    /// </summary>
-    /// <param name="flagKey">Name of the flag</param>
-    /// <param name="defaultValue">Default value used in case of error.</param>
-    /// <param name="context">Context about the user</param>
-    /// <param name="cancellationToken">Token for cancel the async operation</param>
-    /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-    /// <exception cref="TypeMismatchError">If the type of the flag does not match</exception>
-    /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
-    /// <exception cref="GeneralError">If an unknown error happen</exception>
-    /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-    public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
-        EvaluationContext context = null, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-            return new ResolutionDetails<bool>(flagKey, bool.Parse(resp.Value.ToString()), ErrorType.None,
-                resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
-        }
-        catch (FormatException e)
-        {
-            throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
-        }
-        catch (FlagDisabled)
-        {
-            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.None, Reason.Disabled);
-        }
-    }
-
-    /// <summary>
-    ///     ResolveBooleanValueAsync resolve the value for a string Flag.
-    /// </summary>
-    /// <param name="flagKey">Name of the flag</param>
-    /// <param name="defaultValue">Default value used in case of error.</param>
-    /// <param name="context">Context about the user</param>
-    /// <param name="cancellationToken">Token for cancel the async operation</param>
-    /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-    /// <exception cref="TypeMismatchError">If the type of the flag does not match</exception>
-    /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
-    /// <exception cref="GeneralError">If an unknown error happen</exception>
-    /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-    public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey,
-        string defaultValue,
-        EvaluationContext context = null, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-            if (!(resp.Value is JsonElement element && element.ValueKind == JsonValueKind.String))
-                throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
-            return new ResolutionDetails<string>(flagKey, resp.Value.ToString(), ErrorType.None, resp.Reason,
-                resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
-        }
-        catch (FormatException e)
-        {
-            throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
-        }
-        catch (FlagDisabled)
-        {
-            return new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.None, Reason.Disabled);
-        }
-    }
-
-    /// <summary>
-    ///     ResolveBooleanValueAsync resolve the value for an int Flag.
-    /// </summary>
-    /// <param name="flagKey">Name of the flag</param>
-    /// <param name="defaultValue">Default value used in case of error.</param>
-    /// <param name="context">Context about the user</param>
-    /// <param name="cancellationToken">Token for cancel the async operation</param>
-    /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-    /// <exception cref="TypeMismatchError">If the type of the flag does not match</exception>
-    /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
-    /// <exception cref="GeneralError">If an unknown error happen</exception>
-    /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-    public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue,
-        EvaluationContext context = null, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-            return new ResolutionDetails<int>(flagKey, int.Parse(resp.Value.ToString()), ErrorType.None,
-                resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
-        }
-        catch (FormatException e)
-        {
-            throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
-        }
-        catch (FlagDisabled)
-        {
-            return new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.None, Reason.Disabled);
-        }
-    }
-
-    /// <summary>
-    ///     ResolveBooleanValueAsync resolve the value for a double Flag.
-    /// </summary>
-    /// <param name="flagKey">Name of the flag</param>
-    /// <param name="defaultValue">Default value used in case of error.</param>
-    /// <param name="context">Context about the user</param>
-    /// <param name="cancellationToken">Token for cancel the async operation</param>
-    /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-    /// <exception cref="TypeMismatchError">If the type of the flag does not match</exception>
-    /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
-    /// <exception cref="GeneralError">If an unknown error happen</exception>
-    /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-    public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey,
-        double defaultValue,
-        EvaluationContext context = null, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-            return new ResolutionDetails<double>(flagKey,
-                double.Parse(resp.Value.ToString(), CultureInfo.InvariantCulture), ErrorType.None,
-                resp.Reason, resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
-        }
-        catch (FormatException e)
-        {
-            throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
-        }
-        catch (FlagDisabled)
-        {
-            return new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.None, Reason.Disabled);
-        }
-    }
-
-    /// <summary>
-    ///     ResolveBooleanValueAsync resolve the value for a Boolean Flag.
-    /// </summary>
-    /// <param name="flagKey">Name of the flag</param>
-    /// <param name="defaultValue">Default value used in case of error.</param>
-    /// <param name="context">Context about the user</param>
-    /// <param name="cancellationToken">Token for cancel the async operation</param>
-    /// <returns>A ResolutionDetails object containing the value of your flag</returns>
-    /// <exception cref="TypeMismatchError">If the type of the flag does not match</exception>
-    /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
-    /// <exception cref="GeneralError">If an unknown error happen</exception>
-    /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-    public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey,
-        Value defaultValue,
-        EvaluationContext context = null, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var resp = await CallApi(flagKey, defaultValue, context).ConfigureAwait(false);
-            if (resp.Value is JsonElement)
-            {
-                var value = ConvertValue((JsonElement)resp.Value);
-                return new ResolutionDetails<Value>(flagKey, value, ErrorType.None, resp.Reason,
-                    resp.Variant, resp.ErrorDetails, resp.Metadata.ToImmutableMetadata());
-            }
-
-            throw new TypeMismatchError($"flag value {flagKey} had unexpected type");
-        }
-        catch (FormatException e)
-        {
-            throw new TypeMismatchError($"flag value {flagKey} had unexpected type", e);
-        }
-        catch (FlagDisabled)
-        {
-            return new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.None, Reason.Disabled);
-        }
-    }
-
-    /// <summary>
-    ///     This method is handling the call to the GO Feature Flag Relay proxy.
-    /// </summary>
-    /// <param name="flagKey">Name of the flag</param>
-    /// <param name="defaultValue">Default value</param>
-    /// <param name="context">EvaluationContext to convert as parameters for GO Feature Flag Relay Proxy</param>
-    /// <typeparam name="T">Type of the data we should retrieve</typeparam>
-    /// <returns>The API response in a GoFeatureFlagResponse object.</returns>
-    /// <exception cref="FlagNotFoundError">If the flag does not exists</exception>
-    /// <exception cref="GeneralError">If an unknown error happen</exception>
-    /// <exception cref="FlagDisabled">If the flag is disabled</exception>
-    private async Task<OfrepResponse> CallApi<T>(string flagKey, T defaultValue,
-        EvaluationContext context = null)
-    {
-        var request = new OfrepRequest(context);
-        var response = await _httpClient.PostAsync($"ofrep/v1/evaluate/flags/{flagKey}",
-            new StringContent(request.AsJsonString(), Encoding.UTF8, ApplicationJson)).ConfigureAwait(false);
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-            throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
-            throw new UnauthorizedError("invalid token used to contact GO Feature Flag relay proxy instance");
-
-        if (response.StatusCode >= HttpStatusCode.BadRequest)
-            throw new GeneralError("impossible to contact GO Feature Flag relay proxy instance");
-
-        var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        var ofrepResp =
-            JsonSerializer.Deserialize<OfrepResponse>(responseBody, options);
-
-        if (Reason.Disabled.Equals(ofrepResp?.Reason))
-            throw new FlagDisabled();
-
-        if ("FLAG_NOT_FOUND".Equals(ofrepResp?.ErrorCode))
-            throw new FlagNotFoundError($"flag {flagKey} was not found in your configuration");
-
-        if (ofrepResp?.Metadata != null)
-            ofrepResp.Metadata = DictionaryConverter.ConvertDictionary(ofrepResp.Metadata);
-
-        return ofrepResp;
-    }
-
-    /// <summary>
-    ///     convertValue is converting the object return by the proxy response in the right type.
-    /// </summary>
-    /// <param name="value">The value we have received</param>
-    /// <returns>A converted object</returns>
-    /// <exception cref="InvalidCastException">If we are not able to convert the data.</exception>
-    private Value ConvertValue(JsonElement value)
-    {
-        if (value.ValueKind == JsonValueKind.Null || value.ValueKind == JsonValueKind.Undefined) return null;
-
-        if (value.ValueKind == JsonValueKind.False || value.ValueKind == JsonValueKind.True)
-            return new Value(value.GetBoolean());
-
-        if (value.ValueKind == JsonValueKind.Number) return new Value(value.GetDouble());
-
-        if (value.ValueKind == JsonValueKind.Object)
-        {
-            var dict = new Dictionary<string, Value>();
-            using var objEnumerator = value.EnumerateObject();
-            while (objEnumerator.MoveNext())
-            {
-                var current = objEnumerator.Current;
-                var currentValue = ConvertValue(current.Value);
-                if (currentValue != null) dict.Add(current.Name, ConvertValue(current.Value));
-            }
-
-            return new Value(new Structure(dict));
         }
 
-        if (value.ValueKind == JsonValueKind.String) return new Value(value.ToString());
-
-        if (value.ValueKind == JsonValueKind.Array)
+        if (options.FlagChangePollingIntervalMs <= TimeSpan.Zero)
         {
-            using var arrayEnumerator = value.EnumerateArray();
-            var arr = new List<Value>();
-
-            while (arrayEnumerator.MoveNext())
-            {
-                var current = arrayEnumerator.Current;
-                var convertedValue = ConvertValue(current);
-                if (convertedValue != null) arr.Add(convertedValue);
-            }
-
-            return new Value(arr);
+            throw new InvalidOption("FlagChangePollingIntervalMs must be greater than zero");
         }
 
-        throw new ImpossibleToConvertTypeError($"impossible to convert the object {value}");
+        if (options.Timeout <= TimeSpan.Zero)
+        {
+            throw new InvalidOption("Timeout must be greater than zero");
+        }
+
+        if (options.FlushIntervalMs <= TimeSpan.Zero)
+        {
+            throw new InvalidOption("Timeout must be greater than zero");
+        }
+
+        if (options.MaxPendingEvents <= 0)
+        {
+            throw new InvalidOption("MaxPendingEvents must be greater than zero");
+        }
     }
 }

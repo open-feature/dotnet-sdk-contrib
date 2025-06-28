@@ -30,14 +30,22 @@ public static class DictionaryConverter
     public static object ConvertValue(object value)
     {
         if (value is JsonElement jsonElement)
+        {
             switch (jsonElement.ValueKind)
             {
                 case JsonValueKind.String:
                     return jsonElement.GetString();
                 case JsonValueKind.Number:
-                    if (jsonElement.TryGetInt32(out var intValue)) return intValue;
+                    if (jsonElement.TryGetInt32(out var intValue))
+                    {
+                        return intValue;
+                    }
 
-                    if (jsonElement.TryGetDouble(out var doubleValue)) return doubleValue;
+                    if (jsonElement.TryGetDouble(out var doubleValue))
+                    {
+                        return doubleValue;
+                    }
+
                     return jsonElement.GetRawText(); // Fallback to string if not int or double
                 case JsonValueKind.True:
                     return true;
@@ -52,12 +60,16 @@ public static class DictionaryConverter
                                 .GetRawText())); //Recursive for nested objects
                 case JsonValueKind.Array:
                     var array = new List<object>();
-                    foreach (var element in jsonElement.EnumerateArray()) array.Add(ConvertValue(element));
+                    foreach (var element in jsonElement.EnumerateArray())
+                    {
+                        array.Add(ConvertValue(element));
+                    }
 
                     return array;
                 default:
                     return jsonElement.GetRawText(); // Handle other types as needed
             }
+        }
 
         return value; // Return original value if not a JsonElement
     }
