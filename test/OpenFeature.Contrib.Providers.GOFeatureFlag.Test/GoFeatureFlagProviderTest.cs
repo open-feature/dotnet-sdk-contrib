@@ -364,7 +364,7 @@ public class GoFeatureFlagProviderTest
                     HttpMessageHandler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG"),
                     Endpoint = RelayProxyMock.baseUrl,
                     EvaluationType = EvaluationType.InProcess,
-                    FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(500)
+                    FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
                 }
             );
             await Api.Instance.SetProviderAsync("client_test_handler_2", provider);
