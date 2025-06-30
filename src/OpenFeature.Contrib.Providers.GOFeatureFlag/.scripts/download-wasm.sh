@@ -2,7 +2,11 @@
 
 # This script downloads the wasm file from the go-feature-flag repository and adds it to the build.
 
+
+
 wasm_version="v1.45.0" # {{wasm_version}}
+
+ls -la
 
 # Set the repository owner and name
 repo_owner="thomaspoignant"
