@@ -9,6 +9,7 @@ using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.mock;
+using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.utils;
 using OpenFeature.Model;
 using Xunit;
 
@@ -380,7 +381,7 @@ public class GoFeatureFlagProviderTest
             }
 
             var v2 = await client.GetBooleanDetailsAsync("TEST", false, DefaultEvaluationContext);
-            Assert.NotEqual(JsonSerializer.Serialize(v1), JsonSerializer.Serialize(v2));
+            AssertUtil.JsonNotEqual(JsonSerializer.Serialize(v1), JsonSerializer.Serialize(v2));
         }
 
         [Fact(DisplayName = "Should error if flag configuration endpoint return a 404")]
@@ -477,7 +478,7 @@ public class GoFeatureFlagProviderTest
             {
                 handlerCalled = true;
             });
-            await Task.Delay(TimeSpan.FromMilliseconds(150));
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
             Assert.False(handlerCalled);
         }
 

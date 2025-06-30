@@ -25,6 +25,21 @@ public class AssertUtil
         }
     }
 
+    public static void JsonNotEqual(string expectedJson, string actualJson)
+    {
+        try
+        {
+            JsonEqual(expectedJson, actualJson);
+        }
+        catch (EqualException)
+        {
+            // If EqualException is thrown, it means the JSONs are not equal, which is what we want.
+            return;
+        }
+
+        throw new XunitException($"Expected JSON: {expectedJson} to not equal actual JSON: {actualJson}");
+    }
+
     private class EqualException : XunitException
     {
         public EqualException(string expected, string actual)
