@@ -9,7 +9,17 @@
     <Description>GO Feature Flag provider for .NET</Description>
     <Authors>Thomas Poignant</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WasmVersion>v1.45.0</WasmVersion>
+    <OutputDirectory>$(ProjectDir)WasmModules</OutputDirectory>
+    <SourceFile>$(ProjectDir)wasm-releases/evaluation/gofeatureflag-evaluation_$(WasmVersion).wasi</SourceFile>
+    <DestinationFile>$(OutputDirectory)\gofeatureflag-evaluation.wasi</DestinationFile>
   </PropertyGroup>
+
+  <Target Name="PrepareWasmModule" BeforeTargets="CoreCompile">
+    <Warning Text="Source file '$(SourceFile)' does not exist. Skipping file move operation." Condition="!Exists($(SourceFile))"/>
+    <MakeDir Directories="$(OutputDirectory)" Condition="!Exists($(OutputDirectory))"/>
+    <Copy SourceFiles="$(SourceFile)" DestinationFiles="$(DestinationFile)" Condition="Exists($(SourceFile))"/>
+  </Target>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Text.Json" Version="8.0.5"/>
@@ -22,11 +32,4 @@
     <PackageReference Include="Wasmtime" Version="22.0.0"/>
     <EmbeddedResource Include="$(MSBuildProjectDirectory)\WasmModules\gofeatureflag-evaluation.wasi"/>
   </ItemGroup>
-
-  <Target Name="DownloadWasmModule" BeforeTargets="BeforeBuild">
-    <Exec Command="$(MSBuildProjectDirectory)/.scripts/download-wasm.sh"
-          Condition="'$(OS)' != 'Windows_NT' and !Exists('$(MSBuildProjectDirectory)/WasmModules/gofeatureflag-evaluation.wasi')"/>
-    <Exec Command="$(MSBuildProjectDirectory)/.scripts/download-wasm.ps1"
-          Condition="'$(OS)' == 'Windows_NT' and !Exists('$(MSBuildProjectDirectory)/WasmModules/gofeatureflag-evaluation.wasi')"/>
-  </Target>
 </Project>
