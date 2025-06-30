@@ -21,15 +21,15 @@
     <Copy SourceFiles="$(SourceFile)" DestinationFiles="$(DestinationFile)" Condition="Exists($(SourceFile))"/>
   </Target>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Text.Json" Version="8.0.5"/>
-    <PackageReference Include="System.Net.Http" Version="4.3.4"/>
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="OpenFeature" Version="2.2.0"/>
     <PackageReference Include="OpenFeature.Providers.Ofrep" Version="0.1.0"/>
     <PackageReference Include="Wasmtime" Version="22.0.0"/>
     <EmbeddedResource Include="$(MSBuildProjectDirectory)\WasmModules\gofeatureflag-evaluation.wasi"/>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Text.Json" Version="8.0.5"/>
+    <PackageReference Include="System.Net.Http" Version="4.3.4"/>
   </ItemGroup>
 </Project>
