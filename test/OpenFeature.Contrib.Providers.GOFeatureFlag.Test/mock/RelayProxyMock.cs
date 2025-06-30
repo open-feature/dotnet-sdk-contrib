@@ -16,7 +16,6 @@ public class RelayProxyMock
 
     public MockHttpMessageHandler GetRelayProxyMock(string mode)
     {
-        HttpRequestMessage capturedRequest = null;
         var mockHttp = new MockHttpMessageHandler();
         this.AddConfigurationMock(mockHttp, mode);
         this.AddDataCollector(mockHttp, mode);

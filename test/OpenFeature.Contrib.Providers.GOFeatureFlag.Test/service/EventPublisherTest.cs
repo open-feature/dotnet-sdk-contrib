@@ -80,7 +80,7 @@ public class EventPublisherTests
             Version = "1.0.0"
         };
         publisher.AddEvent(eventMock);
-        await Task.Delay(TimeSpan.FromMilliseconds(200));
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
 
         var got = await this._mockHttp.LastRequest.Content.ReadAsStringAsync();
         var want =
@@ -105,14 +105,14 @@ public class EventPublisherTests
             Version = "1.0.0"
         };
         publisher.AddEvent(eventMock);
-        await Task.Delay(TimeSpan.FromMilliseconds(200));
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
 
         var got = await this._mockHttp.LastRequest.Content.ReadAsStringAsync();
         var want =
             "{\"meta\": {},\"events\": [{\"kind\": \"feature\",\"defaultValue\": false,\"value\": \"toto\",\"variation\": \"on\",\"version\": \"1.0.0\",\"creationDate\": 1750406145,\"contextKind\": \"user\",\"key\": \"TEST\",\"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"}]}";
         AssertUtil.JsonEqual(want, got);
 
-        await Task.Delay(TimeSpan.FromMilliseconds(200));
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
         var eventMock2 = new FeatureEvent
         {
             CreationDate = 1750406147,
@@ -125,7 +125,7 @@ public class EventPublisherTests
             Version = "1.0.0"
         };
         publisher.AddEvent(eventMock2);
-        await Task.Delay(TimeSpan.FromMilliseconds(200));
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
         var got2 = await this._mockHttp.LastRequest.Content.ReadAsStringAsync();
         var want2 =
             "{\"meta\": {},\"events\": [{\"kind\": \"feature\",\"defaultValue\": false,\"value\": \"second value\",\"variation\": \"on\",\"version\": \"1.0.0\",\"creationDate\": 1750406147,\"contextKind\": \"user\",\"key\": \"TEST\",\"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"}]}";
@@ -139,7 +139,7 @@ public class EventPublisherTests
     {
         var publisher = new EventPublisher(this._apiMock, this._options);
         await publisher.StartAsync();
-        await Task.Delay(TimeSpan.FromMilliseconds(200));
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
         Assert.Equal(0, this._mockHttp.RequestCount);
         await publisher.StopAsync();
     }
@@ -200,7 +200,7 @@ public class EventPublisherTests
         publisher.AddEvent(eventMock3);
 
         var got = await this._mockHttp.LastRequest.Content.ReadAsStringAsync();
-        await Task.Delay(TimeSpan.FromMilliseconds(200));
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
         var want =
             "{\n  \"meta\": {},\n  \"events\": [\n    {\n      \"kind\": \"feature\",\n      \"defaultValue\": false,\n      \"value\": \"toto\",\n      \"variation\": \"on\",\n      \"version\": \"1.0.0\",\n      \"creationDate\": 1750406145,\n      \"contextKind\": \"user\",\n      \"key\": \"TEST\",\n      \"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"\n    },\n    {\n      \"kind\": \"feature\",\n      \"defaultValue\": false,\n      \"value\": \"toto\",\n      \"variation\": \"on\",\n      \"version\": \"1.0.0\",\n      \"creationDate\": 1750406147,\n      \"contextKind\": \"user\",\n      \"key\": \"TEST\",\n      \"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"\n    }\n  ]\n}";
         AssertUtil.JsonEqual(want, got);
