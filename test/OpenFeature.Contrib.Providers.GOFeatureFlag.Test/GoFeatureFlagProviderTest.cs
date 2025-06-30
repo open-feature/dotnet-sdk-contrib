@@ -42,7 +42,8 @@ public class GoFeatureFlagProviderTest
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
                 {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl
                 }
             );
 
@@ -603,7 +604,8 @@ public class GoFeatureFlagProviderTest
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
-                        Endpoint = baseUrl, FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000)
+                        Endpoint = baseUrl,
+                        FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000)
                     }
                 )
             );
