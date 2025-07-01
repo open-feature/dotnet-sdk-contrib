@@ -63,7 +63,8 @@ public class GoFeatureFlagProviderTest
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
                 {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                    Endpoint = RelayProxyMock.baseUrl
                 }
             );
 
@@ -580,8 +581,8 @@ public class GoFeatureFlagProviderTest
                 new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", false } }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-        }
 #endif
+        }
     }
 
     [Collection("Constructor")]
@@ -593,7 +594,8 @@ public class GoFeatureFlagProviderTest
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
                 {
-                    Endpoint = "https://gofeatureflag.org", EvaluationType = EvaluationType.Remote
+                    Endpoint = "https://gofeatureflag.org",
+                    EvaluationType = EvaluationType.Remote
                 }
             );
             Assert.Equal("GO Feature Flag Provider", provider.GetMetadata()?.Name);
@@ -630,7 +632,8 @@ public class GoFeatureFlagProviderTest
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
-                        Timeout = TimeSpan.FromMilliseconds(1000), EvaluationType = EvaluationType.Remote
+                        Timeout = TimeSpan.FromMilliseconds(1000),
+                        EvaluationType = EvaluationType.Remote
                     }
                 )
             );
@@ -643,7 +646,8 @@ public class GoFeatureFlagProviderTest
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
-                        Endpoint = "https://gofeatureflag.org", EvaluationType = EvaluationType.Remote
+                        Endpoint = "https://gofeatureflag.org",
+                        EvaluationType = EvaluationType.Remote
                     }
                 )
             );
@@ -674,7 +678,9 @@ public class GoFeatureFlagProviderTest
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
-                        Endpoint = baseUrl, MaxPendingEvents = -1, EvaluationType = EvaluationType.Remote
+                        Endpoint = baseUrl,
+                        MaxPendingEvents = -1,
+                        EvaluationType = EvaluationType.Remote
                     }
                 )
             );
@@ -789,8 +795,8 @@ public class GoFeatureFlagProviderTest
             var gotJson = JObject.Parse(got);
             Assert.Equal(2, gotJson["events"].Count());
             await Api.Instance.ShutdownAsync();
-        }
 #endif
+        }
     }
 
     [Collection("EnrichEvaluationContextHook")]
