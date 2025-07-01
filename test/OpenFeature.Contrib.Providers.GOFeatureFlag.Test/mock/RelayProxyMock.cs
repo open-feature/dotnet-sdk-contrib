@@ -34,10 +34,14 @@ public class RelayProxyMock
     private void AddOfrep(MockHttpMessageHandler mockHttp, string mode)
     {
         var prefixEval = baseUrl + "/ofrep/v1/evaluate/flags/";
-        mockHttp.When($"{prefixEval}fail_500").Respond(HttpStatusCode.InternalServerError);
-        mockHttp.When($"{prefixEval}api_key_missing").Respond(HttpStatusCode.BadRequest);
-        mockHttp.When($"{prefixEval}invalid_api_key").Respond(HttpStatusCode.Unauthorized);
-        mockHttp.When($"{prefixEval}flag_not_found").Respond(HttpStatusCode.NotFound);
+        mockHttp.When($"{prefixEval}fail_500").Respond(HttpStatusCode.InternalServerError, mediaType,
+            "{\"error\": \"Internal Server Error\"}");
+        mockHttp.When($"{prefixEval}api_key_missing").Respond(HttpStatusCode.BadRequest, mediaType,
+            "{\"error\": \"API Key is missing\"}");
+        mockHttp.When($"{prefixEval}invalid_api_key").Respond(HttpStatusCode.Unauthorized, mediaType,
+            "{\"error\": \"Invalid API Key\"}");
+        mockHttp.When($"{prefixEval}flag_not_found").Respond(HttpStatusCode.NotFound, mediaType,
+            "{\"error\": \"Flag not found\"}");
         mockHttp.When($"{prefixEval}bool_targeting_match").Respond(mediaType,
             "{ \"value\":true, \"key\":\"bool_targeting_match\", \"reason\":\"TARGETING_MATCH\", \"variant\":\"True\" }");
         mockHttp.When($"{prefixEval}disabled").Respond(mediaType,
@@ -77,16 +81,20 @@ public class RelayProxyMock
         switch (mode)
         {
             case "400":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.BadRequest);
+                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.BadRequest, mediaType,
+                    "{\"error\": \"Bad Request\"}");
                 break;
             case "401":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.Unauthorized);
+                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.Unauthorized, mediaType,
+                    "{\"error\": \"Unauthorized\"}");
                 break;
             case "403":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.Forbidden);
+                mockHttp.When(path).With(this.RecordRequest)
+                    .Respond(HttpStatusCode.Forbidden, mediaType, "{\"error\": \"Forbidden\"}");
                 break;
             case "500":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.InternalServerError);
+                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.InternalServerError, mediaType,
+                    "{\"error\": \"Internal Server Error\"}");
                 break;
             default:
                 mockHttp.When(path).With(this.RecordRequest).Respond(mediaType,
@@ -103,7 +111,14 @@ public class RelayProxyMock
             case "304":
                 mockHttp.When(path).With(this.RecordRequest).Respond(request =>
                 {
-                    var response = new HttpResponseMessage(HttpStatusCode.NotModified);
+                    var response = new HttpResponseMessage(HttpStatusCode.NotModified)
+                    {
+                        Content = new StringContent(
+                            "{\"error\": \"Not Modified\"}",
+                            Encoding.UTF8,
+                            mediaType
+                        )
+                    };
                     response.Content.Headers.LastModified =
                         new DateTimeOffset(2015, 10, 21, 7, 28, 0, TimeSpan.Zero).ToUniversalTime();
                     response.Headers.ETag = new EntityTagHeaderValue("\"123456789\"");
@@ -111,19 +126,24 @@ public class RelayProxyMock
                 });
                 break;
             case "400":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.BadRequest);
+                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.BadRequest, mediaType,
+                    "{\"error\": \"Bad Request\"}");
                 break;
             case "401":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.Unauthorized);
+                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.Unauthorized, mediaType,
+                    "{\"error\": \"Unauthorized\"}");
                 break;
             case "403":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.Forbidden);
+                mockHttp.When(path).With(this.RecordRequest)
+                    .Respond(HttpStatusCode.Forbidden, mediaType, "{\"error\": \"Forbidden\"}");
                 break;
             case "404":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.NotFound);
+                mockHttp.When(path).With(this.RecordRequest)
+                    .Respond(HttpStatusCode.NotFound, mediaType, "{\"error\": \"Not Found\"}");
                 break;
             case "500":
-                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.InternalServerError);
+                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.InternalServerError, mediaType,
+                    "{\"error\": \"Internal Server Error\"}");
                 break;
             case "CHANGE_CONFIG":
                 var callCount = 0;

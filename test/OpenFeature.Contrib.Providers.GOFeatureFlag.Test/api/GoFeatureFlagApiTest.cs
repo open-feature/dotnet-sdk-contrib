@@ -109,7 +109,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration("12345", null);
+            await api.RetrieveFlagConfiguration("12345", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -127,7 +127,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration(null, new[] { "flag1", "flag2" }.ToList());
+            await api.RetrieveFlagConfiguration("", new[] { "flag1", "flag2" }.ToList());
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);

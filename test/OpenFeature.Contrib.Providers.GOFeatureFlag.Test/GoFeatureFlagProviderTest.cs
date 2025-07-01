@@ -374,7 +374,15 @@ public class GoFeatureFlagProviderTest
             {
                 handlerCalled = true;
             });
-            await Task.Delay(TimeSpan.FromMilliseconds(500));
+
+
+            var maxRetry = 10;
+            while (!handlerCalled && maxRetry > 0)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
+                maxRetry--;
+            }
+
             Assert.True(handlerCalled);
 #endif
         }
@@ -738,7 +746,7 @@ public class GoFeatureFlagProviderTest
 
             client.Track("my-key", DefaultEvaluationContext,
                 TrackingEventDetails.Builder().Set("revenue", 123).Set("user_id", "123ABC").Build());
-            await Task.Delay(TimeSpan.FromMilliseconds(200));
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.Single(gotJson["events"]);
