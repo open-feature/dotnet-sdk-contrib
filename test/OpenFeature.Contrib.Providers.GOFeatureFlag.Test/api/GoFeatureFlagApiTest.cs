@@ -40,7 +40,7 @@ public class GoFeatureFlagApiTest
                 ApiKey = "my-api-key"
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration(null, null);
+            await api.RetrieveFlagConfiguration("", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -58,7 +58,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration(null, null);
+            await api.RetrieveFlagConfiguration("", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -75,7 +75,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration(null, null);
+            await api.RetrieveFlagConfiguration("", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -92,7 +92,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration(null, null);
+            await api.RetrieveFlagConfiguration("", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -148,7 +148,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<Unauthorized>(() =>
-                api.RetrieveFlagConfiguration(null, null));
+                api.RetrieveFlagConfiguration("", []));
         }
 
         [Fact(DisplayName = "request should return a an error if 403 received")]
@@ -163,7 +163,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<Unauthorized>(() =>
-                api.RetrieveFlagConfiguration(null, null));
+                api.RetrieveFlagConfiguration("", []));
         }
 
         [Fact(DisplayName = "request should return a an error if 400 received")]
@@ -178,7 +178,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<ImpossibleToRetrieveConfiguration>(() =>
-                api.RetrieveFlagConfiguration(null, null));
+                api.RetrieveFlagConfiguration("", []));
         }
 
         [Fact(DisplayName = "request should return a an error if 500 received")]
@@ -193,7 +193,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<ImpossibleToRetrieveConfiguration>(() =>
-                api.RetrieveFlagConfiguration(null, null));
+                api.RetrieveFlagConfiguration("", []));
         }
 
         [Fact(DisplayName = "request should return a valid FlagConfigResponse if 200 received")]
@@ -241,7 +241,7 @@ public class GoFeatureFlagApiTest
                 LastUpdated = DateTime.Parse("Wed, 21 Oct 2015 07:28:00 GMT")
             };
 
-            var got = await api.RetrieveFlagConfiguration(null, null);
+            var got = await api.RetrieveFlagConfiguration("", []);
             Assert.Equivalent(want, got);
         }
 
@@ -255,7 +255,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            var got = await api.RetrieveFlagConfiguration(null, null);
+            var got = await api.RetrieveFlagConfiguration("", []);
             Assert.Equal(DateTime.MinValue.ToUniversalTime(), got.LastUpdated);
         }
 
@@ -276,7 +276,7 @@ public class GoFeatureFlagApiTest
                 LastUpdated = DateTime.Parse("Wed, 21 Oct 2015 07:28:00 GMT")
             };
 
-            var got = await api.RetrieveFlagConfiguration(null, null);
+            var got = await api.RetrieveFlagConfiguration("", []);
             Assert.Equivalent(want, got);
         }
     }
