@@ -478,7 +478,13 @@ public class GoFeatureFlagProviderTest
             {
                 handlerCalled = true;
             });
-            await Task.Delay(TimeSpan.FromMilliseconds(500));
+            var maxRetry = 10;
+            while (!handlerCalled && maxRetry > 0)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
+                maxRetry--;
+            }
+
             Assert.False(handlerCalled);
         }
 
