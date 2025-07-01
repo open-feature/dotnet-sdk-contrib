@@ -22,7 +22,8 @@ public class EventPublisherTests
         {
             Endpoint = RelayProxyMock.baseUrl,
             HttpMessageHandler = this._mockHttp.GetRelayProxyMock(""),
-            FlushIntervalMs = TimeSpan.FromMilliseconds(100)
+            FlushIntervalMs = TimeSpan.FromMilliseconds(100),
+            EvaluationType = EvaluationType.Remote
         };
         this._apiMock = new GoFeatureFlagApi(this._options);
     }
@@ -154,7 +155,8 @@ public class EventPublisherTests
             Endpoint = RelayProxyMock.baseUrl,
             HttpMessageHandler = handler,
             FlushIntervalMs = TimeSpan.FromMilliseconds(10000),
-            MaxPendingEvents = 2
+            MaxPendingEvents = 2,
+            EvaluationType = EvaluationType.Remote
         };
         var api = new GoFeatureFlagApi(this._options);
 

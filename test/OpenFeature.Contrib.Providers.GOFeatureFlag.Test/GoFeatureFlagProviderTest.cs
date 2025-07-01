@@ -36,15 +36,34 @@ public class GoFeatureFlagProviderTest
     [Collection("In Process Evaluation")]
     public class InProcessEvaluationTest
     {
+        [Fact(DisplayName = "Should throw if InProcess evaluation is used on .NET Framework")]
+        public void ShouldThrowIfInProcessOnNetFramework()
+        {
+#if NETFRAMEWORK
+    var options = new GoFeatureFlagProviderOptions
+    {
+        Endpoint = "http://localhost",
+        EvaluationType = EvaluationType.InProcess,
+        // Set other required options with valid values
+        FlagChangePollingIntervalMs = TimeSpan.FromSeconds(1),
+        Timeout = TimeSpan.FromSeconds(1),
+        FlushIntervalMs = TimeSpan.FromSeconds(1),
+        MaxPendingEvents = 1
+    };
+
+    Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(options));
+#endif
+        }
+
         [Fact(DisplayName = "Should use in process evaluation by default")]
         public async Task ShouldUseInProcessByDefault()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
                 {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
-                    Endpoint = RelayProxyMock.baseUrl
+                    HttpMessageHandler = mockHttp.GetRelayProxyMock(""), Endpoint = RelayProxyMock.baseUrl
                 }
             );
 
@@ -54,12 +73,14 @@ public class GoFeatureFlagProviderTest
             var want = "/v1/flag/configuration";
             Assert.Equal(want,
                 mockHttp.LastRequest.RequestUri?.AbsolutePath);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
 
         [Fact(DisplayName = "Should use in process evaluation if option is set")]
         public async Task ShouldUseInProcessIfOptionIsSet()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -74,28 +95,14 @@ public class GoFeatureFlagProviderTest
             var want = "/v1/flag/configuration";
             Assert.Equal(want,
                 mockHttp.LastRequest.RequestUri?.AbsolutePath);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
-
-        // [Fact(DisplayName = "Should throw an error if the endpoint is not available")]
-        // public async Task ShouldThrowAnErrorIfEndpointNotAvailable()
-        // {
-        //     var mockHttp = new RelayProxyMock();
-        //     var provider = new GoFeatureFlagProvider(
-        //         new GoFeatureFlagProviderOptions
-        //         {
-        //             Endpoint = "http://localhost:9999", // Unavailable endpoint
-        //             EvaluationType = EvaluationType.InProcess
-        //         }
-        //     );
-        //     await Assert.ThrowsAsync<ImpossibleToRetrieveConfiguration>(async () =>
-        //         await Api.Instance.SetProviderAsync("client_test", provider)
-        //     );
-        // }
 
         [Fact(DisplayName = "Should return FLAG_NOT_FOUND if the flag does not exists")]
         public async Task ShouldReturnFlagNotFoundIfFlagDoesNotExists()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -117,13 +124,15 @@ public class GoFeatureFlagProviderTest
                 "",
                 "Flag with key 'DOES_NOT_EXISTS' not found");
             Assert.Equivalent(want, got);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
 
 
         [Fact(DisplayName = "Should error if we expect a boolean and got another type")]
         public async Task ShouldErrorIfWeExpectABooleanAndGotAnotherType()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -147,12 +156,15 @@ public class GoFeatureFlagProviderTest
                 "",
                 "Flag string_key had unexpected type, expected boolean.");
             Assert.Equivalent(want, got);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
+
 
         [Fact(DisplayName = "Should resolve a valid boolean flag with TARGETING MATCH reason")]
         public async Task ShouldResolveAValidBooleanFlagWithTargetingMatchReason()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -177,12 +189,14 @@ public class GoFeatureFlagProviderTest
                 new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", false } }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
 
         [Fact(DisplayName = "Should resolve a valid string flag with TARGETING MATCH reason")]
         public async Task ShouldResolveAValidStringFlagWithTargetingMatchReason()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -210,12 +224,14 @@ public class GoFeatureFlagProviderTest
                     }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
 
         [Fact(DisplayName = "Should resolve a valid double flag with TARGETING MATCH reason")]
         public async Task ShouldResolveAValidDoubleFlagWithTargetingMatchReason()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -240,12 +256,14 @@ public class GoFeatureFlagProviderTest
                 new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", 100.25 } }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
 
         [Fact(DisplayName = "Should resolve a valid integer flag with TARGETING MATCH reason")]
         public async Task ShouldResolveAValidIntegerFlagWithTargetingMatchReason()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -270,12 +288,14 @@ public class GoFeatureFlagProviderTest
                 new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", 1000 } }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
 
         [Fact(DisplayName = "Should resolve a valid object flag with TARGETING MATCH reason")]
         public async Task ShouldResolveAValidObjectFlagWithTargetingMatchReason()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -298,12 +318,14 @@ public class GoFeatureFlagProviderTest
                 Reason.TargetingMatch,
                 "varB");
             Assert.Equivalent(want, got);
-            // await Api.Instance.ShutdownAsync();
+            await Api.Instance.ShutdownAsync();
+#endif
         }
 
         [Fact(DisplayName = "Should use boolean default value if the flag is disabled")]
         public async Task ShouldUseBooleanDefaultValueIfTheFlagIsDisabled()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -326,11 +348,13 @@ public class GoFeatureFlagProviderTest
                 null,
                 new ImmutableMetadata());
             Assert.Equivalent(want, got);
+#endif
         }
 
         [Fact(DisplayName = "Should emit configuration change event, if config has changed")]
         public async Task ShouldEmitConfigurationChangeEventIfConfigHasChanged()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -342,7 +366,6 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-
             await Api.Instance.SetProviderAsync("client_test_handler", provider);
             var client = Api.Instance.GetClient("client_test_handler");
             var handlerCalled = false;
@@ -352,11 +375,13 @@ public class GoFeatureFlagProviderTest
             });
             await Task.Delay(TimeSpan.FromMilliseconds(500));
             Assert.True(handlerCalled);
+#endif
         }
 
         [Fact(DisplayName = "Should change evaluation details if config has changed")]
         public async Task ShouldChangeEvaluationDetailsIfConfigHasChanged()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -382,11 +407,13 @@ public class GoFeatureFlagProviderTest
 
             var v2 = await client.GetBooleanDetailsAsync("TEST", false, DefaultEvaluationContext);
             AssertUtil.JsonNotEqual(JsonSerializer.Serialize(v1), JsonSerializer.Serialize(v2));
+#endif
         }
 
         [Fact(DisplayName = "Should error if flag configuration endpoint return a 404")]
         public async Task ShouldErrorIfFlagConfigurationEndpointReturnA404()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -406,11 +433,13 @@ public class GoFeatureFlagProviderTest
             });
             await Task.Delay(50);
             Assert.True(handlerCalled);
+#endif
         }
 
         [Fact(DisplayName = "Should error if flag configuration endpoint return a 403")]
         public async Task ShouldErrorIfFlagConfigurationEndpointReturnA403()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -430,11 +459,13 @@ public class GoFeatureFlagProviderTest
             });
             await Task.Delay(50);
             Assert.True(handlerCalled);
+#endif
         }
 
         [Fact(DisplayName = "Should error if flag configuration endpoint return a 401")]
         public async Task ShouldErrorIfFlagConfigurationEndpointReturnA401()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -454,12 +485,14 @@ public class GoFeatureFlagProviderTest
             });
             await Task.Delay(50);
             Assert.True(handlerCalled);
+#endif
         }
 
 
         [Fact(DisplayName = "Should ignore configuration if etag is different by last-modified is older")]
         public async Task ShouldIgnoreConfigurationIfEtagIsDifferentByLastModifiedIsOlder()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -486,11 +519,13 @@ public class GoFeatureFlagProviderTest
             }
 
             Assert.False(handlerCalled);
+#endif
         }
 
         [Fact(DisplayName = "Should apply a scheduled rollout step")]
         public async Task ShouldApplyAScheduledRolloutStep()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -514,11 +549,13 @@ public class GoFeatureFlagProviderTest
                 new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", false } }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
+#endif
         }
 
         [Fact(DisplayName = "Should not apply a scheduled rollout step if the date is in the future")]
         public async Task ShouldNotApplyAScheduledRolloutStepIfTheDateIsInTheFuture()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -544,6 +581,7 @@ public class GoFeatureFlagProviderTest
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
         }
+#endif
     }
 
     [Collection("Constructor")]
@@ -553,7 +591,10 @@ public class GoFeatureFlagProviderTest
         public void GetMetadata_ValidateName()
         {
             var provider = new GoFeatureFlagProvider(
-                new GoFeatureFlagProviderOptions { Endpoint = "https://gofeatureflag.org" }
+                new GoFeatureFlagProviderOptions
+                {
+                    Endpoint = "https://gofeatureflag.org", EvaluationType = EvaluationType.Remote
+                }
             );
             Assert.Equal("GO Feature Flag Provider", provider.GetMetadata()?.Name);
         }
@@ -577,7 +618,7 @@ public class GoFeatureFlagProviderTest
         {
             Assert.Throws<InvalidOption>(() =>
                 new GoFeatureFlagProvider(
-                    new GoFeatureFlagProviderOptions { Endpoint = "" }
+                    new GoFeatureFlagProviderOptions { Endpoint = "", EvaluationType = EvaluationType.Remote }
                 )
             );
         }
@@ -587,7 +628,10 @@ public class GoFeatureFlagProviderTest
         {
             Assert.Throws<InvalidOption>(() =>
                 new GoFeatureFlagProvider(
-                    new GoFeatureFlagProviderOptions { Timeout = TimeSpan.FromMilliseconds(1000) }
+                    new GoFeatureFlagProviderOptions
+                    {
+                        Timeout = TimeSpan.FromMilliseconds(1000), EvaluationType = EvaluationType.Remote
+                    }
                 )
             );
         }
@@ -597,7 +641,10 @@ public class GoFeatureFlagProviderTest
         {
             var exception = Record.Exception(() =>
                 new GoFeatureFlagProvider(
-                    new GoFeatureFlagProviderOptions { Endpoint = "https://gofeatureflag.org" }
+                    new GoFeatureFlagProviderOptions
+                    {
+                        Endpoint = "https://gofeatureflag.org", EvaluationType = EvaluationType.Remote
+                    }
                 )
             );
             Assert.Null(exception);
@@ -612,7 +659,8 @@ public class GoFeatureFlagProviderTest
                     new GoFeatureFlagProviderOptions
                     {
                         Endpoint = baseUrl,
-                        FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000)
+                        FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(-1000),
+                        EvaluationType = EvaluationType.Remote
                     }
                 )
             );
@@ -624,7 +672,10 @@ public class GoFeatureFlagProviderTest
             var baseUrl = "http://localhost:1031";
             Assert.Throws<InvalidOption>(() =>
                 new GoFeatureFlagProvider(
-                    new GoFeatureFlagProviderOptions { Endpoint = baseUrl, MaxPendingEvents = -1 }
+                    new GoFeatureFlagProviderOptions
+                    {
+                        Endpoint = baseUrl, MaxPendingEvents = -1, EvaluationType = EvaluationType.Remote
+                    }
                 )
             );
         }
@@ -636,6 +687,7 @@ public class GoFeatureFlagProviderTest
         [Fact(DisplayName = "Should commit events if max pending events is reached")]
         public async Task ShouldCallMultipleTimeTheDataCollectorIfMaxPendingEventsIsReached()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -657,11 +709,13 @@ public class GoFeatureFlagProviderTest
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.NotNull(gotJson["events"].First);
+#endif
         }
 
         [Fact(DisplayName = "Should send the evaluation information to the data collector")]
         public async Task ShouldSendTrackingEventToTheDataCollector()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(
                 new GoFeatureFlagProviderOptions
@@ -682,6 +736,7 @@ public class GoFeatureFlagProviderTest
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.Single(gotJson["events"]);
+#endif
         }
     }
 
@@ -691,6 +746,7 @@ public class GoFeatureFlagProviderTest
         [Fact(DisplayName = "Should commit events if max pending events is reached")]
         public async Task ShouldCommitEventsIfMaxPendingEventsIsReached()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
             {
@@ -708,11 +764,13 @@ public class GoFeatureFlagProviderTest
             var gotJson = JObject.Parse(got);
             Assert.Single(gotJson["events"]);
             await Api.Instance.ShutdownAsync();
+#endif
         }
 
         [Fact(DisplayName = "Should call multiple times the data collector if max pending events is reached")]
         public async Task ShouldCallMultipleTimeTheDataCollectorIfMaxPendingEventsIsReached()
         {
+#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
             {
@@ -732,6 +790,7 @@ public class GoFeatureFlagProviderTest
             Assert.Equal(2, gotJson["events"].Count());
             await Api.Instance.ShutdownAsync();
         }
+#endif
     }
 
     [Collection("EnrichEvaluationContextHook")]

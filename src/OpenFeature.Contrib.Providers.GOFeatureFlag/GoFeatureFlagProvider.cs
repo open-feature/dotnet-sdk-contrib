@@ -62,6 +62,13 @@ public class GoFeatureFlagProvider : FeatureProvider
     internal GoFeatureFlagProvider(GoFeatureFlagProviderOptions options, IOfrepProvider ofrepProvider = null)
     {
         ValidateInputOptions(options);
+#if NETFRAMEWORK
+    if (options.EvaluationType == EvaluationType.InProcess)
+        {
+            throw new InvalidOption(
+                "InProcess evaluation is not supported with .NET Framework.");
+        }
+#endif
         var api = new GoFeatureFlagApi(options);
         var evaluator = this.GetEvaluator(options, api, ofrepProvider);
         this._evaluationService = new EvaluationService(evaluator);
