@@ -75,11 +75,11 @@ public class GoFeatureFlagApi
         }
 
         var response = await this._httpClient.SendAsync(httpRequest).ConfigureAwait(false);
-        var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         switch (response.StatusCode)
         {
             case HttpStatusCode.OK:
             case HttpStatusCode.NotModified:
+                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return HandleFlagConfigurationSuccess(response, body);
             case HttpStatusCode.NotFound:
                 throw new FlagConfigurationEndpointNotFound();
@@ -87,11 +87,13 @@ public class GoFeatureFlagApi
             case HttpStatusCode.Forbidden:
                 throw new Unauthorized("Impossible to retrieve flag configuration: authentication/authorization error");
             case HttpStatusCode.BadRequest:
+                var badRequestErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 throw new ImpossibleToRetrieveConfiguration(
-                    "retrieve flag configuration error: Bad request: " + body);
+                    "retrieve flag configuration error: Bad request: " + badRequestErrBody);
             default:
+                var defaultErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false) ?? "";
                 throw new ImpossibleToRetrieveConfiguration(
-                    "retrieve flag configuration error: unexpected http code " + body);
+                    "retrieve flag configuration error: unexpected http code " + defaultErrBody);
         }
     }
 
@@ -114,20 +116,23 @@ public class GoFeatureFlagApi
             Content = new StringContent(requestStr, Encoding.UTF8, HeaderApplicationJson)
         };
         var response = await this._httpClient.SendAsync(httpRequest).ConfigureAwait(false);
-        var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
         switch (response.StatusCode)
         {
             case HttpStatusCode.OK:
+                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 this._logger.LogInformation("Published {Count} events successfully: {Body}", eventsList.Count, body);
                 return;
             case HttpStatusCode.Unauthorized:
             case HttpStatusCode.Forbidden:
                 throw new Unauthorized("Impossible to send events: authentication/authorization error");
             case HttpStatusCode.BadRequest:
-                throw new ImpossibleToSendDataToTheCollector("Bad request: " + body);
+                var badRequestErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw new ImpossibleToSendDataToTheCollector("Bad request: " + badRequestErrBody);
             default:
+                var defaultErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false) ?? "";
                 throw new ImpossibleToSendDataToTheCollector(
-                    "send data to the collector error: unexpected http code " + body);
+                    "send data to the collector error: unexpected http code " + defaultErrBody);
         }
     }
 
