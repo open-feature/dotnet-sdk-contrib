@@ -1,36 +1,51 @@
-# GO Feature Flag .NET Provider
+# GO Feature Flag - OpenFeature .NET provider
 
-GO Feature Flag provider allows you to connect to your GO Feature Flag instance.  
+[![nuget](https://img.shields.io/nuget/v/OpenFeature.Contrib.GOFeatureFlag?color=blue&style=flat-square&logo=nuget)](https://www.nuget.org/packages/OpenFeature.Contrib.GOFeatureFlag)
 
-[GO Feature Flag](https://gofeatureflag.org) believes in simplicity and offers a simple and lightweight solution to use feature flags.  
-Our focus is to avoid any complex infrastructure work to use GO Feature Flag.
 
-This is a complete feature flagging solution with the possibility to target only a group of users, use any types of flags, store your configuration in various location and advanced rollout functionality. You can also collect usage data of your flags and be notified of configuration changes.
+> [!WARNING]
+> This version of the provider requires to use GO Feature Flag relay-proxy `v1.45.0` or above.
+> If you have an older version of the relay-proxy, please use the version `0.2.1` of the provider.
 
-# .Net SDK usage
+This is the official OpenFeature .NET provider for accessing your feature flags with GO Feature Flag.
 
-## Requirements
+In conjuction with the [OpenFeature SDK](https://openfeature.dev/docs/reference/concepts/provider) you will be able to
+evaluate your feature flags in your **.NET** applications.
 
-- open-feature/dotnet-sdk v1.5.0 > v2.0.0
+For documentation related to flags management in GO Feature Flag, refer to
+the [GO Feature Flag documentation website](https://gofeatureflag.org/docs).
 
-## Install dependencies
+### Functionalities:
 
-The first things we will do is install the **Open Feature SDK** and the **GO Feature Flag provider**.
+- Manage the integration of the OpenFeature .NET SDK and GO Feature Flag relay-proxy.
+- 2 types of evaluations available:
+    - **In process**: fetch the flag configuration from the GO Feature Flag relay-proxy API and evaluate the flags
+      directly in the provider.
+    - **Remote**: Call the GO Feature Flag relay-proxy for each flag evaluation.
+- Collect and send evaluation data to the GO Feature Flag relay-proxy for statistics and monitoring purposes.
+- Support the OpenFeature [tracking API](https://openfeature.dev/docs/reference/concepts/tracking/) to associate metrics
+  or KPIs with feature flag evaluation contexts.
+
+## Dependency Setup
 
 ### .NET Cli
+
 ```shell
 dotnet add package OpenFeature.Contrib.GOFeatureFlag
 ```
+
 ### Package Manager
 
 ```shell
 NuGet\Install-Package OpenFeature.Contrib.GOFeatureFlag
 ```
+
 ### Package Reference
 
 ```xml
 <PackageReference Include="OpenFeature.Contrib.GOFeatureFlag" />
 ```
+
 ### Packet cli
 
 ```shell
@@ -45,53 +60,117 @@ paket add OpenFeature.Contrib.GOFeatureFlag
 
 // Install OpenFeature.Contrib.GOFeatureFlag as a Cake Tool
 #tool nuget:?package=OpenFeature.Contrib.GOFeatureFlag
-```
+```[GoFeatureFlagProviderOptions.cs](GoFeatureFlagProviderOptions.cs)
 
-## Initialize your Open Feature client
+## Getting started
 
-To evaluate the flags you need to have an Open Feature configured in you app.
-This code block shows you how you can create a client that you can use in your application.
+### Initialize the provider
+
+GO Feature Flag provider needs to be created and then set in the global OpenFeatureAPI.
+
+The only required option to create a `GoFeatureFlagProvider` is the endpoint to your GO Feature Flag relay-proxy
+instance.
 
 ```csharp
-using OpenFeature;
 using OpenFeature.Contrib.Providers.GOFeatureFlag;
 
-// ...
+var options = new GoFeatureFlagProviderOptions { Endpoint = "https://gofeatureflag.example.com" };
+var provider = new GoFeatureFlagProvider(options);
 
-var goFeatureFlagProvider = new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions
-{
-    Endpoint = "http://localhost:1031/",
-    Timeout = new TimeSpan(1000 * TimeSpan.TicksPerMillisecond)
-});
-Api.Instance.SetProvider(goFeatureFlagProvider);
-var client = Api.Instance.GetClient("my-app");
+// Associate the provider with the OpenFeature API
+await Api.Instance.SetProviderAsync("client_test", provider);
+
+// Create a client to perform feature flag evaluations
+var client = Api.Instance.GetClient("client_test");
+
+// targetingKey is mandatory for each evaluation
+var evaluationContext = EvaluationContext.Builder()
+        .SetTargetingKey("d45e303a-38c2-11ed-a261-0242ac120002")
+        .Set("email", "john.doe@gofeatureflag.org")
+        .Build();
+
+// Example of a boolean flag evaluation
+var myFeatureFlag = await client.GetBooleanDetailsAsync("my-feature-flag", false, evaluationContext);
 ```
 
-## Evaluate your flag
+The evaluation context is the way for the client to specify contextual data that GO Feature Flag uses to evaluate the
+feature flags, it allows to define rules on the flag.
 
-This code block explain how you can create an `EvaluationContext` and use it to evaluate your flag.
+The `targetingKey` is mandatory for GO Feature Flag in order to evaluate the feature flag, it could be the id of a user,
+a session ID or anything you find relevant to use as identifier during the evaluation.
 
+### Configure the provider
 
-> In this example we are evaluating a `boolean` flag, but other types are available.
-> 
-> **Refer to the [Open Feature documentation](https://openfeature.dev/docs/reference/concepts/evaluation-api#basic-evaluation) to know more about it.**
+You can configure the provider with several options to customize its behavior. The following options are available:
+
+| name                              | mandatory | Description                                                                                                                                                                                                                                                                                                                                                                     |
+|-----------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`Endpoint`**                    | `true`    | endpoint contains the DNS of your GO Feature Flag relay proxy _(ex: https://mydomain.com/gofeatureflagproxy/)_                                                                                                                                                                                                                                                                  |
+| **`EvaluationType`**              | `false`   | evaluationType is the type of evaluation you want to use.<ul><li>If you want to have a local evaluation, you should use InProcess.</li><li>If you want to have an evaluation on the relay-proxy directly, you should use Remote.</li></ul>Default: InProcess<br/>                                                                                                               |
+| **`Timeout`**                     | `false`   | timeout in millisecond we are waiting when calling the relay proxy API. _(default: `10000`)_                                                                                                                                                                                                                                                                                    |
+| **`ApiKey`**                      | `false`   | If the relay proxy is configured to authenticate the requests, you should provide an API Key to the provider. Please ask the administrator of the relay proxy to provide an API Key. _(default: null)_                                                                                                                                                                          |
+| **`FlushIntervalMs`**             | `false`   | interval time we publish statistics collection data to the proxy. The parameter is used only if the cache is enabled, otherwise the collection of the data is done directly when calling the evaluation API. default: `1000` ms                                                                                                                                                 |
+| **`MaxPendingEvents`**            | `false`   | max pending events aggregated before publishing for collection data to the proxy. When event is added while events collection is full, event is omitted. _(default: `10000`)_                                                                                                                                                                                                   |
+| **`DisableDataCollection`**       | `false`   | set to true if you don't want to collect the usage of flags retrieved in the cache. _(default: `false`)_                                                                                                                                                                                                                                                                        |
+| **`ExporterMetadata`**            | `false`   | exporterMetadata is the metadata we send to the GO Feature Flag relay proxy when we report the evaluation data usage.                                                                                                                                                                                                                                                           |
+| **`EvaluationFlagList`**          | `false`   | If you are using in process evaluation, by default we will load in memory all the flags available in the relay proxy. If you want to limit the number of flags loaded in memory, you can use this parameter. By setting this parameter, you will only load the flags available in the list. <p>If null or empty, all the flags available in the relay proxy will be loaded.</p> |
+| **`FlagChangePollingIntervalMs`** | `false`   | interval time we poll the proxy to check if the configuration has changed. It is used for the in process evaluation to check if we should refresh our internal cache. default: `120000`                                                                                                                                                                                         |
+
+### Evaluate a feature flag
+
+The OpenFeature client is used to retrieve values for the current `EvaluationContext`. For example, retrieving a boolean
+value for the flag **"my-flag"**:
 
 ```csharp
-// Context of your flag evaluation.
-// With GO Feature Flag you MUST have a targetingKey that is a unique identifier of the user.
-var userContext = EvaluationContext.Builder()
-    .Set("targetingKey", "1d1b9238-2591-4a47-94cf-d2bc080892f1") // user unique identifier (mandatory)
-    .Set("firstname", "john")
-    .Set("lastname", "doe")
-    .Set("email", "john.doe@gofeatureflag.org")
-    .Set("admin", true) // this field is used in the targeting rule of the flag "flag-only-for-admin"
-    .Set("anonymous", false)
-    .Build();
-
-var adminFlag = await client.GetBooleanValueAsync("flag-only-for-admin", false, userContext);
-if (adminFlag) {
-   // flag "flag-only-for-admin" is true for the user
-} else {
-  // flag "flag-only-for-admin" is false for the user
-}
+var client = Api.Instance.GetClient("client_test");
+var myFeatureFlag = await client.GetBooleanValueAsync("my-feature-flag", false, evaluationContext);
 ```
+
+GO Feature Flag supports different all OpenFeature supported types of feature flags, it means that you can use all the
+accessor directly
+
+```csharp
+// Boolean
+client.GetBooleanValueAsync("my-flag", false, evaluationContext);
+
+// String
+client.GetStringValueAsync("my-flag", "default", evaluationContext);
+
+// Integer
+client.GetIntegerValueAsync("my-flag", 1, evaluationContext);
+
+// Double
+client.GetDoubleValueAsync("my-flag", 1.1, evaluationContext);
+
+// Object
+client.getObjectDetails("my-flag", new Value("any value you want"), evaluationContext);
+```
+
+## How it works
+
+### In process evaluation
+
+When the provider is configured to use in process evaluation, it will fetch the flag configuration from the GO Feature
+Flag relay-proxy API and evaluate the flags directly in the provider.
+
+The evaluation is done inside the provider using a webassembly module that is compiled from the GO Feature Flag source
+code.
+The `wasm` module is used to evaluate the flags, and the source code is available in
+the [thomaspoignant/go-feature-flag](https://github.com/thomaspoignant/go-feature-flag/tree/main/wasm) repository.
+
+The provider will call the GO Feature Flag relay-proxy API to fetch the flag configuration and then evaluate the flags
+using the `wasm` module.
+
+### Remote evaluation
+
+When the provider is configured to use remote evaluation, it will call the GO Feature Flag relay-proxy for each flag
+evaluation.
+
+It will perform an HTTP request to the GO Feature Flag relay-proxy API with the flag name and the evaluation context for
+each flag evaluation.
+
+## ‼️ .NET Framework Compatibility
+
+To be able to use the GO Feature Flag provider using the In Process mode, you need to use **.NET Core SDK 3.0 SDK or
+later**.
+If you are using an older version of the .NET Framework, you will only be able to use the remote evaluation mode.
