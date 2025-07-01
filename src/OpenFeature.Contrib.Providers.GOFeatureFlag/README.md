@@ -143,7 +143,7 @@ client.GetIntegerValueAsync("my-flag", 1, evaluationContext);
 client.GetDoubleValueAsync("my-flag", 1.1, evaluationContext);
 
 // Object
-client.getObjectDetails("my-flag", new Value("any value you want"), evaluationContext);
+client.GetObjectValueAsync("my-flag", new Value("any value you want"), evaluationContext);
 ```
 
 ## How it works
