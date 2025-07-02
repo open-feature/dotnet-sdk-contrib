@@ -9,12 +9,12 @@
     <Description>GO Feature Flag provider for .NET</Description>
     <Authors>Thomas Poignant</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <WasmVersion>v1.45.0</WasmVersion>
     <OutputDirectory>$(ProjectDir)WasmModules</OutputDirectory>
     <SourceFile>$(ProjectDir)wasm-releases/evaluation/gofeatureflag-evaluation_$(WasmVersion).wasi</SourceFile>
     <DestinationFile>$(OutputDirectory)\gofeatureflag-evaluation.wasi</DestinationFile>
     <RootNamespace>OpenFeature.Providers.GOFeatureFlag</RootNamespace>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <Target Name="PrepareWasmModule" BeforeTargets="CoreCompile">
@@ -22,6 +22,11 @@
     <MakeDir Directories="$(OutputDirectory)" Condition="!Exists($(OutputDirectory))"/>
     <Copy SourceFiles="$(SourceFile)" DestinationFiles="$(DestinationFile)" Condition="Exists($(SourceFile))"/>
   </Target>
+
+  <!-- documentation -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenFeature" Version="2.2.0"/>
