@@ -18,7 +18,7 @@ namespace OpenFeature.Contrib.Providers.GOFeatureFlag.wasm;
 public class EvaluateWasm
 {
     private const string resourceName =
-        "OpenFeature.Contrib.Providers.GOFeatureFlag.WasmModules.gofeatureflag-evaluation.wasi";
+        "OpenFeature.Providers.GOFeatureFlag.WasmModules.gofeatureflag-evaluation.wasi";
 
     /// Function to evaluate the feature flag in the WASM module.
     private readonly Function _wasmEvaluate;

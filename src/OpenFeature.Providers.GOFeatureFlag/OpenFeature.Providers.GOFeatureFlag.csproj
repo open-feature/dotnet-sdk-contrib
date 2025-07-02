@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>OpenFeature.Contrib.GOFeatureFlag</PackageId>
+    <PackageId>OpenFeature.Providers.GOFeatureFlag</PackageId>
     <VersionNumber>0.2.1</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
@@ -13,6 +13,7 @@
     <OutputDirectory>$(ProjectDir)WasmModules</OutputDirectory>
     <SourceFile>$(ProjectDir)wasm-releases/evaluation/gofeatureflag-evaluation_$(WasmVersion).wasi</SourceFile>
     <DestinationFile>$(OutputDirectory)\gofeatureflag-evaluation.wasi</DestinationFile>
+    <RootNamespace>OpenFeature.Providers.GOFeatureFlag</RootNamespace>
   </PropertyGroup>
 
   <Target Name="PrepareWasmModule" BeforeTargets="CoreCompile">

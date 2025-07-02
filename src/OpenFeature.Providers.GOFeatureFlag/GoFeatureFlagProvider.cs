@@ -14,7 +14,7 @@ using OpenFeature.Contrib.Providers.GOFeatureFlag.ofrep;
 using OpenFeature.Contrib.Providers.GOFeatureFlag.service;
 using OpenFeature.Model;
 
-[assembly: InternalsVisibleTo("OpenFeature.Contrib.Providers.GOFeatureFlag.Test")]
+[assembly: InternalsVisibleTo("OpenFeature.Providers.GOFeatureFlag.Test")]
 
 namespace OpenFeature.Contrib.Providers.GOFeatureFlag;
 
