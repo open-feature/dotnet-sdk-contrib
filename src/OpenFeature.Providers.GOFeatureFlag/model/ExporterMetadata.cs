@@ -1,6 +1,6 @@
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+namespace OpenFeature.Providers.GOFeatureFlag.model;
 
 /// <summary>
 ///     This class represents the exporter metadata that will be sent in your evaluation data collectore

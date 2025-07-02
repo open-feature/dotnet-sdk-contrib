@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.helper;
+namespace OpenFeature.Providers.GOFeatureFlag.helper;
 
 /// <summary>
 ///     A class that encapsulates the logic for running an asynchronous function

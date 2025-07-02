@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
+namespace OpenFeature.Providers.GOFeatureFlag.extensions;
 
 /// <summary>
 ///     Extensions for GO Feature Flag provider.

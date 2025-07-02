@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+namespace OpenFeature.Providers.GOFeatureFlag.model;
 
 /// <summary>
 ///     CommonEvent is an abstract record that represents the common properties of an event.

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.ofrep;
+using OpenFeature.Providers.GOFeatureFlag.ofrep;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep;
 using OpenFeature.Providers.Ofrep.Configuration;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
+namespace OpenFeature.Providers.GOFeatureFlag.evaluator;
 
 /// <summary>
 ///     RemoteEvaluator is an implementation of IEvaluator that uses the OFREP API to evaluate feature flags.

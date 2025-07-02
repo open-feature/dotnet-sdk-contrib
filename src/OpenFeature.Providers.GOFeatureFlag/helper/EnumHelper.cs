@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.helper;
+namespace OpenFeature.Providers.GOFeatureFlag.helper;
 
 /// <summary>
 ///     EnumHelper is providing helper method to work with enums

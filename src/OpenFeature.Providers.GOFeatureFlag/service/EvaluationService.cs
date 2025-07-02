@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
+using OpenFeature.Providers.GOFeatureFlag.evaluator;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.service;
+namespace OpenFeature.Providers.GOFeatureFlag.service;
 
 /// <summary>
 ///     EvaluationService is a service that provides methods to evaluate feature flags.

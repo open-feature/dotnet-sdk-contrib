@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.ofrep;
+namespace OpenFeature.Providers.GOFeatureFlag.ofrep;
 
 /// <summary>
 ///     IOrepProvider defines the interface for the OpenFeature provider that interacts with OFREP.

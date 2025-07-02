@@ -5,15 +5,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.mock;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.Test.utils;
 using OpenFeature.Model;
+using OpenFeature.Providers.GOFeatureFlag.exception;
+using OpenFeature.Providers.GOFeatureFlag.extensions;
+using OpenFeature.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.Test.mock;
+using OpenFeature.Providers.GOFeatureFlag.Test.utils;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test;
+namespace OpenFeature.Providers.GOFeatureFlag.Test;
 
 public class GoFeatureFlagProviderTest
 {

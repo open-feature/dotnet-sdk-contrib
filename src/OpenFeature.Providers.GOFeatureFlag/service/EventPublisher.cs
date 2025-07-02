@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.helper;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.api;
+using OpenFeature.Providers.GOFeatureFlag.helper;
+using OpenFeature.Providers.GOFeatureFlag.model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.service;
+namespace OpenFeature.Providers.GOFeatureFlag.service;
 
 /// <summary>
 ///     EventPublisher is used to collect events and publish them in batch before they are published.

@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+namespace OpenFeature.Providers.GOFeatureFlag.model;
 
 /// <summary>
 ///     TrackingEvent is a record that represents a tracking event for a feature flag.

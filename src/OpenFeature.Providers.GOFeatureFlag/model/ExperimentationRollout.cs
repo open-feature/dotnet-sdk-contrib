@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+namespace OpenFeature.Providers.GOFeatureFlag.model;
 
 /// <summary>
 ///     Represents the rollout period of an experimentation.

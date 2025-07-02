@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
+namespace OpenFeature.Providers.GOFeatureFlag.converters;
 
 /// <summary>
 ///     OpenFeatureStructureConverter

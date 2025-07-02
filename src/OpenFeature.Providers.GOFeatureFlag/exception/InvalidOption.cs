@@ -1,4 +1,4 @@
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+namespace OpenFeature.Providers.GOFeatureFlag.exception;
 
 /// <summary>
 ///     Exception throw when the options of the provider are invalid.

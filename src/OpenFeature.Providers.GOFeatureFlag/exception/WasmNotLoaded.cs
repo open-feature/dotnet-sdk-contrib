@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+namespace OpenFeature.Providers.GOFeatureFlag.exception;
 
 /// <summary>
 ///     WasmNotLoaded is thrown when the WASM module is not loaded correctly.

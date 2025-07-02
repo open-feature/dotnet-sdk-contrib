@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
+namespace OpenFeature.Providers.GOFeatureFlag.exception;
 
 /// <summary>
 ///     Thrown when it is impossible to retrieve the flag configuration.

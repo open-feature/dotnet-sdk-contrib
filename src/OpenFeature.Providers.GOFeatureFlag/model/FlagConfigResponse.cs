@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.model;
+namespace OpenFeature.Providers.GOFeatureFlag.model;
 
 /// <summary>
 ///     FlagConfigResponse is a class that represents the response of the flag configuration.

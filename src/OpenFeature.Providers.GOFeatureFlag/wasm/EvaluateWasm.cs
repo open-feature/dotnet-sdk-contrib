@@ -2,14 +2,14 @@ using System;
 using System.Reflection;
 using System.Text.Json;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.wasm.bean;
+using OpenFeature.Providers.GOFeatureFlag.converters;
+using OpenFeature.Providers.GOFeatureFlag.exception;
+using OpenFeature.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.wasm.bean;
 using Wasmtime;
 using Module = Wasmtime.Module;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.wasm;
+namespace OpenFeature.Providers.GOFeatureFlag.wasm;
 
 /// <summary>
 ///     EvaluationWasm is a class that represents the evaluation of a feature flag
@@ -30,7 +30,7 @@ public class EvaluateWasm
     private readonly Function _wasmMalloc;
 
     /// Function to get access to the WASM memory.
-    private readonly Memory _wasmMemory;
+    private readonly Wasmtime.Memory _wasmMemory;
 
     /// <summary>
     ///     Constructor of the EvaluationWasm. It initializes the WASM module and the host functions.

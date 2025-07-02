@@ -6,17 +6,17 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.helper;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.wasm;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.wasm.bean;
+using OpenFeature.Providers.GOFeatureFlag.api;
+using OpenFeature.Providers.GOFeatureFlag.exception;
+using OpenFeature.Providers.GOFeatureFlag.extensions;
+using OpenFeature.Providers.GOFeatureFlag.helper;
+using OpenFeature.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.wasm;
+using OpenFeature.Providers.GOFeatureFlag.wasm.bean;
 using OpenFeature.Error;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
+namespace OpenFeature.Providers.GOFeatureFlag.evaluator;
 
 /// <summary>
 ///     InProcessEvaluator is an implementation of the IEvaluator interface that evaluates feature flags in-process.

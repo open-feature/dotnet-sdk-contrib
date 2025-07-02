@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using RichardSzalay.MockHttp;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.mock;
+namespace OpenFeature.Providers.GOFeatureFlag.Test.mock;
 
 public class RelayProxyMock
 {

@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.ofrep;
+namespace OpenFeature.Providers.GOFeatureFlag.ofrep;
 
 /// <summary>
 ///     OfrepProviderWrapper is a wrapper for the OfrepProvider that implements the IOfrepProvider interface.

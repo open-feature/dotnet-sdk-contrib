@@ -4,19 +4,19 @@ using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.api;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.evaluator;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.exception;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.extensions;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.hooks;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.model;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.ofrep;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.service;
+using OpenFeature.Providers.GOFeatureFlag.api;
+using OpenFeature.Providers.GOFeatureFlag.evaluator;
+using OpenFeature.Providers.GOFeatureFlag.exception;
+using OpenFeature.Providers.GOFeatureFlag.extensions;
+using OpenFeature.Providers.GOFeatureFlag.hooks;
+using OpenFeature.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.ofrep;
+using OpenFeature.Providers.GOFeatureFlag.service;
 using OpenFeature.Model;
 
 [assembly: InternalsVisibleTo("OpenFeature.Providers.GOFeatureFlag.Test")]
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag;
+namespace OpenFeature.Providers.GOFeatureFlag;
 
 /// <summary>
 ///     GoFeatureFlagProvider is the OpenFeature provider for GO Feature Flag.

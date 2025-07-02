@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
-using OpenFeature.Contrib.Providers.GOFeatureFlag.converters;
+using OpenFeature.Providers.GOFeatureFlag.converters;
 using OpenFeature.Model;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.GOFeatureFlag.Test.converters;
+namespace OpenFeature.Providers.GOFeatureFlag.Test.converters;
 
 public class SerializationTest
 {

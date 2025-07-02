@@ -72,7 +72,7 @@ The only required option to create a `GoFeatureFlagProvider` is the endpoint to 
 instance.
 
 ```csharp
-using OpenFeature.Contrib.Providers.GOFeatureFlag;
+using OpenFeature.Providers.GOFeatureFlag;
 
 var options = new GoFeatureFlagProviderOptions { Endpoint = "https://gofeatureflag.example.com" };
 var provider = new GoFeatureFlagProvider(options);
