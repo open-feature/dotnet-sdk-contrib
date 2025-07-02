@@ -42,7 +42,7 @@ public class GOFeatureFlagProviderTest
         [Fact(DisplayName = "Should throw if InProcess evaluation is used on .NET Framework")]
         public void ShouldThrowIfInProcessOnNetFramework()
         {
-            var options = new GoFeatureFlagProviderOptions
+            var options = new GOFeatureFlagProviderOptions
             {
                 Endpoint = "http://localhost",
                 EvaluationType = EvaluationType.InProcess,
@@ -53,7 +53,7 @@ public class GOFeatureFlagProviderTest
                 MaxPendingEvents = 1
             };
 
-            Assert.Throws<InvalidOptionException>(() => new GoFeatureFlagProvider(options));
+            Assert.Throws<InvalidOptionException>(() => new GOFeatureFlagProvider(options));
         }
 #endif
 
