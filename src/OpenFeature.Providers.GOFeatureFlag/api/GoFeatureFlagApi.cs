@@ -59,8 +59,8 @@ public class GoFeatureFlagApi
     /// <param name="etag">If provided, we call the API with "If-None-Match" header.</param>
     /// <param name="flags">List of flags to retrieve, if not set or empty, we will retrieve all available flags.</param>
     /// <returns>A FlagConfigResponse returning the success data.</returns>
-    /// <exception cref="FlagConfigurationEndpointNotFound">Thrown if the endpoint is not reachable.</exception>
-    /// <exception cref="ImpossibleToRetrieveConfiguration">Thrown if the endpoint is returning an error.</exception>
+    /// <exception cref="FlagConfigurationEndpointNotFoundException">Thrown if the endpoint is not reachable.</exception>
+    /// <exception cref="ImpossibleToRetrieveConfigurationException">Thrown if the endpoint is returning an error.</exception>
     public async Task<FlagConfigResponse> RetrieveFlagConfigurationAsync(string etag, List<string> flags)
     {
         var requestStr = JsonSerializer.Serialize(new FlagConfigRequest(flags));
@@ -82,17 +82,17 @@ public class GoFeatureFlagApi
                 var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return HandleFlagConfigurationSuccess(response, body);
             case HttpStatusCode.NotFound:
-                throw new FlagConfigurationEndpointNotFound();
+                throw new FlagConfigurationEndpointNotFoundException();
             case HttpStatusCode.Unauthorized:
             case HttpStatusCode.Forbidden:
-                throw new Unauthorized("Impossible to retrieve flag configuration: authentication/authorization error");
+                throw new UnauthorizedException("Impossible to retrieve flag configuration: authentication/authorization error");
             case HttpStatusCode.BadRequest:
                 var badRequestErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                throw new ImpossibleToRetrieveConfiguration(
+                throw new ImpossibleToRetrieveConfigurationException(
                     "retrieve flag configuration error: Bad request: " + badRequestErrBody);
             default:
                 var defaultErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false) ?? "";
-                throw new ImpossibleToRetrieveConfiguration(
+                throw new ImpossibleToRetrieveConfigurationException(
                     "retrieve flag configuration error: unexpected http code " + defaultErrBody);
         }
     }
@@ -102,8 +102,8 @@ public class GoFeatureFlagApi
     /// </summary>
     /// <param name="eventsList">List of events</param>
     /// <param name="exporterMetadata">Metadata associated.</param>
-    /// <exception cref="Unauthorized">Thrown when we are not authorized to call the API</exception>
-    /// <exception cref="ImpossibleToSendDataToTheCollector">Thrown when an error occured when calling the API</exception>
+    /// <exception cref="UnauthorizedException">Thrown when we are not authorized to call the API</exception>
+    /// <exception cref="ImpossibleToSendDataToTheCollectorException">Thrown when an error occured when calling the API</exception>
     public async Task SendEventToDataCollectorAsync(List<IEvent> eventsList, ExporterMetadata exporterMetadata)
     {
         var requestStr =
@@ -125,13 +125,13 @@ public class GoFeatureFlagApi
                 return;
             case HttpStatusCode.Unauthorized:
             case HttpStatusCode.Forbidden:
-                throw new Unauthorized("Impossible to send events: authentication/authorization error");
+                throw new UnauthorizedException("Impossible to send events: authentication/authorization error");
             case HttpStatusCode.BadRequest:
                 var badRequestErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                throw new ImpossibleToSendDataToTheCollector("Bad request: " + badRequestErrBody);
+                throw new ImpossibleToSendDataToTheCollectorException("Bad request: " + badRequestErrBody);
             default:
                 var defaultErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false) ?? "";
-                throw new ImpossibleToSendDataToTheCollector(
+                throw new ImpossibleToSendDataToTheCollectorException(
                     "send data to the collector error: unexpected http code " + defaultErrBody);
         }
     }

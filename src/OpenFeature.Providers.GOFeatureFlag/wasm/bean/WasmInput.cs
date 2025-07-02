@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using System.Text.Json.Serialization;
-using OpenFeature.Providers.GOFeatureFlag.model;
 using OpenFeature.Model;
+using OpenFeature.Providers.GOFeatureFlag.model;
 
 namespace OpenFeature.Providers.GOFeatureFlag.wasm.bean;
 

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using OpenFeature.Providers.GOFeatureFlag.evaluator;
 using OpenFeature.Model;
+using OpenFeature.Providers.GOFeatureFlag.evaluator;
 
 namespace OpenFeature.Providers.GOFeatureFlag.service;
 

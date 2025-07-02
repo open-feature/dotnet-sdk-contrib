@@ -44,13 +44,13 @@ public class EvaluateWasm
         var assembly = Assembly.GetExecutingAssembly();
         if (assembly == null)
         {
-            throw new WasmNotLoaded("Assembly not found. Ensure the WASM module is correctly embedded.");
+            throw new WasmNotLoadedException("Assembly not found. Ensure the WASM module is correctly embedded.");
         }
 
         var stream = assembly.GetManifestResourceStream(resourceName);
         if (stream == null)
         {
-            throw new WasmNotLoaded(
+            throw new WasmNotLoadedException(
                 "WASM module not found. Ensure the resource name is correct and the file is included in the project.");
         }
 
@@ -61,17 +61,17 @@ public class EvaluateWasm
         linker.DefineWasi();
         store.SetWasiConfiguration(wasi);
         var instance = linker.Instantiate(store, module);
-        this._wasmMemory = instance.GetMemory("memory") ?? throw new WasmFunctionNotFound("memory");
-        this._wasmMalloc = instance.GetFunction("malloc") ?? throw new WasmFunctionNotFound("malloc");
-        this._wasmFree = instance.GetFunction("free") ?? throw new WasmFunctionNotFound("free");
-        this._wasmEvaluate = instance.GetFunction("evaluate") ?? throw new WasmFunctionNotFound("evaluate");
+        this._wasmMemory = instance.GetMemory("memory") ?? throw new WasmFunctionNotFoundException("memory");
+        this._wasmMalloc = instance.GetFunction("malloc") ?? throw new WasmFunctionNotFoundException("malloc");
+        this._wasmFree = instance.GetFunction("free") ?? throw new WasmFunctionNotFoundException("free");
+        this._wasmEvaluate = instance.GetFunction("evaluate") ?? throw new WasmFunctionNotFoundException("evaluate");
     }
 
     /// <summary>
     ///     Evaluates a feature flag using the WASM module.
     /// </summary>
     /// <returns>A ResolutionDetails of the feature flag</returns>
-    /// <exception cref="WasmInvalidResult">If for any reasons we have an issue calling the wasm module.</exception>
+    /// <exception cref="WasmInvalidResultException">If for any reasons we have an issue calling the wasm module.</exception>
     public EvaluationResponse Evaluate(WasmInput wasmInput)
     {
         var wasmInputAsStr = JsonSerializer.Serialize(wasmInput, JsonConverterExtensions.DefaultSerializerSettings);
@@ -79,7 +79,7 @@ public class EvaluateWasm
         try
         {
             var evaluateRes = this._wasmEvaluate.Invoke(inputPtr, wasmInputAsStr.Length) as long?
-                              ?? throw new WasmInvalidResult("Evaluate should return a long value.");
+                              ?? throw new WasmInvalidResultException("Evaluate should return a long value.");
             var resAsString = this.ReadFromMemory(evaluateRes);
             var goffResp = JsonSerializer.Deserialize<EvaluationResponse>(resAsString);
             return goffResp;
@@ -107,12 +107,12 @@ public class EvaluateWasm
     /// </summary>
     /// <param name="inputString">string to put in memory</param>
     /// <returns>the address location of this string</returns>
-    /// <exception cref="WasmInvalidResult">If for any reasons we have an issue calling the wasm module.</exception>
+    /// <exception cref="WasmInvalidResultException">If for any reasons we have an issue calling the wasm module.</exception>
     private int CopyToMemory(string inputString)
     {
         // Allocate memory in the Wasm module for the input string.
         var ptr = this._wasmMalloc.Invoke(inputString.Length + 1) as int?
-                  ?? throw new WasmInvalidResult("Malloc should return an int value.");
+                  ?? throw new WasmInvalidResultException("Malloc should return an int value.");
         this._wasmMemory.WriteString(ptr, inputString);
         return ptr;
     }
@@ -122,14 +122,14 @@ public class EvaluateWasm
     /// </summary>
     /// <param name="evaluateRes">result of the evaluate function</param>
     /// <returns>A string containing the output of the evaluate function</returns>
-    /// <exception cref="WasmInvalidResult">If for any reasons we have an issue calling the wasm module.</exception>
+    /// <exception cref="WasmInvalidResultException">If for any reasons we have an issue calling the wasm module.</exception>
     private string ReadFromMemory(long evaluateRes)
     {
         var ptr = (int)(evaluateRes >> 32); // Higher 32 bits for a pointer
         var outputStringLength = (int)(evaluateRes & 0xFFFFFFFF); // Lower 32 bits for length
         if (ptr == 0 || outputStringLength == 0)
         {
-            throw new WasmInvalidResult("Output string pointer or length is invalid.");
+            throw new WasmInvalidResultException("Output string pointer or length is invalid.");
         }
 
         var result = this._wasmMemory.ReadString(ptr, outputStringLength);

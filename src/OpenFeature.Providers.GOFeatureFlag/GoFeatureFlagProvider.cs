@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.api;
 using OpenFeature.Providers.GOFeatureFlag.evaluator;
 using OpenFeature.Providers.GOFeatureFlag.exception;
@@ -12,7 +13,6 @@ using OpenFeature.Providers.GOFeatureFlag.hooks;
 using OpenFeature.Providers.GOFeatureFlag.model;
 using OpenFeature.Providers.GOFeatureFlag.ofrep;
 using OpenFeature.Providers.GOFeatureFlag.service;
-using OpenFeature.Model;
 
 [assembly: InternalsVisibleTo("OpenFeature.Providers.GOFeatureFlag.Test")]
 
@@ -44,11 +44,13 @@ public class GoFeatureFlagProvider : FeatureProvider
     private IImmutableList<Hook> _hooks = ImmutableArray.Create<Hook>();
 
     /// <summary>
-    ///     Constructor of the provider.
+    ///     GO Feature Flag provider constructor, this provider can be used in 2 different modes:
+    ///       - InProcess: the evaluation is done in the same process as the application, using the GO Feature Flag API to retrieve the feature flags configuration.
+    ///       - Remote: the evaluation is done in a remote process, using the relay-proxy evaluation API.
     /// </summary>
     /// <param name="options">Options used while creating the provider</param>
     /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="InvalidOption">if no options are provided, or we have a wrong configuration.</exception>
+    /// <exception cref="InvalidOptionException">if no options are provided, or we have a wrong configuration.</exception>
     public GoFeatureFlagProvider(GoFeatureFlagProviderOptions options) : this(options, null)
     {
         // we don't do anything here, the internal constructor will do the job.
@@ -246,45 +248,45 @@ public class GoFeatureFlagProvider : FeatureProvider
     ///     validateInputOptions is validating the different options provided when creating the provider.
     /// </summary>
     /// <param name="options">Options used while creating the provider</param>
-    /// <exception cref="InvalidOption">if no options are provided, or we have a wrong configuration.</exception>
+    /// <exception cref="InvalidOptionException">if no options are provided, or we have a wrong configuration.</exception>
     private static void ValidateInputOptions(GoFeatureFlagProviderOptions options)
     {
         if (options is null)
         {
-            throw new InvalidOption("No options provided");
+            throw new InvalidOptionException("No options provided");
         }
 
         if (string.IsNullOrEmpty(options.Endpoint))
         {
-            throw new InvalidOption("endpoint is a mandatory field when initializing the provider");
+            throw new InvalidOptionException("endpoint is a mandatory field when initializing the provider");
         }
 
 #if NETFRAMEWORK
     if (options.EvaluationType == EvaluationType.InProcess)
         {
-            throw new InvalidOption(
+            throw new InvalidOptionException(
                 "InProcess evaluation is not supported with .NET Framework.");
         }
 #endif
 
         if (options.FlagChangePollingIntervalMs <= TimeSpan.Zero)
         {
-            throw new InvalidOption("FlagChangePollingIntervalMs must be greater than zero");
+            throw new InvalidOptionException("FlagChangePollingIntervalMs must be greater than zero");
         }
 
         if (options.Timeout <= TimeSpan.Zero)
         {
-            throw new InvalidOption("Timeout must be greater than zero");
+            throw new InvalidOptionException("Timeout must be greater than zero");
         }
 
         if (options.FlushIntervalMs <= TimeSpan.Zero)
         {
-            throw new InvalidOption("Timeout must be greater than zero");
+            throw new InvalidOptionException("Timeout must be greater than zero");
         }
 
         if (options.MaxPendingEvents <= 0)
         {
-            throw new InvalidOption("MaxPendingEvents must be greater than zero");
+            throw new InvalidOptionException("MaxPendingEvents must be greater than zero");
         }
     }
 }

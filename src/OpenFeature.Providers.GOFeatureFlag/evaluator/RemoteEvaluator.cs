@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using OpenFeature.Providers.GOFeatureFlag.ofrep;
 using OpenFeature.Model;
+using OpenFeature.Providers.GOFeatureFlag.ofrep;
 using OpenFeature.Providers.Ofrep;
 using OpenFeature.Providers.Ofrep.Configuration;
 

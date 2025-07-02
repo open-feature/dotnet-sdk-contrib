@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.extensions;
 using OpenFeature.Providers.GOFeatureFlag.model;
 using OpenFeature.Providers.GOFeatureFlag.service;
-using OpenFeature.Model;
 
 namespace OpenFeature.Providers.GOFeatureFlag.hooks;
 

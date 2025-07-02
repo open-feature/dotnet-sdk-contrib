@@ -612,13 +612,13 @@ public class GoFeatureFlagProviderTest
         [Fact]
         public void Constructor_Options_Null()
         {
-            Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(null));
+            Assert.Throws<InvalidOptionException>(() => new GoFeatureFlagProvider(null));
         }
 
         [Fact]
         public void Constructor_Options_Empty()
         {
-            Assert.Throws<InvalidOption>(() =>
+            Assert.Throws<InvalidOptionException>(() =>
                 new GoFeatureFlagProvider(new GoFeatureFlagProviderOptions())
             );
         }
@@ -626,7 +626,7 @@ public class GoFeatureFlagProviderTest
         [Fact]
         public void Constructor_Options_EmptyEndpoint()
         {
-            Assert.Throws<InvalidOption>(() =>
+            Assert.Throws<InvalidOptionException>(() =>
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions { Endpoint = "", EvaluationType = EvaluationType.Remote }
                 )
@@ -636,7 +636,7 @@ public class GoFeatureFlagProviderTest
         [Fact]
         public void Constructor_Options_OnlyTimeout()
         {
-            Assert.Throws<InvalidOption>(() =>
+            Assert.Throws<InvalidOptionException>(() =>
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
@@ -666,7 +666,7 @@ public class GoFeatureFlagProviderTest
         public void ShouldErrorIfInvalidFlushIntervalIsSet()
         {
             var baseUrl = "http://localhost:1031";
-            Assert.Throws<InvalidOption>(() =>
+            Assert.Throws<InvalidOptionException>(() =>
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
@@ -682,7 +682,7 @@ public class GoFeatureFlagProviderTest
         public void ShouldErrorIfInvalidMaxPendingEventsIsSet()
         {
             var baseUrl = "http://localhost:1031";
-            Assert.Throws<InvalidOption>(() =>
+            Assert.Throws<InvalidOptionException>(() =>
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions
                     {
@@ -869,7 +869,7 @@ public class GoFeatureFlagProviderTest
         public Task ShouldErrorIfEndpointNotAvailable()
         {
             var mockHttp = new RelayProxyMock();
-            Assert.Throws<InvalidOption>(() =>
+            Assert.Throws<InvalidOptionException>(() =>
             {
                 new GoFeatureFlagProvider(
                     new GoFeatureFlagProviderOptions

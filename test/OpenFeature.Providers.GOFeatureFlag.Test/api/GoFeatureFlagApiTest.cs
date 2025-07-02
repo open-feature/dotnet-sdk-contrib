@@ -4,12 +4,12 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.api;
 using OpenFeature.Providers.GOFeatureFlag.exception;
 using OpenFeature.Providers.GOFeatureFlag.model;
 using OpenFeature.Providers.GOFeatureFlag.Test.mock;
 using OpenFeature.Providers.GOFeatureFlag.Test.utils;
-using OpenFeature.Model;
 using Xunit;
 
 namespace OpenFeature.Providers.GOFeatureFlag.Test.api;
@@ -147,7 +147,7 @@ public class GoFeatureFlagApiTest
             };
             var api = new GoFeatureFlagApi(options);
 
-            await Assert.ThrowsAsync<Unauthorized>(() =>
+            await Assert.ThrowsAsync<UnauthorizedException>(() =>
                 api.RetrieveFlagConfigurationAsync("", []));
         }
 
@@ -162,7 +162,7 @@ public class GoFeatureFlagApiTest
             };
             var api = new GoFeatureFlagApi(options);
 
-            await Assert.ThrowsAsync<Unauthorized>(() =>
+            await Assert.ThrowsAsync<UnauthorizedException>(() =>
                 api.RetrieveFlagConfigurationAsync("", []));
         }
 
@@ -177,7 +177,7 @@ public class GoFeatureFlagApiTest
             };
             var api = new GoFeatureFlagApi(options);
 
-            await Assert.ThrowsAsync<ImpossibleToRetrieveConfiguration>(() =>
+            await Assert.ThrowsAsync<ImpossibleToRetrieveConfigurationException>(() =>
                 api.RetrieveFlagConfigurationAsync("", []));
         }
 
@@ -192,7 +192,7 @@ public class GoFeatureFlagApiTest
             };
             var api = new GoFeatureFlagApi(options);
 
-            await Assert.ThrowsAsync<ImpossibleToRetrieveConfiguration>(() =>
+            await Assert.ThrowsAsync<ImpossibleToRetrieveConfigurationException>(() =>
                 api.RetrieveFlagConfigurationAsync("", []));
         }
 
@@ -401,7 +401,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
-            await Assert.ThrowsAsync<Unauthorized>(async () =>
+            await Assert.ThrowsAsync<UnauthorizedException>(async () =>
                 await api.SendEventToDataCollectorAsync(events, exporterMetadata));
         }
 
@@ -417,7 +417,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
-            await Assert.ThrowsAsync<Unauthorized>(async () =>
+            await Assert.ThrowsAsync<UnauthorizedException>(async () =>
                 await api.SendEventToDataCollectorAsync(events, exporterMetadata));
         }
 
@@ -433,7 +433,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
-            await Assert.ThrowsAsync<ImpossibleToSendDataToTheCollector>(async () =>
+            await Assert.ThrowsAsync<ImpossibleToSendDataToTheCollectorException>(async () =>
                 await api.SendEventToDataCollectorAsync(events, exporterMetadata));
         }
 
@@ -449,7 +449,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
-            await Assert.ThrowsAsync<ImpossibleToSendDataToTheCollector>(async () =>
+            await Assert.ThrowsAsync<ImpossibleToSendDataToTheCollectorException>(async () =>
                 await api.SendEventToDataCollectorAsync(events, exporterMetadata));
         }
     }

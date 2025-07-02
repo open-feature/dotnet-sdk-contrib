@@ -7,6 +7,6 @@ namespace OpenFeature.Providers.GOFeatureFlag.exception;
 /// </summary>
 /// <param name="message">Message associated with the exception.</param>
 /// <param name="e"></param>
-public class ImpossibleToRetrieveConfiguration(string message, Exception e = null) : GoFeatureFlagException(message, e)
+public class ImpossibleToRetrieveConfigurationException(string message, Exception e = null) : GoFeatureFlagException(message, e)
 {
 }

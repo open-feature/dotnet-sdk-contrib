@@ -6,6 +6,8 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
+using OpenFeature.Error;
+using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.api;
 using OpenFeature.Providers.GOFeatureFlag.exception;
 using OpenFeature.Providers.GOFeatureFlag.extensions;
@@ -13,8 +15,6 @@ using OpenFeature.Providers.GOFeatureFlag.helper;
 using OpenFeature.Providers.GOFeatureFlag.model;
 using OpenFeature.Providers.GOFeatureFlag.wasm;
 using OpenFeature.Providers.GOFeatureFlag.wasm.bean;
-using OpenFeature.Error;
-using OpenFeature.Model;
 
 namespace OpenFeature.Providers.GOFeatureFlag.evaluator;
 
@@ -288,7 +288,7 @@ public class InProcessEvaluator : IEvaluator
     /// <summary>
     ///     LoadConfiguration is responsible for loading the configuration of the flags from the API.
     /// </summary>
-    /// <exception cref="ImpossibleToRetrieveConfiguration">
+    /// <exception cref="ImpossibleToRetrieveConfigurationException">
     ///     In case, we are not able to call the relay proxy and to
     ///     get the flag values.
     /// </exception>
@@ -301,7 +301,7 @@ public class InProcessEvaluator : IEvaluator
 
         if (flagConfigResponse is null)
         {
-            throw new ImpossibleToRetrieveConfiguration("Flag configuration response is null");
+            throw new ImpossibleToRetrieveConfigurationException("Flag configuration response is null");
         }
 
         if ((this._etag ?? "").Equals(flagConfigResponse.Etag))
@@ -458,6 +458,6 @@ public class InProcessEvaluator : IEvaluator
             return new Value(arr);
         }
 
-        throw new ImpossibleToConvertTypeError($"impossible to convert the object {value}");
+        throw new ImpossibleToConvertTypeException($"impossible to convert the object {value}");
     }
 }

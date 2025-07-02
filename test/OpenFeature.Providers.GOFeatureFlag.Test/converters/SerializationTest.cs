@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
-using OpenFeature.Providers.GOFeatureFlag.converters;
 using OpenFeature.Model;
+using OpenFeature.Providers.GOFeatureFlag.converters;
 using Xunit;
 
 namespace OpenFeature.Providers.GOFeatureFlag.Test.converters;

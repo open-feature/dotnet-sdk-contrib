@@ -4,8 +4,8 @@ using OpenFeature.Providers.GOFeatureFlag.api;
 using OpenFeature.Providers.GOFeatureFlag.model;
 using OpenFeature.Providers.GOFeatureFlag.service;
 using OpenFeature.Providers.GOFeatureFlag.Test.mock;
-using OpenFeature.Providers.GOFeatureFlag.Test.utils;
 using OpenFeature.Providers.GOFeatureFlag.Test.mock;
+using OpenFeature.Providers.GOFeatureFlag.Test.utils;
 using Xunit;
 
 namespace OpenFeature.Providers.GOFeatureFlag.Test.service;

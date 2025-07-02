@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
-using OpenFeature.Providers.GOFeatureFlag.ofrep;
 using OpenFeature.Model;
+using OpenFeature.Providers.GOFeatureFlag.ofrep;
 
 namespace OpenFeature.Providers.GOFeatureFlag.Test.mock;
 
