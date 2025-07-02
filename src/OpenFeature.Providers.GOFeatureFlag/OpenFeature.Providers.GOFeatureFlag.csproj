@@ -14,6 +14,7 @@
     <SourceFile>$(ProjectDir)wasm-releases/evaluation/gofeatureflag-evaluation_$(WasmVersion).wasi</SourceFile>
     <DestinationFile>$(OutputDirectory)\gofeatureflag-evaluation.wasi</DestinationFile>
     <RootNamespace>OpenFeature.Providers.GOFeatureFlag</RootNamespace>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <Target Name="PrepareWasmModule" BeforeTargets="CoreCompile">
