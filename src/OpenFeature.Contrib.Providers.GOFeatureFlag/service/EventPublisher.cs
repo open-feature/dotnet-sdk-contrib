@@ -103,7 +103,7 @@ public class EventPublisher
 
         try
         {
-            await this._api.SendEventToDataCollector(eventsToPublish, this._options.ExporterMetadata)
+            await this._api.SendEventToDataCollectorAsync(eventsToPublish, this._options.ExporterMetadata)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)

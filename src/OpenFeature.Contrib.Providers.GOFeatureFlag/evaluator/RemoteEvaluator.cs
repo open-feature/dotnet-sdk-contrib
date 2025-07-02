@@ -43,14 +43,6 @@ public class RemoteEvaluator : IEvaluator
     }
 
     /// <summary>
-    ///     Shutdown the evaluator.
-    /// </summary>
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    /// <summary>
     ///     Initialize the evaluator.
     /// </summary>
     public Task InitializeAsync()
@@ -65,7 +57,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<Value>> Evaluate(string flagKey, Value defaultValue,
+    public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
         EvaluationContext evaluationContext)
     {
         return this._ofrepProvider.ResolveStructureValueAsync(flagKey, defaultValue, evaluationContext);
@@ -78,7 +70,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<string>> Evaluate(string flagKey, string defaultValue,
+    public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
         EvaluationContext evaluationContext)
     {
         return this._ofrepProvider.ResolveStringValueAsync(flagKey, defaultValue, evaluationContext);
@@ -91,7 +83,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<int>> Evaluate(string flagKey, int defaultValue,
+    public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
         EvaluationContext evaluationContext)
     {
         return this._ofrepProvider.ResolveIntegerValueAsync(flagKey, defaultValue, evaluationContext);
@@ -104,7 +96,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<double>> Evaluate(string flagKey, double defaultValue,
+    public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
         EvaluationContext evaluationContext)
     {
         return this._ofrepProvider.ResolveDoubleValueAsync(flagKey, defaultValue, evaluationContext);
@@ -117,7 +109,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<bool>> Evaluate(string flagKey, bool defaultValue,
+    public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
         EvaluationContext evaluationContext)
     {
         return this._ofrepProvider.ResolveBooleanValueAsync(flagKey, defaultValue, evaluationContext);
@@ -131,5 +123,13 @@ public class RemoteEvaluator : IEvaluator
     public bool IsFlagTrackable(string flagKey)
     {
         return true;
+    }
+
+    /// <summary>
+    ///     Shutdown the evaluator.
+    /// </summary>
+    public ValueTask DisposeAsync()
+    {
+        return default;
     }
 }

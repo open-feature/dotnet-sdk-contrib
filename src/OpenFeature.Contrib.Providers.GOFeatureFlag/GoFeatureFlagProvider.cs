@@ -156,7 +156,7 @@ public class GoFeatureFlagProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 
@@ -172,7 +172,7 @@ public class GoFeatureFlagProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 
@@ -188,7 +188,7 @@ public class GoFeatureFlagProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 
@@ -205,7 +205,7 @@ public class GoFeatureFlagProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 
@@ -221,7 +221,7 @@ public class GoFeatureFlagProvider : FeatureProvider
         EvaluationContext context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluation(flagKey, defaultValue, context)
+        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 

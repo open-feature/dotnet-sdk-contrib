@@ -40,7 +40,7 @@ public class GoFeatureFlagApiTest
                 ApiKey = "my-api-key"
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration("", []);
+            await api.RetrieveFlagConfigurationAsync("", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -58,7 +58,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration("", []);
+            await api.RetrieveFlagConfigurationAsync("", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -75,7 +75,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration("", []);
+            await api.RetrieveFlagConfigurationAsync("", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -92,7 +92,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration("", []);
+            await api.RetrieveFlagConfigurationAsync("", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -109,7 +109,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration("12345", []);
+            await api.RetrieveFlagConfigurationAsync("12345", []);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -127,7 +127,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            await api.RetrieveFlagConfiguration("", new[] { "flag1", "flag2" }.ToList());
+            await api.RetrieveFlagConfigurationAsync("", new[] { "flag1", "flag2" }.ToList());
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -148,7 +148,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<Unauthorized>(() =>
-                api.RetrieveFlagConfiguration("", []));
+                api.RetrieveFlagConfigurationAsync("", []));
         }
 
         [Fact(DisplayName = "request should return a an error if 403 received")]
@@ -163,7 +163,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<Unauthorized>(() =>
-                api.RetrieveFlagConfiguration("", []));
+                api.RetrieveFlagConfigurationAsync("", []));
         }
 
         [Fact(DisplayName = "request should return a an error if 400 received")]
@@ -178,7 +178,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<ImpossibleToRetrieveConfiguration>(() =>
-                api.RetrieveFlagConfiguration("", []));
+                api.RetrieveFlagConfigurationAsync("", []));
         }
 
         [Fact(DisplayName = "request should return a an error if 500 received")]
@@ -193,7 +193,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<ImpossibleToRetrieveConfiguration>(() =>
-                api.RetrieveFlagConfiguration("", []));
+                api.RetrieveFlagConfigurationAsync("", []));
         }
 
         [Fact(DisplayName = "request should return a valid FlagConfigResponse if 200 received")]
@@ -241,7 +241,7 @@ public class GoFeatureFlagApiTest
                 LastUpdated = DateTime.Parse("Wed, 21 Oct 2015 07:28:00 GMT")
             };
 
-            var got = await api.RetrieveFlagConfiguration("", []);
+            var got = await api.RetrieveFlagConfigurationAsync("", []);
             Assert.Equivalent(want, got);
         }
 
@@ -255,7 +255,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GoFeatureFlagApi(options);
-            var got = await api.RetrieveFlagConfiguration("", []);
+            var got = await api.RetrieveFlagConfigurationAsync("", []);
             Assert.Equal(DateTime.MinValue.ToUniversalTime(), got.LastUpdated);
         }
 
@@ -276,7 +276,7 @@ public class GoFeatureFlagApiTest
                 LastUpdated = DateTime.Parse("Wed, 21 Oct 2015 07:28:00 GMT")
             };
 
-            var got = await api.RetrieveFlagConfiguration("", []);
+            var got = await api.RetrieveFlagConfigurationAsync("", []);
             Assert.Equivalent(want, got);
         }
     }
@@ -297,7 +297,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
-            await api.SendEventToDataCollector(events, exporterMetadata);
+            await api.SendEventToDataCollectorAsync(events, exporterMetadata);
 
             mockHttp.LastRequest.Headers.TryGetValues("Authorization", out var values);
             Assert.NotNull(values);
@@ -316,7 +316,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
-            await api.SendEventToDataCollector(events, exporterMetadata);
+            await api.SendEventToDataCollectorAsync(events, exporterMetadata);
 
             mockHttp.LastRequest.Headers.TryGetValues("Authorization", out var values);
             Assert.Null(values);
@@ -334,7 +334,7 @@ public class GoFeatureFlagApiTest
             var api = new GoFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
-            await api.SendEventToDataCollector(events, exporterMetadata);
+            await api.SendEventToDataCollectorAsync(events, exporterMetadata);
             Assert.Equivalent("application/json; charset=utf-8",
                 mockHttp.LastRequest.Content.Headers.ContentType.ToString());
         }
@@ -378,7 +378,7 @@ public class GoFeatureFlagApiTest
 
             var meta = new ExporterMetadata();
             meta.Add("env", "production");
-            await api.SendEventToDataCollector(events, meta);
+            await api.SendEventToDataCollectorAsync(events, meta);
 
             var request = mockHttp.LastRequest;
             Assert.NotNull(request);
@@ -402,7 +402,7 @@ public class GoFeatureFlagApiTest
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await Assert.ThrowsAsync<Unauthorized>(async () =>
-                await api.SendEventToDataCollector(events, exporterMetadata));
+                await api.SendEventToDataCollectorAsync(events, exporterMetadata));
         }
 
         [Fact(DisplayName = "request should return a an error if 403 received")]
@@ -418,7 +418,7 @@ public class GoFeatureFlagApiTest
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await Assert.ThrowsAsync<Unauthorized>(async () =>
-                await api.SendEventToDataCollector(events, exporterMetadata));
+                await api.SendEventToDataCollectorAsync(events, exporterMetadata));
         }
 
         [Fact(DisplayName = "request should return a an error if 400 received")]
@@ -434,7 +434,7 @@ public class GoFeatureFlagApiTest
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await Assert.ThrowsAsync<ImpossibleToSendDataToTheCollector>(async () =>
-                await api.SendEventToDataCollector(events, exporterMetadata));
+                await api.SendEventToDataCollectorAsync(events, exporterMetadata));
         }
 
         [Fact(DisplayName = "request should return a an error if 500 received")]
@@ -450,7 +450,7 @@ public class GoFeatureFlagApiTest
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await Assert.ThrowsAsync<ImpossibleToSendDataToTheCollector>(async () =>
-                await api.SendEventToDataCollector(events, exporterMetadata));
+                await api.SendEventToDataCollectorAsync(events, exporterMetadata));
         }
     }
 }

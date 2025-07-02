@@ -96,7 +96,7 @@ public class InProcessEvaluator : IEvaluator
         this._lastUpdate = DateTime.MinValue.ToUniversalTime();
         this._evaluationEngine = new EvaluateWasm();
         this._periodicAsyncRunner = new PeriodicAsyncRunner(
-            this.LoadConfiguration, this._options.FlagChangePollingIntervalMs, this._options.Logger);
+            this.LoadConfigurationAsync, this._options.FlagChangePollingIntervalMs, this._options.Logger);
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ public class InProcessEvaluator : IEvaluator
     /// </summary>
     public async Task InitializeAsync()
     {
-        await this.LoadConfiguration().ConfigureAwait(false);
+        await this.LoadConfigurationAsync().ConfigureAwait(false);
         _ = Task.Run(this._periodicAsyncRunner.StartAsync);
     }
 
@@ -127,21 +127,13 @@ public class InProcessEvaluator : IEvaluator
     }
 
     /// <summary>
-    ///     Shutdown the evaluator.
-    /// </summary>
-    public Task DisposeAsync()
-    {
-        return this._periodicAsyncRunner.StopAsync();
-    }
-
-    /// <summary>
     ///     Evaluate an Object flag.
     /// </summary>
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<Value>> Evaluate(string flagKey, Value defaultValue,
+    public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
         EvaluationContext evaluationContext)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
@@ -165,7 +157,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<string>> Evaluate(string flagKey, string defaultValue,
+    public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
         EvaluationContext evaluationContext)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
@@ -187,7 +179,8 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<int>> Evaluate(string flagKey, int defaultValue, EvaluationContext evaluationContext)
+    public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
+        EvaluationContext evaluationContext)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -208,7 +201,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<bool>> Evaluate(string flagKey, bool defaultValue,
+    public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
         EvaluationContext evaluationContext)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
@@ -230,7 +223,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
-    public Task<ResolutionDetails<double>> Evaluate(string flagKey, double defaultValue,
+    public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
         EvaluationContext evaluationContext)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
@@ -243,6 +236,14 @@ public class InProcessEvaluator : IEvaluator
 
         throw new FeatureProviderException(ErrorType.TypeMismatch,
             $"Flag {flagKey} had unexpected type, expected double.");
+    }
+
+    /// <summary>
+    ///     Shutdown the evaluator.
+    /// </summary>
+    public ValueTask DisposeAsync()
+    {
+        return new ValueTask(this._periodicAsyncRunner.StopAsync());
     }
 
 
@@ -291,11 +292,11 @@ public class InProcessEvaluator : IEvaluator
     ///     In case, we are not able to call the relay proxy and to
     ///     get the flag values.
     /// </exception>
-    private async Task LoadConfiguration()
+    private async Task LoadConfigurationAsync()
     {
         // call the API to retrieve the flags' configuration and store it in the local copy
         var flagConfigResponse =
-            await this._api.RetrieveFlagConfiguration(this._etag, this._options.EvaluationFlagList)
+            await this._api.RetrieveFlagConfigurationAsync(this._etag, this._options.EvaluationFlagList)
                 .ConfigureAwait(false);
 
         if (flagConfigResponse is null)

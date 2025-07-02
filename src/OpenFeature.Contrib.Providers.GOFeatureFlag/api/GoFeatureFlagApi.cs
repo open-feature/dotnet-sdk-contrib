@@ -61,7 +61,7 @@ public class GoFeatureFlagApi
     /// <returns>A FlagConfigResponse returning the success data.</returns>
     /// <exception cref="FlagConfigurationEndpointNotFound">Thrown if the endpoint is not reachable.</exception>
     /// <exception cref="ImpossibleToRetrieveConfiguration">Thrown if the endpoint is returning an error.</exception>
-    public async Task<FlagConfigResponse> RetrieveFlagConfiguration(string etag, List<string> flags)
+    public async Task<FlagConfigResponse> RetrieveFlagConfigurationAsync(string etag, List<string> flags)
     {
         var requestStr = JsonSerializer.Serialize(new FlagConfigRequest(flags));
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/flag/configuration")
@@ -104,7 +104,7 @@ public class GoFeatureFlagApi
     /// <param name="exporterMetadata">Metadata associated.</param>
     /// <exception cref="Unauthorized">Thrown when we are not authorized to call the API</exception>
     /// <exception cref="ImpossibleToSendDataToTheCollector">Thrown when an error occured when calling the API</exception>
-    public async Task SendEventToDataCollector(List<IEvent> eventsList, ExporterMetadata exporterMetadata)
+    public async Task SendEventToDataCollectorAsync(List<IEvent> eventsList, ExporterMetadata exporterMetadata)
     {
         var requestStr =
             JsonSerializer.Serialize(
