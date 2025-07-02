@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace OpenFeature.Providers.GOFeatureFlag.converters;
+namespace OpenFeature.Providers.GOFeatureFlag.Converters;
 
 /// <summary>
 ///     Extensions for default JsonConverter behavior

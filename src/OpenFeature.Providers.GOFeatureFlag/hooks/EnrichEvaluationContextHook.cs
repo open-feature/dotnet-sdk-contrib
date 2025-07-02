@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
-using OpenFeature.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.Models;
 
-namespace OpenFeature.Providers.GOFeatureFlag.hooks;
+namespace OpenFeature.Providers.GOFeatureFlag.Hooks;
 
 /// <summary>
 ///     Enrich the evaluation context with additional information

@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using OpenFeature.Providers.GOFeatureFlag.api;
-using OpenFeature.Providers.GOFeatureFlag.model;
-using OpenFeature.Providers.GOFeatureFlag.service;
+using OpenFeature.Providers.GOFeatureFlag.Api;
+using OpenFeature.Providers.GOFeatureFlag.Models;
+using OpenFeature.Providers.GOFeatureFlag.Services;
 using OpenFeature.Providers.GOFeatureFlag.Test.mock;
 using OpenFeature.Providers.GOFeatureFlag.Test.mock;
 using OpenFeature.Providers.GOFeatureFlag.Test.utils;
@@ -12,21 +12,21 @@ namespace OpenFeature.Providers.GOFeatureFlag.Test.service;
 
 public class EventPublisherTests
 {
-    private readonly GoFeatureFlagApi _apiMock;
+    private readonly GOFeatureFlagApi _apiMock;
     private readonly RelayProxyMock _mockHttp;
-    private readonly GoFeatureFlagProviderOptions _options;
+    private readonly GOFeatureFlagProviderOptions _options;
 
     public EventPublisherTests()
     {
         this._mockHttp = new RelayProxyMock();
-        this._options = new GoFeatureFlagProviderOptions
+        this._options = new GOFeatureFlagProviderOptions
         {
             Endpoint = RelayProxyMock.baseUrl,
             HttpMessageHandler = this._mockHttp.GetRelayProxyMock(""),
             FlushIntervalMs = TimeSpan.FromMilliseconds(100),
             EvaluationType = EvaluationType.Remote
         };
-        this._apiMock = new GoFeatureFlagApi(this._options);
+        this._apiMock = new GOFeatureFlagApi(this._options);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class EventPublisherTests
     {
         var proxyMock = new RelayProxyMock();
         var handler = proxyMock.GetRelayProxyMock("");
-        var options = new GoFeatureFlagProviderOptions
+        var options = new GOFeatureFlagProviderOptions
         {
             Endpoint = RelayProxyMock.baseUrl,
             HttpMessageHandler = handler,
@@ -159,7 +159,7 @@ public class EventPublisherTests
             MaxPendingEvents = 2,
             EvaluationType = EvaluationType.Remote
         };
-        var api = new GoFeatureFlagApi(this._options);
+        var api = new GOFeatureFlagApi(this._options);
 
         var publisher = new EventPublisher(api, options);
         await publisher.StartAsync();

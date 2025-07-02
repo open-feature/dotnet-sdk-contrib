@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using OpenFeature.Model;
 
-namespace OpenFeature.Providers.GOFeatureFlag.evaluator;
+namespace OpenFeature.Providers.GOFeatureFlag.Evaluator;
 
 /// <summary>
 ///     IEvaluator is an interface that represents the evaluation of a feature flag.

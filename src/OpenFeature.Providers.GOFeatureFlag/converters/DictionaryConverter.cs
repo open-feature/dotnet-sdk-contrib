@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
-namespace OpenFeature.Providers.GOFeatureFlag.converters;
+namespace OpenFeature.Providers.GOFeatureFlag.Converters;
 
 /// <summary>
 ///     DictionaryConverter is converting a json Dictionary to a Dictionary with real object.

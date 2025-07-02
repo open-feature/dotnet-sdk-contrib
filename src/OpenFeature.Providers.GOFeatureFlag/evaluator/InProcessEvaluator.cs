@@ -8,15 +8,15 @@ using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using OpenFeature.Providers.GOFeatureFlag.api;
-using OpenFeature.Providers.GOFeatureFlag.exception;
-using OpenFeature.Providers.GOFeatureFlag.extensions;
-using OpenFeature.Providers.GOFeatureFlag.helper;
-using OpenFeature.Providers.GOFeatureFlag.model;
-using OpenFeature.Providers.GOFeatureFlag.wasm;
-using OpenFeature.Providers.GOFeatureFlag.wasm.bean;
+using OpenFeature.Providers.GOFeatureFlag.Api;
+using OpenFeature.Providers.GOFeatureFlag.Exceptions;
+using OpenFeature.Providers.GOFeatureFlag.Extensions;
+using OpenFeature.Providers.GOFeatureFlag.Helpers;
+using OpenFeature.Providers.GOFeatureFlag.Models;
+using OpenFeature.Providers.GOFeatureFlag.Wasm;
+using OpenFeature.Providers.GOFeatureFlag.Wasm.Bean;
 
-namespace OpenFeature.Providers.GOFeatureFlag.evaluator;
+namespace OpenFeature.Providers.GOFeatureFlag.Evaluator;
 
 /// <summary>
 ///     InProcessEvaluator is an implementation of the IEvaluator interface that evaluates feature flags in-process.
@@ -26,7 +26,7 @@ public class InProcessEvaluator : IEvaluator
     /// <summary>
     ///     API to contact GO Feature Flag.
     /// </summary>
-    private readonly GoFeatureFlagApi _api;
+    private readonly GOFeatureFlagApi _api;
 
     /// <summary>
     ///     WASM evaluation engine.
@@ -41,7 +41,7 @@ public class InProcessEvaluator : IEvaluator
     /// <summary>
     ///     Options to configure the provider.
     /// </summary>
-    private readonly GoFeatureFlagProviderOptions _options;
+    private readonly GOFeatureFlagProviderOptions _options;
 
     /// <summary>
     ///     PeriodicAsyncRunner is used to periodically check for configuration changes.
@@ -82,7 +82,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="eventChannel">Event channel to send events to the event bus or event handler</param>
     /// <param name="providerMetadata">Metadata containing information about the provider</param>
     /// <exception cref="ArgumentNullException">Thrown when a mandatory </exception>
-    public InProcessEvaluator(GoFeatureFlagApi api, GoFeatureFlagProviderOptions options, Channel<object> eventChannel,
+    public InProcessEvaluator(GOFeatureFlagApi api, GOFeatureFlagProviderOptions options, Channel<object> eventChannel,
         Metadata providerMetadata)
     {
         this._providerMetadata = providerMetadata ??

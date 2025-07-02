@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using OpenFeature.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.Models;
 using Wasmtime;
 
 namespace OpenFeature.Providers.GOFeatureFlag;
@@ -11,7 +11,7 @@ namespace OpenFeature.Providers.GOFeatureFlag;
 /// <Summary>
 ///     GoFeatureFlagProviderOptions contains the options to initialise the provider.
 /// </Summary>
-public class GoFeatureFlagProviderOptions
+public class GOFeatureFlagProviderOptions
 {
     /// <Summary>
     ///     (optional) interval time we poll the proxy to check if the configuration has changed. If the

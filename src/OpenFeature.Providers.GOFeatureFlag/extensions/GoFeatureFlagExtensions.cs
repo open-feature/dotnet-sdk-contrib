@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using OpenFeature.Model;
 
-namespace OpenFeature.Providers.GOFeatureFlag.extensions;
+namespace OpenFeature.Providers.GOFeatureFlag.Extensions;
 
 /// <summary>
 ///     Extensions for GO Feature Flag provider.
 /// </summary>
-public static class GoFeatureFlagExtensions
+public static class GOFeatureFlagExtensions
 {
     /// <summary>
     ///     Convert a Dictionary to an ImmutableMetadata.

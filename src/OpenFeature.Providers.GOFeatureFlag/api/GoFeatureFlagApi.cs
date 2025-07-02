@@ -8,16 +8,16 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using OpenFeature.Providers.GOFeatureFlag.converters;
-using OpenFeature.Providers.GOFeatureFlag.exception;
-using OpenFeature.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.Converters;
+using OpenFeature.Providers.GOFeatureFlag.Exceptions;
+using OpenFeature.Providers.GOFeatureFlag.Models;
 
-namespace OpenFeature.Providers.GOFeatureFlag.api;
+namespace OpenFeature.Providers.GOFeatureFlag.Api;
 
 /// <summary>
-///     GoFeatureFlagApi is a class that provides methods to interact with the GO Feature Flag API.
+/// GOFeatureFlagApi is a class that provides methods to interact with the GO Feature Flag API.
 /// </summary>
-public class GoFeatureFlagApi
+public class GOFeatureFlagApi
 {
     private const string HeaderApplicationJson = "application/json";
     private readonly HttpClient _httpClient;
@@ -25,11 +25,11 @@ public class GoFeatureFlagApi
 
 
     /// <summary>
-    ///     Constructor for GoFeatureFlagApi.
+    /// Constructor for GOFeatureFlagApi.
     /// </summary>
     /// <param name="options">Options provided during the initialization of the provider</param>
     /// <exception cref="ArgumentNullException">Thrown when options are not provided</exception>
-    public GoFeatureFlagApi(GoFeatureFlagProviderOptions options)
+    public GOFeatureFlagApi(GOFeatureFlagProviderOptions options)
     {
         if (options == null) { throw new ArgumentNullException(nameof(options), "Options cannot be null"); }
 

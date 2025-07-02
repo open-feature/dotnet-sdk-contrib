@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using OpenFeature.Model;
-using OpenFeature.Providers.GOFeatureFlag.converters;
+using OpenFeature.Providers.GOFeatureFlag.Converters;
 using Xunit;
 
 namespace OpenFeature.Providers.GOFeatureFlag.Test.converters;

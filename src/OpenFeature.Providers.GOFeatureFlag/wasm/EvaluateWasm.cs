@@ -2,14 +2,14 @@ using System;
 using System.Reflection;
 using System.Text.Json;
 using OpenFeature.Constant;
-using OpenFeature.Providers.GOFeatureFlag.converters;
-using OpenFeature.Providers.GOFeatureFlag.exception;
-using OpenFeature.Providers.GOFeatureFlag.model;
-using OpenFeature.Providers.GOFeatureFlag.wasm.bean;
+using OpenFeature.Providers.GOFeatureFlag.Converters;
+using OpenFeature.Providers.GOFeatureFlag.Exceptions;
+using OpenFeature.Providers.GOFeatureFlag.Models;
+using OpenFeature.Providers.GOFeatureFlag.Wasm.Bean;
 using Wasmtime;
 using Module = Wasmtime.Module;
 
-namespace OpenFeature.Providers.GOFeatureFlag.wasm;
+namespace OpenFeature.Providers.GOFeatureFlag.Wasm;
 
 /// <summary>
 ///     EvaluationWasm is a class that represents the evaluation of a feature flag
@@ -17,7 +17,7 @@ namespace OpenFeature.Providers.GOFeatureFlag.wasm;
 /// </summary>
 public class EvaluateWasm
 {
-    private const string resourceName =
+    private const string ResourceName =
         "OpenFeature.Providers.GOFeatureFlag.WasmModules.gofeatureflag-evaluation.wasi";
 
     /// Function to evaluate the feature flag in the WASM module.
@@ -47,7 +47,7 @@ public class EvaluateWasm
             throw new WasmNotLoadedException("Assembly not found. Ensure the WASM module is correctly embedded.");
         }
 
-        var stream = assembly.GetManifestResourceStream(resourceName);
+        var stream = assembly.GetManifestResourceStream(ResourceName);
         if (stream == null)
         {
             throw new WasmNotLoadedException(

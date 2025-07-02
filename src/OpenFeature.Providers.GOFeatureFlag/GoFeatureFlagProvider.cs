@@ -5,14 +5,14 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
-using OpenFeature.Providers.GOFeatureFlag.api;
-using OpenFeature.Providers.GOFeatureFlag.evaluator;
-using OpenFeature.Providers.GOFeatureFlag.exception;
-using OpenFeature.Providers.GOFeatureFlag.extensions;
-using OpenFeature.Providers.GOFeatureFlag.hooks;
-using OpenFeature.Providers.GOFeatureFlag.model;
-using OpenFeature.Providers.GOFeatureFlag.ofrep;
-using OpenFeature.Providers.GOFeatureFlag.service;
+using OpenFeature.Providers.GOFeatureFlag.Api;
+using OpenFeature.Providers.GOFeatureFlag.Evaluator;
+using OpenFeature.Providers.GOFeatureFlag.Exceptions;
+using OpenFeature.Providers.GOFeatureFlag.Extensions;
+using OpenFeature.Providers.GOFeatureFlag.Hooks;
+using OpenFeature.Providers.GOFeatureFlag.Models;
+using OpenFeature.Providers.GOFeatureFlag.Ofrep;
+using OpenFeature.Providers.GOFeatureFlag.Services;
 
 [assembly: InternalsVisibleTo("OpenFeature.Providers.GOFeatureFlag.Test")]
 
@@ -21,7 +21,7 @@ namespace OpenFeature.Providers.GOFeatureFlag;
 /// <summary>
 ///     GoFeatureFlagProvider is the OpenFeature provider for GO Feature Flag.
 /// </summary>
-public class GoFeatureFlagProvider : FeatureProvider
+public class GOFeatureFlagProvider : FeatureProvider
 {
     /// <summary>
     ///     EvaluationService is the service used to evaluate feature flags.
@@ -33,7 +33,7 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// </summary>
     private readonly EventPublisher _eventPublisher;
 
-    private readonly GoFeatureFlagProviderOptions _options;
+    private readonly GOFeatureFlagProviderOptions _options;
 
     /// <summary>
     ///     Metadata associated with this provider.
@@ -51,7 +51,7 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// <param name="options">Options used while creating the provider</param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="InvalidOptionException">if no options are provided, or we have a wrong configuration.</exception>
-    public GoFeatureFlagProvider(GoFeatureFlagProviderOptions options) : this(options, null)
+    public GOFeatureFlagProvider(GOFeatureFlagProviderOptions options) : this(options, null)
     {
         // we don't do anything here, the internal constructor will do the job.
     }
@@ -61,10 +61,10 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// </summary>
     /// <param name="options">Options used while creating the provider</param>
     /// <param name="ofrepProvider">The OFREP provider should be set only for test purposes</param>
-    internal GoFeatureFlagProvider(GoFeatureFlagProviderOptions options, IOfrepProvider ofrepProvider = null)
+    internal GOFeatureFlagProvider(GOFeatureFlagProviderOptions options, IOfrepProvider ofrepProvider = null)
     {
         ValidateInputOptions(options);
-        var api = new GoFeatureFlagApi(options);
+        var api = new GOFeatureFlagApi(options);
         var evaluator = this.GetEvaluator(options, api, ofrepProvider);
         this._evaluationService = new EvaluationService(evaluator);
         this._eventPublisher = new EventPublisher(api, options);
@@ -87,7 +87,7 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// <param name="api">API layer to access the relay proxy.</param>
     /// <param name="ofrepProvider">Optional custom OFREP provider (used for test)</param>
     /// <returns></returns>
-    private IEvaluator GetEvaluator(GoFeatureFlagProviderOptions options, GoFeatureFlagApi api,
+    private IEvaluator GetEvaluator(GOFeatureFlagProviderOptions options, GOFeatureFlagApi api,
         IOfrepProvider ofrepProvider = null)
     {
         if (options.EvaluationType == EvaluationType.Remote)
@@ -249,7 +249,7 @@ public class GoFeatureFlagProvider : FeatureProvider
     /// </summary>
     /// <param name="options">Options used while creating the provider</param>
     /// <exception cref="InvalidOptionException">if no options are provided, or we have a wrong configuration.</exception>
-    private static void ValidateInputOptions(GoFeatureFlagProviderOptions options)
+    private static void ValidateInputOptions(GOFeatureFlagProviderOptions options)
     {
         if (options is null)
         {

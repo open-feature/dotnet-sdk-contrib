@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Model;
-using OpenFeature.Providers.GOFeatureFlag.hooks;
-using OpenFeature.Providers.GOFeatureFlag.model;
+using OpenFeature.Providers.GOFeatureFlag.Hooks;
+using OpenFeature.Providers.GOFeatureFlag.Models;
 using Xunit;
 
 namespace OpenFeature.Providers.GOFeatureFlag.Test.hook;
