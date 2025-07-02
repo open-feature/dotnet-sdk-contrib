@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\src\OpenFeature.Providers.GOFeatureFlag\OpenFeature.Providers.GOFeatureFlag.csproj" />
+    <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.GOFeatureFlag\OpenFeature.Contrib.Providers.GOFeatureFlag.csproj"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Wasmtime" Version="22.0.0"/>
