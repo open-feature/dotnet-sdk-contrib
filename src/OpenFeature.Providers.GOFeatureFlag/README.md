@@ -1,6 +1,6 @@
 # GO Feature Flag - OpenFeature .NET provider
 
-[![nuget](https://img.shields.io/nuget/v/OpenFeature.Contrib.GOFeatureFlag?color=blue&style=flat-square&logo=nuget)](https://www.nuget.org/packages/OpenFeature.Contrib.GOFeatureFlag)
+[![nuget](https://img.shields.io/nuget/v/OpenFeature.Providers.GOFeatureFlag?color=blue&style=flat-square&logo=nuget)](https://www.nuget.org/packages/OpenFeature.Providers.GOFeatureFlag)
 
 
 > [!WARNING]
@@ -31,35 +31,35 @@ the [GO Feature Flag documentation website](https://gofeatureflag.org/docs).
 ### .NET Cli
 
 ```shell
-dotnet add package OpenFeature.Contrib.GOFeatureFlag
+dotnet add package OpenFeature.Providers.GOFeatureFlag
 ```
 
 ### Package Manager
 
 ```shell
-NuGet\Install-Package OpenFeature.Contrib.GOFeatureFlag
+NuGet\Install-Package OpenFeature.Providers.GOFeatureFlag
 ```
 
 ### Package Reference
 
 ```xml
-<PackageReference Include="OpenFeature.Contrib.GOFeatureFlag" />
+<PackageReference Include="OpenFeature.Providers.GOFeatureFlag" />
 ```
 
 ### Packet cli
 
 ```shell
-paket add OpenFeature.Contrib.GOFeatureFlag
+paket add OpenFeature.Providers.GOFeatureFlag
 ```
 
 ### Cake
 
 ```shell
-// Install OpenFeature.Contrib.GOFeatureFlag as a Cake Addin
-#addin nuget:?package=OpenFeature.Contrib.GOFeatureFlag
+// Install OpenFeature.Providers.GOFeatureFlag as a Cake Addin
+#addin nuget:?package=OpenFeature.Providers.GOFeatureFlag
 
-// Install OpenFeature.Contrib.GOFeatureFlag as a Cake Tool
-#tool nuget:?package=OpenFeature.Contrib.GOFeatureFlag
+// Install OpenFeature.Providers.GOFeatureFlag as a Cake Tool
+#tool nuget:?package=OpenFeature.Providers.GOFeatureFlag
 ```[GoFeatureFlagProviderOptions.cs](GoFeatureFlagProviderOptions.cs)
 
 ## Getting started
