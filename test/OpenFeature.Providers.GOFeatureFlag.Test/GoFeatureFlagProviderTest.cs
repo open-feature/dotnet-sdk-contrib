@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
 using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.exception;
-using OpenFeature.Providers.GOFeatureFlag.exception;
 using OpenFeature.Providers.GOFeatureFlag.extensions;
 using OpenFeature.Providers.GOFeatureFlag.model;
 using OpenFeature.Providers.GOFeatureFlag.Test.mock;
@@ -52,7 +51,7 @@ public class GoFeatureFlagProviderTest
         MaxPendingEvents = 1
     };
 
-    Assert.Throws<InvalidOption>(() => new GoFeatureFlagProvider(options));
+    Assert.Throws<InvalidOptionException>(() => new GoFeatureFlagProvider(options));
 #endif
         }
 
