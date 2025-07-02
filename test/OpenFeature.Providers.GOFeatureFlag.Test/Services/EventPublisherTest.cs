@@ -3,12 +3,11 @@ using System.Threading.Tasks;
 using OpenFeature.Providers.GOFeatureFlag.Api;
 using OpenFeature.Providers.GOFeatureFlag.Models;
 using OpenFeature.Providers.GOFeatureFlag.Services;
-using OpenFeature.Providers.GOFeatureFlag.Test.mock;
-using OpenFeature.Providers.GOFeatureFlag.Test.mock;
-using OpenFeature.Providers.GOFeatureFlag.Test.utils;
+using OpenFeature.Providers.GOFeatureFlag.Test.Mocks;
+using OpenFeature.Providers.GOFeatureFlag.Test.Utils;
 using Xunit;
 
-namespace OpenFeature.Providers.GOFeatureFlag.Test.service;
+namespace OpenFeature.Providers.GOFeatureFlag.Test.Services;
 
 public class EventPublisherTests
 {

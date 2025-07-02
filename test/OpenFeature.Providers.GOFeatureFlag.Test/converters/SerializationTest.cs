@@ -6,7 +6,7 @@ using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.Converters;
 using Xunit;
 
-namespace OpenFeature.Providers.GOFeatureFlag.Test.converters;
+namespace OpenFeature.Providers.GOFeatureFlag.Test.Converters;
 
 public class SerializationTest
 {

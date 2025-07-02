@@ -2,7 +2,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using Xunit.Sdk;
 
-namespace OpenFeature.Providers.GOFeatureFlag.Test.utils;
+namespace OpenFeature.Providers.GOFeatureFlag.Test.Utils;
 
 /// <summary>
 ///     AssertUtil is a utility class that provides methods for asserting conditions in tests.

@@ -6,7 +6,7 @@ using OpenFeature.Providers.GOFeatureFlag.Hooks;
 using OpenFeature.Providers.GOFeatureFlag.Models;
 using Xunit;
 
-namespace OpenFeature.Providers.GOFeatureFlag.Test.hook;
+namespace OpenFeature.Providers.GOFeatureFlag.Test.Hooks;
 
 public class EnrichEvaluationContextHookTest
 {

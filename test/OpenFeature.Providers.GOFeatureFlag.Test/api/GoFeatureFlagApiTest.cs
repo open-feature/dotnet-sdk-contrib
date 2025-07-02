@@ -5,16 +5,16 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using OpenFeature.Model;
-using OpenFeature.Providers.GOFeatureFlag.api;
+using OpenFeature.Providers.GOFeatureFlag.Api;
 using OpenFeature.Providers.GOFeatureFlag.Exceptions;
 using OpenFeature.Providers.GOFeatureFlag.Models;
-using OpenFeature.Providers.GOFeatureFlag.Test.mock;
-using OpenFeature.Providers.GOFeatureFlag.Test.utils;
+using OpenFeature.Providers.GOFeatureFlag.Test.Mocks;
+using OpenFeature.Providers.GOFeatureFlag.Test.Utils;
 using Xunit;
 
-namespace OpenFeature.Providers.GOFeatureFlag.Test.api;
+namespace OpenFeature.Providers.GOFeatureFlag.Test.Api;
 
-public class GoFeatureFlagApiTest
+public class GOFeatureFlagApiTest
 {
     [Collection("Constructor")]
     public class ConstructorTest
@@ -22,7 +22,7 @@ public class GoFeatureFlagApiTest
         [Fact(DisplayName = "Should throw if option is missing")]
         public void ShouldThrowIfOptionMissing()
         {
-            Assert.Throws<ArgumentNullException>(() => new GoFeatureFlagApi(null));
+            Assert.Throws<ArgumentNullException>(() => new GOFeatureFlagApi(null));
         }
     }
 
@@ -39,7 +39,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl,
                 ApiKey = "my-api-key"
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             await api.RetrieveFlagConfigurationAsync("", []);
 
             var request = mockHttp.LastRequest;
@@ -57,7 +57,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             await api.RetrieveFlagConfigurationAsync("", []);
 
             var request = mockHttp.LastRequest;
@@ -74,7 +74,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             await api.RetrieveFlagConfigurationAsync("", []);
 
             var request = mockHttp.LastRequest;
@@ -91,7 +91,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             await api.RetrieveFlagConfigurationAsync("", []);
 
             var request = mockHttp.LastRequest;
@@ -108,7 +108,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             await api.RetrieveFlagConfigurationAsync("12345", []);
 
             var request = mockHttp.LastRequest;
@@ -126,7 +126,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             await api.RetrieveFlagConfigurationAsync("", new[] { "flag1", "flag2" }.ToList());
 
             var request = mockHttp.LastRequest;
@@ -145,7 +145,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("401"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<UnauthorizedException>(() =>
                 api.RetrieveFlagConfigurationAsync("", []));
@@ -160,7 +160,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("403"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<UnauthorizedException>(() =>
                 api.RetrieveFlagConfigurationAsync("", []));
@@ -175,7 +175,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("400"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<ImpossibleToRetrieveConfigurationException>(() =>
                 api.RetrieveFlagConfigurationAsync("", []));
@@ -190,7 +190,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("500"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
 
             await Assert.ThrowsAsync<ImpossibleToRetrieveConfigurationException>(() =>
                 api.RetrieveFlagConfigurationAsync("", []));
@@ -205,7 +205,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("SIMPLE_FLAG_CONFIG"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var want = new FlagConfigResponse
             {
                 Flags = new Dictionary<string, Flag>
@@ -254,7 +254,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("SIMPLE_FLAG_CONFIG_INVALID_HEADERS"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var got = await api.RetrieveFlagConfigurationAsync("", []);
             Assert.Equal(DateTime.MinValue.ToUniversalTime(), got.LastUpdated);
         }
@@ -269,7 +269,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("304"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var want = new FlagConfigResponse
             {
                 Etag = "\"123456789\"",
@@ -294,7 +294,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl,
                 ApiKey = "my-api-key"
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await api.SendEventToDataCollectorAsync(events, exporterMetadata);
@@ -313,7 +313,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await api.SendEventToDataCollectorAsync(events, exporterMetadata);
@@ -331,7 +331,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await api.SendEventToDataCollectorAsync(events, exporterMetadata);
@@ -349,7 +349,7 @@ public class GoFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl,
                 ApiKey = "my-api-key"
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var events = new List<IEvent>
             {
                 new FeatureEvent
@@ -398,7 +398,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("401"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await Assert.ThrowsAsync<UnauthorizedException>(async () =>
@@ -414,7 +414,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("403"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await Assert.ThrowsAsync<UnauthorizedException>(async () =>
@@ -430,7 +430,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("400"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await Assert.ThrowsAsync<ImpossibleToSendDataToTheCollectorException>(async () =>
@@ -446,7 +446,7 @@ public class GoFeatureFlagApiTest
                 HttpMessageHandler = mockHttp.GetRelayProxyMock("500"),
                 Endpoint = RelayProxyMock.baseUrl
             };
-            var api = new GoFeatureFlagApi(options);
+            var api = new GOFeatureFlagApi(options);
             var events = new List<IEvent>();
             var exporterMetadata = new ExporterMetadata();
             await Assert.ThrowsAsync<ImpossibleToSendDataToTheCollectorException>(async () =>

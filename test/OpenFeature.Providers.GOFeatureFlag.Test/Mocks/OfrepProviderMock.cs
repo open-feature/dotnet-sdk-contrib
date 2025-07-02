@@ -4,7 +4,7 @@ using OpenFeature.Constant;
 using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.Ofrep;
 
-namespace OpenFeature.Providers.GOFeatureFlag.Test.mock;
+namespace OpenFeature.Providers.GOFeatureFlag.Test.Mocks;
 
 public class OfrepProviderMock : IOfrepProvider
 {

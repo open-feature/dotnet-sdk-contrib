@@ -9,13 +9,15 @@ using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.Exceptions;
 using OpenFeature.Providers.GOFeatureFlag.Extensions;
 using OpenFeature.Providers.GOFeatureFlag.Models;
-using OpenFeature.Providers.GOFeatureFlag.Test.mock;
-using OpenFeature.Providers.GOFeatureFlag.Test.utils;
+using OpenFeature.Providers.GOFeatureFlag.Test.Mocks;
+using OpenFeature.Providers.GOFeatureFlag.Test.Utils;
 using Xunit;
+
+using OpenFeatureApi = OpenFeature.Api;
 
 namespace OpenFeature.Providers.GOFeatureFlag.Test;
 
-public class GoFeatureFlagProviderTest
+public class GOFeatureFlagProviderTest
 {
     private static readonly EvaluationContext DefaultEvaluationContext = EvaluationContext.Builder()
         .SetTargetingKey("d45e303a-38c2-11ed-a261-0242ac120002")
@@ -68,13 +70,13 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             await client.GetBooleanDetailsAsync("bool_targeting_match", false, EvaluationContext.Empty);
             var want = "/v1/flag/configuration";
             Assert.Equal(want,
                 mockHttp.LastRequest.RequestUri?.AbsolutePath);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -92,11 +94,11 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
             var want = "/v1/flag/configuration";
             Assert.Equal(want,
                 mockHttp.LastRequest.RequestUri?.AbsolutePath);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -114,8 +116,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetBooleanDetailsAsync("DOES_NOT_EXISTS", false, EvaluationContext.Empty);
             var want = new FlagEvaluationDetails<bool>(
                 "DOES_NOT_EXISTS",
@@ -125,7 +127,7 @@ public class GoFeatureFlagProviderTest
                 "",
                 "Flag with key 'DOES_NOT_EXISTS' not found");
             Assert.Equivalent(want, got);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -144,8 +146,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var evaluationContext = EvaluationContext.Builder().SetTargetingKey("d4a4ed17-83ea-4cbb-a608-ac9e498e0a77")
                 .Build();
             var got = await client.GetBooleanDetailsAsync("string_key", false, evaluationContext);
@@ -157,7 +159,7 @@ public class GoFeatureFlagProviderTest
                 "",
                 "Flag string_key had unexpected type, expected boolean.");
             Assert.Equivalent(want, got);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -176,8 +178,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetBooleanDetailsAsync("bool_targeting_match", false,
                 DefaultEvaluationContext);
             var want = new FlagEvaluationDetails<bool>(
@@ -190,7 +192,7 @@ public class GoFeatureFlagProviderTest
                 new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", false } }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -208,8 +210,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetStringDetailsAsync("string_key", "",
                 DefaultEvaluationContext);
             var want = new FlagEvaluationDetails<string>(
@@ -225,7 +227,7 @@ public class GoFeatureFlagProviderTest
                     }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -243,8 +245,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetDoubleDetailsAsync("double_key", 100.10,
                 DefaultEvaluationContext);
             var want = new FlagEvaluationDetails<double>(
@@ -257,7 +259,7 @@ public class GoFeatureFlagProviderTest
                 new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", 100.25 } }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -275,8 +277,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetIntegerDetailsAsync("integer_key", 1000,
                 DefaultEvaluationContext);
             var want = new FlagEvaluationDetails<int>(
@@ -289,7 +291,7 @@ public class GoFeatureFlagProviderTest
                 new Dictionary<string, object> { { "description", "this is a test flag" }, { "defaultValue", 1000 } }
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -307,8 +309,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetObjectDetailsAsync("object_key", new Value(), DefaultEvaluationContext);
             var want = new FlagEvaluationDetails<Value>(
                 "object_key",
@@ -319,7 +321,7 @@ public class GoFeatureFlagProviderTest
                 Reason.TargetingMatch,
                 "varB");
             Assert.Equivalent(want, got);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -337,8 +339,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetBooleanDetailsAsync("disabled_bool", false, DefaultEvaluationContext);
             var want = new FlagEvaluationDetails<bool>(
                 "disabled_bool",
@@ -367,8 +369,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test_handler", provider);
-            var client = Api.Instance.GetClient("client_test_handler");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test_handler", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test_handler");
             var handlerCalled = false;
             client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, _ =>
             {
@@ -401,8 +403,8 @@ public class GoFeatureFlagProviderTest
                     FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
                 }
             );
-            await Api.Instance.SetProviderAsync("client_test_handler_2", provider);
-            var client = Api.Instance.GetClient("client_test_handler_2");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test_handler_2", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test_handler_2");
             var handlerCalled = false;
             client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, _ =>
             {
@@ -433,8 +435,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var handlerCalled = false;
             client.AddHandler(ProviderEventTypes.ProviderError, _ =>
             {
@@ -459,8 +461,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var handlerCalled = false;
             client.AddHandler(ProviderEventTypes.ProviderError, _ =>
             {
@@ -485,8 +487,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var handlerCalled = false;
             client.AddHandler(ProviderEventTypes.ProviderError, _ =>
             {
@@ -513,8 +515,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test_handler_no_change_lastmodified", provider);
-            var client = Api.Instance.GetClient("client_test_handler_no_change_lastmodified");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test_handler_no_change_lastmodified", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test_handler_no_change_lastmodified");
             var handlerCalled = false;
             client.AddHandler(ProviderEventTypes.ProviderConfigurationChanged, _ =>
             {
@@ -545,8 +547,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetBooleanDetailsAsync("my-flag", false, DefaultEvaluationContext);
             var want = new FlagEvaluationDetails<bool>(
                 "my-flag",
@@ -575,8 +577,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
             var got = await client.GetBooleanDetailsAsync("my-flag-scheduled-in-future", false,
                 DefaultEvaluationContext);
             var want = new FlagEvaluationDetails<bool>(
@@ -714,8 +716,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
 
             client.Track("my-key", DefaultEvaluationContext,
                 TrackingEventDetails.Builder().Set("revenue", 123).Set("user_id", "123ABC").Build());
@@ -741,8 +743,8 @@ public class GoFeatureFlagProviderTest
                 }
             );
 
-            await Api.Instance.SetProviderAsync("client_test", provider);
-            var client = Api.Instance.GetClient("client_test");
+            await OpenFeatureApi.Instance.SetProviderAsync("client_test", provider);
+            var client = OpenFeatureApi.Instance.GetClient("client_test");
 
             client.Track("my-key", DefaultEvaluationContext,
                 TrackingEventDetails.Builder().Set("revenue", 123).Set("user_id", "123ABC").Build());
@@ -770,14 +772,14 @@ public class GoFeatureFlagProviderTest
                 MaxPendingEvents = 1
             });
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
             await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.Single(gotJson["events"]);
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
 
@@ -794,15 +796,15 @@ public class GoFeatureFlagProviderTest
                 MaxPendingEvents = 2
             });
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
             await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
             await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.Equal(2, gotJson["events"].Count());
-            await Api.Instance.ShutdownAsync();
+            await OpenFeatureApi.Instance.ShutdownAsync();
 #endif
         }
     }
@@ -830,8 +832,8 @@ public class GoFeatureFlagProviderTest
                 ofrepProvider
             );
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             var got = await client.GetStringDetailsAsync("flag", "default", DefaultEvaluationContext);
             var lastEvaluationContext = ofrepProvider.LastEvaluationContext;
             lastEvaluationContext.TryGetValue("gofeatureflag", out var goFeatureFlagValue);
@@ -853,8 +855,8 @@ public class GoFeatureFlagProviderTest
                 ofrepProvider
             );
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             var got = await client.GetStringDetailsAsync("flag", "default", DefaultEvaluationContext);
             var lastEvaluationContext = ofrepProvider.LastEvaluationContext;
             lastEvaluationContext.TryGetValue("gofeatureflag", out var goFeatureFlagValue);
@@ -897,8 +899,8 @@ public class GoFeatureFlagProviderTest
                 new OfrepProviderMock()
             );
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             var got = await client.GetStringDetailsAsync("flag", "default", DefaultEvaluationContext);
             var want = new ResolutionDetails<string>(
                 "flag",
@@ -933,8 +935,8 @@ public class GoFeatureFlagProviderTest
                 new OfrepProviderMock()
             );
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             var got = await client.GetBooleanDetailsAsync("flag", false, DefaultEvaluationContext);
             var want = new ResolutionDetails<bool>(
                 "flag",
@@ -969,8 +971,8 @@ public class GoFeatureFlagProviderTest
                 new OfrepProviderMock()
             );
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             var got = await client.GetDoubleDetailsAsync("flag", 1.2, DefaultEvaluationContext);
             var want = new ResolutionDetails<double>(
                 "flag",
@@ -1005,8 +1007,8 @@ public class GoFeatureFlagProviderTest
                 new OfrepProviderMock()
             );
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             var got = await client.GetIntegerDetailsAsync("flag", 1, DefaultEvaluationContext);
             var want = new ResolutionDetails<int>(
                 "flag",
@@ -1041,8 +1043,8 @@ public class GoFeatureFlagProviderTest
                 new OfrepProviderMock()
             );
 
-            await Api.Instance.SetProviderAsync("test-client", provider);
-            var client = Api.Instance.GetClient("test-client");
+            await OpenFeatureApi.Instance.SetProviderAsync("test-client", provider);
+            var client = OpenFeatureApi.Instance.GetClient("test-client");
             var got = await client.GetObjectDetailsAsync("flag", new Value(1), DefaultEvaluationContext);
             var want = new ResolutionDetails<Value>(
                 "flag",
