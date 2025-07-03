@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.2.1...OpenFeature.Contrib.Providers.Flagsmith-v0.2.2) (2025-07-03)
+
+
+### 🧹 Chore
+
+* Add .editorconfig and cleanup code ([#375](https://github.com/open-feature/dotnet-sdk-contrib/issues/375)) ([683a392](https://github.com/open-feature/dotnet-sdk-contrib/commit/683a392604aca6c9a92b1f64fa30bc9e3e069b4f))
+* relax doc requirements for test projects ([e204e16](https://github.com/open-feature/dotnet-sdk-contrib/commit/e204e168ee8ccda34f46de325d45447e3ef85f73))
+
 ## [0.2.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.2.0...OpenFeature.Contrib.Providers.Flagsmith-v0.2.1) (2025-04-23)
 
 
