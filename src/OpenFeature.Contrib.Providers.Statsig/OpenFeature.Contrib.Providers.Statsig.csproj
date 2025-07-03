@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Statsig" Version="1.26.0" />
+    <PackageReference Include="Statsig" Version="2.3.0" />
     <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
   </ItemGroup>
 
