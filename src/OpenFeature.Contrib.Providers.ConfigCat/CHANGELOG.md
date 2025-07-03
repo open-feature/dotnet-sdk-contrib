@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.1.1...OpenFeature.Contrib.Providers.ConfigCat-v0.1.2) (2025-07-03)
+
+
+### 🧹 Chore
+
+* Add .editorconfig and cleanup code ([#375](https://github.com/open-feature/dotnet-sdk-contrib/issues/375)) ([683a392](https://github.com/open-feature/dotnet-sdk-contrib/commit/683a392604aca6c9a92b1f64fa30bc9e3e069b4f))
+* **deps:** update dependency configcat.client to 9.3.2 ([#289](https://github.com/open-feature/dotnet-sdk-contrib/issues/289)) ([58db25e](https://github.com/open-feature/dotnet-sdk-contrib/commit/58db25ee63a6a9ba72ba06032630197dea1bcbaf))
+* relax doc requirements for test projects ([e204e16](https://github.com/open-feature/dotnet-sdk-contrib/commit/e204e168ee8ccda34f46de325d45447e3ef85f73))
+
 ## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.1.0...OpenFeature.Contrib.Providers.ConfigCat-v0.1.1) (2024-09-17)
 
 
