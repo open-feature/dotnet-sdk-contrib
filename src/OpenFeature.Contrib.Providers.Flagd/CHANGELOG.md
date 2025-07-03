@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.3.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.2...OpenFeature.Contrib.Providers.Flagd-v0.3.3) (2025-07-03)
+
+
+### ✨ New Features
+
+* Add Dependency Injection extensions for Adding Flagd Provider ([#410](https://github.com/open-feature/dotnet-sdk-contrib/issues/410)) ([0f59127](https://github.com/open-feature/dotnet-sdk-contrib/commit/0f59127adadcd8f5675c21b4fc285fcf4368b263))
+* add JSON Schema validation for Flagd provider when in-process mode is used ([#373](https://github.com/open-feature/dotnet-sdk-contrib/issues/373)) ([5037f60](https://github.com/open-feature/dotnet-sdk-contrib/commit/5037f60c4a2bf14b79fb1420e9340c66da6671b4))
+
+
+### 🧹 Chore
+
+* Add .editorconfig and cleanup code ([#375](https://github.com/open-feature/dotnet-sdk-contrib/issues/375)) ([683a392](https://github.com/open-feature/dotnet-sdk-contrib/commit/683a392604aca6c9a92b1f64fa30bc9e3e069b4f))
+* **deps:** update dependency grpc.net.client to 2.71.0 ([#365](https://github.com/open-feature/dotnet-sdk-contrib/issues/365)) ([949aaf1](https://github.com/open-feature/dotnet-sdk-contrib/commit/949aaf1e97a5c102f37e3118a8182997f5191d4f))
+* relax doc requirements for test projects ([e204e16](https://github.com/open-feature/dotnet-sdk-contrib/commit/e204e168ee8ccda34f46de325d45447e3ef85f73))
+
+
+### 🔄 Refactoring
+
+* Refactor Init and Shutdown ([#416](https://github.com/open-feature/dotnet-sdk-contrib/issues/416)) ([7f59d4c](https://github.com/open-feature/dotnet-sdk-contrib/commit/7f59d4c39bd0778876e15f234d6c5d23fe233044))
+
 ## [0.3.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.1...OpenFeature.Contrib.Providers.Flagd-v0.3.2) (2025-04-23)
 
 
