@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.2...OpenFeature.Contrib.Providers.Flagd-v0.3.3) (2025-07-04)
+
+
+### ✨ New Features
+
+* Add Dependency Injection extensions for Adding Flagd Provider ([#410](https://github.com/open-feature/dotnet-sdk-contrib/issues/410)) ([0f59127](https://github.com/open-feature/dotnet-sdk-contrib/commit/0f59127adadcd8f5675c21b4fc285fcf4368b263))
+* add JSON Schema validation for Flagd provider when in-process mode is used ([#373](https://github.com/open-feature/dotnet-sdk-contrib/issues/373)) ([5037f60](https://github.com/open-feature/dotnet-sdk-contrib/commit/5037f60c4a2bf14b79fb1420e9340c66da6671b4))
+
 ## [0.3.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.1...OpenFeature.Contrib.Providers.Flagd-v0.3.2) (2025-04-23)
 
 
