@@ -8,7 +8,7 @@ components:
   src/OpenFeature.Contrib.Providers.Flagd:
     - bacherfl
     - toddbaert
-  src/OpenFeature.Contrib.Providers.GOFeatureFlag:
+  src/OpenFeature.Providers.GOFeatureFlag:
     - thomaspoignant
   src/OpenFeature.Contrib.Providers.Flagsmith:
     - vpetrusevici
@@ -34,7 +34,7 @@ components:
   test/OpenFeature.Contrib.Providers.Flagd.Test:
     - bacherfl
     - toddbaert
-  test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test:
+  test/OpenFeature.Providers.GOFeatureFlag.Test:
     - thomaspoignant
   test/OpenFeature.Contrib.Providers.Flagsmith.Test:
     - vpetrusevici
