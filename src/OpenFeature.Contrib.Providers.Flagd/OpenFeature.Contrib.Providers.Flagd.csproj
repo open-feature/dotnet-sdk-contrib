@@ -18,7 +18,7 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="8.0.2" />
+    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="8.0.3" />
   </ItemGroup>
   <ItemGroup>
     <!-- The schema.proto file referenced here will be used to automatically generate the Grpc
@@ -26,13 +26,13 @@
     <!-- The generated files will be placed in ./obj/Debug/netstandard2.0/Protos -->
     <PackageReference Include="JsonLogic" Version="5.4.0" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
-    <PackageReference Include="NJsonSchema" Version="11.0.0" />
+    <PackageReference Include="NJsonSchema" Version="11.3.2" />
     <PackageReference Include="Semver" Version="3.0.0" />
     <Protobuf Include="schemas\protobuf\flagd\evaluation\v1\evaluation.proto" GrpcServices="Client" />
     <Protobuf Include="schemas\protobuf\flagd\sync\v1\sync.proto" GrpcServices="Client" />
-    <PackageReference Include="Google.Protobuf" Version="3.30.2" />
+    <PackageReference Include="Google.Protobuf" Version="3.31.1" />
     <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.71.0">
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
