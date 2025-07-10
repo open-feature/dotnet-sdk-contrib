@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/OpenFeature.Contrib.Hooks.Otel/OpenFeature.Contrib.Hooks.Otel.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.ConfigCat/OpenFeature.Contrib.Providers.ConfigCat.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.EnvVar/OpenFeature.Contrib.Providers.EnvVar.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.FeatureManagement/OpenFeature.Contrib.Providers.FeatureManagement.csproj" />
@@ -12,7 +11,6 @@
     <Project Path="src/OpenFeature.Providers.Ofrep/OpenFeature.Providers.Ofrep.csproj" />
   </Folder>
   <Folder Name="/test/">
-    <Project Path="test/OpenFeature.Contrib.Hooks.Otel.Test/OpenFeature.Contrib.Hooks.Otel.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj" />
