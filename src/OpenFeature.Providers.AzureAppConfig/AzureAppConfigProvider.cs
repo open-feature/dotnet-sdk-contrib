@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Azure.Data.AppConfiguration;
 using OpenFeature.Constant;
 using OpenFeature.Model;
@@ -56,59 +57,57 @@ public sealed class AzureAppConfigProvider : FeatureProvider
 
             if (configValue?.Value?.Value == null)
             {
-                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, "Feature flag not found");
+                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, Reason.Error, "Feature flag not found");
             }
 
-            var featureFlag = System.Text.Json.JsonSerializer.Deserialize<FeatureFlag>(configValue.Value.Value);
+            var featureFlag = JsonSerializer.Deserialize<FeatureFlag>(configValue.Value.Value);
 
-            if (featureFlag == null || !featureFlag.Enabled)
+            if (featureFlag == null)
             {
-                return new ResolutionDetails<bool>(flagKey, false);
+                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General, Reason.Error, "Failed to deserialize feature flag");
             }
 
-            // If no conditions are specified, return the enabled state
-            if (featureFlag.Conditions?.ClientFilters == null || featureFlag.Conditions.ClientFilters.Count == 0)
+            if (!featureFlag.Enabled)
             {
-                return new ResolutionDetails<bool>(flagKey, true);
+                return new ResolutionDetails<bool>(flagKey, defaultValue, reason: Reason.Disabled);
             }
 
-            // For this basic implementation, we'll evaluate simple percentage filters
-            // In a full implementation, you'd want to integrate with Microsoft.FeatureManagement
-            var result = this.EvaluateConditions(featureFlag, context);
+            var result = GetVariantValue(featureFlag);
+
             return new ResolutionDetails<bool>(flagKey, result);
         }
         catch (Azure.RequestFailedException ex) when (ex.Status == 404)
         {
-            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, "Feature flag not found");
+            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, Reason.Error, ex.Message);
         }
         catch (Exception ex)
         {
-            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General, ex.Message);
+            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General, Reason.Error, ex.Message);
         }
     }
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.TypeMismatch, "String values are not supported. Use boolean feature flags only."));
+        return Task.FromResult(new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error, "String values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.TypeMismatch, "Integer values are not supported. Use boolean feature flags only."));
+        return Task.FromResult(new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error, "Integer values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.TypeMismatch, "Double values are not supported. Use boolean feature flags only."));
+        return Task.FromResult(new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error, "Double values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.TypeMismatch, "Structure values are not supported. Use boolean feature flags only."));
+        return Task.FromResult(new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error, "Structure values are not supported. Use boolean feature flags only."));
     }
 
     private string GetFeatureFlagKey(string flagKey)
@@ -116,65 +115,17 @@ public sealed class AzureAppConfigProvider : FeatureProvider
         return this._options.FeatureFlagPrefix + flagKey;
     }
 
-    private bool EvaluateConditions(FeatureFlag featureFlag, EvaluationContext? context)
+    private static bool GetVariantValue(FeatureFlag featureFlag)
     {
-        if (featureFlag.Conditions?.ClientFilters == null)
-            return true;
-
-        foreach (var filter in featureFlag.Conditions.ClientFilters)
+        if (featureFlag.Variants == null || featureFlag.Variants.Count == 0)
         {
-            switch (filter.Name?.ToLowerInvariant())
-            {
-                case "microsoft.percentage":
-                case "percentagefilter":
-                    if (filter.Parameters?.TryGetValue("Value", out var percentageObj) == true)
-                    {
-                        if (double.TryParse(percentageObj.ToString(), out var percentage))
-                        {
-                            // Simple percentage evaluation - in production you'd want a more sophisticated approach
-                            var userId = context?.GetValue("userId")?.AsString ?? context?.GetValue("targetingId")?.AsString ?? "anonymous";
-                            var hash = Math.Abs(userId.GetHashCode()) % 100;
-                            return hash < percentage;
-                        }
-                    }
-                    break;
-
-                case "microsoft.targeting":
-                case "targetingfilter":
-                    // Basic targeting evaluation - in production you'd integrate with Microsoft.FeatureManagement
-                    if (context != null)
-                    {
-                        var userId = context.GetValue("userId")?.AsString;
-                        var groups = context.GetValue("groups")?.AsList;
-
-                        if (filter.Parameters?.TryGetValue("Audience", out var audienceObj) == true && audienceObj is System.Text.Json.JsonElement audienceElement)
-                        {
-                            // Check if user is in the target users list
-                            if (audienceElement.TryGetProperty("Users", out var usersElement) && !string.IsNullOrEmpty(userId))
-                            {
-                                foreach (var userElement in usersElement.EnumerateArray())
-                                {
-                                    if (string.Equals(userElement.GetString(), userId, StringComparison.OrdinalIgnoreCase))
-                                        return true;
-                                }
-                            }
-
-                            // Check if user is in any of the target groups
-                            if (audienceElement.TryGetProperty("Groups", out var groupsElement) && groups != null)
-                            {
-                                foreach (var groupElement in groupsElement.EnumerateArray())
-                                {
-                                    var targetGroup = groupElement.GetString();
-                                    if (groups.Any(g => string.Equals(g.AsString, targetGroup, StringComparison.OrdinalIgnoreCase)))
-                                        return true;
-                                }
-                            }
-                        }
-                    }
-                    break;
-            }
+            throw new InvalidOperationException("Feature flag has no variants");
         }
 
-        return false;
+        var variant = featureFlag.Variants.FirstOrDefault(v =>
+            string.Equals(v.Name, featureFlag.Allocation.DefaultWhenEnabled, StringComparison.OrdinalIgnoreCase));
+
+        // If variant found, return its value; otherwise throw an exception
+        return variant?.ConfigurationValue ?? throw new InvalidOperationException("Feature flag has no variants");
     }
 }

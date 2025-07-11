@@ -20,38 +20,38 @@ internal class FeatureFlag
     public bool Enabled { get; set; }
 
     /// <summary>
-    /// Gets or sets the conditions under which the feature flag should be enabled.
+    /// Gets or sets the variants for the feature flag.
     /// </summary>
-    [JsonPropertyName("conditions")]
-    public FeatureFlagConditions? Conditions { get; set; }
+    [JsonPropertyName("variants")]
+    public List<FeatureFlagVariant>? Variants { get; set; }
+
+    /// <summary>
+    /// Gets or sets the default value when the feature flag is enabled.
+    /// </summary>
+    [JsonPropertyName("allocation")]
+    public Allocation Allocation { get; set; } = new Allocation();
+}
+
+internal class Allocation
+{
+    [JsonPropertyName("default_when_enabled")]
+    public string DefaultWhenEnabled { get; set; } = string.Empty;
 }
 
 /// <summary>
-/// Represents the conditions for a feature flag.
+/// Represents a variant for a feature flag.
 /// </summary>
-internal class FeatureFlagConditions
+internal class FeatureFlagVariant
 {
     /// <summary>
-    /// Gets or sets the client filters that determine when the feature flag is enabled.
-    /// </summary>
-    [JsonPropertyName("client_filters")]
-    public List<ClientFilter> ClientFilters { get; set; } = new();
-}
-
-/// <summary>
-/// Represents a client filter for feature flag evaluation.
-/// </summary>
-internal class ClientFilter
-{
-    /// <summary>
-    /// Gets or sets the name of the filter.
+    /// Gets or sets the name of the variant.
     /// </summary>
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the parameters for the filter.
+    /// Gets or sets the configuration value for the variant.
     /// </summary>
-    [JsonPropertyName("parameters")]
-    public Dictionary<string, object> Parameters { get; set; } = new();
+    [JsonPropertyName("configuration_value")]
+    public bool ConfigurationValue { get; set; }
 }

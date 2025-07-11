@@ -6,10 +6,9 @@ An OpenFeature provider for Azure App Configuration that supports boolean featur
 
 This provider allows you to use Azure App Configuration feature flags with OpenFeature. It supports:
 
--   **Feature Flags**: Azure App Configuration feature flags with conditions and filters
--   **Targeting**: User and group-based targeting
--   **Percentage Rollouts**: Gradual feature rollouts
+-   **Feature Flags**: Simple Azure App Configuration feature flags with variants
 -   **Boolean Values Only**: This provider focuses exclusively on boolean feature flags
+-   **Variant Support**: Optional support for named variants (defaults to basic enabled/disabled)
 
 ## Installation
 
@@ -67,64 +66,59 @@ var provider = new AzureAppConfigProvider(connectionString, options);
 
 ### Using with Evaluation Context
 
+The evaluation context is not used in the current implementation but is available for future enhancements:
+
 ```csharp
 var context = EvaluationContext.Builder()
     .Set("userId", "user123")
-    .Set("groups", new List<string> { "beta-users", "premium-users" })
     .Build();
 
-var isEnabled = await client.GetBooleanValueAsync("beta-feature", false, context);
+var isEnabled = await client.GetBooleanValueAsync("my-feature", false, context);
 ```
 
 ## Feature Flag Support
 
-The provider supports Azure App Configuration feature flags with the following filters:
+The provider supports simple Azure App Configuration feature flags with optional variants:
 
-### Percentage Filter
+### Basic Feature Flag
 
-Enable a feature for a percentage of users:
+A simple feature flag without variants (uses basic enabled/disabled):
+
+```json
+{
+    "id": "my-feature",
+    "enabled": true
+}
+```
+
+### Feature Flag with Variants
+
+A feature flag with explicit On/Off variants:
 
 ```json
 {
     "id": "my-feature",
     "enabled": true,
-    "conditions": {
-        "client_filters": [
-            {
-                "name": "Microsoft.Percentage",
-                "parameters": {
-                    "Value": 50
-                }
-            }
-        ]
-    }
+    "variants": [
+        {
+            "name": "Off",
+            "configuration_value": false
+        },
+        {
+            "name": "On",
+            "configuration_value": true
+        }
+    ]
 }
 ```
 
-### Targeting Filter
+When enabled, the provider will:
 
-Enable a feature for specific users or groups:
+1. Look for an "On" variant if variants are defined
+2. Return the variant's `configuration_value`
+3. Default to `true` if no "On" variant is found or no variants are defined
 
-```json
-{
-    "id": "my-feature",
-    "enabled": true,
-    "conditions": {
-        "client_filters": [
-            {
-                "name": "Microsoft.Targeting",
-                "parameters": {
-                    "Audience": {
-                        "Users": ["user1", "user2"],
-                        "Groups": ["beta-users", "premium-users"],
-                        "DefaultRolloutPercentage": 25
-                    }
-                }
-            }
-        ]
-    }
-}
-```
+When disabled, the provider always returns `false`.
 
 ## Configuration Options
 
