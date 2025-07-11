@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PackageId>OpenFeature.Providers.AzureAppConfig</PackageId>
+        <VersionNumber>0.1.0</VersionNumber> <!--x-release-please-version -->
+        <VersionPrefix>$(VersionNumber)</VersionPrefix>
+        <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
+        <FileVersion>$(VersionNumber)</FileVersion>
+        <Description>Azure App Configuration provider for .NET</Description>
+        <Authors>OpenFeature Authors</Authors>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- make the internal methods visible to our test project -->
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>$(MSBuildProjectName).Test</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Data.AppConfiguration" Version="1.4.1" />
+        <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
+    </ItemGroup>
+
+</Project>

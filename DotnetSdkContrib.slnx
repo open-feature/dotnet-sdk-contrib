@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/OpenFeature.Providers.AzureAppConfig/OpenFeature.Providers.AzureAppConfig.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.ConfigCat/OpenFeature.Contrib.Providers.ConfigCat.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.EnvVar/OpenFeature.Contrib.Providers.EnvVar.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.FeatureManagement/OpenFeature.Contrib.Providers.FeatureManagement.csproj" />
