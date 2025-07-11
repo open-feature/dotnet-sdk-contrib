@@ -20,5 +20,5 @@ public class AzureAppConfigProviderOptions
     /// <summary>
     /// Gets or sets the label to filter configuration values. If null, no label filter is applied.
     /// </summary>
-    public string Label { get; set; } = null;
+    public string? Label { get; set; }
 }

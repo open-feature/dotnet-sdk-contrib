@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Data.AppConfiguration;
 using OpenFeature.Constant;
 using OpenFeature.Model;
@@ -23,7 +19,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
     /// <param name="connectionString">The Azure App Configuration connection string.</param>
     /// <param name="options">Optional configuration options for the provider.</param>
     /// <exception cref="ArgumentNullException">Thrown when connectionString is null or empty.</exception>
-    public AzureAppConfigProvider(string connectionString, AzureAppConfigProviderOptions options = null)
+    public AzureAppConfigProvider(string connectionString, AzureAppConfigProviderOptions? options = null)
     {
         if (string.IsNullOrEmpty(connectionString))
             throw new ArgumentNullException(nameof(connectionString), "Connection string cannot be null or empty.");
@@ -38,7 +34,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
     /// <param name="configurationClient">The Azure App Configuration client.</param>
     /// <param name="options">Optional configuration options for the provider.</param>
     /// <exception cref="ArgumentNullException">Thrown when configurationClient is null.</exception>
-    public AzureAppConfigProvider(ConfigurationClient configurationClient, AzureAppConfigProviderOptions options = null)
+    public AzureAppConfigProvider(ConfigurationClient configurationClient, AzureAppConfigProviderOptions? options = null)
     {
         this._configurationClient = configurationClient ?? throw new ArgumentNullException(nameof(configurationClient));
         this._options = options ?? new AzureAppConfigProviderOptions();
@@ -51,7 +47,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -65,7 +61,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
 
             var featureFlag = System.Text.Json.JsonSerializer.Deserialize<FeatureFlag>(configValue.Value.Value);
 
-            if (!featureFlag.Enabled)
+            if (featureFlag == null || !featureFlag.Enabled)
             {
                 return new ResolutionDetails<bool>(flagKey, false);
             }
@@ -92,7 +88,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -117,7 +113,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -147,7 +143,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -177,7 +173,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -222,7 +218,7 @@ public sealed class AzureAppConfigProvider : FeatureProvider
         return this._options.ConfigurationPrefix + flagKey;
     }
 
-    private bool EvaluateConditions(FeatureFlag featureFlag, EvaluationContext context)
+    private bool EvaluateConditions(FeatureFlag featureFlag, EvaluationContext? context)
     {
         if (featureFlag.Conditions?.ClientFilters == null)
             return true;
