@@ -32,8 +32,14 @@ internal class FeatureFlag
     public Allocation Allocation { get; set; } = new Allocation();
 }
 
+/// <summary>
+/// Represents the allocation for a feature flag.
+/// </summary>
 internal class Allocation
 {
+    /// <summary>
+    /// Gets or sets the default value when the feature flag is enabled.
+    /// </summary>
     [JsonPropertyName("default_when_enabled")]
     public string DefaultWhenEnabled { get; set; } = string.Empty;
 }
