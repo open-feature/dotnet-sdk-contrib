@@ -1,15 +1,15 @@
 # Azure App Configuration Provider for .NET
 
-An OpenFeature provider for Azure App Configuration that supports both feature flags and configuration values.
+An OpenFeature provider for Azure App Configuration that supports boolean feature flags.
 
 ## Overview
 
-This provider allows you to use Azure App Configuration as a feature flag and configuration provider for OpenFeature. It supports:
+This provider allows you to use Azure App Configuration feature flags with OpenFeature. It supports:
 
 -   **Feature Flags**: Azure App Configuration feature flags with conditions and filters
--   **Configuration Values**: Regular configuration key-value pairs
 -   **Targeting**: User and group-based targeting
 -   **Percentage Rollouts**: Gradual feature rollouts
+-   **Boolean Values Only**: This provider focuses exclusively on boolean feature flags
 
 ## Installation
 
@@ -36,9 +36,6 @@ var client = OpenFeature.Api.Instance.GetClient();
 
 // Use feature flags
 var isEnabled = await client.GetBooleanValueAsync("my-feature", false);
-
-// Use configuration values
-var setting = await client.GetStringValueAsync("my-setting", "default-value");
 ```
 
 ### Using Azure Identity
@@ -62,7 +59,6 @@ await OpenFeature.Api.Instance.SetProviderAsync(provider);
 var options = new AzureAppConfigProviderOptions
 {
     FeatureFlagPrefix = ".appconfig.featureflag/",
-    ConfigurationPrefix = "MyApp:",
     Label = "Production"
 };
 
@@ -132,19 +128,14 @@ Enable a feature for specific users or groups:
 
 ## Configuration Options
 
-| Option                | Description                           | Default                   |
-| --------------------- | ------------------------------------- | ------------------------- |
-| `FeatureFlagPrefix`   | Prefix for feature flag keys          | `.appconfig.featureflag/` |
-| `ConfigurationPrefix` | Prefix for configuration keys         | `""` (empty)              |
-| `Label`               | Label filter for configuration values | `null`                    |
+| Option              | Description                    | Default                   |
+| ------------------- | ------------------------------ | ------------------------- |
+| `FeatureFlagPrefix` | Prefix for feature flag keys   | `.appconfig.featureflag/` |
+| `Label`             | Label filter for feature flags | `null`                    |
 
 ## Supported Data Types
 
--   **Boolean**: Feature flags and boolean configuration values
--   **String**: Text configuration values
--   **Integer**: Numeric configuration values
--   **Double**: Floating-point configuration values
--   **Structure**: JSON configuration values parsed as OpenFeature Value objects
+-   **Boolean**: Feature flags only - other data types will return `ErrorType.TypeMismatch`
 
 ## Error Handling
 
@@ -158,8 +149,8 @@ The provider handles common Azure App Configuration errors:
 ## Best Practices
 
 1. **Connection Management**: Reuse the `ConfigurationClient` instance across multiple provider instances
-2. **Caching**: Consider implementing caching for frequently accessed configuration values
-3. **Error Handling**: Always provide sensible default values for feature flags and configuration
+2. **Caching**: Consider implementing caching for frequently accessed feature flags
+3. **Error Handling**: Always provide sensible default values for feature flags
 4. **Security**: Use Azure Identity (Managed Identity, Service Principal) instead of connection strings in production
 5. **Monitoring**: Monitor Azure App Configuration usage and implement proper logging
 

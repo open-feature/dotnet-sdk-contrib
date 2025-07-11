@@ -5,7 +5,7 @@ using OpenFeature.Model;
 namespace OpenFeature.Providers.AzureAppConfig;
 
 /// <summary>
-/// An OpenFeature provider for Azure App Configuration with feature flags support.
+/// An OpenFeature provider for Azure App Configuration boolean feature flags.
 /// </summary>
 public sealed class AzureAppConfigProvider : FeatureProvider
 {
@@ -88,134 +88,32 @@ public sealed class AzureAppConfigProvider : FeatureProvider
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
+    public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var configKey = this.GetConfigurationKey(flagKey);
-            var configValue = await this._configurationClient.GetConfigurationSettingAsync(configKey, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            if (configValue?.Value?.Value == null)
-            {
-                return new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.FlagNotFound, "Configuration key not found");
-            }
-
-            return new ResolutionDetails<string>(flagKey, configValue.Value.Value);
-        }
-        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
-        {
-            return new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.FlagNotFound, "Configuration key not found");
-        }
-        catch (Exception ex)
-        {
-            return new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.General, ex.Message);
-        }
+        return Task.FromResult(new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.TypeMismatch, "String values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
+    public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var configKey = this.GetConfigurationKey(flagKey);
-            var configValue = await this._configurationClient.GetConfigurationSettingAsync(configKey, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            if (configValue?.Value?.Value == null)
-            {
-                return new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.FlagNotFound, "Configuration key not found");
-            }
-
-            if (int.TryParse(configValue.Value.Value, out var intValue))
-            {
-                return new ResolutionDetails<int>(flagKey, intValue);
-            }
-
-            return new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.TypeMismatch, "Value is not a valid integer");
-        }
-        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
-        {
-            return new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.FlagNotFound, "Configuration key not found");
-        }
-        catch (Exception ex)
-        {
-            return new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.General, ex.Message);
-        }
+        return Task.FromResult(new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.TypeMismatch, "Integer values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
+    public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var configKey = this.GetConfigurationKey(flagKey);
-            var configValue = await this._configurationClient.GetConfigurationSettingAsync(configKey, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            if (configValue?.Value?.Value == null)
-            {
-                return new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.FlagNotFound, "Configuration key not found");
-            }
-
-            if (double.TryParse(configValue.Value.Value, out var doubleValue))
-            {
-                return new ResolutionDetails<double>(flagKey, doubleValue);
-            }
-
-            return new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.TypeMismatch, "Value is not a valid double");
-        }
-        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
-        {
-            return new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.FlagNotFound, "Configuration key not found");
-        }
-        catch (Exception ex)
-        {
-            return new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.General, ex.Message);
-        }
+        return Task.FromResult(new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.TypeMismatch, "Double values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
+    public override Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var configKey = this.GetConfigurationKey(flagKey);
-            var configValue = await this._configurationClient.GetConfigurationSettingAsync(configKey, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            if (configValue?.Value?.Value == null)
-            {
-                return new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.FlagNotFound, "Configuration key not found");
-            }
-
-            try
-            {
-                var jsonElement = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(configValue.Value.Value);
-                var value = new Value(jsonElement);
-                return new ResolutionDetails<Value>(flagKey, value);
-            }
-            catch (System.Text.Json.JsonException)
-            {
-                // If it's not valid JSON, treat it as a string value
-                var value = new Value(configValue.Value.Value);
-                return new ResolutionDetails<Value>(flagKey, value);
-            }
-        }
-        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
-        {
-            return new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.FlagNotFound, "Configuration key not found");
-        }
-        catch (Exception ex)
-        {
-            return new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.General, ex.Message);
-        }
+        return Task.FromResult(new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.TypeMismatch, "Structure values are not supported. Use boolean feature flags only."));
     }
 
     private string GetFeatureFlagKey(string flagKey)
     {
         return this._options.FeatureFlagPrefix + flagKey;
-    }
-
-    private string GetConfigurationKey(string flagKey)
-    {
-        return this._options.ConfigurationPrefix + flagKey;
     }
 
     private bool EvaluateConditions(FeatureFlag featureFlag, EvaluationContext? context)

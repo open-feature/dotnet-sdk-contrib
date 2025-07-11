@@ -6,7 +6,7 @@
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
-    <Description>Azure App Configuration provider for .NET</Description>
+    <Description>Azure App Configuration feature flag provider for .NET</Description>
     <Authors>OpenFeature Authors</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
