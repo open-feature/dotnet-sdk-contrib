@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference
+      Include="..\..\src\OpenFeature.Providers.AzureAppConfig\OpenFeature.Providers.AzureAppConfig.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -13,6 +13,7 @@
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj" />
+    <Project Path="test/OpenFeature.Providers.AzureAppConfig.Test/OpenFeature.Providers.AzureAppConfig.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.Flagd.E2e.Common/OpenFeature.Contrib.Providers.Flagd.E2e.Common.csproj" />
