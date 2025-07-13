@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;netstandard2.0;net462</TargetFrameworks>
     <PackageId>OpenFeature.Providers.AzureAppConfig</PackageId>
     <VersionNumber>0.1.0</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
@@ -9,6 +10,8 @@
     <Description>Azure App Configuration feature flag provider for .NET</Description>
     <Authors>OpenFeature Authors</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTags>Azure;AppConfiguration;FeatureFlags;OpenFeature</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -28,7 +31,11 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Data.AppConfiguration" Version="1.4.1" />
-    <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
+    <PackageReference Include="OpenFeature" Version="[2.3,3.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

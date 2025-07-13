@@ -1,6 +1,41 @@
 # Azure App Configuration Provider for .NET
 
-An OpenFeature provider for Azure App Configuration that supports boolean feature flags.
+[![NuGet version](https://badge.fury.io/nu/OpenFeature.Providers.AzureAppConfig.svg)](https://badge.fury.io/nu/OpenFeature.Providers.AzureAppConfig)
+
+The Azure App Configuration provider allows you to connect to your Azure App Configuration instance for feature flag management.
+
+## .NET SDK usage
+
+### Requirements
+
+-   OpenFeature SDK v2.3.0 or later
+-   Supported target frameworks:
+    -   .NET 8.0
+    -   .NET 9.0
+    -   .NET Standard 2.0
+    -   .NET Framework 4.6.2
+
+### Install dependencies
+
+The first things we will do is install the **OpenFeature SDK** and the **Azure App Configuration provider**.
+
+#### .NET CLI
+
+```shell
+dotnet add package OpenFeature.Providers.AzureAppConfig
+```
+
+#### Package Manager
+
+```shell
+NuGet\Install-Package OpenFeature.Providers.AzureAppConfig
+```
+
+#### Package Reference
+
+```xml
+<PackageReference Include="OpenFeature.Providers.AzureAppConfig" />
+```
 
 ## Overview
 
@@ -9,14 +44,6 @@ This provider allows you to use Azure App Configuration feature flags with OpenF
 -   **Feature Flags**: Simple Azure App Configuration feature flags with variants
 -   **Boolean Values Only**: This provider focuses exclusively on boolean feature flags
 -   **Variant Support**: Optional support for named variants (defaults to basic enabled/disabled)
-
-## Installation
-
-Add the NuGet package to your project:
-
-```bash
-dotnet add package OpenFeature.Providers.AzureAppConfig
-```
 
 ## Usage
 
@@ -179,6 +206,10 @@ app.MapGet("/", async (IFeatureClient featureClient) =>
 
 app.Run();
 ```
+
+## Contributing
+
+This project is part of the [OpenFeature .NET SDK Contributions](https://github.com/open-feature/dotnet-sdk-contrib) repository. For development and contribution guidelines, please see the main repository's [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ## License
 
