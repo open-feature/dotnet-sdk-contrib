@@ -21,6 +21,8 @@ components:
   src/OpenFeature.Contrib.Providers.Flipt:
     - jeandreidc
     - markphelps
+  src/OpenFeature.Providers.AzureAppConfig:
+    - askpt
 
   # test/
   test/OpenFeature.Contrib.Providers.Flagd.Test:
@@ -43,6 +45,8 @@ components:
   test/src/OpenFeature.Contrib.Providers.Flipt.Test:
     - jeandreidc
     - markphelps
+  test/src/OpenFeature.Providers.AzureAppConfig.Test:
+    - askpt
 
 ignored-authors:
   - renovate-bot
