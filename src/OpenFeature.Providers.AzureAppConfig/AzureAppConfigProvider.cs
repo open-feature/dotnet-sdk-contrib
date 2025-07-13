@@ -57,14 +57,22 @@ public sealed class AzureAppConfigProvider : FeatureProvider
 
             if (configValue?.Value?.Value == null)
             {
-                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, Reason.Error, "Feature flag not found");
+                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, reason: Reason.Error, errorMessage: "Feature flag not found");
             }
 
-            var featureFlag = JsonSerializer.Deserialize<FeatureFlag>(configValue.Value.Value);
+            FeatureFlag? featureFlag;
+            try
+            {
+                featureFlag = JsonSerializer.Deserialize<FeatureFlag>(configValue.Value.Value);
+            }
+            catch (JsonException)
+            {
+                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General, reason: Reason.Error, errorMessage: "Failed to deserialize feature flag");
+            }
 
             if (featureFlag == null)
             {
-                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General, Reason.Error, "Failed to deserialize feature flag");
+                return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General, reason: Reason.Error, errorMessage: "Failed to deserialize feature flag");
             }
 
             if (!featureFlag.Enabled)
@@ -74,40 +82,40 @@ public sealed class AzureAppConfigProvider : FeatureProvider
 
             var result = GetVariantValue(featureFlag);
 
-            return new ResolutionDetails<bool>(flagKey, result);
+            return new ResolutionDetails<bool>(flagKey, result, reason: Reason.Static);
         }
         catch (Azure.RequestFailedException ex) when (ex.Status == 404)
         {
-            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, Reason.Error, ex.Message);
+            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.FlagNotFound, reason: Reason.Error, errorMessage: ex.Message);
         }
         catch (Exception ex)
         {
-            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General, Reason.Error, ex.Message);
+            return new ResolutionDetails<bool>(flagKey, defaultValue, ErrorType.General, reason: Reason.Error, errorMessage: ex.Message);
         }
     }
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error, "String values are not supported. Use boolean feature flags only."));
+        return Task.FromResult(new ResolutionDetails<string>(flagKey, defaultValue, ErrorType.TypeMismatch, reason: Reason.Error, errorMessage: "String values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error, "Integer values are not supported. Use boolean feature flags only."));
+        return Task.FromResult(new ResolutionDetails<int>(flagKey, defaultValue, ErrorType.TypeMismatch, reason: Reason.Error, errorMessage: "Integer values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error, "Double values are not supported. Use boolean feature flags only."));
+        return Task.FromResult(new ResolutionDetails<double>(flagKey, defaultValue, ErrorType.TypeMismatch, reason: Reason.Error, errorMessage: "Double values are not supported. Use boolean feature flags only."));
     }
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.TypeMismatch, Reason.Error, "Structure values are not supported. Use boolean feature flags only."));
+        return Task.FromResult(new ResolutionDetails<Value>(flagKey, defaultValue, ErrorType.TypeMismatch, reason: Reason.Error, errorMessage: "Structure values are not supported. Use boolean feature flags only."));
     }
 
     private string GetFeatureFlagKey(string flagKey)
