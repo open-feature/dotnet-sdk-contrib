@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.Ofrep;
@@ -56,9 +57,10 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
-        EvaluationContext? evaluationContext = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         return this._ofrepProvider.ResolveStructureValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -69,9 +71,10 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
-        EvaluationContext? evaluationContext = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         return this._ofrepProvider.ResolveStringValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -82,9 +85,10 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
-        EvaluationContext? evaluationContext = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         return this._ofrepProvider.ResolveIntegerValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -95,9 +99,10 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
-        EvaluationContext? evaluationContext = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         return this._ofrepProvider.ResolveDoubleValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -108,9 +113,10 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
-        EvaluationContext? evaluationContext = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         return this._ofrepProvider.ResolveBooleanValueAsync(flagKey, defaultValue, evaluationContext);
     }

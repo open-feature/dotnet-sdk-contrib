@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep;
@@ -27,13 +28,14 @@ public class OfrepProviderWrapper : IOfrepProvider
     /// <param name="context">
     ///     <see cref="T:OpenFeature.Model.EvaluationContext" />
     /// </param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
-        EvaluationContext? context = null)
+        EvaluationContext? context = null,CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveStructureValueAsync(flagKey, defaultValue, context);
+        return this._provider.ResolveStructureValueAsync(flagKey, defaultValue, context,cancellationToken ?? CancellationToken.None);
     }
 
     /// <param name="flagKey">Feature flag key</param>
@@ -41,13 +43,14 @@ public class OfrepProviderWrapper : IOfrepProvider
     /// <param name="context">
     ///     <see cref="T:OpenFeature.Model.EvaluationContext" />
     /// </param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
-        EvaluationContext? context = null)
+        EvaluationContext? context = null,CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveStringValueAsync(flagKey, defaultValue, context);
+        return this._provider.ResolveStringValueAsync(flagKey, defaultValue, context,cancellationToken ?? CancellationToken.None);
     }
 
     /// <param name="flagKey">Feature flag key</param>
@@ -55,13 +58,14 @@ public class OfrepProviderWrapper : IOfrepProvider
     /// <param name="context">
     ///     <see cref="T:OpenFeature.Model.EvaluationContext" />
     /// </param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue,
-        EvaluationContext? context = null)
+        EvaluationContext? context = null,CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveIntegerValueAsync(flagKey, defaultValue, context);
+        return this._provider.ResolveIntegerValueAsync(flagKey, defaultValue, context,cancellationToken ?? CancellationToken.None);
     }
 
     /// <param name="flagKey">Feature flag key</param>
@@ -69,13 +73,14 @@ public class OfrepProviderWrapper : IOfrepProvider
     /// <param name="context">
     ///     <see cref="T:OpenFeature.Model.EvaluationContext" />
     /// </param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
-        EvaluationContext? context = null)
+        EvaluationContext? context = null,CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveDoubleValueAsync(flagKey, defaultValue, context);
+        return this._provider.ResolveDoubleValueAsync(flagKey, defaultValue, context,cancellationToken ?? CancellationToken.None);
     }
 
     /// <param name="flagKey">Feature flag key</param>
@@ -83,13 +88,14 @@ public class OfrepProviderWrapper : IOfrepProvider
     /// <param name="context">
     ///     <see cref="T:OpenFeature.Model.EvaluationContext" />
     /// </param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
-        EvaluationContext? context = null)
+        EvaluationContext? context = null, CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveBooleanValueAsync(flagKey, defaultValue, context);
+        return this._provider.ResolveBooleanValueAsync(flagKey, defaultValue, context, cancellationToken ?? CancellationToken.None);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Model;
@@ -11,7 +12,7 @@ public class OfrepProviderMock : IOfrepProvider
     public EvaluationContext LastEvaluationContext { get; private set; }
 
     public Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
-        EvaluationContext context)
+        EvaluationContext context, CancellationToken? cancellationToken = null)
     {
         this.LastEvaluationContext = context;
         return Task.FromResult(new ResolutionDetails<Value>(
@@ -32,7 +33,7 @@ public class OfrepProviderMock : IOfrepProvider
     }
 
     public Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
-        EvaluationContext context)
+        EvaluationContext context, CancellationToken? cancellationToken = null)
     {
         this.LastEvaluationContext = context;
         return Task.FromResult(new ResolutionDetails<string>(
@@ -53,7 +54,7 @@ public class OfrepProviderMock : IOfrepProvider
     }
 
     public Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue,
-        EvaluationContext context)
+        EvaluationContext context, CancellationToken? cancellationToken = null)
     {
         this.LastEvaluationContext = context;
         return Task.FromResult(new ResolutionDetails<int>(
@@ -74,7 +75,7 @@ public class OfrepProviderMock : IOfrepProvider
     }
 
     public Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
-        EvaluationContext context)
+        EvaluationContext context, CancellationToken? cancellationToken = null)
     {
         this.LastEvaluationContext = context;
         return Task.FromResult(new ResolutionDetails<double>(
@@ -95,7 +96,7 @@ public class OfrepProviderMock : IOfrepProvider
     }
 
     public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
-        EvaluationContext context)
+        EvaluationContext context, CancellationToken? cancellationToken = null)
     {
         this.LastEvaluationContext = context;
         return Task.FromResult(new ResolutionDetails<bool>(

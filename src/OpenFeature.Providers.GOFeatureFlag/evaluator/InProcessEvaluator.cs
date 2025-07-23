@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -131,9 +132,10 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
-        EvaluationContext? evaluationContext=null)
+        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -155,9 +157,10 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
-        EvaluationContext? evaluationContext=null)
+        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -177,9 +180,10 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
-        EvaluationContext? evaluationContext=null)
+        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -199,9 +203,10 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
-        EvaluationContext? evaluationContext=null)
+        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -221,9 +226,10 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="flagKey">name of the feature flag</param>
     /// <param name="defaultValue">default value</param>
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
+    /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
-        EvaluationContext? evaluationContext=null)
+        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
