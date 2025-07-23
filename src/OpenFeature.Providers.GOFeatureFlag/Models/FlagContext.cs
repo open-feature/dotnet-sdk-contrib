@@ -19,5 +19,5 @@ public class FlagContext
     ///     Additional context values to enrich the evaluation context.
     /// </summary>
     [JsonPropertyName("evaluationContextEnrichment")]
-    public IDictionary<string, object> EvaluationContextEnrichment { get; set; }= new Dictionary<string, object>();
+    public IDictionary<string, object> EvaluationContextEnrichment { get; set; } = new Dictionary<string, object>();
 }

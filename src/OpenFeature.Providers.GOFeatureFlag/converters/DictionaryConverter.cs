@@ -57,7 +57,7 @@ public static class DictionaryConverter
                     return ConvertDictionary(
                         JsonSerializer
                             .Deserialize<Dictionary<string, object>>(jsonElement
-                                .GetRawText())??new Dictionary<string, object>());
+                                .GetRawText()) ?? new Dictionary<string, object>());
                 case JsonValueKind.Array:
                     var array = new List<object>();
                     foreach (var element in jsonElement.EnumerateArray())

@@ -135,7 +135,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
-        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -160,7 +160,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
-        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -183,7 +183,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
-        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -206,7 +206,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
-        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -229,7 +229,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
-        EvaluationContext? evaluationContext=null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -260,7 +260,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="evaluationContext">Context of the evaluation</param>
     /// <returns>An EvaluationResponse containing the output of the evaluation.</returns>
     private EvaluationResponse GenericEvaluate(string flagKey, object defaultValue,
-        EvaluationContext? evaluationContext=null)
+        EvaluationContext? evaluationContext = null)
     {
         var flagExist = this._flags.TryGetValue(flagKey, out var flag);
         if (!flagExist || flag is null)

@@ -49,12 +49,4 @@ public class EvaluationResponse
     /// </summary>
     [JsonPropertyName("metadata")]
     public Dictionary<string, object>? Metadata { get; set; }
-
-
-    // [JsonPropertyName("cacheable")]
-    // public bool Cacheable { get; set; }
-    // [JsonPropertyName("failed")]
-    // public bool Failed { get; set; }
-    // [JsonPropertyName("version")]
-    // public string Version { get; set; }
 }

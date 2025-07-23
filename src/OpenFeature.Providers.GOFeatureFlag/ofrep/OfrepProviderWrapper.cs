@@ -33,9 +33,9 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
-        EvaluationContext? context = null,CancellationToken? cancellationToken = null)
+        EvaluationContext? context = null, CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveStructureValueAsync(flagKey, defaultValue, context,cancellationToken ?? CancellationToken.None);
+        return this._provider.ResolveStructureValueAsync(flagKey, defaultValue, context, cancellationToken ?? CancellationToken.None);
     }
 
     /// <param name="flagKey">Feature flag key</param>
@@ -48,9 +48,9 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
-        EvaluationContext? context = null,CancellationToken? cancellationToken = null)
+        EvaluationContext? context = null, CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveStringValueAsync(flagKey, defaultValue, context,cancellationToken ?? CancellationToken.None);
+        return this._provider.ResolveStringValueAsync(flagKey, defaultValue, context, cancellationToken ?? CancellationToken.None);
     }
 
     /// <param name="flagKey">Feature flag key</param>
@@ -63,9 +63,9 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue,
-        EvaluationContext? context = null,CancellationToken? cancellationToken = null)
+        EvaluationContext? context = null, CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveIntegerValueAsync(flagKey, defaultValue, context,cancellationToken ?? CancellationToken.None);
+        return this._provider.ResolveIntegerValueAsync(flagKey, defaultValue, context, cancellationToken ?? CancellationToken.None);
     }
 
     /// <param name="flagKey">Feature flag key</param>
@@ -78,9 +78,9 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
-        EvaluationContext? context = null,CancellationToken? cancellationToken = null)
+        EvaluationContext? context = null, CancellationToken? cancellationToken = null)
     {
-        return this._provider.ResolveDoubleValueAsync(flagKey, defaultValue, context,cancellationToken ?? CancellationToken.None);
+        return this._provider.ResolveDoubleValueAsync(flagKey, defaultValue, context, cancellationToken ?? CancellationToken.None);
     }
 
     /// <param name="flagKey">Feature flag key</param>
