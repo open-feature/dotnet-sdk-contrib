@@ -41,7 +41,7 @@ public class GOFeatureFlagProviderOptions
     ///     (optional) timeout we are waiting when calling the go-feature-flag relay proxy API.
     ///     Default: 10000 ms
     /// </Summary>
-    public TimeSpan Timeout { get; set; } = new(10000 * TimeSpan.TicksPerMillisecond);
+    public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(10000);
 
     /// <Summary>
     ///     (optional) If you want to provide your own HttpMessageHandler.
