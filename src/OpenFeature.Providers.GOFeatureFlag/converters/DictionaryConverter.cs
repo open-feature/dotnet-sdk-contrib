@@ -14,7 +14,7 @@ public static class DictionaryConverter
     /// </summary>
     /// <param name="inputDictionary"></param>
     /// <returns>A dictionary with real types.</returns>
-    public static Dictionary<string, object> ConvertDictionary(Dictionary<string, object> inputDictionary)
+    public static Dictionary<string, object?> ConvertDictionary(Dictionary<string, object> inputDictionary)
     {
         return inputDictionary.ToDictionary(
             kvp => kvp.Key,
@@ -27,14 +27,14 @@ public static class DictionaryConverter
     /// </summary>
     /// <param name="value"></param>
     /// <returns>A value with real types.</returns>
-    public static object ConvertValue(object value)
+    public static object? ConvertValue(object value)
     {
         if (value is JsonElement jsonElement)
         {
             switch (jsonElement.ValueKind)
             {
                 case JsonValueKind.String:
-                    return jsonElement.GetString();
+                    return jsonElement.GetString() ?? string.Empty;
                 case JsonValueKind.Number:
                     if (jsonElement.TryGetInt32(out var intValue))
                     {
@@ -57,14 +57,17 @@ public static class DictionaryConverter
                     return ConvertDictionary(
                         JsonSerializer
                             .Deserialize<Dictionary<string, object>>(jsonElement
-                                .GetRawText())); //Recursive for nested objects
+                                .GetRawText())??new Dictionary<string, object>());
                 case JsonValueKind.Array:
                     var array = new List<object>();
                     foreach (var element in jsonElement.EnumerateArray())
                     {
-                        array.Add(ConvertValue(element));
+                        var convertedValue = ConvertValue(element);
+                        if (convertedValue is not null)
+                        {
+                            array.Add(convertedValue);
+                        }
                     }
-
                     return array;
                 default:
                     return jsonElement.GetRawText(); // Handle other types as needed

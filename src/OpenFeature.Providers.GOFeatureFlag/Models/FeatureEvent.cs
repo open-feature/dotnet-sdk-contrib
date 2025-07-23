@@ -22,18 +22,18 @@ public sealed record FeatureEvent : CommonEvent
     ///     Value of the feature flag evaluation result.
     /// </summary>
     [JsonPropertyName("value")]
-    public object Value { get; init; }
+    public object? Value { get; init; }
 
     /// <summary>
     ///     Variation is the variation of the feature flag that was returned by the evaluation.
     /// </summary>
     [JsonPropertyName("variation")]
-    public string Variation { get; init; }
+    public string Variation { get; init; } = "no-variant";
 
     /// <summary>
     ///     Version is the version of the feature flag that was evaluated.
     ///     If the feature flag is not versioned, this will be null or empty.
     /// </summary>
     [JsonPropertyName("version")]
-    public string Version { get; init; }
+    public string? Version { get; init; }
 }

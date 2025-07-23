@@ -13,7 +13,7 @@ public class FlagConfigRequest
     ///     Specifies the flags to be checked in the flag management system.
     /// </summary>
     /// <param name="flags"></param>
-    public FlagConfigRequest(List<string> flags)
+    public FlagConfigRequest(List<string>? flags)
     {
         this.Flags = flags ?? new List<string>();
     }

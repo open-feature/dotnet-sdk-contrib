@@ -37,7 +37,7 @@ public class EnrichEvaluationContextHook : Hook
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public override ValueTask<EvaluationContext> BeforeAsync<T>(HookContext<T> context,
-        IReadOnlyDictionary<string, object> hints = null, CancellationToken cancellationToken = default)
+        IReadOnlyDictionary<string, object>? hints = null, CancellationToken cancellationToken = default)
     {
         var builder = EvaluationContext.Builder();
         if (this._metadata != null && this._metadata.Count != 0)

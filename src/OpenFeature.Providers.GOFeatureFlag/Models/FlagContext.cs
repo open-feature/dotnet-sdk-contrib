@@ -13,11 +13,11 @@ public class FlagContext
     ///     The default value to return from the SDK if no rule matches.
     /// </summary>
     [JsonPropertyName("defaultSdkValue")]
-    public object DefaultSdkValue { get; set; }
+    public object? DefaultSdkValue { get; set; }
 
     /// <summary>
     ///     Additional context values to enrich the evaluation context.
     /// </summary>
     [JsonPropertyName("evaluationContextEnrichment")]
-    public IDictionary<string, object> EvaluationContextEnrichment { get; set; }
+    public IDictionary<string, object> EvaluationContextEnrichment { get; set; }= new Dictionary<string, object>();
 }

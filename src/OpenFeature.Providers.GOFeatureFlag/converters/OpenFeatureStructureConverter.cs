@@ -24,7 +24,9 @@ public class OpenFeatureStructureConverter : JsonConverter<Structure>
     {
         using var jsonDocument = JsonDocument.ParseValue(ref reader);
         var jsonText = jsonDocument.RootElement.GetRawText();
+
+
         return new Structure(JsonSerializer.Deserialize<Dictionary<string, Value>>(jsonText,
-            JsonConverterExtensions.DefaultSerializerSettings));
+            JsonConverterExtensions.DefaultSerializerSettings) ?? new Dictionary<string, Value>());
     }
 }

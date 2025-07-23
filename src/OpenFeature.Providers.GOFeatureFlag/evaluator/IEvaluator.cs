@@ -23,7 +23,7 @@ public interface IEvaluator : IAsyncDisposable
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
-        EvaluationContext evaluationContext);
+        EvaluationContext? evaluationContext = null);
 
     /// <summary>
     ///     Evaluate a string flag.
@@ -33,7 +33,7 @@ public interface IEvaluator : IAsyncDisposable
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
-        EvaluationContext evaluationContext);
+        EvaluationContext? evaluationContext = null);
 
     /// <summary>
     ///     Evaluate an int flag.
@@ -43,7 +43,7 @@ public interface IEvaluator : IAsyncDisposable
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
-        EvaluationContext evaluationContext);
+        EvaluationContext? evaluationContext = null);
 
     /// <summary>
     ///     Evaluate a double flag.
@@ -53,7 +53,7 @@ public interface IEvaluator : IAsyncDisposable
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
-        EvaluationContext evaluationContext);
+        EvaluationContext? evaluationContext = null);
 
     /// <summary>
     ///     Evaluate a boolean flag.
@@ -63,7 +63,7 @@ public interface IEvaluator : IAsyncDisposable
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
-        EvaluationContext evaluationContext);
+        EvaluationContext? evaluationContext = null);
 
     /// <summary>
     ///     Check if the flag is trackable.

@@ -7,6 +7,6 @@ namespace OpenFeature.Providers.GOFeatureFlag.Exceptions;
 /// </summary>
 /// <param name="message">message</param>
 /// <param name="e">child exception</param>
-public class UnauthorizedException(string message, Exception e = null) : GOFeatureFlagException(message, e)
+public class UnauthorizedException(string message, Exception? e = null) : GOFeatureFlagException(message, e)
 {
 }

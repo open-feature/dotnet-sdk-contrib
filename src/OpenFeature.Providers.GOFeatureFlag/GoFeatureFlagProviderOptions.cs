@@ -25,7 +25,11 @@ public class GOFeatureFlagProviderOptions
     ///     (mandatory) endpoint contains the DNS of your GO Feature Flag relay proxy
     ///     example: https://mydomain.com/gofeatureflagproxy/
     /// </Summary>
-    public string Endpoint { get; set; }
+#if NET7_0_OR_GREATER
+    public required string Endpoint { get; set; }
+#else
+    public string Endpoint { get; set; } = string.Empty;
+#endif
 
     /// <summary>
     ///     EvaluationType defines how the evaluation is done.
@@ -43,7 +47,7 @@ public class GOFeatureFlagProviderOptions
     ///     (optional) If you want to provide your own HttpMessageHandler.
     ///     Default: null
     /// </Summary>
-    public HttpMessageHandler HttpMessageHandler { get; set; }
+    public HttpMessageHandler? HttpMessageHandler { get; set; }
 
     /// <Summary>
     ///     (optional) If the relay proxy is configured to authenticate the request, you should provide
@@ -52,7 +56,7 @@ public class GOFeatureFlagProviderOptions
     ///     (This feature is available only if you are using GO Feature Flag relay proxy v1.7.0 or above)
     ///     Default: null
     /// </Summary>
-    public string ApiKey { get; set; }
+    public string? ApiKey { get; set; }
 
     /// <summary>
     ///     (optional) ExporterMetadata are static information you can set that will be available in the
@@ -66,7 +70,7 @@ public class GOFeatureFlagProviderOptions
     ///     By setting this parameter, you will only load the flags available in the list.
     ///     <p>If null or empty, all the flags available in the relay proxy will be loaded.</p>
     /// </Summary>
-    public List<string> EvaluationFlagList { get; set; }
+    public List<string>? EvaluationFlagList { get; set; }
 
     /// <summary>
     ///     Logger for the provider. When not specified <see cref="Instance" /> is used.

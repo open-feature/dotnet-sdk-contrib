@@ -13,14 +13,17 @@ public static class GOFeatureFlagExtensions
     /// </summary>
     /// <param name="metadataDictionary"></param>
     /// <returns></returns>
-    public static ImmutableMetadata
-        ToImmutableMetadata(this Dictionary<string, object> metadataDictionary) // 'this' keyword is crucial
+    public static ImmutableMetadata?
+        ToImmutableMetadata(this Dictionary<string, object>? metadataDictionary) // 'this' keyword is crucial
     {
         return metadataDictionary != null ? new ImmutableMetadata(metadataDictionary) : null;
     }
 
-    /// <inheritdoc/>
-    public static bool IsAnonymous(this EvaluationContext evaluationContext)
+    /// <summary>
+    /// Extension method to check if the evaluation context is anonymous.
+    /// </summary>
+    /// <param name="evaluationContext">The evaluation context to check.</param>
+    public static bool IsAnonymous(this EvaluationContext? evaluationContext)
     {
         try
         {

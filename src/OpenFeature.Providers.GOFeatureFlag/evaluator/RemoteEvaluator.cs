@@ -19,7 +19,7 @@ public class RemoteEvaluator : IEvaluator
     /// </summary>
     /// <param name="options">Options of the GOFF Provider</param>
     /// <param name="ofrepProvider">Optional custom OFREP provider (used for test)</param>
-    internal RemoteEvaluator(GOFeatureFlagProviderOptions options, IOfrepProvider ofrepProvider = null)
+    internal RemoteEvaluator(GOFeatureFlagProviderOptions options, IOfrepProvider? ofrepProvider = null)
     {
         if (ofrepProvider != null)
         {
@@ -58,7 +58,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return this._ofrepProvider.ResolveStructureValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -71,7 +71,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return this._ofrepProvider.ResolveStringValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -84,7 +84,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return this._ofrepProvider.ResolveIntegerValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -97,7 +97,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return this._ofrepProvider.ResolveDoubleValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -110,7 +110,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return this._ofrepProvider.ResolveBooleanValueAsync(flagKey, defaultValue, evaluationContext);
     }

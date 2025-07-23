@@ -56,12 +56,12 @@ public class InProcessEvaluator : IEvaluator
     /// <summary>
     ///     Last hash of the flags' configuration.
     /// </summary>
-    private string _etag;
+    private string? _etag;
 
     /// <summary>
     ///     Evaluation context enrichment.
     /// </summary>
-    private IDictionary<string, object> _evaluationContextEnrichment;
+    private IDictionary<string, object>? _evaluationContextEnrichment;
 
     /// <summary>
     ///     Local copy of the flags' configuration.
@@ -91,7 +91,6 @@ public class InProcessEvaluator : IEvaluator
         this._api = api ?? throw new ArgumentNullException(nameof(api), "API layer cannot be null");
         this._options = options ?? throw new ArgumentNullException(nameof(options), "Options cannot be null");
         this._eventChannel = eventChannel;
-        this._etag = "";
         this._flags = new Dictionary<string, Flag>();
         this._lastUpdate = DateTime.MinValue.ToUniversalTime();
         this._evaluationEngine = new EvaluateWasm();
@@ -123,7 +122,7 @@ public class InProcessEvaluator : IEvaluator
             return true;
         }
 
-        return flag.TrackEvents ?? true;
+        return flag?.TrackEvents ?? true;
     }
 
     /// <summary>
@@ -134,7 +133,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext=null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -143,7 +142,7 @@ public class InProcessEvaluator : IEvaluator
                 kind => kind == jsonValue.ValueKind))
         {
             var value = ConvertValue((JsonElement)response.Value);
-            return Task.FromResult(PrepareResponse(response, flagKey, value));
+            return Task.FromResult(PrepareResponse(response, flagKey, value ?? defaultValue));
         }
 
         throw new FeatureProviderException(ErrorType.TypeMismatch,
@@ -158,14 +157,14 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext=null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
         if (response.Value is JsonElement jsonValue &&
             jsonValue.ValueKind == JsonValueKind.String)
         {
-            return Task.FromResult(PrepareResponse(response, flagKey, jsonValue.GetString()));
+            return Task.FromResult(PrepareResponse(response, flagKey, jsonValue.GetString() ?? defaultValue));
         }
 
         throw new FeatureProviderException(ErrorType.TypeMismatch,
@@ -180,7 +179,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext=null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -202,7 +201,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext=null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -224,7 +223,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="evaluationContext">evaluation context of the evaluation</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext=null)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);
@@ -255,10 +254,10 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="evaluationContext">Context of the evaluation</param>
     /// <returns>An EvaluationResponse containing the output of the evaluation.</returns>
     private EvaluationResponse GenericEvaluate(string flagKey, object defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext=null)
     {
         var flagExist = this._flags.TryGetValue(flagKey, out var flag);
-        if (!flagExist)
+        if (!flagExist || flag is null)
         {
             return new EvaluationResponse
             {
@@ -273,11 +272,11 @@ public class InProcessEvaluator : IEvaluator
         var input = new WasmInput
         {
             FlagKey = flagKey,
-            EvalContext = evaluationContext.AsDictionary().ToImmutableDictionary(),
+            EvalContext = evaluationContext?.AsDictionary().ToImmutableDictionary() ?? ImmutableDictionary<string, Value>.Empty,
             FlagContext = new FlagContext
             {
                 DefaultSdkValue = defaultValue,
-                EvaluationContextEnrichment = this._evaluationContextEnrichment
+                EvaluationContextEnrichment = this._evaluationContextEnrichment ?? new Dictionary<string, object>(),
             },
             Flag = flag
         };
@@ -390,7 +389,7 @@ public class InProcessEvaluator : IEvaluator
         catch (InvalidCastException ex)
         {
             throw new FeatureProviderException(ErrorType.TypeMismatch,
-                $"Flag value {flagKey} had unexpected type {response.Value.GetType()}.",
+                $"Flag value {flagKey} had unexpected type {response?.Value?.GetType()}.",
                 ex);
         }
     }
@@ -401,7 +400,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="value">The value we have received</param>
     /// <returns>A converted object</returns>
     /// <exception cref="InvalidCastException">If we are not able to convert the data.</exception>
-    private static Value ConvertValue(JsonElement value)
+    private static Value? ConvertValue(JsonElement value)
     {
         if (value.ValueKind == JsonValueKind.Null || value.ValueKind == JsonValueKind.Undefined)
         {
@@ -428,7 +427,7 @@ public class InProcessEvaluator : IEvaluator
                 var currentValue = ConvertValue(current.Value);
                 if (currentValue != null)
                 {
-                    dict.Add(current.Name, ConvertValue(current.Value));
+                    dict.Add(current.Name, currentValue);
                 }
             }
 

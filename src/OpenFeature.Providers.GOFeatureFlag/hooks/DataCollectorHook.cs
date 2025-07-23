@@ -38,7 +38,7 @@ public class DataCollectorHook : Hook
     public override ValueTask AfterAsync<T>(
         HookContext<T> context,
         FlagEvaluationDetails<T> details,
-        IReadOnlyDictionary<string, object> hints = null,
+        IReadOnlyDictionary<string, object>? hints = null,
         CancellationToken cancellationToken = default)
     {
         if (!this._evaluationService.IsFlagTrackable(context.FlagKey))
@@ -52,9 +52,9 @@ public class DataCollectorHook : Hook
             Key = context.FlagKey,
             ContextKind = context.EvaluationContext.IsAnonymous() ? "anonymousUser" : "user",
             DefaultValue = false,
-            Variation = details.Variant,
+            Variation = details.Variant ?? "SdkDefault",
             Value = details.Value,
-            UserKey = context.EvaluationContext.TargetingKey,
+            UserKey = context?.EvaluationContext?.TargetingKey ?? string.Empty,
             CreationDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
         this._eventPublisher.AddEvent(eventToPublish);
@@ -72,7 +72,7 @@ public class DataCollectorHook : Hook
     public override ValueTask ErrorAsync<T>(
         HookContext<T> context,
         Exception error,
-        IReadOnlyDictionary<string, object> hints = null,
+        IReadOnlyDictionary<string, object>? hints = null,
         CancellationToken cancellationToken = default)
     {
         if (!this._evaluationService.IsFlagTrackable(context.FlagKey))
@@ -88,7 +88,7 @@ public class DataCollectorHook : Hook
             DefaultValue = true,
             Variation = "SdkDefault",
             Value = context.DefaultValue,
-            UserKey = context.EvaluationContext.TargetingKey,
+            UserKey = context?.EvaluationContext?.TargetingKey ?? string.Empty,
             CreationDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
         this._eventPublisher.AddEvent(eventToPublish);

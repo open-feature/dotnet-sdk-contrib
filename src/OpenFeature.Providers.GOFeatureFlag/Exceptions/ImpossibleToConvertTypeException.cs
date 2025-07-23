@@ -14,7 +14,7 @@ public class ImpossibleToConvertTypeException : FeatureProviderException
     /// </summary>
     /// <param name="message">Message to display</param>
     /// <param name="innerException">Original exception</param>
-    public ImpossibleToConvertTypeException(string message, Exception innerException = null) : base(
+    public ImpossibleToConvertTypeException(string message, Exception? innerException = null) : base(
         ErrorType.ParseError,
         message, innerException)
     {

@@ -15,19 +15,28 @@ public static class EnumHelper
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public static T GetEnumValueFromDescription<T>(string description) where T : Enum
+    public static T GetEnumValueFromDescription<T>(string? description) where T : Enum
     {
+        if (string.IsNullOrEmpty(description))
+        {
+            throw new ArgumentException("Description cannot be null or empty", nameof(description));
+        }
         foreach (var field in typeof(T).GetFields())
         {
-            var attr = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
-            if (attr != null && attr.Description == description)
+            if (Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) is DescriptionAttribute attr && attr.Description == description)
             {
-                return (T)field.GetValue(null);
+                if (field.GetValue(null) is T value)
+                {
+                    return value;
+                }
             }
 
             if (field.Name == description)
             {
-                return (T)field.GetValue(null);
+                if (field.GetValue(null) is T value)
+                {
+                    return value;
+                }
             }
         }
 

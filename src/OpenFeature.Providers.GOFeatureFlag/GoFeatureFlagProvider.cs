@@ -51,7 +51,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="options">Options used while creating the provider</param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="InvalidOptionException">if no options are provided, or we have a wrong configuration.</exception>
-    public GOFeatureFlagProvider(GOFeatureFlagProviderOptions options) : this(options, null)
+    public GoFeatureFlagProvider(GOFeatureFlagProviderOptions options) : this(options, null)
     {
         // we don't do anything here, the internal constructor will do the job.
     }
@@ -88,7 +88,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="ofrepProvider">Optional custom OFREP provider (used for test)</param>
     /// <returns></returns>
     private IEvaluator GetEvaluator(GOFeatureFlagProviderOptions options, GOFeatureFlagApi api,
-        IOfrepProvider ofrepProvider = null)
+        IOfrepProvider? ofrepProvider = null)
     {
         if (options.EvaluationType == EvaluationType.Remote)
         {
@@ -148,7 +148,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="cancellationToken">The CancellationToken.</param>
     /// <returns>ResolutionDetails</returns>
     public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
-        EvaluationContext context = null,
+        EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
         return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
@@ -164,7 +164,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="cancellationToken">The CancellationToken.</param>
     /// <returns>ResolutionDetails</returns>
     public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
-        EvaluationContext context = null,
+        EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
         return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
@@ -180,7 +180,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="cancellationToken">The CancellationToken.</param>
     /// <returns>ResolutionDetails</returns>
     public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue,
-        EvaluationContext context = null,
+        EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
         return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
@@ -197,7 +197,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="cancellationToken">The CancellationToken.</param>
     /// <returns>ResolutionDetails</returns>
     public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
-        EvaluationContext context = null,
+        EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
         return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
@@ -213,7 +213,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="cancellationToken">The CancellationToken.</param>
     /// <returns>ResolutionDetails</returns>
     public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
-        EvaluationContext context = null,
+        EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
         return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
@@ -227,15 +227,15 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="trackingEventName">The name associated with this tracking event</param>
     /// <param name="evaluationContext">The evaluation context used in the evaluation of the flag (optional)</param>
     /// <param name="trackingEventDetails">Data pertinent to the tracking event (Optional)</param>
-    public override void Track(string trackingEventName, EvaluationContext evaluationContext = default,
-        TrackingEventDetails trackingEventDetails = default)
+    public override void Track(string trackingEventName, EvaluationContext? evaluationContext = default,
+        TrackingEventDetails? trackingEventDetails = default)
     {
         var trackingEvent =
             new TrackingEvent
             {
-                EvaluationContext = evaluationContext?.AsDictionary(),
-                UserKey = evaluationContext != null ? evaluationContext.TargetingKey : "undefined-targetingKey",
-                ContextKind = evaluationContext.IsAnonymous() ? "anonymousUser" : "user",
+                EvaluationContext = evaluationContext?.AsDictionary() ?? new Dictionary<string, Value>().ToImmutableDictionary(),
+                UserKey = evaluationContext?.TargetingKey ?? "undefined-targetingKey",
+                ContextKind = evaluationContext != null && evaluationContext.IsAnonymous() ? "anonymousUser" : "user",
                 Key = trackingEventName,
                 TrackingEventDetails = trackingEventDetails?.AsDictionary() ??
                                        new Dictionary<string, Value>().ToImmutableDictionary(),
@@ -249,7 +249,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// </summary>
     /// <param name="options">Options used while creating the provider</param>
     /// <exception cref="InvalidOptionException">if no options are provided, or we have a wrong configuration.</exception>
-    private static void ValidateInputOptions(GOFeatureFlagProviderOptions options)
+    private static void ValidateInputOptions(GoFeatureFlagProviderOptions options)
     {
         if (options is null)
         {

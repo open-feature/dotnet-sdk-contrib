@@ -14,23 +14,30 @@ public class WasmInput
     ///     Flag key to be evaluated.
     /// </summary>
     [JsonPropertyName("flagKey")]
-    public string FlagKey { get; set; }
+#if NET7_0_OR_GREATER
+    public required string FlagKey { get; set; }
+#else
+    public string FlagKey { get; set; } = string.Empty;
+#endif
 
     /// <summary>
     ///     Flag to be evaluated.
     /// </summary>
     [JsonPropertyName("flag")]
-    public Flag Flag { get; set; }
-
+#if NET7_0_OR_GREATER
+    public required Flag Flag { get; set; }
+#else
+    public Flag Flag { get; set; } = new Flag();
+#endif
     /// <summary>
     ///     Evaluation context for a flag evaluation.
     /// </summary>
     [JsonPropertyName("evalContext")]
-    public ImmutableDictionary<string, Value> EvalContext { get; set; }
+    public ImmutableDictionary<string, Value> EvalContext { get; set; } = ImmutableDictionary<string, Value>.Empty;
 
     /// <summary>
     ///     Flag context containing default SDK value and evaluation context enrichment.
     /// </summary>
     [JsonPropertyName("flagContext")]
-    public FlagContext FlagContext { get; set; }
+    public FlagContext FlagContext { get; set; } = new FlagContext();
 }

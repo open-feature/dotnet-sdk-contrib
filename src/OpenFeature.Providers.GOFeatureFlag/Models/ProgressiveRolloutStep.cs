@@ -12,7 +12,7 @@ public class ProgressiveRolloutStep
     ///     The variation to be served at this rollout step.
     /// </summary>
     [JsonPropertyName("variation")]
-    public string Variation { get; set; }
+    public string? Variation { get; set; }
 
     /// <summary>
     ///     The percentage of users to receive this variation at this step.

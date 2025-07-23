@@ -61,7 +61,7 @@ public class GOFeatureFlagApi
     /// <returns>A FlagConfigResponse returning the success data.</returns>
     /// <exception cref="FlagConfigurationEndpointNotFoundException">Thrown if the endpoint is not reachable.</exception>
     /// <exception cref="ImpossibleToRetrieveConfigurationException">Thrown if the endpoint is returning an error.</exception>
-    public async Task<FlagConfigResponse> RetrieveFlagConfigurationAsync(string etag, List<string> flags)
+    public async Task<FlagConfigResponse> RetrieveFlagConfigurationAsync(string? etag, List<string>? flags)
     {
         var requestStr = JsonSerializer.Serialize(new FlagConfigRequest(flags));
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/flag/configuration")
@@ -154,8 +154,8 @@ public class GOFeatureFlagApi
             var goffResp = JsonSerializer.Deserialize<FlagConfigResponse>(body,
                 JsonConverterExtensions.DefaultSerializerSettings);
 
-            result.EvaluationContextEnrichment = goffResp.EvaluationContextEnrichment;
-            result.Flags = goffResp.Flags ?? new Dictionary<string, Flag>();
+            result.EvaluationContextEnrichment = goffResp?.EvaluationContextEnrichment ?? new Dictionary<string, object>();
+            result.Flags = goffResp?.Flags ?? new Dictionary<string, Flag>();
         }
 
         return result;

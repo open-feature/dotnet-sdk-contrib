@@ -17,7 +17,7 @@ public interface IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
-        EvaluationContext context);
+        EvaluationContext? context = null);
 
     /// <param name="flagKey">Feature flag key</param>
     /// <param name="defaultValue">Default value</param>
@@ -28,7 +28,7 @@ public interface IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
-        EvaluationContext context);
+        EvaluationContext? context = null);
 
     /// <param name="flagKey">Feature flag key</param>
     /// <param name="defaultValue">Default value</param>
@@ -38,7 +38,7 @@ public interface IOfrepProvider
     /// <returns>
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
-    Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context);
+    Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext? context = null);
 
     /// <param name="flagKey">Feature flag key</param>
     /// <param name="defaultValue">Default value</param>
@@ -49,7 +49,7 @@ public interface IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
-        EvaluationContext context);
+        EvaluationContext? context = null);
 
     /// <param name="flagKey">Feature flag key</param>
     /// <param name="defaultValue">Default value</param>
@@ -60,7 +60,7 @@ public interface IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     Task<ResolutionDetails<bool>>
-        ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context);
+        ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext? context = null);
 
 
     /// <summary>

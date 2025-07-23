@@ -31,7 +31,7 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue,
-        EvaluationContext context)
+        EvaluationContext? context = null)
     {
         return this._provider.ResolveStructureValueAsync(flagKey, defaultValue, context);
     }
@@ -45,7 +45,7 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue,
-        EvaluationContext context)
+        EvaluationContext? context = null)
     {
         return this._provider.ResolveStringValueAsync(flagKey, defaultValue, context);
     }
@@ -59,7 +59,7 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue,
-        EvaluationContext context)
+        EvaluationContext? context = null)
     {
         return this._provider.ResolveIntegerValueAsync(flagKey, defaultValue, context);
     }
@@ -73,7 +73,7 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue,
-        EvaluationContext context)
+        EvaluationContext? context = null)
     {
         return this._provider.ResolveDoubleValueAsync(flagKey, defaultValue, context);
     }
@@ -87,7 +87,7 @@ public class OfrepProviderWrapper : IOfrepProvider
     ///     <see cref="T:OpenFeature.Model.ResolutionDetails`1" />
     /// </returns>
     public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
-        EvaluationContext context)
+        EvaluationContext? context = null)
     {
         return this._provider.ResolveBooleanValueAsync(flagKey, defaultValue, context);
     }

@@ -15,6 +15,8 @@
     <SourceFile>$(ProjectDir)wasm-releases/evaluation/gofeatureflag-evaluation_$(WasmVersion).wasi</SourceFile>
     <DestinationFile>$(OutputDirectory)\gofeatureflag-evaluation.wasi</DestinationFile>
     <RootNamespace>OpenFeature.Providers.GOFeatureFlag</RootNamespace>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <Target Name="PrepareWasmModule" BeforeTargets="CoreCompile">
@@ -29,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenFeature" Version="2.2.0"/>
-    <PackageReference Include="OpenFeature.Providers.Ofrep" Version="0.1.0"/>
+    <PackageReference Include="OpenFeature" Version="2.7.0"/>
+    <PackageReference Include="OpenFeature.Providers.Ofrep" Version="0.1.1"/>
     <PackageReference Include="Wasmtime" Version="22.0.0"/>
     <EmbeddedResource Include="$(MSBuildProjectDirectory)\WasmModules\gofeatureflag-evaluation.wasi"/>
   </ItemGroup>

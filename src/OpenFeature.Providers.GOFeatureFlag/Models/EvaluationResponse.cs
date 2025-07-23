@@ -12,7 +12,7 @@ public class EvaluationResponse
     ///     Variation is the variation of the flag that was returned by the evaluation.
     /// </summary>
     [JsonPropertyName("variationType")]
-    public string VariationType { get; set; }
+    public string? VariationType { get; set; }
 
     /// <summary>
     ///     trackEvents indicates whether events should be tracked for this evaluation.
@@ -24,31 +24,31 @@ public class EvaluationResponse
     ///     reason is the reason for the evaluation result.
     /// </summary>
     [JsonPropertyName("reason")]
-    public string Reason { get; set; }
+    public string? Reason { get; set; }
 
     /// <summary>
     ///     errorCode is the error code for the evaluation result, if any.
     /// </summary>
     [JsonPropertyName("errorCode")]
-    public string ErrorCode { get; set; }
+    public string? ErrorCode { get; set; }
 
     /// <summary>
     ///     errorDetails provides additional details about the error, if any.
     /// </summary>
     [JsonPropertyName("errorDetails")]
-    public string ErrorDetails { get; set; }
+    public string? ErrorDetails { get; set; }
 
     /// <summary>
     ///     value is the evaluated value of the flag.
     /// </summary>
     [JsonPropertyName("value")]
-    public object Value { get; set; }
+    public object? Value { get; set; }
 
     /// <summary>
     ///     metadata is a dictionary containing additional metadata about the evaluation.
     /// </summary>
     [JsonPropertyName("metadata")]
-    public Dictionary<string, object> Metadata { get; set; }
+    public Dictionary<string, object>? Metadata { get; set; }
 
 
     // [JsonPropertyName("cacheable")]

@@ -34,7 +34,7 @@ public class EvaluationService(IEvaluator evaluator)
     /// <param name="evaluationContext">Context for the flag evaluation</param>
     /// <returns>A resolution details</returns>
     public async Task<ResolutionDetails<bool>> GetEvaluationAsync(string flagKey, bool defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return await evaluator.EvaluateAsync(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
@@ -47,7 +47,7 @@ public class EvaluationService(IEvaluator evaluator)
     /// <param name="evaluationContext">Context for the flag evaluation</param>
     /// <returns>A resolution details</returns>
     public async Task<ResolutionDetails<string>> GetEvaluationAsync(string flagKey, string defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return await evaluator.EvaluateAsync(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
@@ -60,7 +60,7 @@ public class EvaluationService(IEvaluator evaluator)
     /// <param name="evaluationContext">Context for the flag evaluation</param>
     /// <returns>A resolution details</returns>
     public async Task<ResolutionDetails<int>> GetEvaluationAsync(string flagKey, int defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return await evaluator.EvaluateAsync(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
@@ -73,7 +73,7 @@ public class EvaluationService(IEvaluator evaluator)
     /// <param name="evaluationContext">Context for the flag evaluation</param>
     /// <returns>A resolution details</returns>
     public async Task<ResolutionDetails<double>> GetEvaluationAsync(string flagKey, double defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return await evaluator.EvaluateAsync(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }
@@ -86,7 +86,7 @@ public class EvaluationService(IEvaluator evaluator)
     /// <param name="evaluationContext">Context for the flag evaluation</param>
     /// <returns>A resolution details</returns>
     public async Task<ResolutionDetails<Value>> GetEvaluationAsync(string flagKey, Value defaultValue,
-        EvaluationContext evaluationContext)
+        EvaluationContext? evaluationContext = null)
     {
         return await evaluator.EvaluateAsync(flagKey, defaultValue, evaluationContext).ConfigureAwait(false);
     }

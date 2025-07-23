@@ -19,11 +19,11 @@ public sealed record TrackingEvent : CommonEvent
     ///     EvaluationContext contains the evaluation context used for the tracking.
     /// </summary>
     [JsonPropertyName("evaluationContext")]
-    public IImmutableDictionary<string, Value> EvaluationContext { get; init; }
+    public IImmutableDictionary<string, Value>? EvaluationContext { get; init; }
 
     /// <summary>
     ///     TrackingDetails contains the details of the tracking event.
     /// </summary>
     [JsonPropertyName("trackingEventDetails")]
-    public IImmutableDictionary<string, Value> TrackingEventDetails { get; init; }
+    public IImmutableDictionary<string, Value>? TrackingEventDetails { get; init; }
 }

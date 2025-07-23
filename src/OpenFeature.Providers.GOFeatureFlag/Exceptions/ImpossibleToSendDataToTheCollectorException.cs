@@ -7,6 +7,6 @@ namespace OpenFeature.Providers.GOFeatureFlag.Exceptions;
 /// </summary>
 /// <param name="message">Message associated with the exception.</param>
 /// <param name="e"></param>
-public class ImpossibleToSendDataToTheCollectorException(string message, Exception e = null) : GOFeatureFlagException(message, e)
+public class ImpossibleToSendDataToTheCollectorException(string message, Exception? e = null) : GOFeatureFlagException(message, e)
 {
 }

@@ -82,6 +82,10 @@ public class EvaluateWasm
                               ?? throw new WasmInvalidResultException("Evaluate should return a long value.");
             var resAsString = this.ReadFromMemory(evaluateRes);
             var goffResp = JsonSerializer.Deserialize<EvaluationResponse>(resAsString);
+            if (goffResp == null)
+            {
+                throw new WasmInvalidResultException("Deserialization of EvaluationResponse failed.");
+            }
             return goffResp;
         }
         catch (Exception ex)

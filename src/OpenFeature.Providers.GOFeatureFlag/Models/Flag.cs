@@ -12,5 +12,5 @@ public class Flag : FlagBase
     ///     The list of scheduled rollout steps for this flag.
     /// </summary>
     [JsonPropertyName("scheduledRollout")]
-    public List<ScheduledStep> ScheduledRollout { get; set; }
+    public List<ScheduledStep>? ScheduledRollout { get; set; }
 }
