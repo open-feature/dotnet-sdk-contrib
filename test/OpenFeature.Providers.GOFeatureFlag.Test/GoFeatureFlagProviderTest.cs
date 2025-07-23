@@ -586,7 +586,11 @@ public class GOFeatureFlagProviderTest
         public void Constructor_Options_Empty()
         {
             Assert.Throws<InvalidOptionException>(() =>
-                new GOFeatureFlagProvider(new GOFeatureFlagProviderOptions())
+                new GOFeatureFlagProvider(new GOFeatureFlagProviderOptions()
+                {
+                    Endpoint = null,
+                })
+
             );
         }
 
@@ -607,6 +611,7 @@ public class GOFeatureFlagProviderTest
                 new GOFeatureFlagProvider(
                     new GOFeatureFlagProviderOptions
                     {
+                        Endpoint = null,
                         Timeout = TimeSpan.FromMilliseconds(1000),
                         EvaluationType = EvaluationType.Remote
                     }

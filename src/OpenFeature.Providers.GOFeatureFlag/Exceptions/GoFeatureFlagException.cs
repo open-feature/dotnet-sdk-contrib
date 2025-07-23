@@ -28,7 +28,7 @@ public abstract class GOFeatureFlagException : Exception
     /// </summary>
     /// <param name="message">Message of your exception</param>
     /// <param name="inner">Root exception.</param>
-    public GOFeatureFlagException(string message, Exception inner)
+    public GOFeatureFlagException(string message, Exception? inner)
         : base(message, inner)
     {
     }

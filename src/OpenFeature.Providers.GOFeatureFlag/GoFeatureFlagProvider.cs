@@ -51,7 +51,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <param name="options">Options used while creating the provider</param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="InvalidOptionException">if no options are provided, or we have a wrong configuration.</exception>
-    public GoFeatureFlagProvider(GOFeatureFlagProviderOptions options) : this(options, null)
+    public GOFeatureFlagProvider(GOFeatureFlagProviderOptions options) : this(options, null)
     {
         // we don't do anything here, the internal constructor will do the job.
     }
@@ -61,7 +61,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// </summary>
     /// <param name="options">Options used while creating the provider</param>
     /// <param name="ofrepProvider">The OFREP provider should be set only for test purposes</param>
-    internal GOFeatureFlagProvider(GOFeatureFlagProviderOptions options, IOfrepProvider ofrepProvider = null)
+    internal GOFeatureFlagProvider(GOFeatureFlagProviderOptions options, IOfrepProvider? ofrepProvider = null)
     {
         ValidateInputOptions(options);
         var api = new GOFeatureFlagApi(options);
@@ -249,7 +249,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// </summary>
     /// <param name="options">Options used while creating the provider</param>
     /// <exception cref="InvalidOptionException">if no options are provided, or we have a wrong configuration.</exception>
-    private static void ValidateInputOptions(GoFeatureFlagProviderOptions options)
+    private static void ValidateInputOptions(GOFeatureFlagProviderOptions options)
     {
         if (options is null)
         {
