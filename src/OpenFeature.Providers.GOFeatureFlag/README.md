@@ -5,7 +5,7 @@
 
 > [!WARNING]
 > This version of the provider requires to use GO Feature Flag relay-proxy `v1.45.0` or above.
-> If you have an older version of the relay-proxy, please use the version `0.2.1` of the provider.
+> If you have an older version of the relay-proxy, please use the version the package `OpenFeature.Contrib.Providers.GOFeatureFlag` in version `0.2.1` to get the right provider.
 
 This is the official OpenFeature .NET provider for accessing your feature flags with GO Feature Flag.
 
