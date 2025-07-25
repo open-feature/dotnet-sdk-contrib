@@ -18,31 +18,18 @@ public abstract record CommonEvent : IEvent
     ///     ContextKind is the kind of context that generated an event.
     /// </summary>
     [JsonPropertyName("contextKind")]
-#if NET7_0_OR_GREATER
     public required string ContextKind { get; init; }
-# else
-    public string ContextKind { get; init; } = string.Empty;
-#endif
 
 
     /// <summary>
     ///     Feature flag name or key.
     /// </summary>
     [JsonPropertyName("key")]
-#if NET7_0_OR_GREATER
     public required string Key { get; init; }
-# else
-    public string Key { get; init; } = string.Empty;
-#endif
 
     /// <summary>
     ///     User key is the unique identifier for the user or context (the targetingKey).
     /// </summary>
     [JsonPropertyName("userKey")]
-#if NET7_0_OR_GREATER
     public required string UserKey { get; init; }
-# else
-    public string UserKey { get; init; } = string.Empty;
-#endif
-
 }

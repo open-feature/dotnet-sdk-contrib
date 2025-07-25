@@ -21,19 +21,11 @@ public class ProgressiveRollout
     ///     The initial step of the progressive rollout.
     /// </summary>
     [JsonPropertyName("initial")]
-#if NET7_0_OR_GREATER
     public required ProgressiveRolloutStep Initial { get; set; }
-#else
-    public ProgressiveRolloutStep Initial { get; set; }
-#endif
 
     /// <summary>
     ///     The end step of the progressive rollout.
     /// </summary>
     [JsonPropertyName("end")]
-#if NET7_0_OR_GREATER
     public required ProgressiveRolloutStep End { get; set; }
-#else
-    public ProgressiveRolloutStep End { get; set; }
-#endif
 }

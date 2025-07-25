@@ -14,21 +14,14 @@ public class WasmInput
     ///     Flag key to be evaluated.
     /// </summary>
     [JsonPropertyName("flagKey")]
-#if NET7_0_OR_GREATER
     public required string FlagKey { get; set; }
-#else
-    public string FlagKey { get; set; } = string.Empty;
-#endif
 
     /// <summary>
     ///     Flag to be evaluated.
     /// </summary>
     [JsonPropertyName("flag")]
-#if NET7_0_OR_GREATER
     public required Flag Flag { get; set; }
-#else
-    public Flag Flag { get; set; } = new Flag();
-#endif
+    
     /// <summary>
     ///     Evaluation context for a flag evaluation.
     /// </summary>

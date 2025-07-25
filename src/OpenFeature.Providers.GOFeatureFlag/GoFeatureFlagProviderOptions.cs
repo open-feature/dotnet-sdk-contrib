@@ -25,11 +25,7 @@ public class GOFeatureFlagProviderOptions
     ///     (mandatory) endpoint contains the DNS of your GO Feature Flag relay proxy
     ///     example: https://mydomain.com/gofeatureflagproxy/
     /// </Summary>
-#if NET7_0_OR_GREATER
     public required string Endpoint { get; set; }
-#else
-    public string Endpoint { get; set; } = string.Empty;
-#endif
 
     /// <summary>
     ///     EvaluationType defines how the evaluation is done.
