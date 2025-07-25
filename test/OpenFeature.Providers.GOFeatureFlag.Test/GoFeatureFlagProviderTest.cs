@@ -670,10 +670,11 @@ public class GOFeatureFlagProviderTest
     [Collection("Tracking")]
     public class TrackingTest
     {
+#if NETCOREAPP
         [Fact(DisplayName = "Should commit events if max pending events is reached")]
         public async Task ShouldCallMultipleTimeTheDataCollectorIfMaxPendingEventsIsReached()
         {
-#if NETCOREAPP
+
             var mockHttp = new RelayProxyMock();
             var provider = new GOFeatureFlagProvider(
                 new GOFeatureFlagProviderOptions
@@ -695,13 +696,11 @@ public class GOFeatureFlagProviderTest
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.NotNull(gotJson["events"].First);
-#endif
         }
 
         [Fact(DisplayName = "Should send the evaluation information to the data collector")]
         public async Task ShouldSendTrackingEventToTheDataCollector()
         {
-#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GOFeatureFlagProvider(
                 new GOFeatureFlagProviderOptions
@@ -722,17 +721,18 @@ public class GOFeatureFlagProviderTest
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
             var gotJson = JObject.Parse(got);
             Assert.Single(gotJson["events"]);
-#endif
         }
+#endif
     }
+
 
     [Collection("DataCollectorHook")]
     public class DataCollectorHook
     {
+#if NETCOREAPP
         [Fact(DisplayName = "Should commit events if max pending events is reached")]
         public async Task ShouldCommitEventsIfMaxPendingEventsIsReached()
         {
-#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GOFeatureFlagProvider(new GOFeatureFlagProviderOptions
             {
@@ -750,13 +750,11 @@ public class GOFeatureFlagProviderTest
             var gotJson = JObject.Parse(got);
             Assert.Single(gotJson["events"]);
             await OpenFeatureApi.Instance.ShutdownAsync();
-#endif
         }
 
         [Fact(DisplayName = "Should call multiple times the data collector if max pending events is reached")]
         public async Task ShouldCallMultipleTimeTheDataCollectorIfMaxPendingEventsIsReached()
         {
-#if NETCOREAPP
             var mockHttp = new RelayProxyMock();
             var provider = new GOFeatureFlagProvider(new GOFeatureFlagProviderOptions
             {
@@ -775,8 +773,8 @@ public class GOFeatureFlagProviderTest
             var gotJson = JObject.Parse(got);
             Assert.Equal(2, gotJson["events"].Count());
             await OpenFeatureApi.Instance.ShutdownAsync();
-#endif
         }
+#endif
     }
 
     [Collection("EnrichEvaluationContextHook")]
