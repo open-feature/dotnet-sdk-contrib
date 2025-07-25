@@ -21,6 +21,8 @@ components:
   src/OpenFeature.Contrib.Providers.Flipt:
     - jeandreidc
     - markphelps
+  src/OpenFeature.Providers.Ofrep:
+    - weyert
 
   # test/
   test/OpenFeature.Contrib.Providers.Flagd.Test:
@@ -43,6 +45,8 @@ components:
   test/src/OpenFeature.Contrib.Providers.Flipt.Test:
     - jeandreidc
     - markphelps
+  test/OpenFeature.Providers.Ofrep.Test:
+    - weyert
 
 ignored-authors:
   - renovate-bot
