@@ -13,14 +13,15 @@
         "OpenFeature.Contrib.Providers.Flagd.csproj"
       ]
     },
-    "src/OpenFeature.Contrib.Providers.GOFeatureFlag": {
-      "package-name": "OpenFeature.Contrib.Providers.GOFeatureFlag",
+    "src/OpenFeature.Providers.GOFeatureFlag": {
+      "package-name": "OpenFeature.Providers.GOFeatureFlag",
       "release-type": "simple",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
+      "release-as": "v1.0.0",
       "extra-files": [
-        "OpenFeature.Contrib.Providers.GOFeatureFlag.csproj"
+        "OpenFeature.Providers.GOFeatureFlag.csproj"
       ]
     },
     "src/OpenFeature.Contrib.Providers.Flagsmith": {
