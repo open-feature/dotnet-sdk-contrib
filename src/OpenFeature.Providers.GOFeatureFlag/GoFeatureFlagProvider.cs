@@ -26,7 +26,7 @@ public class GOFeatureFlagProvider : FeatureProvider
     /// <summary>
     ///     EvaluationService is the service used to evaluate feature flags.
     /// </summary>
-    private readonly EvaluationService _evaluationService;
+    private readonly IEvaluator _evaluationService;
 
     /// <summary>
     ///     EventPublisher is used to collect events and publish them in batch before they are published.
@@ -66,7 +66,7 @@ public class GOFeatureFlagProvider : FeatureProvider
         ValidateInputOptions(options);
         var api = new GOFeatureFlagApi(options);
         var evaluator = this.GetEvaluator(options, api, ofrepProvider);
-        this._evaluationService = new EvaluationService(evaluator);
+        this._evaluationService = evaluator;
         this._eventPublisher = new EventPublisher(api, options);
         this._options = options;
     }
@@ -151,7 +151,7 @@ public class GOFeatureFlagProvider : FeatureProvider
         EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
+        return await this._evaluationService.EvaluateAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 
@@ -167,7 +167,7 @@ public class GOFeatureFlagProvider : FeatureProvider
         EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
+        return await this._evaluationService.EvaluateAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 
@@ -183,7 +183,7 @@ public class GOFeatureFlagProvider : FeatureProvider
         EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
+        return await this._evaluationService.EvaluateAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 
@@ -200,7 +200,7 @@ public class GOFeatureFlagProvider : FeatureProvider
         EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
+        return await this._evaluationService.EvaluateAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 
@@ -216,7 +216,7 @@ public class GOFeatureFlagProvider : FeatureProvider
         EvaluationContext? context = null,
         CancellationToken cancellationToken = new())
     {
-        return await this._evaluationService.GetEvaluationAsync(flagKey, defaultValue, context)
+        return await this._evaluationService.EvaluateAsync(flagKey, defaultValue, context)
             .ConfigureAwait(false);
     }
 

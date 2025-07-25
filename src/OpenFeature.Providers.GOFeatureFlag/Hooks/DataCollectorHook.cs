@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
+using OpenFeature.Providers.GOFeatureFlag.Evaluator;
 using OpenFeature.Providers.GOFeatureFlag.Extensions;
 using OpenFeature.Providers.GOFeatureFlag.Models;
 using OpenFeature.Providers.GOFeatureFlag.Services;
@@ -14,18 +15,18 @@ namespace OpenFeature.Providers.GOFeatureFlag.Hooks;
 /// </summary>
 public class DataCollectorHook : Hook
 {
-    private readonly EvaluationService _evaluationService;
+    private readonly IEvaluator _evaluator;
     private readonly EventPublisher _eventPublisher;
 
     /// <summary>
     ///     DataCollectorHook is a hook that collects data during the evaluation of feature flags.
     /// </summary>
-    /// <param name="evaluationService">service to evaluate the flag</param>
+    /// <param name="evaluator">service to evaluate the flag</param>
     /// <param name="eventPublisher"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public DataCollectorHook(EvaluationService evaluationService, EventPublisher eventPublisher)
+    public DataCollectorHook(IEvaluator evaluator, EventPublisher eventPublisher)
     {
-        this._evaluationService = evaluationService ?? throw new ArgumentNullException(nameof(evaluationService));
+        this._evaluator = evaluator ?? throw new ArgumentNullException(nameof(evaluator));
         this._eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
     }
 
@@ -41,7 +42,7 @@ public class DataCollectorHook : Hook
         IReadOnlyDictionary<string, object>? hints = null,
         CancellationToken cancellationToken = default)
     {
-        if (!this._evaluationService.IsFlagTrackable(context.FlagKey))
+        if (!this._evaluator.IsFlagTrackable(context.FlagKey))
         {
             // If the flag is not trackable, we do not need to collect data.
             return new ValueTask();
@@ -75,7 +76,7 @@ public class DataCollectorHook : Hook
         IReadOnlyDictionary<string, object>? hints = null,
         CancellationToken cancellationToken = default)
     {
-        if (!this._evaluationService.IsFlagTrackable(context.FlagKey))
+        if (!this._evaluator.IsFlagTrackable(context.FlagKey))
         {
             // If the flag is not trackable, we do not need to collect data.
             return new ValueTask();
