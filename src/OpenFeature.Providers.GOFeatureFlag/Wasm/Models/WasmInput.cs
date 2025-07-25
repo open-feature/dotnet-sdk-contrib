@@ -21,7 +21,7 @@ public class WasmInput
     /// </summary>
     [JsonPropertyName("flag")]
     public required Flag Flag { get; set; }
-    
+
     /// <summary>
     ///     Evaluation context for a flag evaluation.
     /// </summary>
