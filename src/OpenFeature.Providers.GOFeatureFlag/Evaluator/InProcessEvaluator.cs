@@ -206,7 +206,7 @@ public class InProcessEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
-        EvaluationContext? evaluationContext = null,CancellationToken cancellationToken = default)
+        EvaluationContext? evaluationContext = null, CancellationToken cancellationToken = default)
     {
         var response = this.GenericEvaluate(flagKey, defaultValue, evaluationContext);
         this.HandleError(response, flagKey);

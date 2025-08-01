@@ -165,7 +165,7 @@ public class EvaluateWasm : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!this._disposed )
+        if (!this._disposed)
         {
             // In Wasmtime 22.0.0, most objects are automatically managed
             // The Engine and Store are the main resources that need cleanup
