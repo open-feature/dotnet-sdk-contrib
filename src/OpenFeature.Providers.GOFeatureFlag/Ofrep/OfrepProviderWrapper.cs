@@ -107,4 +107,12 @@ public class OfrepProviderWrapper : IOfrepProvider
     {
         return this._provider.InitializeAsync(context);
     }
+
+    /// <summary>
+    /// Dispose method to clean up resources used by the OfrepProviderWrapper.
+    /// </summary>
+    public void Dispose()
+    {
+        this._provider.Dispose();
+    }
 }

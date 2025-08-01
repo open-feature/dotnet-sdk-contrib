@@ -1,3 +1,5 @@
+// it is needed to support the RequiredMemberAttribute and CompilerFeatureRequiredAttribute
+// and the SetsRequiredMembersAttribute attributes in .NET 6 and earlier versions.
 namespace System.Runtime.CompilerServices
 {
 #if !NET7_0_OR_GREATER

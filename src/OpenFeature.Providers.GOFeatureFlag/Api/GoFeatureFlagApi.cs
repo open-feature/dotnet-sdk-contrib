@@ -91,7 +91,7 @@ public class GOFeatureFlagApi
                 throw new ImpossibleToRetrieveConfigurationException(
                     "retrieve flag configuration error: Bad request: " + badRequestErrBody);
             default:
-                var defaultErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false) ?? "";
+                var defaultErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false) ?? String.Empty;
                 throw new ImpossibleToRetrieveConfigurationException(
                     "retrieve flag configuration error: unexpected http code " + defaultErrBody);
         }
@@ -130,7 +130,7 @@ public class GOFeatureFlagApi
                 var badRequestErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 throw new ImpossibleToSendDataToTheCollectorException("Bad request: " + badRequestErrBody);
             default:
-                var defaultErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false) ?? "";
+                var defaultErrBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false) ?? String.Empty;
                 throw new ImpossibleToSendDataToTheCollectorException(
                     "send data to the collector error: unexpected http code " + defaultErrBody);
         }

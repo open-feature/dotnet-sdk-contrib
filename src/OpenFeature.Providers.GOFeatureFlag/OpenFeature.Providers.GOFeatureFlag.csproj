@@ -25,12 +25,10 @@
     <Copy SourceFiles="$(SourceFile)" DestinationFiles="$(DestinationFile)" Condition="Exists($(SourceFile))"/>
   </Target>
 
-  <!-- documentation -->
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\"/>
-  </ItemGroup>
+    <InternalsVisibleTo Include="OpenFeature.Providers.GOFeatureFlag.Test" />
 
-  <ItemGroup>
     <PackageReference Include="OpenFeature" Version="2.7.0"/>
     <PackageReference Include="OpenFeature.Providers.Ofrep" Version="0.1.1"/>
     <PackageReference Include="Wasmtime" Version="22.0.0"/>

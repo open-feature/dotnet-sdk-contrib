@@ -30,8 +30,10 @@ public class RemoteEvaluator : IEvaluator
 
         var ofrepOptions = new OfrepOptions(options.Endpoint);
 
-        var headers = new Dictionary<string, string>();
-        headers.Add("Content-Type", "application/json");
+        var headers = new Dictionary<string, string>
+        {
+            { "Content-Type", "application/json" }
+        };
         if (options.ApiKey != null)
         {
             headers.Add("Authorization", $"Bearer {options.ApiKey}");
@@ -60,7 +62,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<Value>> EvaluateAsync(string flagKey, Value defaultValue,
-        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken cancellationToken = default)
     {
         return this._ofrepProvider.ResolveStructureValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -74,7 +76,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<string>> EvaluateAsync(string flagKey, string defaultValue,
-        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken cancellationToken = default)
     {
         return this._ofrepProvider.ResolveStringValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -88,7 +90,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<int>> EvaluateAsync(string flagKey, int defaultValue,
-        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken cancellationToken = default)
     {
         return this._ofrepProvider.ResolveIntegerValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -102,7 +104,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<double>> EvaluateAsync(string flagKey, double defaultValue,
-        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken cancellationToken = default)
     {
         return this._ofrepProvider.ResolveDoubleValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -116,7 +118,7 @@ public class RemoteEvaluator : IEvaluator
     /// <param name="cancellationToken">cancellation token</param>
     /// <returns>An ResolutionDetails response</returns>
     public Task<ResolutionDetails<bool>> EvaluateAsync(string flagKey, bool defaultValue,
-        EvaluationContext? evaluationContext = null, CancellationToken? cancellationToken = null)
+        EvaluationContext? evaluationContext = null, CancellationToken cancellationToken = default)
     {
         return this._ofrepProvider.ResolveBooleanValueAsync(flagKey, defaultValue, evaluationContext);
     }
@@ -136,6 +138,7 @@ public class RemoteEvaluator : IEvaluator
     /// </summary>
     public ValueTask DisposeAsync()
     {
-        return default;
+        this._ofrepProvider.Dispose();
+        return new ValueTask();
     }
 }

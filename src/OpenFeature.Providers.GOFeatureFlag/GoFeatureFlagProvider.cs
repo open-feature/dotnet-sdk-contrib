@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
@@ -13,8 +12,6 @@ using OpenFeature.Providers.GOFeatureFlag.Hooks;
 using OpenFeature.Providers.GOFeatureFlag.Models;
 using OpenFeature.Providers.GOFeatureFlag.Ofrep;
 using OpenFeature.Providers.GOFeatureFlag.Services;
-
-[assembly: InternalsVisibleTo("OpenFeature.Providers.GOFeatureFlag.Test")]
 
 namespace OpenFeature.Providers.GOFeatureFlag;
 

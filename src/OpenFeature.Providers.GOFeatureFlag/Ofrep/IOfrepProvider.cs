@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Model;
@@ -7,7 +8,7 @@ namespace OpenFeature.Providers.GOFeatureFlag.Ofrep;
 /// <summary>
 ///     IOrepProvider defines the interface for the OpenFeature provider that interacts with OFREP.
 /// </summary>
-public interface IOfrepProvider
+public interface IOfrepProvider: IDisposable
 {
     /// <param name="flagKey">Feature flag key</param>
     /// <param name="defaultValue">Default value</param>
