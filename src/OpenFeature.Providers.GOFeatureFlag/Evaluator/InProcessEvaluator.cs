@@ -248,6 +248,7 @@ public class InProcessEvaluator : IEvaluator
     /// </summary>
     public ValueTask DisposeAsync()
     {
+        this._evaluationEngine?.Dispose();
         return new ValueTask(this._periodicAsyncRunner.StopAsync());
     }
 

@@ -120,4 +120,9 @@ public class OfrepProviderMock : IOfrepProvider
     {
         return Task.CompletedTask;
     }
+
+    public void Dispose()
+    {
+        // nothing to dispose in this mock
+    }
 }

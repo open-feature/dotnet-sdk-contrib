@@ -15,7 +15,7 @@ namespace OpenFeature.Providers.GOFeatureFlag.Wasm;
 ///     EvaluationWasm is a class that represents the evaluation of a feature flag
 ///     it calls an external WASM module to evaluate the feature flag.
 /// </summary>
-public class EvaluateWasm
+public class EvaluateWasm : IDisposable
 {
     private const string ResourceName =
         "OpenFeature.Providers.GOFeatureFlag.WasmModules.gofeatureflag-evaluation.wasi";
@@ -33,13 +33,28 @@ public class EvaluateWasm
     private readonly Wasmtime.Memory _wasmMemory;
 
     /// <summary>
+    ///     Engine instance for WASM execution.
+    /// </summary>
+    private readonly Engine _engine;
+
+    /// <summary>
+    ///     Store instance for WASM state management.
+    /// </summary>
+    private readonly Store _store;
+
+    /// <summary>
+    ///     Flag to track if the object has been disposed.
+    /// </summary>
+    private bool _disposed;
+
+    /// <summary>
     ///     Constructor of the EvaluationWasm. It initializes the WASM module and the host functions.
     /// </summary>
     public EvaluateWasm()
     {
-        var engine = new Engine();
-        var linker = new Linker(engine);
-        var store = new Store(engine);
+        this._engine = new Engine();
+        var linker = new Linker(this._engine);
+        this._store = new Store(this._engine);
 
         var assembly = Assembly.GetExecutingAssembly();
         if (assembly == null)
@@ -54,13 +69,13 @@ public class EvaluateWasm
                 "WASM module not found. Ensure the resource name is correct and the file is included in the project.");
         }
 
-        var module = Module.FromStream(engine, "evaluation", stream);
+        var module = Module.FromStream(this._engine, "evaluation", stream);
         var wasi = new WasiConfiguration()
             .WithInheritedStandardOutput()
             .WithInheritedStandardError();
         linker.DefineWasi();
-        store.SetWasiConfiguration(wasi);
-        var instance = linker.Instantiate(store, module);
+        this._store.SetWasiConfiguration(wasi);
+        var instance = linker.Instantiate(this._store, module);
         this._wasmMemory = instance.GetMemory("memory") ?? throw new WasmFunctionNotFoundException("memory");
         this._wasmMalloc = instance.GetFunction("malloc") ?? throw new WasmFunctionNotFoundException("malloc");
         this._wasmFree = instance.GetFunction("free") ?? throw new WasmFunctionNotFoundException("free");
@@ -74,6 +89,11 @@ public class EvaluateWasm
     /// <exception cref="WasmInvalidResultException">If for any reasons we have an issue calling the wasm module.</exception>
     public EvaluationResponse Evaluate(WasmInput wasmInput)
     {
+        if (this._disposed)
+        {
+            throw new ObjectDisposedException(nameof(EvaluateWasm));
+        }
+
         var wasmInputAsStr = JsonSerializer.Serialize(wasmInput, JsonConverterExtensions.DefaultSerializerSettings);
         var inputPtr = this.CopyToMemory(wasmInputAsStr);
         try
@@ -138,5 +158,23 @@ public class EvaluateWasm
 
         var result = this._wasmMemory.ReadString(ptr, outputStringLength);
         return result;
+    }
+
+    /// <summary>
+    ///     Disposes of the WASM resources.
+    /// </summary>
+    public void Dispose()
+    {
+        if (!this._disposed )
+        {
+            // In Wasmtime 22.0.0, most objects are automatically managed
+            // The Engine and Store are the main resources that need cleanup
+            // Other objects like Instance, Module, Linker are managed by the Store/Engine
+            this._store?.Dispose();
+            this._engine?.Dispose();
+
+            this._disposed = true;
+        }
+        GC.SuppressFinalize(this);
     }
 }
