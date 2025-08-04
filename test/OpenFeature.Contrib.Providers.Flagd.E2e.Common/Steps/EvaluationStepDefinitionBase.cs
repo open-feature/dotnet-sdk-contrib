@@ -13,8 +13,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 public abstract class EvaluationStepDefinitionsBase
 {
     private readonly ScenarioContext _scenarioContext;
-    protected FeatureClient client;
-    protected FeatureClient name;
+    private FeatureClient client;
     private bool booleanFlagValue;
     private string stringFlagValue;
     private int intFlagValue;
@@ -38,14 +37,20 @@ public abstract class EvaluationStepDefinitionsBase
 
     public EvaluationStepDefinitionsBase(ScenarioContext scenarioContext)
     {
-        Skip.If(Environment.GetEnvironmentVariable("E2E") != "true");
         _scenarioContext = scenarioContext;
     }
 
     [Given(@"a stable provider")]
     public void Givenastableprovider()
     {
-        // done in sub-classes
+        if (this._scenarioContext.TryGetValue<FeatureClient>("Client", out var client))
+        {
+            this.client = client;
+        }
+        else
+        {
+            throw new InvalidOperationException("Client not found in scenario context. Ensure the BeforeTestRun hook initializes the client.");
+        }
     }
 
     [When(@"a boolean flag with key ""(.*)"" is evaluated with default value ""(.*)""")]

@@ -1,13 +1,28 @@
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 using Reqnroll;
+using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps;
 
 [Binding, Scope(Feature = "Flag evaluation")]
 public class EvaluationStepDefinitionsRpc : EvaluationStepDefinitionsBase
 {
-    static EvaluationStepDefinitionsRpc()
+    public EvaluationStepDefinitionsRpc(ScenarioContext scenarioContext) : base(scenarioContext)
     {
+    }
+
+    [BeforeScenario]
+    public static async Task BeforeFeatureAsync(ScenarioContext scenarioContext)
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        Skip.If(configuration["E2E"] != "true");
+
         var host = TestHooks.FlagdTestBed.Container.Hostname;
         var port = TestHooks.FlagdTestBed.Container.GetMappedPublicPort(8013);
 
@@ -18,11 +33,17 @@ public class EvaluationStepDefinitionsRpc : EvaluationStepDefinitionsBase
                 .Build()
             );
 
-        Api.Instance.SetProviderAsync("rpc-test-evaluation", flagdProvider).Wait(5000);
+        await Api.Instance.SetProviderAsync("rpc-test-evaluation", flagdProvider).ConfigureAwait(false);
+
+        var client = Api.Instance.GetClient("rpc-test-evaluation");
+
+        scenarioContext.Set(configuration, "Configuration");
+        scenarioContext.Set(client, "Client");
     }
 
-    public EvaluationStepDefinitionsRpc(ScenarioContext scenarioContext) : base(scenarioContext)
+    [AfterScenario]
+    public static async Task AfterFeatureAsync()
     {
-        client = Api.Instance.GetClient("rpc-test-evaluation");
+        await Api.Instance.ShutdownAsync().ConfigureAwait(false);
     }
 }

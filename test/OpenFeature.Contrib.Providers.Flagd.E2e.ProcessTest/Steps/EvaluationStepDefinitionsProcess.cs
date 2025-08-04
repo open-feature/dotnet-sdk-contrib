@@ -1,13 +1,28 @@
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 using Reqnroll;
+using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest.Steps;
 
 [Binding, Scope(Feature = "Flag evaluation")]
 public class EvaluationStepDefinitionsProcess : EvaluationStepDefinitionsBase
 {
-    static EvaluationStepDefinitionsProcess()
+    public EvaluationStepDefinitionsProcess(ScenarioContext scenarioContext) : base(scenarioContext)
     {
+    }
+
+    [BeforeScenario]
+    public static async Task BeforeFeatureAsync(ScenarioContext scenarioContext)
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        Skip.If(configuration["E2E"] != "true");
+
         var host = TestHooks.FlagdSyncTestBed.Container.Hostname;
         var port = TestHooks.FlagdSyncTestBed.Container.GetMappedPublicPort(8015);
 
@@ -19,11 +34,17 @@ public class EvaluationStepDefinitionsProcess : EvaluationStepDefinitionsBase
                 .Build()
             );
 
-        Api.Instance.SetProviderAsync("process-test-evaluation", flagdProvider).Wait(5000);
+        await Api.Instance.SetProviderAsync("process-test-evaluation", flagdProvider).ConfigureAwait(false);
+
+        var client = Api.Instance.GetClient("process-test-evaluation");
+
+        scenarioContext.Set(configuration, "Configuration");
+        scenarioContext.Set(client, "Client");
     }
 
-    public EvaluationStepDefinitionsProcess(ScenarioContext scenarioContext) : base(scenarioContext)
+    [AfterScenario]
+    public static async Task AfterFeatureAsync()
     {
-        client = Api.Instance.GetClient("process-test-evaluation");
+        await Api.Instance.ShutdownAsync().ConfigureAwait(false);
     }
 }
