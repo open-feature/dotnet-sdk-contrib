@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
@@ -16,7 +17,7 @@ public class FlagdStepDefinitionsRpc : FlagdStepDefinitionsBase
     }
 
     [BeforeScenario]
-    public static async Task BeforeFeatureAsync(ScenarioContext scenarioContext)
+    public static async Task BeforeScenarioAsync(ScenarioContext scenarioContext)
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: true)
@@ -44,8 +45,15 @@ public class FlagdStepDefinitionsRpc : FlagdStepDefinitionsBase
     }
 
     [AfterScenario]
-    public static async Task AfterFeatureAsync()
+    public static async Task AfterScenarioAsync()
     {
-        await Api.Instance.ShutdownAsync().ConfigureAwait(false);
+        try
+        {
+            await Api.Instance.ShutdownAsync().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception during Shutdown {0}", ex.Message);
+        }
     }
 }
