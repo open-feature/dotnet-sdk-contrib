@@ -23,6 +23,7 @@ public class TestHooks
             return;
         }
 
+        featureContext.Set(false, "IgnoreTest");
         featureContext.Set(configuration, "Configuration");
 
         await FlagdTestBed.Container.StartAsync().ConfigureAwait(false);
