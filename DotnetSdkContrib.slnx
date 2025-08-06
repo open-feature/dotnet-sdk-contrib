@@ -6,9 +6,9 @@
     <Project Path="src/OpenFeature.Contrib.Providers.Flagd/OpenFeature.Contrib.Providers.Flagd.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.Flagsmith/OpenFeature.Contrib.Providers.Flagsmith.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.Flipt/OpenFeature.Contrib.Providers.Flipt.csproj" />
-    <Project Path="src/OpenFeature.Contrib.Providers.GOFeatureFlag/OpenFeature.Contrib.Providers.GOFeatureFlag.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.Statsig/OpenFeature.Contrib.Providers.Statsig.csproj" />
     <Project Path="src/OpenFeature.Providers.Ofrep/OpenFeature.Providers.Ofrep.csproj" />
+    <Project Path="src/OpenFeature.Providers.GOFeatureFlag/OpenFeature.Providers.GOFeatureFlag.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj" />
@@ -20,8 +20,8 @@
     <Project Path="test/OpenFeature.Contrib.Providers.Flagd.Test/OpenFeature.Contrib.Providers.Flagd.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.Flagsmith.Test/OpenFeature.Contrib.Providers.Flagsmith.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.Flipt.Test/OpenFeature.Contrib.Providers.Flipt.Test.csproj" />
-    <Project Path="test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test/OpenFeature.Contrib.Providers.GOFeatureFlag.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.Statsig.Test/OpenFeature.Contrib.Providers.Statsig.Test.csproj" />
     <Project Path="test/OpenFeature.Providers.Ofrep.Test/OpenFeature.Providers.Ofrep.Test.csproj" />
+    <Project Path="test/OpenFeature.Providers.GOFeatureFlag.Test/OpenFeature.Providers.GOFeatureFlag.Test.csproj" />
   </Folder>
 </Solution>
