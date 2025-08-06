@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 using Reqnroll;
 using Xunit;
@@ -15,10 +16,14 @@ public class FlagdStepDefinitionsProcess : FlagdStepDefinitionsBase
     }
 
     [BeforeScenario]
-    public static async Task BeforeScenarioAsync(ScenarioContext scenarioContext, FeatureContext featureContext)
+    public static async Task BeforeScenarioAsync(ScenarioContext scenarioContext)
     {
-        var ignoreTest = featureContext.Get<bool>("IgnoreTest");
-        Skip.If(ignoreTest, "Skipping test as E2E tests are disabled, enable them by updating the appsettings.json");
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        Skip.If(configuration["E2E"] != "true", "Skipping test as E2E tests are disabled, enable them by updating the appsettings.json.");
 
         var host = TestHooks.FlagdSyncTestBed.Container.Hostname;
         var port = TestHooks.FlagdSyncTestBed.Container.GetMappedPublicPort(8015);
@@ -36,5 +41,6 @@ public class FlagdStepDefinitionsProcess : FlagdStepDefinitionsBase
         var client = Api.Instance.GetClient("process-test-flagd");
 
         scenarioContext.Set(client, "Client");
+        scenarioContext.Set(configuration, "Configuration");
     }
 }

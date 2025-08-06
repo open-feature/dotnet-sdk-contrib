@@ -9,8 +9,8 @@ public class TestHooks
 {
     public static FlagdSyncTestBedContainer FlagdSyncTestBed { get; private set; }
 
-    [BeforeFeature]
-    public static async Task StartContainerAsync(FeatureContext featureContext)
+    [BeforeTestRun]
+    public static async Task StartContainerAsync()
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: true)
@@ -19,18 +19,14 @@ public class TestHooks
 
         if (configuration["E2E"] != "true")
         {
-            featureContext.Set(true, "IgnoreTest");
             return;
         }
-
-        featureContext.Set(false, "IgnoreTest");
-        featureContext.Set(configuration, "Configuration");
 
         FlagdSyncTestBed = new FlagdSyncTestBedContainer();
         await FlagdSyncTestBed.Container.StartAsync().ConfigureAwait(false);
     }
 
-    [AfterFeature]
+    [AfterTestRun]
     public static async Task StopContainerAsync()
     {
         if (FlagdSyncTestBed != null)
