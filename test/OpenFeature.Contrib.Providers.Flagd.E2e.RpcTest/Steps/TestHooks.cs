@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Reqnroll;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps;
@@ -11,8 +12,17 @@ public class TestHooks
     [BeforeTestRun]
     public static async Task StartContainerAsync()
     {
-        FlagdTestBed = new FlagdRpcTestBedContainer();
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
 
+        if (configuration["E2E"] != "true")
+        {
+            return;
+        }
+
+        FlagdTestBed = new FlagdRpcTestBedContainer();
         await FlagdTestBed.Container.StartAsync().ConfigureAwait(false);
     }
 
