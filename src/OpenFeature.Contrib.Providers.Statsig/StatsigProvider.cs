@@ -56,16 +56,20 @@ public sealed class StatsigProvider : FeatureProvider
             result.Reason == EvaluationReason.DataAdapter)
         {
             gateFound = true;
-        } else if (result.Reason == EvaluationReason.Unrecognized)
+        }
+        else if (result.Reason == EvaluationReason.Unrecognized)
         {
             responseType = ErrorType.FlagNotFound;
-        } else if (result.Reason == EvaluationReason.Uninitialized)
+        }
+        else if (result.Reason == EvaluationReason.Uninitialized)
         {
             responseType = ErrorType.ProviderNotReady;
-        } else if (result.Reason == EvaluationReason.Unsupported)
+        }
+        else if (result.Reason == EvaluationReason.Unsupported)
         {
             responseType = ErrorType.InvalidContext;
-        } else if (result.Reason == EvaluationReason.Error)
+        }
+        else if (result.Reason == EvaluationReason.Error)
         {
             responseType = ErrorType.General;
         }
