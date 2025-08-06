@@ -61,6 +61,7 @@
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
+      "release-as": "v0.2.0",
       "extra-files": [
         "OpenFeature.Contrib.Providers.Statsig.csproj"
       ]
