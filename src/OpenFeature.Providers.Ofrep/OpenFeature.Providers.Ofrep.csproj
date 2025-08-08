@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0"/>
-    <PackageReference Include="OpenFeature" Version="$(OpenFeatureVersion)"/>
+    <PackageReference Include="OpenFeature.DependencyInjection" Version="$(OpenFeatureVersion)"/>
   </ItemGroup>
   <PropertyGroup>
     <OpenFeatureVersion>[2.2,2.99999]</OpenFeatureVersion>
