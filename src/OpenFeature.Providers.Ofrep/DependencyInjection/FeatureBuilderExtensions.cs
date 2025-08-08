@@ -21,6 +21,7 @@ public static class FeatureBuilderExtensions
     public static OpenFeatureBuilder AddOfrepProvider(this OpenFeatureBuilder builder, Action<OfrepProviderOptions> configure)
     {
         builder.Services.Configure(OfrepProviderOptions.DefaultName, configure);
+        builder.Services.AddSingleton<IValidateOptions<OfrepProviderOptions>, OfrepProviderOptionsValidator>();
         return builder.AddProvider(sp => CreateProvider(sp, null));
     }
 
@@ -30,6 +31,7 @@ public static class FeatureBuilderExtensions
     public static OpenFeatureBuilder AddOfrepProvider(this OpenFeatureBuilder builder, string domain, Action<OfrepProviderOptions> configure)
     {
         builder.Services.Configure(domain, configure);
+        builder.Services.AddSingleton<IValidateOptions<OfrepProviderOptions>, OfrepProviderOptionsValidator>();
         return builder.AddProvider(domain, CreateProvider);
     }
 
@@ -38,11 +40,7 @@ public static class FeatureBuilderExtensions
         var monitor = sp.GetRequiredService<IOptionsMonitor<OfrepProviderOptions>>();
         var opts = string.IsNullOrEmpty(domain) ? monitor.Get(OfrepProviderOptions.DefaultName) : monitor.Get(domain);
 
-        if (string.IsNullOrWhiteSpace(opts.BaseUrl))
-        {
-            throw new ArgumentException("Ofrep BaseUrl is required. Set it on OfrepProviderOptions.BaseUrl.");
-        }
-
+        // Options validation is handled by OfrepProviderOptionsValidator during service registration
         var ofrepOptions = new OfrepOptions(opts.BaseUrl)
         {
             Timeout = opts.Timeout,

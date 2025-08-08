@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OpenFeature.Providers.Ofrep.DependencyInjection;
 using Xunit;
 
@@ -10,7 +11,7 @@ public class FeatureBuilderExtensionsTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void AddOfrepProvider_WithInvalidBaseUrl_Throws_ArgumentException(string? url)
+    public void AddOfrepProvider_WithInvalidBaseUrl_Throws_OptionsValidationException(string? url)
     {
         using var services = new ServiceCollection()
             .AddOpenFeature(builder =>
@@ -19,8 +20,8 @@ public class FeatureBuilderExtensionsTests
             })
             .BuildServiceProvider();
 
-        // Provider creation is deferred until resolution; resolving should throw due to missing BaseUrl
-        var exception = Assert.Throws<ArgumentException>(() => services.GetRequiredService<FeatureProvider>());
+        // Provider creation is validated on registration
+        var exception = Assert.Throws<OptionsValidationException>(() => services.GetRequiredService<FeatureProvider>());
         Assert.Contains("Ofrep BaseUrl is required", exception.Message);
     }
 
