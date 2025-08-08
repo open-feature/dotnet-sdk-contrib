@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenFeature.Providers.Ofrep.DependencyInjection;
 using Xunit;
 
-namespace OpenFeature.Providers.Ofrep.Test;
+namespace OpenFeature.Providers.Ofrep.Test.DependencyInjection;
 
 public class FeatureBuilderExtensionsTests
 {
