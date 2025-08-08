@@ -16,30 +16,12 @@ namespace OpenFeature.Providers.Ofrep.DependencyInjection;
 public static class FeatureBuilderExtensions
 {
     /// <summary>
-    /// Adds the OfrepProvider with default options registration.
-    /// </summary>
-    public static OpenFeatureBuilder AddOfrepProvider(this OpenFeatureBuilder builder)
-    {
-        builder.Services.AddOptions<OfrepProviderOptions>(OfrepProviderOptions.DefaultName);
-        return builder.AddProvider(sp => CreateProvider(sp, null));
-    }
-
-    /// <summary>
     /// Adds the OfrepProvider with configured options.
     /// </summary>
     public static OpenFeatureBuilder AddOfrepProvider(this OpenFeatureBuilder builder, Action<OfrepProviderOptions> configure)
     {
         builder.Services.Configure(OfrepProviderOptions.DefaultName, configure);
         return builder.AddProvider(sp => CreateProvider(sp, null));
-    }
-
-    /// <summary>
-    /// Adds the OfrepProvider for a named domain with default options.
-    /// </summary>
-    public static OpenFeatureBuilder AddOfrepProvider(this OpenFeatureBuilder builder, string domain)
-    {
-        builder.Services.AddOptions<OfrepProviderOptions>(domain);
-        return builder.AddProvider(domain, CreateProvider);
     }
 
     /// <summary>
