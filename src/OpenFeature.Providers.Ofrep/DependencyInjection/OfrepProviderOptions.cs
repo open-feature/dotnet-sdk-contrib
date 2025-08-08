@@ -1,3 +1,7 @@
+#if NETFRAMEWORK
+using System.Net.Http;
+#endif
+
 namespace OpenFeature.Providers.Ofrep.DependencyInjection;
 
 /// <summary>
@@ -24,4 +28,18 @@ public record OfrepProviderOptions
     /// Optional additional HTTP headers.
     /// </summary>
     public Dictionary<string, string> Headers { get; set; } = new();
+
+    /// <summary>
+    /// Optional named HttpClient to use via IHttpClientFactory.
+    /// If set, the provider will resolve an IHttpClientFactory and create the named client.
+    /// You must register the client in your ServiceCollection using AddHttpClient(name, ...).
+    /// </summary>
+    public string? HttpClientName { get; set; }
+
+    /// <summary>
+    /// Optional callback to configure the HttpClient used by the provider.
+    /// If <see cref="HttpClientName"/> is set, the named client will be resolved first and then this delegate is invoked.
+    /// If not set, a default client will be created (preferably from IHttpClientFactory if available) and then configured.
+    /// </summary>
+    public Action<IServiceProvider, HttpClient>? ConfigureHttpClient { get; set; }
 }

@@ -19,7 +19,7 @@ public class OfrepProviderTest : IDisposable
     public void Constructor_ShouldThrowArgumentNullException_WhenConfigurationIsNull()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new OfrepProvider(null!));
+        Assert.Throws<ArgumentNullException>(() => new OfrepProvider((OfrepOptions)null!));
     }
 
     [Fact]

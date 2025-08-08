@@ -31,6 +31,15 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         this._client = new OfrepClient(configuration);
     }
 
+    /// <summary>
+    /// Creates new instance of <see cref="OfrepProvider"/> with a pre-constructed client.
+    /// </summary>
+    /// <param name="client">The OFREP client.</param>
+    internal OfrepProvider(IOfrepClient client)
+    {
+        this._client = client ?? throw new ArgumentNullException(nameof(client));
+    }
+
     /// <inheritdoc/>
     public override Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
