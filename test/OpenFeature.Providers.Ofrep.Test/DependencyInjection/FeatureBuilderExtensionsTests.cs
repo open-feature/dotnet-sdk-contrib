@@ -208,7 +208,7 @@ public class FeatureBuilderExtensionsTests
                 builder.AddOfrepProvider(o =>
                 {
                     o.BaseUrl = "https://api.example.com/";
-                    o.ConfigureHttpClient = (_, __) => configured = true;
+                    o.ConfigureHttpClient = (_, _) => configured = true;
                 });
             })
             .BuildServiceProvider();

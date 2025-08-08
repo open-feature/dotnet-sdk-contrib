@@ -20,7 +20,7 @@ public class OfrepProviderOptionsValidatorTests
         var options = new OfrepProviderOptions { BaseUrl = baseUrl! };
 
         // Act
-        var result = _validator.Validate("test", options);
+        var result = this._validator.Validate("test", options);
 
         // Assert
         Assert.True(result.Failed);
@@ -39,7 +39,7 @@ public class OfrepProviderOptionsValidatorTests
         var options = new OfrepProviderOptions { BaseUrl = baseUrl };
 
         // Act
-        var result = _validator.Validate("test", options);
+        var result = this._validator.Validate("test", options);
 
         // Assert
         Assert.True(result.Failed);
@@ -58,7 +58,7 @@ public class OfrepProviderOptionsValidatorTests
         var options = new OfrepProviderOptions { BaseUrl = baseUrl };
 
         // Act
-        var result = _validator.Validate("test", options);
+        var result = this._validator.Validate("test", options);
 
         // Assert
         Assert.True(result.Failed);
@@ -80,7 +80,7 @@ public class OfrepProviderOptionsValidatorTests
         var options = new OfrepProviderOptions { BaseUrl = baseUrl };
 
         // Act
-        var result = _validator.Validate("test", options);
+        var result = this._validator.Validate("test", options);
 
         // Assert
         Assert.False(result.Failed);
@@ -94,7 +94,7 @@ public class OfrepProviderOptionsValidatorTests
         var options = new OfrepProviderOptions { BaseUrl = "https://api.example.com" };
 
         // Act
-        var result = _validator.Validate(null, options);
+        var result = this._validator.Validate(null, options);
 
         // Assert
         Assert.False(result.Failed);
@@ -114,7 +114,7 @@ public class OfrepProviderOptionsValidatorTests
         };
 
         // Act
-        var result = _validator.Validate("test", options);
+        var result = this._validator.Validate("test", options);
 
         // Assert
         Assert.False(result.Failed);

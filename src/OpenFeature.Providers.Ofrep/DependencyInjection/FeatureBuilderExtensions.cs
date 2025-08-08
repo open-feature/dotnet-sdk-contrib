@@ -54,21 +54,13 @@ public static class FeatureBuilderExtensions
         var factory = sp.GetService<IHttpClientFactory>();
         if (factory != null)
         {
-            if (!string.IsNullOrWhiteSpace(opts.HttpClientName))
-            {
-                httpClient = factory.CreateClient(opts.HttpClientName!);
-            }
-            else
-            {
-                httpClient = factory.CreateClient();
-            }
+            httpClient = string.IsNullOrWhiteSpace(opts.HttpClientName) ? factory.CreateClient() : factory.CreateClient(opts.HttpClientName!);
         }
 
         // If no factory/client, let OfrepClient create its own HttpClient
         if (httpClient == null)
         {
-            var provider = new OfrepProvider(ofrepOptions); // internal client management
-            return provider;
+            return new OfrepProvider(ofrepOptions); // internal client management
         }
 
         // Allow user to configure the HttpClient
@@ -79,7 +71,7 @@ public static class FeatureBuilderExtensions
         {
             httpClient.BaseAddress = new Uri(ofrepOptions.BaseUrl);
         }
-        if (httpClient.Timeout == default)
+        if (httpClient.Timeout == TimeSpan.Zero)
         {
             httpClient.Timeout = ofrepOptions.Timeout;
         }
