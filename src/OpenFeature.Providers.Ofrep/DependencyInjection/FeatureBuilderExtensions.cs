@@ -63,7 +63,7 @@ public static class FeatureBuilderExtensions
 
         var ofrepOptions = new OfrepOptions(opts.BaseUrl)
         {
-            Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds),
+            Timeout = opts.Timeout,
             Headers = opts.Headers
         };
 

@@ -20,9 +20,9 @@ public record OfrepProviderOptions
     public string BaseUrl { get; set; } = string.Empty;
 
     /// <summary>
-    /// HTTP request timeout in seconds. Defaults to 10.
+    /// HTTP request timeout. Defaults to 10 seconds.
     /// </summary>
-    public int TimeoutSeconds { get; set; } = 10;
+    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(10);
 
     /// <summary>
     /// Optional additional HTTP headers.
