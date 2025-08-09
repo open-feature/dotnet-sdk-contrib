@@ -1,13 +1,13 @@
 // This file is NOT tested in dotnet framework because it uses Microsoft.AspNetCore.Builder, which is not available in .NET 6.0 and later.
 
 #if !NETFRAMEWORK
+using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 using OpenFeature.Providers.Ofrep.DependencyInjection;
 using Xunit;
 
