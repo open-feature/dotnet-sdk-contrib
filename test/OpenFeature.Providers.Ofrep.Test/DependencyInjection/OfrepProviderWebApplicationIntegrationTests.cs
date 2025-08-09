@@ -1,6 +1,6 @@
 // This file is NOT tested in dotnet framework because it uses Microsoft.AspNetCore.Builder, which is not available in .NET 6.0 and later.
 
-#if !NETFRAMEWORK
+#if NET9_0
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
