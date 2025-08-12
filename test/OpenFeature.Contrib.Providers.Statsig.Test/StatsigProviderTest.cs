@@ -41,7 +41,7 @@ public class StatsigProviderTest
         await statsigProvider.InitializeAsync(null);
         statsigProvider.ServerDriver.OverrideGate(flagName, flagValue);
 
-        // Act 
+        // Act
         var result = await statsigProvider.ResolveBooleanValueAsync(flagName, defaultValue);
 
         // Assert
@@ -67,7 +67,7 @@ public class StatsigProviderTest
     }
 
     [Fact]
-    public async Task TestConcurrentInitilization_DoesntThrowException()
+    public async Task TestConcurrentInitialization_DoesntThrowException()
     {
         // Arrange
         var concurrencyTestClass = new StatsigProvider();

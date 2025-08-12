@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.Providers.Statsig</PackageId>
-    <VersionNumber>0.1.0</VersionNumber><!--x-release-please-version -->
+    <VersionNumber>0.1.1</VersionNumber><!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Statsig" Version="1.26.0" />
+    <PackageReference Include="Statsig" Version="2.3.1" />
     <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
   </ItemGroup>
 

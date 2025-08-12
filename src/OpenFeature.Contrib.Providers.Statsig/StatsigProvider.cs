@@ -50,28 +50,28 @@ public sealed class StatsigProvider : FeatureProvider
         var gateFound = false;
         var responseType = ErrorType.None;
 
-        switch (result.Reason)
+        if (result.Reason == EvaluationReason.Network ||
+            result.Reason == EvaluationReason.LocalOverride ||
+            result.Reason == EvaluationReason.Bootstrap ||
+            result.Reason == EvaluationReason.DataAdapter)
         {
-            case EvaluationReason.Network:
-            case EvaluationReason.LocalOverride:
-            case EvaluationReason.Bootstrap:
-            case EvaluationReason.DataAdapter:
-                gateFound = true;
-                break;
-            case EvaluationReason.Unrecognized:
-                responseType = ErrorType.FlagNotFound;
-                break;
-            case EvaluationReason.Uninitialized:
-                responseType = ErrorType.ProviderNotReady;
-                break;
-            case EvaluationReason.Unsupported:
-                responseType = ErrorType.InvalidContext;
-                break;
-            case EvaluationReason.Error:
-                responseType = ErrorType.General;
-                break;
-            case null:
-                break;
+            gateFound = true;
+        }
+        else if (result.Reason == EvaluationReason.Unrecognized)
+        {
+            responseType = ErrorType.FlagNotFound;
+        }
+        else if (result.Reason == EvaluationReason.Uninitialized)
+        {
+            responseType = ErrorType.ProviderNotReady;
+        }
+        else if (result.Reason == EvaluationReason.Unsupported)
+        {
+            responseType = ErrorType.InvalidContext;
+        }
+        else if (result.Reason == EvaluationReason.Error)
+        {
+            responseType = ErrorType.General;
         }
         return Task.FromResult(new ResolutionDetails<bool>(flagKey, gateFound ? result.Value : defaultValue, responseType));
     }

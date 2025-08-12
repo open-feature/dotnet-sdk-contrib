@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.1.0...OpenFeature.Contrib.Providers.Statsig-v0.1.1) (2025-08-06)
+
+
+### ✨ New Features
+
+* Update Statsig client to v2 ([66d4ecd](https://github.com/open-feature/dotnet-sdk-contrib/commit/66d4ecd63e98bc9acb3dc76a98386056c4f5f192))
+
 ## [0.1.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.0.9...OpenFeature.Contrib.Providers.Statsig-v0.1.0) (2024-08-22)
 
 
