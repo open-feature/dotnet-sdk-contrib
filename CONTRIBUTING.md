@@ -46,6 +46,32 @@ The instructions above will generate a test project for you.
 
 Use `dotnet test` to test the entire project.
 
+### Running End-to-End (E2E) Integration Tests
+
+To run the E2E integration tests for this repository, you need to set up your development environment as follows:
+
+#### Prerequisites
+
+- **Docker**: You must have Docker installed and running on your machine. You can use [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) or install Docker on Linux/Mac OS. The E2E tests require Docker to spin up test containers.
+
+#### Configuration
+
+Each E2E test project contains an `appsettings.json` file. To enable E2E tests, ensure the following setting is present and set to `true`:
+
+```json
+{
+  "E2E": "true"
+}
+```
+
+You can also set the `E2E` environment variable to `true` if you prefer not to modify the `appsettings.json` file.
+
+An example E2E project are the Flagd Provider E2E tests, found [here](/test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/appsettings.json).
+
+If you want to disable E2E tests, set `"E2E": "false"` or remove the setting.
+
+> **Note:** The E2E tests will be skipped if Docker is not running or if the `E2E` setting is not enabled in `appsettings.json`.
+
 ## Automated Changelog
 
 Each time a release is published the changelogs will be generated automatically using [googleapis/release-please-action](https://github.com/googleapis/release-please-action). The tool will organise the changes based on the PR labels.

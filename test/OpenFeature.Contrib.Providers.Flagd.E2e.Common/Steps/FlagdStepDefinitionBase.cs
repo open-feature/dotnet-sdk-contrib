@@ -10,8 +10,7 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 public abstract class FlagdStepDefinitionsBase
 {
     private readonly ScenarioContext _scenarioContext;
-    protected FeatureClient client;
-    protected FeatureClient name;
+    private FeatureClient client;
     private bool booleanZeroValue;
     private string stringZeroValue;
     private int intZeroFlagValue;
@@ -26,14 +25,20 @@ public abstract class FlagdStepDefinitionsBase
 
     public FlagdStepDefinitionsBase(ScenarioContext scenarioContext)
     {
-        Skip.If(Environment.GetEnvironmentVariable("E2E") != "true");
         _scenarioContext = scenarioContext;
     }
 
     [Given(@"a flagd provider is set")]
     public void GivenAFlagdProviderIsSet()
     {
-        // done in subclasses
+        if (this._scenarioContext.TryGetValue<FeatureClient>("Client", out var client))
+        {
+            this.client = client;
+        }
+        else
+        {
+            throw new InvalidOperationException("Client not found in scenario context. Ensure the BeforeTestRun hook initializes the client.");
+        }
     }
 
     [When(@"a PROVIDER_READY handler is added")]

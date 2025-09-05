@@ -1,5 +1,8 @@
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 using Reqnroll;
+using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps;
 
@@ -8,8 +11,20 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps;
 [Scope(Feature = "flagd json evaluation")]
 public class FlagdStepDefinitionsRpc : FlagdStepDefinitionsBase
 {
-    static FlagdStepDefinitionsRpc()
+    public FlagdStepDefinitionsRpc(ScenarioContext scenarioContext) : base(scenarioContext)
     {
+    }
+
+    [BeforeScenario]
+    public static async Task BeforeScenarioAsync(ScenarioContext scenarioContext, FeatureContext featureContext)
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        Skip.If(configuration["E2E"] != "true", "Skipping test as E2E tests are disabled, enable them by updating the appsettings.json.");
+
         var host = TestHooks.FlagdTestBed.Container.Hostname;
         var port = TestHooks.FlagdTestBed.Container.GetMappedPublicPort(8013);
 
@@ -20,11 +35,11 @@ public class FlagdStepDefinitionsRpc : FlagdStepDefinitionsBase
                 .Build()
             );
 
-        Api.Instance.SetProviderAsync("rpc-test-flagd", flagdProvider).Wait(5000);
-    }
+        await Api.Instance.SetProviderAsync("rpc-test-flagd", flagdProvider).ConfigureAwait(false);
 
-    public FlagdStepDefinitionsRpc(ScenarioContext scenarioContext) : base(scenarioContext)
-    {
-        client = Api.Instance.GetClient("rpc-test-flagd");
+        var client = Api.Instance.GetClient("rpc-test-flagd");
+
+        scenarioContext.Set(client, "Client");
+        scenarioContext.Set(configuration, "Configuration");
     }
 }
