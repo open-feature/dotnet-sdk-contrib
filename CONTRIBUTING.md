@@ -46,9 +46,58 @@ The instructions above will generate a test project for you.
 
 Use `dotnet test` to test the entire project.
 
-## Versioning and releasing
+### Running End-to-End (E2E) Integration Tests
 
-This repo uses _Release Please_ to release packages. Release Please sets up a running PR that tracks all changes for the library components, and maintains the versions according to [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), generated when [PRs are merged](https://github.com/amannn/action-semantic-pull-request). When Release Please's running PR is merged, any changed artifacts are published.
+To run the E2E integration tests for this repository, you need to set up your development environment as follows:
+
+#### Prerequisites
+
+- **Docker**: You must have Docker installed and running on your machine. You can use [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) or install Docker on Linux/Mac OS. The E2E tests require Docker to spin up test containers.
+
+#### Configuration
+
+Each E2E test project contains an `appsettings.json` file. To enable E2E tests, ensure the following setting is present and set to `true`:
+
+```json
+{
+  "E2E": "true"
+}
+```
+
+You can also set the `E2E` environment variable to `true` if you prefer not to modify the `appsettings.json` file.
+
+An example E2E project are the Flagd Provider E2E tests, found [here](/test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/appsettings.json).
+
+If you want to disable E2E tests, set `"E2E": "false"` or remove the setting.
+
+> **Note:** The E2E tests will be skipped if Docker is not running or if the `E2E` setting is not enabled in `appsettings.json`.
+
+## Automated Changelog
+
+Each time a release is published the changelogs will be generated automatically using [googleapis/release-please-action](https://github.com/googleapis/release-please-action). The tool will organise the changes based on the PR labels.
+Please make sure you follow the latest [conventions](https://www.conventionalcommits.org/en/v1.0.0/). We use an automation to check if the pull request respects the desired conventions. You can check it [here](https://github.com/open-feature/dotnet-sdk/actions/workflows/lint-pr.yml). Must be one of the following:
+
+-   build: Changes that affect the build system or external dependencies (example scopes: nuget)
+-   ci: Changes to our CI configuration files and scripts (example scopes: GitHub Actions, Coverage)
+-   docs: Documentation only changes
+-   feat: A new feature
+-   fix: A bug fix
+-   perf: A code change that improves performance
+-   refactor: A code change that neither fixes a bug nor adds a feature
+-   style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+-   test: Adding missing tests or correcting existing tests
+
+If you want to point out a breaking change, you should use `!` after the type. For example: `feat!: excellent new feature`.
+
+### Changelog Visibility and Release Triggers
+
+Only certain types are visible in the generated changelog:
+
+-   `feat`: ✨ New Features - New functionality added
+-   `fix`: 🐛 Bug Fixes - Bug fixes and corrections
+-   `perf`: 🚀 Performance - Performance improvements
+-   `refactor`: 🔧 Refactoring - Code changes that neither fix bugs nor add features
+-   `revert`: 🔙 Reverts - Reverted changes
 
 ## Dependencies
 

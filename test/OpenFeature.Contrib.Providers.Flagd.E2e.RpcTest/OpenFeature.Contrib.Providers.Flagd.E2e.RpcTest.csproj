@@ -1,33 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <None
-      Include="../../spec/specification/assets/gherkin/evaluation.feature"
-      Link="../../../Features/%(Filename)%(Extension)"
-      DestinationFolder="../../../Features/"
-      CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../spec/specification/assets/gherkin/evaluation.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- TODO: add reconnect tests (remove exclusion) -->
   <ItemGroup>
-    <None
-      Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/*.feature"
-      Exclude="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/flagd-reconnect.feature"
-      Link="../../../Features/%(Filename)%(Extension)"
-      DestinationFolder="../../../Features/"
-      CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/*.feature" Exclude="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/flagd-reconnect.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\..\src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj" />
-    <ProjectReference
-      Include="..\OpenFeature.Contrib.Providers.Flagd.E2e.Common\OpenFeature.Contrib.Providers.Flagd.E2e.Common.csproj" />
+    <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Flagd\OpenFeature.Contrib.Providers.Flagd.csproj" />
+    <ProjectReference Include="..\OpenFeature.Contrib.Providers.Flagd.E2e.Common\OpenFeature.Contrib.Providers.Flagd.E2e.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Reqnroll.xUnit" Version="2.4.1" />
     <PackageReference Include="Testcontainers" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Reqnroll;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest.Steps;
@@ -11,8 +12,17 @@ public class TestHooks
     [BeforeTestRun]
     public static async Task StartContainerAsync()
     {
-        FlagdSyncTestBed = new FlagdSyncTestBedContainer();
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
 
+        if (configuration["E2E"] != "true")
+        {
+            return;
+        }
+
+        FlagdSyncTestBed = new FlagdSyncTestBedContainer();
         await FlagdSyncTestBed.Container.StartAsync().ConfigureAwait(false);
     }
 
