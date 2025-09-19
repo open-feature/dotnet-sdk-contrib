@@ -81,8 +81,17 @@ public class EventPublisherTests
             Version = "1.0.0"
         };
         publisher.AddEvent(eventMock);
-        await Task.Delay(TimeSpan.FromMilliseconds(500));
 
+        // Wait for the request to be made, with a timeout to prevent hanging
+        var timeout = TimeSpan.FromSeconds(5);
+        var startTime = DateTime.UtcNow;
+        while (this._mockHttp.LastRequest == null && DateTime.UtcNow - startTime < timeout)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(50));
+        }
+
+        Assert.NotNull(this._mockHttp.LastRequest);
+        Assert.NotNull(this._mockHttp.LastRequest.Content);
         var got = await this._mockHttp.LastRequest.Content.ReadAsStringAsync();
         var want =
             "{\"meta\": {},\"events\": [{\"kind\": \"feature\",\"defaultValue\": false,\"value\": \"toto\",\"variation\": \"on\",\"version\": \"1.0.0\",\"creationDate\": 1750406145,\"contextKind\": \"user\",\"key\": \"TEST\",\"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"}]}";
