@@ -71,10 +71,7 @@ public static class FeatureBuilderExtensions
         {
             httpClient.BaseAddress = new Uri(ofrepOptions.BaseUrl);
         }
-        if (httpClient.Timeout == TimeSpan.Zero)
-        {
-            httpClient.Timeout = ofrepOptions.Timeout;
-        }
+        httpClient.Timeout = ofrepOptions.Timeout;
         foreach (var header in ofrepOptions.Headers)
         {
             if (!httpClient.DefaultRequestHeaders.Contains(header.Key))

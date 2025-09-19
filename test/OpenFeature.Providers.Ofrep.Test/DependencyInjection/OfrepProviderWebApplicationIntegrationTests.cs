@@ -1,4 +1,4 @@
-// This file is NOT tested in dotnet framework because it uses Microsoft.AspNetCore.Builder, which is not available in .NET 6.0 and later.
+// This file is NOT tested in .NET Framework because it uses APIs (such as Microsoft.AspNetCore.Builder) that are only available in .NET 6.0 and later.
 
 #if NET9_0
 using System.Text.Json;
