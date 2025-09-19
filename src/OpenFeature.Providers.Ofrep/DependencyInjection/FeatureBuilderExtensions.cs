@@ -7,6 +7,7 @@ using System.Net.Http;
 #endif
 using Microsoft.Extensions.Logging;
 using OpenFeature.Providers.Ofrep.Client;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace OpenFeature.Providers.Ofrep.DependencyInjection;
 
@@ -21,7 +22,7 @@ public static class FeatureBuilderExtensions
     public static OpenFeatureBuilder AddOfrepProvider(this OpenFeatureBuilder builder, Action<OfrepProviderOptions> configure)
     {
         builder.Services.Configure(OfrepProviderOptions.DefaultName, configure);
-        builder.Services.AddSingleton<IValidateOptions<OfrepProviderOptions>, OfrepProviderOptionsValidator>();
+        builder.Services.TryAddSingleton<IValidateOptions<OfrepProviderOptions>, OfrepProviderOptionsValidator>();
         return builder.AddProvider(sp => CreateProvider(sp, null));
     }
 
@@ -31,7 +32,7 @@ public static class FeatureBuilderExtensions
     public static OpenFeatureBuilder AddOfrepProvider(this OpenFeatureBuilder builder, string domain, Action<OfrepProviderOptions> configure)
     {
         builder.Services.Configure(domain, configure);
-        builder.Services.AddSingleton<IValidateOptions<OfrepProviderOptions>, OfrepProviderOptionsValidator>();
+        builder.Services.TryAddSingleton<IValidateOptions<OfrepProviderOptions>, OfrepProviderOptionsValidator>();
         return builder.AddProvider(domain, CreateProvider);
     }
 
