@@ -15,17 +15,12 @@ internal class TestHttpMessageHandler : HttpMessageHandler
 
     public IReadOnlyList<HttpRequestMessage> Requests => this._requests.AsReadOnly();
 
-    public void SetupResponse(HttpStatusCode statusCode, string content, string? etag = null)
+    public void SetupResponse(HttpStatusCode statusCode, string content)
     {
         var httpResponse = new HttpResponseMessage(statusCode)
         {
             Content = new StringContent(content, Encoding.UTF8, "application/json")
         };
-
-        if (!string.IsNullOrEmpty(etag))
-        {
-            httpResponse.Headers.ETag = new System.Net.Http.Headers.EntityTagHeaderValue(etag);
-        }
 
         this.SetupResponse(httpResponse);
     }
