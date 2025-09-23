@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Time.Testing;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client;
 using OpenFeature.Providers.Ofrep.Configuration;
@@ -748,6 +749,79 @@ public class OfrepClientTest : IDisposable
         Assert.NotNull(secondResult);
         Assert.Equal("general_error", secondResult.ErrorCode);
         Assert.Equal("Rate limit exceeded.", secondResult.ErrorMessage);
+    }
+
+    [Fact]
+    public void Constructor_WithTimeProvider_ShouldInitializeSuccessfully()
+    {
+        // Arrange
+        var startTime = new DateTimeOffset(2023, 1, 1, 12, 0, 0, TimeSpan.Zero);
+        var fakeTimeProvider = new FakeTimeProvider(startTime);
+
+        // Act & Assert - Constructor should complete successfully
+        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger, fakeTimeProvider);
+        Assert.NotNull(client);
+    }
+
+    [Fact]
+    public async Task EvaluateFlag_WithFakeTimeProvider_ShouldRespectRetryAfterTimeout()
+    {
+        // Arrange
+        const string flagKey = "rate-limited-flag";
+        const bool defaultValue = false;
+        var startTime = new DateTimeOffset(2023, 1, 1, 12, 0, 0, TimeSpan.Zero);
+        var fakeTimeProvider = new FakeTimeProvider(startTime);
+
+        // Create a custom mock handler that can set RetryAfter header
+        var mockHandler = new TestHttpMessageHandler();
+        var responseWithRetryAfter = new HttpResponseMessage(HttpStatusCode.TooManyRequests)
+        {
+            Content = new StringContent("Rate limit exceeded"),
+            Headers = { RetryAfter = new System.Net.Http.Headers.RetryConditionHeaderValue(TimeSpan.FromSeconds(60)) }
+        };
+
+        // Setup the custom response directly
+        mockHandler.SetupResponse((HttpStatusCode)429, "Rate limit exceeded");
+
+        using var client = new OfrepClient(this._configuration, mockHandler, this._mockLogger, fakeTimeProvider);
+
+        // Act & Assert
+        // First request should trigger rate limit and set retry after
+        var firstResult = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+        Assert.Equal("general_error", firstResult.ErrorCode);
+        Assert.Equal("Rate limit exceeded.", firstResult.ErrorMessage);
+
+        // Second request immediately should also be rate limited (no HTTP call due to client-side rate limiting)
+        var secondResult = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+        Assert.Equal("general_error", secondResult.ErrorCode);
+        Assert.Equal("Rate limit exceeded.", secondResult.ErrorMessage);
+
+        // This should have made only 1 HTTP request (the first one), not 2
+        Assert.Single(mockHandler.Requests);
+
+        // Advance time by 30 seconds - should still be rate limited
+        fakeTimeProvider.Advance(TimeSpan.FromSeconds(30));
+        var thirdResult = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+        Assert.Equal("general_error", thirdResult.ErrorCode);
+        Assert.Equal("Rate limit exceeded.", thirdResult.ErrorMessage);
+
+        // Still only 1 HTTP request should have been made
+        Assert.Single(mockHandler.Requests);
+
+        // Advance time by another 31 seconds (total 61 seconds) - rate limit should be cleared
+        fakeTimeProvider.Advance(TimeSpan.FromSeconds(31));
+
+        // Setup successful response for the next call
+        var successResponse = new OfrepResponse<bool>(flagKey, true) { Reason = "STATIC", Variant = "on" };
+        var json = JsonSerializer.Serialize(successResponse, this._jsonSerializerCamelCase);
+        mockHandler.SetupResponse(HttpStatusCode.OK, json);
+
+        var fourthResult = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+        Assert.Equal("STATIC", fourthResult.Reason);
+        Assert.True(fourthResult.Value);
+
+        // Now we should have made 2 HTTP requests total
+        Assert.Equal(2, mockHandler.Requests.Count);
     }
 
     #endregion
