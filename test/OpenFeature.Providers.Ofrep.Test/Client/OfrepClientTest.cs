@@ -781,7 +781,7 @@ public class OfrepClientTest : IDisposable
         };
 
         // Setup the custom response directly
-        mockHandler.SetupResponse((HttpStatusCode)429, "Rate limit exceeded");
+        mockHandler.SetupResponse(responseWithRetryAfter);
 
         using var client = new OfrepClient(this._configuration, mockHandler, this._mockLogger, fakeTimeProvider);
 
