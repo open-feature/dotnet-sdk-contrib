@@ -774,7 +774,7 @@ public class OfrepClientTest : IDisposable
 
         // Create a custom mock handler that can set RetryAfter header
         var mockHandler = new TestHttpMessageHandler();
-        var responseWithRetryAfter = new HttpResponseMessage(HttpStatusCode.TooManyRequests)
+        var responseWithRetryAfter = new HttpResponseMessage((HttpStatusCode)429)
         {
             Content = new StringContent("Rate limit exceeded"),
             Headers = { RetryAfter = new System.Net.Http.Headers.RetryConditionHeaderValue(TimeSpan.FromSeconds(60)) }
