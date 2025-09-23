@@ -24,6 +24,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     private readonly HttpClient _httpClient;
     private DateTimeOffset? _retryAfterDate;
     private readonly ILogger _logger;
+    private readonly TimeProvider _timeProvider;
     private bool _disposed;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -37,8 +38,9 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// </summary>
     /// <param name="configuration">The OFREP configuration.</param>
     /// <param name="logger">The logger for the client.</param>
-    public OfrepClient(OfrepOptions configuration, ILogger? logger = null)
-        : this(configuration, CreateDefaultHandler(), logger) // Use helper for default handler
+    /// <param name="timeProvider">The time provider for time-related operations. Defaults to TimeProvider.System.</param>
+    public OfrepClient(OfrepOptions configuration, ILogger? logger = null, TimeProvider? timeProvider = null)
+        : this(configuration, CreateDefaultHandler(), logger, timeProvider) // Use helper for default handler
     {
     }
 
@@ -47,7 +49,8 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// </summary>
     /// <param name="httpClient">The HttpClient to use for requests. Caller may provide one from IHttpClientFactory.</param>
     /// <param name="logger">The logger for the client.</param>
-    internal OfrepClient(HttpClient httpClient, ILogger? logger = null)
+    /// <param name="timeProvider">The time provider for time-related operations. Defaults to TimeProvider.System.</param>
+    internal OfrepClient(HttpClient httpClient, ILogger? logger = null, TimeProvider? timeProvider = null)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(httpClient);
@@ -60,6 +63,7 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         this._logger = logger ?? NullLogger<OfrepClient>.Instance;
         this._httpClient = httpClient;
+        this._timeProvider = timeProvider ?? TimeProvider.System;
     }
 
     /// <summary>
@@ -68,7 +72,8 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// <param name="configuration">The OFREP configuration.</param>
     /// <param name="handler">The HTTP message handler.</param>
     /// <param name="logger">The logger for the client.</param>
-    internal OfrepClient(OfrepOptions configuration, HttpMessageHandler handler, ILogger? logger = null)
+    /// <param name="timeProvider">The time provider for time-related operations. Defaults to TimeProvider.System.</param>
+    internal OfrepClient(OfrepOptions configuration, HttpMessageHandler handler, ILogger? logger = null, TimeProvider? timeProvider = null)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(configuration);
@@ -96,6 +101,8 @@ internal sealed partial class OfrepClient : IOfrepClient
         {
             this._httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
         }
+
+        this._timeProvider = timeProvider ?? TimeProvider.System;
     }
 
     /// <inheritdoc/>
@@ -111,7 +118,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
 #endif
 
-        if (this._retryAfterDate.HasValue && this._retryAfterDate.Value > DateTimeOffset.UtcNow)
+        if (this._retryAfterDate.HasValue && this._retryAfterDate.Value > this._timeProvider.GetUtcNow())
         {
             return new OfrepResponse<T>(flagKey, defaultValue)
             {
@@ -190,7 +197,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         var retryAfter = response.Headers.RetryAfter;
         if (retryAfter?.Delta.HasValue == true)
         {
-            this._retryAfterDate = DateTimeOffset.UtcNow.Add(retryAfter.Delta.Value);
+            this._retryAfterDate = this._timeProvider.GetUtcNow().Add(retryAfter.Delta.Value);
         }
         else if (retryAfter?.Date.HasValue == true)
         {
@@ -198,7 +205,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
         else
         {
-            this._retryAfterDate = DateTimeOffset.UtcNow.AddMinutes(1);
+            this._retryAfterDate = this._timeProvider.GetUtcNow().AddMinutes(1);
         }
 
         return new OfrepResponse<T>(key, defaultValue)

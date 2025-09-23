@@ -22,13 +22,23 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     /// </summary>
     /// <param name="configuration">The OFREP provider configuration.</param>
     public OfrepProvider(OfrepOptions configuration)
+        : this(configuration, null)
+    {
+    }
+
+    /// <summary>
+    /// Creates new instance of <see cref="OfrepProvider"/>
+    /// </summary>
+    /// <param name="configuration">The OFREP provider configuration.</param>
+    /// <param name="timeProvider">The time provider for time-related operations. Defaults to TimeProvider.System.</param>
+    public OfrepProvider(OfrepOptions configuration, TimeProvider? timeProvider)
     {
         if (configuration == null)
         {
             throw new ArgumentNullException(nameof(configuration));
         }
 
-        this._client = new OfrepClient(configuration);
+        this._client = new OfrepClient(configuration, timeProvider: timeProvider);
     }
 
     /// <summary>

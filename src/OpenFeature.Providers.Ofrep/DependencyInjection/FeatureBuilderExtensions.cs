@@ -61,7 +61,8 @@ public static class FeatureBuilderExtensions
         // If no factory/client, let OfrepClient create its own HttpClient
         if (httpClient == null)
         {
-            return new OfrepProvider(ofrepOptions); // internal client management
+            var timeProviderService = sp.GetService<TimeProvider>();
+            return new OfrepProvider(ofrepOptions, timeProviderService); // internal client management
         }
 
         // Allow user to configure the HttpClient
@@ -84,7 +85,8 @@ public static class FeatureBuilderExtensions
         // Build OfrepClient using provided HttpClient and wire into OfrepProvider
         var loggerFactory = sp.GetService<ILoggerFactory>();
         var logger = loggerFactory?.CreateLogger<OfrepClient>();
-        var ofrepClient = new OfrepClient(httpClient, logger);
+        var timeProvider = sp.GetService<TimeProvider>();
+        var ofrepClient = new OfrepClient(httpClient, logger, timeProvider);
         return new OfrepProvider(ofrepClient);
     }
 }
