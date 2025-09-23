@@ -43,6 +43,26 @@ internal sealed partial class OfrepClient : IOfrepClient
     }
 
     /// <summary>
+    /// Creates a new instance of <see cref="OfrepClient"/> using a provided <see cref="HttpClient"/>.
+    /// </summary>
+    /// <param name="httpClient">The HttpClient to use for requests. Caller may provide one from IHttpClientFactory.</param>
+    /// <param name="logger">The logger for the client.</param>
+    internal OfrepClient(HttpClient httpClient, ILogger? logger = null)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(httpClient);
+#else
+        if (httpClient == null)
+        {
+            throw new ArgumentNullException(nameof(httpClient));
+        }
+#endif
+
+        this._logger = logger ?? NullLogger<OfrepClient>.Instance;
+        this._httpClient = httpClient;
+    }
+
+    /// <summary>
     /// Internal constructor for testing purposes.
     /// </summary>
     /// <param name="configuration">The OFREP configuration.</param>

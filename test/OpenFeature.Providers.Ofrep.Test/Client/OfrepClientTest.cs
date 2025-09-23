@@ -59,7 +59,7 @@ public class OfrepClientTest : IDisposable
     public void Constructor_WithNullConfiguration_ShouldThrowArgumentNullException()
     {
         // Arrange, Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new OfrepClient(null!, this._mockLogger));
+        Assert.Throws<ArgumentNullException>(() => new OfrepClient((OfrepOptions)null!, this._mockLogger));
     }
 
     [Fact]
