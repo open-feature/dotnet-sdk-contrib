@@ -39,7 +39,7 @@ public static class FeatureBuilderExtensions
     private static OfrepProvider CreateProvider(IServiceProvider sp, string? domain)
     {
         var monitor = sp.GetRequiredService<IOptionsMonitor<OfrepProviderOptions>>();
-        var opts = string.IsNullOrEmpty(domain) ? monitor.Get(OfrepProviderOptions.DefaultName) : monitor.Get(domain);
+        var opts = string.IsNullOrWhiteSpace(domain) ? monitor.Get(OfrepProviderOptions.DefaultName) : monitor.Get(domain);
 
         // Options validation is handled by OfrepProviderOptionsValidator during service registration
         var ofrepOptions = new OfrepOptions(opts.BaseUrl)
