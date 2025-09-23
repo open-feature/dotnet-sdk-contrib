@@ -67,6 +67,18 @@ var provider = new OfrepProvider(config);
 await Api.Instance.SetProviderAsync(provider);
 ```
 
+### TimeProvider Support
+
+For testing and scenarios where you need to control time-related behavior (such as rate limiting), you can provide a custom `TimeProvider`:
+
+```csharp
+// Using a custom TimeProvider for testing
+var customTimeProvider = new FakeTimeProvider(); // From Microsoft.Extensions.TimeProvider.Testing
+var provider = new OfrepProvider(config, customTimeProvider);
+```
+
+When using dependency injection, the provider will automatically use any registered `TimeProvider` from the service container.
+
 ## Configuration Options
 
 The `OfrepOptions` class supports the following options:
