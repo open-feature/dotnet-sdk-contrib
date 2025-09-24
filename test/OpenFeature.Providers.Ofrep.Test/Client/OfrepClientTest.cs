@@ -11,6 +11,7 @@ using OpenFeature.Providers.Ofrep.Client;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Models;
 using OpenFeature.Providers.Ofrep.Test.Helpers;
+using OpenFeature.Constant;
 using Xunit;
 
 namespace OpenFeature.Providers.Ofrep.Test.Client;
@@ -246,6 +247,53 @@ public class OfrepClientTest : IDisposable
         Assert.Equal(defaultValue, result.Value);
         Assert.Equal("parse_error", result.ErrorCode);
         Assert.Contains("null or empty response", result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task EvaluateFlag_WhenResponseDefersToCodeDefault_ShouldUseDefaultValue()
+    {
+        // Arrange
+        const string flagKey = "code-default";
+        const bool defaultValue = true;
+
+        const string jsonResponse = "{\"key\":\"code-default\",\"variant\":\"control\",\"metadata\":{\"traceId\":\"abc-123\"}}";
+        this._mockHandler.SetupResponse(HttpStatusCode.OK, jsonResponse);
+
+        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
+
+        // Act
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+
+        // Assert
+        Assert.Equal(defaultValue, result.Value);
+        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal("control", result.Variant);
+
+        Assert.NotNull(result.Metadata);
+        Assert.True(result.Metadata!.TryGetValue("traceId", out var traceId));
+        var traceIdElement = Assert.IsType<JsonElement>(traceId);
+        Assert.Equal("abc-123", traceIdElement.GetString());
+    }
+
+    [Fact]
+    public async Task EvaluateFlag_WhenCodeDefaultResponseIncludesReason_ShouldPreserveServerReason()
+    {
+        // Arrange
+        const string flagKey = "code-default-reason";
+        const int defaultValue = 7;
+
+        const string jsonResponse = "{\"key\":\"code-default-reason\",\"reason\":\"STATIC\"}";
+        this._mockHandler.SetupResponse(HttpStatusCode.OK, jsonResponse);
+
+        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
+
+        // Act
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+
+        // Assert
+        Assert.Equal(defaultValue, result.Value);
+        Assert.Equal("STATIC", result.Reason);
+        Assert.Null(result.Metadata);
     }
 
     [Fact]
