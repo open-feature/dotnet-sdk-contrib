@@ -258,9 +258,9 @@ internal sealed partial class OfrepClient : IOfrepClient
     private async Task<OfrepResponse<T>> ProcessOkResponseAsync<T>(string flagKey, T defaultValue,
         HttpResponseMessage response, CancellationToken cancellationToken = default)
     {
-        var evaluationResponse = await response.Content
-            .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
-        if (evaluationResponse == null)
+        var rawResponse = await response.Content
+            .ReadFromJsonAsync<OfrepResponse<JsonElement>>(JsonOptions, cancellationToken).ConfigureAwait(false);
+        if (rawResponse == null)
         {
             this.LogNullResponse(flagKey);
             return new OfrepResponse<T>(flagKey, defaultValue)
@@ -268,6 +268,41 @@ internal sealed partial class OfrepClient : IOfrepClient
                 ErrorCode = ErrorCodes.ParseError,
                 ErrorMessage = "Received null or empty response from server."
             };
+        }
+
+        var hasValue = rawResponse.Value.ValueKind != JsonValueKind.Undefined &&
+                       rawResponse.Value.ValueKind != JsonValueKind.Null;
+
+        T resolvedValue;
+        if (hasValue)
+        {
+            try
+            {
+                resolvedValue = rawResponse.Value.Deserialize<T>(JsonOptions) ?? defaultValue;
+            }
+            catch (JsonException ex)
+            {
+                this.LogJsonParseError(flagKey, ex.Message, ex);
+                return HandleEvaluationError(flagKey, ex, defaultValue);
+            }
+        }
+        else
+        {
+            resolvedValue = defaultValue;
+        }
+
+        var evaluationResponse = new OfrepResponse<T>(rawResponse.Key ?? flagKey, resolvedValue)
+        {
+            ErrorCode = rawResponse.ErrorCode,
+            ErrorMessage = rawResponse.ErrorMessage,
+            Reason = rawResponse.Reason,
+            Variant = rawResponse.Variant,
+            Metadata = rawResponse.Metadata
+        };
+
+        if (!hasValue)
+        {
+            evaluationResponse.Reason ??= Reason.Default;
         }
 
         return evaluationResponse;
