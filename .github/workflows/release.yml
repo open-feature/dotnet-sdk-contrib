@@ -28,7 +28,7 @@ jobs:
     environment: publish
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      id-token: write # enable GitHub OIDC token issuance for this job (NuGet login)
       contents: write # upload sbom to a release
       attestations: write
       packages: read # for internal nuget reading
@@ -72,9 +72,16 @@ jobs:
         run: |
           dotnet pack --configuration Release --no-build
 
+        # Get a short-lived NuGet API key
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@76cce0bd8d4b2f5dcdb45e2316d76c328632a902 # v1
+        id: login
+        with:
+          user: ${{secrets.NUGET_USER}}
+
       - name: Publish to Nuget
         run: |
-          dotnet nuget push "${{ matrix.release }}/**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }}
+          dotnet nuget push "${{ matrix.release }}/**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
