@@ -259,7 +259,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         HttpResponseMessage response, CancellationToken cancellationToken = default)
     {
         var rawResponse = await response.Content
-            .ReadFromJsonAsync<OfrepEvaluationResponse>(JsonOptions, cancellationToken).ConfigureAwait(false);
+            .ReadFromJsonAsync<OfrepResponse<JsonElement>>(JsonOptions, cancellationToken).ConfigureAwait(false);
         if (rawResponse == null)
         {
             this.LogNullResponse(flagKey);
