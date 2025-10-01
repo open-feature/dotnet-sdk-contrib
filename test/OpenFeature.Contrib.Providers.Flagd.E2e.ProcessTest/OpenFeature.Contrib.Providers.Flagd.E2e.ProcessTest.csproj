@@ -4,9 +4,11 @@
     <None Include="../../spec/specification/assets/gherkin/evaluation.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <!-- TODO: add reconnect tests (remove exclusion) -->
+  <!-- TODO: add remaining tests -->
   <ItemGroup>
-    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/*.feature" Exclude="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/flagd-reconnect.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/version.txt" Link="flagd-testbed-version.txt" DestinationFolder="." CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/flagd.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/flagd-json-evaluator.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

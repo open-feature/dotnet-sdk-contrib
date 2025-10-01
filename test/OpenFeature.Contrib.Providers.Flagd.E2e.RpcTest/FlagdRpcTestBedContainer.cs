@@ -7,10 +7,10 @@ public class FlagdRpcTestBedContainer
 {
     public IContainer Container { get; }
 
-    public FlagdRpcTestBedContainer()
+    public FlagdRpcTestBedContainer(string version)
     {
         Container = new ContainerBuilder()
-            .WithImage("ghcr.io/open-feature/flagd-testbed:v0.5.21")
+            .WithImage($"ghcr.io/open-feature/flagd-testbed:v{version}")
             .WithPortBinding(8013, true)
             .Build();
     }
