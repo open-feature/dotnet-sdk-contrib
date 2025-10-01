@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Reqnroll;
@@ -22,7 +23,10 @@ public class TestHooks
             return;
         }
 
-        FlagdTestBed = new FlagdRpcTestBedContainer();
+        var version = File.ReadAllText("flagd-testbed-version.txt")
+            .Trim();
+
+        FlagdTestBed = new FlagdRpcTestBedContainer(version);
         await FlagdTestBed.Container.StartAsync().ConfigureAwait(false);
     }
 
