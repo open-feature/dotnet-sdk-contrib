@@ -23,10 +23,13 @@ public class TestHooks
             return;
         }
 
-        var version = File.ReadAllText("flagd-testbed-version.txt")
-            .Trim();
+#if NET8_0_OR_GREATER
+        var version = await File.ReadAllTextAsync("flagd-testbed-version.txt").ConfigureAwait(false);
+#else
+        var version = File.ReadAllText("flagd-testbed-version.txt");
+#endif
 
-        FlagdSyncTestBed = new FlagdSyncTestBedContainer(version);
+        FlagdSyncTestBed = new FlagdSyncTestBedContainer(version.Trim());
         await FlagdSyncTestBed.Container.StartAsync().ConfigureAwait(false);
     }
 
