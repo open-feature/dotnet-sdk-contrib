@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.1...OpenFeature.Providers.Ofrep-v0.1.2) (2025-10-01)
+
+
+### ✨ New Features
+
+* Add Dependency Injection support ([#459](https://github.com/open-feature/dotnet-sdk-contrib/issues/459)) ([12d6775](https://github.com/open-feature/dotnet-sdk-contrib/commit/12d6775b6cab99a5753fbace7089bfd810def20c))
+* Implement OFREP default evaluation response ([#468](https://github.com/open-feature/dotnet-sdk-contrib/issues/468)) ([670f1ca](https://github.com/open-feature/dotnet-sdk-contrib/commit/670f1caef8ddb6deee1ed134442212389cad08e2))
+
+
+### 🔧 Refactoring
+
+* change to use TimeProvider ([#466](https://github.com/open-feature/dotnet-sdk-contrib/issues/466)) ([ec12f2d](https://github.com/open-feature/dotnet-sdk-contrib/commit/ec12f2df1f5432785472bb7ea21547405db08dcd))
+
 ## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.0...OpenFeature.Providers.Ofrep-v0.1.1) (2025-07-03)
 
 
