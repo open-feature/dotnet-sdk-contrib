@@ -6,22 +6,15 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 [Binding]
 public class BeforeHooks
 {
-    private readonly FlagdTestBedContainer _container;
-
-    public BeforeHooks(FlagdTestBedContainer container)
+    [BeforeTestRun]
+    public static async Task BeforeTestRunAsync(FlagdTestBedContainer container)
     {
-        this._container = container;
+        await container.Container.StartAsync().ConfigureAwait(false);
     }
 
-    [BeforeScenario]
-    public async Task BeforeTestRunAsync()
+    [AfterTestRun]
+    public static async Task AfterTestRunAsync(FlagdTestBedContainer container)
     {
-        await this._container.Container.StartAsync().ConfigureAwait(false);
-    }
-
-    [AfterScenario]
-    public async Task AfterTestRunAsync()
-    {
-        await this._container.Container.StopAsync().ConfigureAwait(false);
+        await container.Container.StopAsync().ConfigureAwait(false);
     }
 }
