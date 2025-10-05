@@ -6,7 +6,6 @@
 
   <!-- TODO: add remaining tests -->
   <ItemGroup>
-    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/version.txt" Link="flagd-testbed-version.txt" DestinationFolder="." CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/flagd.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/flagd-json-evaluator.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
@@ -17,17 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Reqnroll.xUnit" Version="2.4.1" />
-    <PackageReference Include="Testcontainers" Version="4.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

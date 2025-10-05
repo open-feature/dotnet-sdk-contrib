@@ -10,9 +10,12 @@ using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 
-public abstract class EvaluationStepDefinitionsBase
+[Binding]
+[Scope(Feature = "Flag evaluation")]
+public class EvaluationStepDefinitionsBase
 {
-    private readonly ScenarioContext _scenarioContext;
+    private readonly FlagdTestBedContainer container;
+    private readonly TestContext _context;
     private FeatureClient client;
     private bool booleanFlagValue;
     private string stringFlagValue;
@@ -35,22 +38,44 @@ public abstract class EvaluationStepDefinitionsBase
     private int typeErrorDefaultValue;
     private FlagEvaluationDetails<int> typeErrorDetails;
 
-    public EvaluationStepDefinitionsBase(ScenarioContext scenarioContext)
+    public EvaluationStepDefinitionsBase(FlagdTestBedContainer container, TestContext testContext)
     {
-        _scenarioContext = scenarioContext;
+        this.container = container;
+        this._context = testContext;
     }
 
     [Given(@"a stable provider")]
-    public void Givenastableprovider()
+    public async Task Givenastableprovider()
     {
-        if (this._scenarioContext.TryGetValue<FeatureClient>("Client", out var client))
+        var api = Api.Instance;
+        var resolverType = this._context.ProviderResolverType;
+
+        var resolver = resolverType switch
         {
-            this.client = client;
-        }
-        else
+            "InProcess" => ResolverType.IN_PROCESS,
+            "Rpc" => ResolverType.RPC,
+            _ => throw new ArgumentException($"Unknown resolver type: {resolverType}")
+        };
+
+        var port = resolverType switch
         {
-            throw new InvalidOperationException("Client not found in scenario context. Ensure the BeforeTestRun hook initializes the client.");
-        }
+            "InProcess" => this.container.Container.GetMappedPublicPort(8015),
+            "Rpc" => this.container.Container.GetMappedPublicPort(8013),
+            _ => throw new ArgumentException($"Unknown resolver type: {resolverType}")
+        };
+
+        var host = this.container.Container.Hostname;
+        var flagdProvider = new FlagdProvider(
+            FlagdConfig.Builder()
+                .WithHost(host)
+                .WithPort(port)
+                .WithResolverType(resolver)
+                .Build()
+            );
+
+        await api.SetProviderAsync(flagdProvider);
+
+        this.client = api.GetClient("openfeatureclient");
     }
 
     [When(@"a boolean flag with key ""(.*)"" is evaluated with default value ""(.*)""")]

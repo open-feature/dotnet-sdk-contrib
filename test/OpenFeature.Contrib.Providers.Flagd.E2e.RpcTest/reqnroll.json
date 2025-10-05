@@ -1,0 +1,8 @@
+{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+  "bindingAssemblies": [
+    {
+      "assembly": "OpenFeature.Contrib.Providers.Flagd.E2e.Common"
+    }
+  ]
+}
