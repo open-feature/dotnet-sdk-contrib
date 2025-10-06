@@ -37,8 +37,8 @@ public class EvaluationStepDefinitionsBase : BaseSteps
     private int typeErrorDefaultValue;
     private FlagEvaluationDetails<int> typeErrorDetails;
 
-    public EvaluationStepDefinitionsBase(FlagdTestBedContainer container, TestContext testContext)
-        : base(container, testContext)
+    public EvaluationStepDefinitionsBase(TestContext testContext)
+        : base(testContext)
     {
     }
 

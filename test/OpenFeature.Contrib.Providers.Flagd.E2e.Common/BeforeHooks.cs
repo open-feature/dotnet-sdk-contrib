@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Reqnroll;
@@ -9,6 +10,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 [Binding]
 public class BeforeHooks
 {
+    internal static FlagdTestBedContainer Container;
+
     private readonly IConfiguration _configuration;
 
     public BeforeHooks(IConfiguration configuration)
@@ -17,16 +20,26 @@ public class BeforeHooks
     }
 
     [BeforeTestRun]
-    public static async Task BeforeTestRunAsync(FlagdTestBedContainer container)
+    public static async Task BeforeTestRunAsync()
     {
+#if NET8_0_OR_GREATER
+        var version = await File.ReadAllTextAsync("flagd-testbed-version.txt").ConfigureAwait(false);
+#else
+        var version = File.ReadAllText("flagd-testbed-version.txt");
+#endif
+        var container = new FlagdTestBedContainer(version.Trim());
         await container.Container.StartAsync().ConfigureAwait(false);
+
+        Container = container;
     }
 
     [AfterTestRun]
-    public static async Task AfterTestRunAsync(FlagdTestBedContainer container)
+    public static async Task AfterTestRunAsync()
     {
-        await container.Container.StopAsync().ConfigureAwait(false);
-        await container.Container.DisposeAsync().ConfigureAwait(false);
+        await Container.Container.StopAsync().ConfigureAwait(false);
+        await Container.Container.DisposeAsync().ConfigureAwait(false);
+
+        Container = null;
     }
 
     [BeforeScenario]

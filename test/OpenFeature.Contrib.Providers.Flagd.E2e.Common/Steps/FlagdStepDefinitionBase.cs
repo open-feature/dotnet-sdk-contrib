@@ -26,8 +26,8 @@ public class FlagdStepDefinitionsBase : BaseSteps
     private bool changeHandlerRan = false;
     private EvaluationContext evaluationContext;
 
-    public FlagdStepDefinitionsBase(FlagdTestBedContainer container, TestContext testContext)
-        : base(container, testContext)
+    public FlagdStepDefinitionsBase(TestContext testContext)
+        : base(testContext)
     {
     }
 

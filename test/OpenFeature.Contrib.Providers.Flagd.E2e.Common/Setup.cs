@@ -1,4 +1,3 @@
-using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll;
@@ -21,12 +20,8 @@ public class Setup
 
         var context = new TestContext();
 
-        var version = File.ReadAllText("flagd-testbed-version.txt");
-        var container = new FlagdTestBedContainer(version.Trim());
-
         services.AddSingleton<IConfiguration>(configuration);
         services.AddSingleton(context);
-        services.AddSingleton(container);
 
         return services;
     }
