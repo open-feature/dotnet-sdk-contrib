@@ -34,5 +34,5 @@ public class Setup
 
 public class TestContext
 {
-    public string ProviderResolverType { get; set; }
+    public ResolverType ProviderResolverType { get; set; }
 }

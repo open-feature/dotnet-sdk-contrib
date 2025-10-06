@@ -17,6 +17,6 @@ public class BeforeHooks
     [BeforeScenario]
     public void BeforeScenario()
     {
-        this._context.ProviderResolverType = "Rpc";
+        this._context.ProviderResolverType = ResolverType.RPC;
     }
 }

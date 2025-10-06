@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.E2e.Common.Steps;
 using OpenFeature.Model;
 using Reqnroll;
 using Xunit;
@@ -12,10 +13,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 
 [Binding]
 [Scope(Feature = "Flag evaluation")]
-public class EvaluationStepDefinitionsBase
+public class EvaluationStepDefinitionsBase : BaseSteps
 {
-    private readonly FlagdTestBedContainer container;
-    private readonly TestContext _context;
     private FeatureClient client;
     private bool booleanFlagValue;
     private string stringFlagValue;
@@ -39,43 +38,14 @@ public class EvaluationStepDefinitionsBase
     private FlagEvaluationDetails<int> typeErrorDetails;
 
     public EvaluationStepDefinitionsBase(FlagdTestBedContainer container, TestContext testContext)
+        : base(container, testContext)
     {
-        this.container = container;
-        this._context = testContext;
     }
 
     [Given(@"a stable provider")]
     public async Task Givenastableprovider()
     {
-        var api = Api.Instance;
-        var resolverType = this._context.ProviderResolverType;
-
-        var resolver = resolverType switch
-        {
-            "InProcess" => ResolverType.IN_PROCESS,
-            "Rpc" => ResolverType.RPC,
-            _ => throw new ArgumentException($"Unknown resolver type: {resolverType}")
-        };
-
-        var port = resolverType switch
-        {
-            "InProcess" => this.container.Container.GetMappedPublicPort(8015),
-            "Rpc" => this.container.Container.GetMappedPublicPort(8013),
-            _ => throw new ArgumentException($"Unknown resolver type: {resolverType}")
-        };
-
-        var host = this.container.Container.Hostname;
-        var flagdProvider = new FlagdProvider(
-            FlagdConfig.Builder()
-                .WithHost(host)
-                .WithPort(port)
-                .WithResolverType(resolver)
-                .Build()
-            );
-
-        await api.SetProviderAsync(flagdProvider);
-
-        this.client = api.GetClient("openfeatureclient");
+        this.client = await this.CreateFeatureClientAsync().ConfigureAwait(false);
     }
 
     [When(@"a boolean flag with key ""(.*)"" is evaluated with default value ""(.*)""")]

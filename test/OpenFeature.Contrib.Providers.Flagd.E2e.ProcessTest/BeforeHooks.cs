@@ -17,6 +17,6 @@ public class BeforeHooks
     [BeforeScenario]
     public void BeforeScenario()
     {
-        this._context.ProviderResolverType = "InProcess";
+        this._context.ProviderResolverType = ResolverType.IN_PROCESS;
     }
 }

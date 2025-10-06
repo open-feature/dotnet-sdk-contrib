@@ -26,6 +26,7 @@ public class BeforeHooks
     public static async Task AfterTestRunAsync(FlagdTestBedContainer container)
     {
         await container.Container.StopAsync().ConfigureAwait(false);
+        await container.Container.DisposeAsync().ConfigureAwait(false);
     }
 
     [BeforeScenario]
