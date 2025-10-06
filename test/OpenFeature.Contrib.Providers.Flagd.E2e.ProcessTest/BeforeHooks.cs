@@ -2,14 +2,14 @@ using System;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 using Reqnroll;
 
-namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest.Steps;
+namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest;
 
 [Binding]
-public class EvaluationStepDefinitionsProcess
+public class BeforeHooks
 {
     private readonly TestContext _context;
 
-    public EvaluationStepDefinitionsProcess(TestContext context)
+    public BeforeHooks(TestContext context)
     {
         this._context = context ?? throw new ArgumentNullException(nameof(context));
     }

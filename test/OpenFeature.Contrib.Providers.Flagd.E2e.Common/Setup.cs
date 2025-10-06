@@ -35,6 +35,4 @@ public class Setup
 public class TestContext
 {
     public string ProviderResolverType { get; set; }
-
-    public FlagdTestBedContainer TestContainer { get; set; }
 }

@@ -2,14 +2,14 @@ using System;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 using Reqnroll;
 
-namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest.Steps;
+namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest;
 
 [Binding]
-public class FlagdStepDefinitionsRpc
+public class BeforeHooks
 {
     private readonly TestContext _context;
 
-    public FlagdStepDefinitionsRpc(TestContext context)
+    public BeforeHooks(TestContext context)
     {
         this._context = context ?? throw new ArgumentNullException(nameof(context));
     }
