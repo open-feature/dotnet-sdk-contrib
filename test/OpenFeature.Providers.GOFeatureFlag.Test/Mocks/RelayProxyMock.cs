@@ -14,6 +14,9 @@ public class RelayProxyMock
     public HttpRequestMessage LastRequest { get; set; }
     public int RequestCount { get; private set; }
 
+    private int _configChangeRequestCount = 0;
+    private int _configLastModifiedRequestCount = 0;
+
     public MockHttpMessageHandler GetRelayProxyMock(string mode)
     {
         var mockHttp = new MockHttpMessageHandler();
@@ -146,14 +149,13 @@ public class RelayProxyMock
                     "{\"error\": \"Internal Server Error\"}");
                 break;
             case "CHANGE_CONFIG":
-                var callCount = 0;
                 mockHttp.When(path).With(this.RecordRequest).Respond(request =>
                 {
-                    callCount++;
+                    this._configChangeRequestCount++;
                     var response = new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new StringContent(
-                            callCount == 1
+                            this._configChangeRequestCount == 1
                                 ? "{\n  \"flags\": {\n    \"TEST\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"off\"\n      }\n    },\n    \"TEST2\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"on\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n"
                                 : "{\n  \"flags\": {\n    \"TEST123\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"off\"\n      }\n    },\n    \"TEST2\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"on\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n",
                             Encoding.UTF8,
@@ -161,23 +163,22 @@ public class RelayProxyMock
                         )
                     };
                     response.Content.Headers.LastModified =
-                        callCount == 1
+                        this._configChangeRequestCount == 1
                             ? new DateTimeOffset(2015, 10, 21, 7, 20, 0, TimeSpan.Zero).ToUniversalTime()
                             : new DateTimeOffset(2015, 10, 21, 7, 28, 0, TimeSpan.Zero).ToUniversalTime();
                     response.Headers.ETag =
-                        new EntityTagHeaderValue(callCount == 1 ? "\"123456789\"" : "\"1234567891011\"");
+                        new EntityTagHeaderValue(this._configChangeRequestCount == 1 ? "\"123456789\"" : "\"1234567891011\"");
                     return response;
                 });
                 break;
             case "CHANGE_CONFIG_LAST_MODIFIED_OLDER":
-                var callCountLastModified = 0;
                 mockHttp.When(path).With(this.RecordRequest).Respond(request =>
                 {
-                    callCountLastModified++;
+                    this._configLastModifiedRequestCount++;
                     var response = new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new StringContent(
-                            callCountLastModified == 1
+                            this._configLastModifiedRequestCount == 1
                                 ? "{\n  \"flags\": {\n    \"TEST\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"off\"\n      }\n    },\n    \"TEST2\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"on\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n"
                                 : "{\n  \"flags\": {\n    \"TEST123\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"off\"\n      }\n    },\n    \"TEST2\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"on\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n",
                             Encoding.UTF8,
@@ -185,11 +186,11 @@ public class RelayProxyMock
                         )
                     };
                     response.Content.Headers.LastModified =
-                        callCountLastModified == 1
+                        this._configLastModifiedRequestCount == 1
                             ? new DateTimeOffset(2015, 10, 21, 7, 20, 0, TimeSpan.Zero).ToUniversalTime()
                             : new DateTimeOffset(2015, 10, 21, 7, 18, 0, TimeSpan.Zero).ToUniversalTime();
                     response.Headers.ETag =
-                        new EntityTagHeaderValue(callCountLastModified == 1 ? "\"123456789\"" : "\"1234567891011\"");
+                        new EntityTagHeaderValue(this._configLastModifiedRequestCount == 1 ? "\"123456789\"" : "\"1234567891011\"");
                     return response;
                 });
                 break;
