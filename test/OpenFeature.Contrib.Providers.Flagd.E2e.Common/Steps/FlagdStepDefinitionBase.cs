@@ -1,15 +1,18 @@
 using System;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.E2e.Common.Steps;
 using OpenFeature.Model;
 using Reqnroll;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 
-public abstract class FlagdStepDefinitionsBase
+[Binding]
+[Scope(Feature = "flagd providers")]
+[Scope(Feature = "flagd json evaluation")]
+public class FlagdStepDefinitionsBase : BaseSteps
 {
-    private readonly ScenarioContext _scenarioContext;
     private FeatureClient client;
     private bool booleanZeroValue;
     private string stringZeroValue;
@@ -23,22 +26,15 @@ public abstract class FlagdStepDefinitionsBase
     private bool changeHandlerRan = false;
     private EvaluationContext evaluationContext;
 
-    public FlagdStepDefinitionsBase(ScenarioContext scenarioContext)
+    public FlagdStepDefinitionsBase(TestContext testContext)
+        : base(testContext)
     {
-        _scenarioContext = scenarioContext;
     }
 
     [Given(@"a flagd provider is set")]
-    public void GivenAFlagdProviderIsSet()
+    public async Task GivenAFlagdProviderIsSet()
     {
-        if (this._scenarioContext.TryGetValue<FeatureClient>("Client", out var client))
-        {
-            this.client = client;
-        }
-        else
-        {
-            throw new InvalidOperationException("Client not found in scenario context. Ensure the BeforeTestRun hook initializes the client.");
-        }
+        this.client = await this.CreateFeatureClientAsync().ConfigureAwait(false);
     }
 
     [When(@"a PROVIDER_READY handler is added")]

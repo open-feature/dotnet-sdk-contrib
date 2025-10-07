@@ -4,15 +4,17 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
+using OpenFeature.Contrib.Providers.Flagd.E2e.Common.Steps;
 using OpenFeature.Model;
 using Reqnroll;
 using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common;
 
-public abstract class EvaluationStepDefinitionsBase
+[Binding]
+[Scope(Feature = "Flag evaluation")]
+public class EvaluationStepDefinitionsBase : BaseSteps
 {
-    private readonly ScenarioContext _scenarioContext;
     private FeatureClient client;
     private bool booleanFlagValue;
     private string stringFlagValue;
@@ -35,22 +37,15 @@ public abstract class EvaluationStepDefinitionsBase
     private int typeErrorDefaultValue;
     private FlagEvaluationDetails<int> typeErrorDetails;
 
-    public EvaluationStepDefinitionsBase(ScenarioContext scenarioContext)
+    public EvaluationStepDefinitionsBase(TestContext testContext)
+        : base(testContext)
     {
-        _scenarioContext = scenarioContext;
     }
 
     [Given(@"a stable provider")]
-    public void Givenastableprovider()
+    public async Task Givenastableprovider()
     {
-        if (this._scenarioContext.TryGetValue<FeatureClient>("Client", out var client))
-        {
-            this.client = client;
-        }
-        else
-        {
-            throw new InvalidOperationException("Client not found in scenario context. Ensure the BeforeTestRun hook initializes the client.");
-        }
+        this.client = await this.CreateFeatureClientAsync().ConfigureAwait(false);
     }
 
     [When(@"a boolean flag with key ""(.*)"" is evaluated with default value ""(.*)""")]
