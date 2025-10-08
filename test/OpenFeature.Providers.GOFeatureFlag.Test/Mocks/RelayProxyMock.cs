@@ -146,11 +146,6 @@ public class RelayProxyMock
                     "{\"error\": \"Internal Server Error\"}");
                 break;
             case "CHANGE_CONFIG":
-                mockHttp
-                    .When(path)
-                    .With(this.RecordRequest)
-                    .Respond(request => GetFirstChangeConfigMessage());
-                break;
             case "CHANGE_CONFIG_LAST_MODIFIED_OLDER":
                 mockHttp
                     .When(path)
