@@ -146,52 +146,11 @@ public class RelayProxyMock
                     "{\"error\": \"Internal Server Error\"}");
                 break;
             case "CHANGE_CONFIG":
-                var callCount = 0;
-                mockHttp.When(path).With(this.RecordRequest).Respond(request =>
-                {
-                    callCount++;
-                    var response = new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new StringContent(
-                            callCount == 1
-                                ? "{\n  \"flags\": {\n    \"TEST\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"off\"\n      }\n    },\n    \"TEST2\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"on\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n"
-                                : "{\n  \"flags\": {\n    \"TEST123\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"off\"\n      }\n    },\n    \"TEST2\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"on\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n",
-                            Encoding.UTF8,
-                            mediaType
-                        )
-                    };
-                    response.Content.Headers.LastModified =
-                        callCount == 1
-                            ? new DateTimeOffset(2015, 10, 21, 7, 20, 0, TimeSpan.Zero).ToUniversalTime()
-                            : new DateTimeOffset(2015, 10, 21, 7, 28, 0, TimeSpan.Zero).ToUniversalTime();
-                    response.Headers.ETag =
-                        new EntityTagHeaderValue(callCount == 1 ? "\"123456789\"" : "\"1234567891011\"");
-                    return response;
-                });
-                break;
             case "CHANGE_CONFIG_LAST_MODIFIED_OLDER":
-                var callCountLastModified = 0;
-                mockHttp.When(path).With(this.RecordRequest).Respond(request =>
-                {
-                    callCountLastModified++;
-                    var response = new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new StringContent(
-                            callCountLastModified == 1
-                                ? "{\n  \"flags\": {\n    \"TEST\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"off\"\n      }\n    },\n    \"TEST2\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"on\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n"
-                                : "{\n  \"flags\": {\n    \"TEST123\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"off\"\n      }\n    },\n    \"TEST2\": {\n      \"variations\": {\n        \"off\": false,\n        \"on\": true\n      },\n      \"defaultRule\": {\n        \"variation\": \"on\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n",
-                            Encoding.UTF8,
-                            mediaType
-                        )
-                    };
-                    response.Content.Headers.LastModified =
-                        callCountLastModified == 1
-                            ? new DateTimeOffset(2015, 10, 21, 7, 20, 0, TimeSpan.Zero).ToUniversalTime()
-                            : new DateTimeOffset(2015, 10, 21, 7, 18, 0, TimeSpan.Zero).ToUniversalTime();
-                    response.Headers.ETag =
-                        new EntityTagHeaderValue(callCountLastModified == 1 ? "\"123456789\"" : "\"1234567891011\"");
-                    return response;
-                });
+                mockHttp
+                    .When(path)
+                    .With(this.RecordRequest)
+                    .Respond(request => GetFirstChangeConfigMessage());
                 break;
             case "SIMPLE_FLAG_CONFIG":
                 mockHttp.When(path).With(this.RecordRequest).Respond(request =>
@@ -248,5 +207,147 @@ public class RelayProxyMock
                     "{\n  \"flags\": {\n    \"bool_targeting_match\": {\n      \"variations\": {\n        \"disabled\": false,\n        \"enabled\": true\n      },\n      \"targeting\": [\n        {\n          \"query\": \"email eq \\\"john.doe@gofeatureflag.org\\\"\",\n          \"variation\": \"enabled\"\n        }\n      ],\n      \"defaultRule\": {\n        \"percentage\": {\n          \"enabled\": 0,\n          \"disabled\": 100\n        }\n      },\n      \"metadata\": {\n        \"description\": \"this is a test flag\",\n        \"defaultValue\": false\n      }\n    },\n    \"disabled_bool\": {\n      \"disable\": true,\n      \"variations\": {\n        \"disabled\": false,\n        \"enabled\": true\n      },\n      \"defaultRule\": {\n        \"percentage\": {\n          \"enabled\": 0,\n          \"disabled\": 100\n        }\n      },\n      \"metadata\": {\n        \"description\": \"this is a test flag\",\n        \"defaultValue\": false\n      }\n    },\n    \"disabled_float\": {\n      \"disable\": true,\n      \"variations\": {\n        \"high\": 103.25,\n        \"medium\": 101.25,\n        \"low\": 100.25\n      },\n      \"defaultRule\": {\n        \"percentage\": {\n          \"low\": 0,\n          \"medium\": 0,\n          \"high\": 100\n        }\n      },\n      \"metadata\": {\n        \"description\": \"this is a test\",\n        \"defaultValue\": 100.25\n      }\n    },\n    \"disabled_int\": {\n      \"disable\": true,\n      \"variations\": {\n        \"high\": 103,\n        \"medium\": 101,\n        \"low\": 100\n      },\n      \"defaultRule\": {\n        \"percentage\": {\n          \"low\": 0,\n          \"medium\": 0,\n          \"high\": 100\n        }\n      },\n      \"metadata\": {\n        \"description\": \"this is a test\",\n        \"defaultValue\": 100\n      }\n    },\n    \"disabled_interface\": {\n      \"disable\": true,\n      \"variations\": {\n        \"varA\": {\n          \"test\": \"john\"\n        },\n        \"varB\": {\n          \"test\": \"doe\"\n        }\n      },\n      \"defaultRule\": {\n        \"percentage\": {\n          \"varA\": 0,\n          \"varB\": 100\n        }\n      },\n      \"metadata\": {\n        \"description\": \"this is a test\"\n      }\n    },\n    \"disabled_string\": {\n      \"disable\": true,\n      \"variations\": {\n        \"color1\": \"CC0002\",\n        \"color2\": \"CC0001\",\n        \"color3\": \"CC0000\"\n      },\n      \"defaultRule\": {\n        \"percentage\": {\n          \"color3\": 0,\n          \"color2\": 0,\n          \"color1\": 100\n        }\n      },\n      \"metadata\": {\n        \"description\": \"this is a test\",\n        \"defaultValue\": \"CC0000\"\n      }\n    },\n    \"double_key\": {\n      \"variations\": {\n        \"high\": 103.25,\n        \"medium\": 101.25,\n        \"low\": 100.25\n      },\n      \"targeting\": [\n        {\n          \"query\": \"email eq \\\"john.doe@gofeatureflag.org\\\"\",\n          \"variation\": \"medium\"\n        }\n      ],\n      \"defaultRule\": {\n        \"percentage\": {\n          \"high\": 0,\n          \"medium\": 0,\n          \"low\": 100\n        }\n      },\n      \"metadata\": {\n        \"description\": \"this is a test flag\",\n        \"defaultValue\": 100.25\n      }\n    },\n    \"integer_key\": {\n      \"variations\": {\n        \"high\": 103,\n        \"medium\": 101,\n        \"low\": 100\n      },\n      \"defaultRule\": {\n        \"percentage\": {\n          \"low\": 0,\n          \"medium\": 0,\n          \"high\": 100\n        }\n      },\n      \"targeting\": [\n        {\n          \"query\": \"email eq \\\"john.doe@gofeatureflag.org\\\"\",\n          \"variation\": \"medium\"\n        }\n      ],\n      \"metadata\": {\n        \"defaultValue\": 1000,\n        \"description\": \"this is a test flag\"\n      }\n    },\n    \"object_key\": {\n      \"variations\": {\n        \"varA\": {\n          \"test\": \"default\"\n        },\n        \"varB\": {\n          \"test\": \"false\"\n        }\n      },\n      \"targeting\": [\n        {\n          \"query\": \"email eq \\\"john.doe@gofeatureflag.org\\\"\",\n          \"variation\": \"varB\"\n        }\n      ],\n      \"defaultRule\": {\n        \"variation\": \"varA\"\n      }\n    },\n    \"string_key\": {\n      \"trackEvents\": false,\n      \"variations\": {\n        \"color1\": \"CC0002\",\n        \"color2\": \"CC0001\",\n        \"color3\": \"CC0000\"\n      },\n      \"defaultRule\": {\n        \"percentage\": {\n          \"color3\": 0,\n          \"color2\": 0,\n          \"color1\": 100\n        }\n      },\n      \"metadata\": {\n        \"description\": \"this is a test flag\",\n        \"defaultValue\": \"CC0000\"\n      }\n    },\n    \"string_key_with_version\": {\n      \"variations\": {\n        \"color1\": \"CC0002\",\n        \"color2\": \"CC0001\",\n        \"color3\": \"CC0000\"\n      },\n      \"defaultRule\": {\n        \"percentage\": {\n          \"color3\": 0,\n          \"color2\": 0,\n          \"color1\": 100\n        }\n      },\n      \"targeting\": [\n        {\n          \"query\": \"email eq \\\"john.doe@gofeatureflag.org\\\"\",\n          \"variation\": \"color1\"\n        }\n      ],\n      \"metadata\": {\n        \"description\": \"this is a test\",\n        \"defaultValue\": \"CC0000\"\n      }\n    },\n    \"flag-use-evaluation-context-enrichment\": {\n      \"variations\": {\n        \"A\": \"A\",\n        \"B\": \"B\"\n      },\n      \"targeting\": [\n        {\n          \"query\": \"environment eq \\\"integration-test\\\"\",\n          \"variation\": \"A\"\n        }\n      ],\n      \"defaultRule\": {\n        \"variation\": \"B\"\n      }\n    }\n  },\n  \"evaluationContextEnrichment\": {\n    \"env\": \"production\"\n  }\n}\n");
                 break;
         }
+    }
+
+    public void UpdateConfigurationMock(MockHttpMessageHandler mockHttp, string mode)
+    {
+        var path = $"{baseUrl}/v1/flag/configuration";
+        mockHttp.Clear();
+
+        switch (mode)
+        {
+            case "CHANGE_CONFIG":
+                mockHttp
+                    .When(path)
+                    .With(this.RecordRequest)
+                    .Respond(request => GetSecondChangeConfigMessage());
+                break;
+            case "CHANGE_CONFIG_LAST_MODIFIED_OLDER":
+                mockHttp
+                    .When(path)
+                    .With(this.RecordRequest)
+                    .Respond(request => GetOlderChangeConfigMessage());
+                break;
+        }
+    }
+
+    private static HttpResponseMessage GetFirstChangeConfigMessage()
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                """
+                {
+                  "flags": {
+                    "TEST": {
+                      "variations": {
+                        "off": false,
+                        "on": true
+                      },
+                      "defaultRule": {
+                        "variation": "off"
+                      }
+                    },
+                    "TEST2": {
+                      "variations": {
+                        "off": false,
+                        "on": true
+                      },
+                      "defaultRule": {
+                        "variation": "on"
+                      }
+                    }
+                  },
+                  "evaluationContextEnrichment": {
+                    "env": "production"
+                  }
+                }
+                """,
+                Encoding.UTF8,
+                mediaType)
+        };
+        response.Content.Headers.LastModified = new DateTimeOffset(2015, 10, 21, 7, 20, 0, TimeSpan.Zero).ToUniversalTime();
+        response.Headers.ETag = new EntityTagHeaderValue("\"123456789\"");
+        return response;
+    }
+
+    private static HttpResponseMessage GetSecondChangeConfigMessage()
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                """
+                {
+                  "flags": {
+                    "TEST123": {
+                      "variations": {
+                        "off": false,
+                        "on": true
+                      },
+                      "defaultRule": {
+                        "variation": "off"
+                      }
+                    },
+                    "TEST2": {
+                      "variations": {
+                        "off": false,
+                        "on": true
+                      },
+                      "defaultRule": {
+                        "variation": "on"
+                      }
+                    }
+                  },
+                  "evaluationContextEnrichment": {
+                    "env": "production"
+                  }
+                }
+                """,
+                Encoding.UTF8,
+                mediaType)
+        };
+        response.Content.Headers.LastModified = new DateTimeOffset(2015, 10, 21, 7, 28, 0, TimeSpan.Zero).ToUniversalTime();
+        response.Headers.ETag = new EntityTagHeaderValue("\"1234567891011\"");
+        return response;
+    }
+
+    private static HttpResponseMessage GetOlderChangeConfigMessage()
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                """
+                {
+                  "flags": {
+                    "TEST123": {
+                      "variations": {
+                        "off": false,
+                        "on": true
+                      },
+                      "defaultRule": {
+                        "variation": "off"
+                      }
+                    },
+                    "TEST2": {
+                      "variations": {
+                        "off": false,
+                        "on": true
+                      },
+                      "defaultRule": {
+                        "variation": "on"
+                      }
+                    }
+                  },
+                  "evaluationContextEnrichment": {
+                    "env": "production"
+                  }
+                }
+                """,
+                Encoding.UTF8,
+                mediaType)
+        };
+        response.Content.Headers.LastModified = new DateTimeOffset(2015, 10, 21, 7, 18, 0, TimeSpan.Zero).ToUniversalTime();
+        response.Headers.ETag = new EntityTagHeaderValue("\"1234567891011\"");
+        return response;
     }
 }

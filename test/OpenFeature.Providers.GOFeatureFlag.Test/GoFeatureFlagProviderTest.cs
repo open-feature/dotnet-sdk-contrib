@@ -339,10 +339,11 @@ public class GOFeatureFlagProviderTest
         public async Task ShouldEmitConfigurationChangeEventIfConfigHasChanged()
         {
             var mockHttp = new RelayProxyMock();
+            var changeConfigMock = mockHttp.GetRelayProxyMock("CHANGE_CONFIG");
             var provider = new GOFeatureFlagProvider(
                 new GOFeatureFlagProviderOptions
                 {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG"),
+                    HttpMessageHandler = changeConfigMock,
                     Endpoint = RelayProxyMock.baseUrl,
                     EvaluationType = EvaluationType.InProcess,
                     FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
@@ -357,6 +358,8 @@ public class GOFeatureFlagProviderTest
                 handlerCalled = true;
             });
 
+            // Change the config returned by the mock, wait for handler to detect this
+            mockHttp.UpdateConfigurationMock(changeConfigMock, "CHANGE_CONFIG");
 
             var maxRetry = 10;
             while (!handlerCalled && maxRetry > 0)
@@ -372,10 +375,11 @@ public class GOFeatureFlagProviderTest
         public async Task ShouldChangeEvaluationDetailsIfConfigHasChanged()
         {
             var mockHttp = new RelayProxyMock();
+            var changeConfigMock = mockHttp.GetRelayProxyMock("CHANGE_CONFIG");
             var provider = new GOFeatureFlagProvider(
                 new GOFeatureFlagProviderOptions
                 {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG"),
+                    HttpMessageHandler = changeConfigMock,
                     Endpoint = RelayProxyMock.baseUrl,
                     EvaluationType = EvaluationType.InProcess,
                     FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
@@ -389,6 +393,9 @@ public class GOFeatureFlagProviderTest
                 handlerCalled = true;
             });
             var v1 = await client.GetBooleanDetailsAsync("TEST", false, DefaultEvaluationContext);
+
+            // Change the config returned by the mock, wait for handler to detect this
+            mockHttp.UpdateConfigurationMock(changeConfigMock, "CHANGE_CONFIG");
             while (!handlerCalled)
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(100));
@@ -474,10 +481,11 @@ public class GOFeatureFlagProviderTest
         public async Task ShouldIgnoreConfigurationIfEtagIsDifferentByLastModifiedIsOlder()
         {
             var mockHttp = new RelayProxyMock();
+            var changeConfigMock = mockHttp.GetRelayProxyMock("CHANGE_CONFIG_LAST_MODIFIED_OLDER");
             var provider = new GOFeatureFlagProvider(
                 new GOFeatureFlagProviderOptions
                 {
-                    HttpMessageHandler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG_LAST_MODIFIED_OLDER"),
+                    HttpMessageHandler = changeConfigMock,
                     Endpoint = RelayProxyMock.baseUrl,
                     EvaluationType = EvaluationType.InProcess,
                     FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
@@ -491,6 +499,10 @@ public class GOFeatureFlagProviderTest
             {
                 handlerCalled = true;
             });
+
+            // Change the config returned by the mock, wait for handler to not detect this
+            mockHttp.UpdateConfigurationMock(changeConfigMock, "CHANGE_CONFIG_LAST_MODIFIED_OLDER");
+
             var maxRetry = 10;
             while (!handlerCalled && maxRetry > 0)
             {
