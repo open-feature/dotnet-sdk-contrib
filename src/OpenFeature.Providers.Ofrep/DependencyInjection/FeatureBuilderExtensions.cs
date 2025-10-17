@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using OpenFeature.DependencyInjection;
+using OpenFeature.Hosting;
 using OpenFeature.Providers.Ofrep.Configuration;
 #if NETFRAMEWORK
 using System.Net.Http;
