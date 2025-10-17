@@ -38,9 +38,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="OpenFeature" Version="$(OpenFeatureVersion)" />
-    <PackageReference Include="OpenFeature.DependencyInjection" Version="$(OpenFeatureVersion)" />
+    <PackageReference Include="OpenFeature.Hosting" Version="$(OpenFeatureVersion)" />
   </ItemGroup>
   <PropertyGroup>
-    <OpenFeatureVersion>[2.2,2.99999]</OpenFeatureVersion> 
+    <OpenFeatureVersion>[2.9,2.99999]</OpenFeatureVersion>
   </PropertyGroup>
 </Project>

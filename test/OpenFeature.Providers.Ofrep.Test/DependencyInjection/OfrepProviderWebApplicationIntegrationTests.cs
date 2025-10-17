@@ -38,7 +38,6 @@ public class OfrepProviderWebApplicationIntegrationTests
         builder.Services.AddOpenFeature(openFeatureBuilder =>
         {
             openFeatureBuilder
-                .AddHostedFeatureLifecycle()
                 .AddOfrepProvider(c =>
                 {
                     c.BaseUrl = baseUrl;

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using OpenFeature.Contrib.Providers.Flagd;
 using OpenFeature.Contrib.Providers.Flagd.DependencyInjection;
+using OpenFeature.Hosting;
 
 namespace OpenFeature.DependencyInjection.Providers.Flagd;
 

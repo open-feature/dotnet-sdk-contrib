@@ -22,10 +22,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-    <PackageReference Include="OpenFeature.DependencyInjection" Version="$(OpenFeatureVersion)" />
+    <PackageReference Include="OpenFeature.Hosting" Version="$(OpenFeatureVersion)" />
   </ItemGroup>
   <PropertyGroup>
-    <OpenFeatureVersion>[2.2,2.99999]</OpenFeatureVersion>
+    <OpenFeatureVersion>[2.9,2.99999]</OpenFeatureVersion>
   </PropertyGroup>
 
   <ItemGroup
