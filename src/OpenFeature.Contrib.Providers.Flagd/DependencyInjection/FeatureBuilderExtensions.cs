@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using OpenFeature.Hosting;
 using OpenFeature.Contrib.Providers.Flagd;
 using OpenFeature.Contrib.Providers.Flagd.DependencyInjection;
+using OpenFeature.Hosting;
 
 namespace OpenFeature.DependencyInjection.Providers.Flagd;
 
