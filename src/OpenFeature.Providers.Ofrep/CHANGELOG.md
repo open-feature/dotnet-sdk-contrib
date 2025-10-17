@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.2...OpenFeature.Providers.Ofrep-v0.1.3) (2025-10-17)
+
+
+### 🐛 Bug Fixes
+
+* Update OpenFeature dependencies and remove unused lifecycle method ([#475](https://github.com/open-feature/dotnet-sdk-contrib/issues/475)) ([1b3af8d](https://github.com/open-feature/dotnet-sdk-contrib/commit/1b3af8da0a78aa3cee181bc44bd8d2a80515cacd))
+
 ## [0.1.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.1...OpenFeature.Providers.Ofrep-v0.1.2) (2025-10-01)
 
 
