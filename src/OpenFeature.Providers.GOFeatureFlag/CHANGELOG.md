@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.0 (2025-10-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **go-feature-flag:** Introduce in-process evaluation + tracking ([#433](https://github.com/open-feature/dotnet-sdk-contrib/issues/433))
+
+### ✨ New Features
+
+* **go-feature-flag:** Introduce in-process evaluation + tracking ([#433](https://github.com/open-feature/dotnet-sdk-contrib/issues/433)) ([92828aa](https://github.com/open-feature/dotnet-sdk-contrib/commit/92828aacf6edef6662665e54e45536fc1e90898b))
+
 ## [0.2.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.GOFeatureFlag-v0.2.0...OpenFeature.Contrib.Providers.GOFeatureFlag-v0.2.1) (2025-02-10)
 
 
