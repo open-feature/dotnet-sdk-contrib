@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.3...OpenFeature.Contrib.Providers.Flagd-v0.3.4) (2025-10-17)
+
+
+### 🐛 Bug Fixes
+
+* Update OpenFeature dependencies and remove unused lifecycle method ([#475](https://github.com/open-feature/dotnet-sdk-contrib/issues/475)) ([1b3af8d](https://github.com/open-feature/dotnet-sdk-contrib/commit/1b3af8da0a78aa3cee181bc44bd8d2a80515cacd))
+
 ## [0.3.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.2...OpenFeature.Contrib.Providers.Flagd-v0.3.3) (2025-07-04)
 
 
