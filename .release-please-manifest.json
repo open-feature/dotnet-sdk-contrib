@@ -1,5 +1,5 @@
 {
-  "src/OpenFeature.Contrib.Providers.Flagd": "0.3.3",
+  "src/OpenFeature.Contrib.Providers.Flagd": "0.3.4",
   "src/OpenFeature.Contrib.Providers.GOFeatureFlag": "0.2.1",
   "src/OpenFeature.Contrib.Providers.Flagsmith": "0.2.1",
   "src/OpenFeature.Contrib.Providers.ConfigCat": "0.1.1",
@@ -7,6 +7,6 @@
   "src/OpenFeature.Contrib.Providers.Statsig": "0.1.1",
   "src/OpenFeature.Contrib.Providers.Flipt": "0.0.5",
   "src/OpenFeature.Contrib.Providers.EnvVar": "0.0.7",
-  "src/OpenFeature.Providers.Ofrep": "0.1.2",
+  "src/OpenFeature.Providers.Ofrep": "0.1.3",
   "src/OpenFeature.Providers.GOFeatureFlag": "1.0.0"
 }
