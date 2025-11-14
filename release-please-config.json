@@ -19,7 +19,6 @@
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
-      "release-as": "v1.0.0",
       "extra-files": [
         "OpenFeature.Providers.GOFeatureFlag.csproj"
       ]
