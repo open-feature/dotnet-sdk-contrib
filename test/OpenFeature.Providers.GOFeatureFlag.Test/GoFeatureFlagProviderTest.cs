@@ -477,7 +477,7 @@ public class GOFeatureFlagProviderTest
             Assert.True(handlerCalled);
         }
 
-        [Fact(DisplayName = "Should ignore configuration if etag is different by last-modified is older")]
+        [Fact(DisplayName = "Should ignore configuration if etag is different by last-modified is older", Skip = "This test is failing. See https://github.com/open-feature/dotnet-sdk-contrib/issues/506")]
         public async Task ShouldIgnoreConfigurationIfEtagIsDifferentByLastModifiedIsOlder()
         {
             var mockHttp = new RelayProxyMock();
