@@ -22,7 +22,7 @@ public class ContextSteps
         switch (type)
         {
             case "String":
-                context.Set(key, value);
+                context.Set(key, new Value(value));
                 break;
             default:
                 break;

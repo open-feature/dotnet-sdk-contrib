@@ -1,3 +1,4 @@
+using System.IO;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 
@@ -11,8 +12,12 @@ public class FlagdTestBedContainer
     {
         Container = new ContainerBuilder()
             .WithImage($"ghcr.io/open-feature/flagd-testbed:v{version}")
+            .WithPortBinding(8080, true)
+            .WithPortBinding(8016, true)
             .WithPortBinding(8015, true)
+            .WithPortBinding(8014, true)
             .WithPortBinding(8013, true)
+            .WithResourceMapping(new DirectoryInfo("./flags"), "/flags")
             .Build();
     }
 }
