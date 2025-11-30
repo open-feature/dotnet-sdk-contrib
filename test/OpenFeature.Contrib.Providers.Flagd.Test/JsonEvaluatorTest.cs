@@ -332,4 +332,77 @@ public class UnitTestJsonEvaluator
     {
         Assert.Throws<ParseErrorException>(() => _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.invalidFlagMetadata));
     }
+
+    [Fact]
+    public void TestJsonEvaluatorFlagWithNoDefaultVariantReturnsNotFound()
+    {
+        // Arrange
+        var flag = //lang=json
+            """
+            {
+              "flags": {
+                "flag-with-no-default-variant": {
+                  "variants": {
+                    "on": true,
+                    "off": false
+                  },
+                  "notDefaultVariant": "on",
+                  "metadata":{
+                    "string": "1.0.2",
+                      "integer": 2,
+                      "boolean": true,
+                      "float": 0.1
+                  }
+                }
+              }
+            }
+            """;
+
+        this._jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, flag);
+
+        // Act
+        var result = this._jsonEvaluator.ResolveBooleanValueAsync("flag-with-no-default-variant", false);
+
+        // Assert
+        Assert.False(result.Value);
+        Assert.Equal("flag-with-no-default-variant", result.FlagKey);
+        Assert.Equal("ERROR", result.Reason);
+        Assert.Equal(ErrorType.FlagNotFound, result.ErrorType);
+        Assert.Equal("Flag 'flag-with-no-default-variant' has no default variant defined, will use code default", result.ErrorMessage);
+        Assert.Null(result.Variant);
+        Assert.NotNull(result.FlagMetadata);
+        Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
+        Assert.Equal(2, result.FlagMetadata.GetDouble("integer"));
+        Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
+        Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
+    }
+
+    [Fact]
+    public void TestJsonEvaluatorFlagWithEmptyDefaultVariantReturnsNotFound()
+    {
+        // Arrange
+        var flag = //lang=json
+            """
+            {
+              "flags": {
+                "flag-with-empty-default-variant": {
+                  "variants": {
+                    "on": true,
+                    "off": false
+                  },
+                  "defaultVariant": ""
+                }
+              }
+            }
+            """;
+
+        this._jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, flag);
+
+        // Act
+        var result = this._jsonEvaluator.ResolveBooleanValueAsync("flag-with-empty-default-variant", false);
+
+        // Assert
+        Assert.False(result.Value);
+        Assert.Equal(ErrorType.FlagNotFound, result.ErrorType);
+    }
 }
