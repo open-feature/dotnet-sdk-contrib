@@ -1,5 +1,4 @@
-using System;
-using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
+using OpenFeature.Contrib.Providers.Flagd.E2e.Common.Utils;
 using Reqnroll;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest;
@@ -7,16 +6,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest;
 [Binding]
 public class BeforeHooks
 {
-    private readonly TestContext _context;
+    private State State { get; set; }
 
-    public BeforeHooks(TestContext context)
+    public BeforeHooks(State state)
     {
-        this._context = context ?? throw new ArgumentNullException(nameof(context));
+        this.State = state;
     }
 
-    [BeforeScenario]
+    [BeforeScenario(Order = 1)]
     public void BeforeScenario()
     {
-        this._context.ProviderResolverType = ResolverType.IN_PROCESS;
+        this.State.ProviderResolverType = ResolverType.IN_PROCESS;
     }
 }

@@ -1,5 +1,4 @@
-using System;
-using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
+using OpenFeature.Contrib.Providers.Flagd.E2e.Common.Utils;
 using Reqnroll;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest;
@@ -7,16 +6,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest;
 [Binding]
 public class BeforeHooks
 {
-    private readonly TestContext _context;
+    private State State { get; set; }
 
-    public BeforeHooks(TestContext context)
+    public BeforeHooks(State state)
     {
-        this._context = context ?? throw new ArgumentNullException(nameof(context));
+        this.State = state;
     }
 
     [BeforeScenario]
     public void BeforeScenario()
     {
-        this._context.ProviderResolverType = ResolverType.RPC;
+        this.State.ProviderResolverType = ResolverType.RPC;
     }
 }
