@@ -162,12 +162,7 @@ internal class InProcessResolver : Resolver
                         }
                     }
 
-                    var flagdEvent = new FlagdProviderEvent
-                    {
-                        EventType = ProviderEventTypes.ProviderConfigurationChanged,
-                        FlagsChanged = new List<string>(_evaluator.Flags.Keys),
-                        SyncMetadata = metadata.Build()
-                    };
+                    var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(_evaluator.Flags.Keys), metadata.Build());
                     this._flagdEventPublisher(flagdEvent);
                 }
             }
@@ -177,12 +172,7 @@ internal class InProcessResolver : Resolver
             }
             catch (RpcException)
             {
-                var flagdEvent = new FlagdProviderEvent
-                {
-                    EventType = ProviderEventTypes.ProviderError,
-                    FlagsChanged = new List<string>(),
-                    SyncMetadata = Structure.Empty
-                };
+                var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
                 this._flagdEventPublisher(flagdEvent);
 
                 // Handle the dropped connection by reconnecting and retrying the stream

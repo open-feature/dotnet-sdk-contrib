@@ -257,12 +257,7 @@ internal class RpcResolver : Resolver
 
     private void HandleConfigurationChangedEvent(List<string> flagsChanged)
     {
-        var flagdEvent = new FlagdProviderEvent
-        {
-            EventType = ProviderEventTypes.ProviderConfigurationChanged,
-            FlagsChanged = flagsChanged,
-            SyncMetadata = Structure.Empty
-        };
+        var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, Structure.Empty);
         this._flagdEventPublisher(flagdEvent);
 
         if (!_config.CacheEnabled)
@@ -289,12 +284,7 @@ internal class RpcResolver : Resolver
         _eventStreamRetries = 0;
         _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
 
-        var flagdEvent = new FlagdProviderEvent
-        {
-            EventType = ProviderEventTypes.ProviderReady,
-            FlagsChanged = flagsChanged,
-            SyncMetadata = Structure.Empty
-        };
+        var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderReady, flagsChanged, Structure.Empty);
         this._flagdEventPublisher(flagdEvent);
 
         if (_config.CacheEnabled)
@@ -312,12 +302,7 @@ internal class RpcResolver : Resolver
             return;
         }
 
-        var flagdEvent = new FlagdProviderEvent
-        {
-            EventType = ProviderEventTypes.ProviderError,
-            FlagsChanged = new List<string>(),
-            SyncMetadata = Structure.Empty
-        };
+        var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
         this._flagdEventPublisher(flagdEvent);
 
         // Handle the dropped connection by reconnecting and retrying the stream
