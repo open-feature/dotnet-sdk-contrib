@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -28,10 +28,11 @@ internal class RpcResolver : Resolver
     private int _eventStreamRetries;
     private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
     private GrpcChannel _channel;
-    private Channel<object> _eventChannel;
-    private Model.Metadata _providerMetadata;
+    private readonly Action<FlagdProviderEvent> _flagdEventPublisher;
 
-    internal RpcResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata)
+    internal RpcResolver(
+        FlagdConfig config,
+        Action<FlagdProviderEvent> flagdEventPublisher)
     {
         if (config == null)
         {
@@ -39,8 +40,7 @@ internal class RpcResolver : Resolver
         }
 
         _config = config;
-        _eventChannel = eventChannel;
-        _providerMetadata = providerMetadata;
+        this._flagdEventPublisher = flagdEventPublisher;
         _client = BuildClientForPlatform(_config);
         _mtx = new Mutex();
 
@@ -50,7 +50,11 @@ internal class RpcResolver : Resolver
         }
     }
 
-    internal RpcResolver(Service.ServiceClient client, FlagdConfig config, ICache<string, object> cache, Channel<object> eventChannel, Model.Metadata providerMetadata) : this(config, eventChannel, providerMetadata)
+    internal RpcResolver(
+        Service.ServiceClient client,
+        FlagdConfig config,
+        ICache<string, object> cache)
+        : this(config, (evt) => { })
     {
         _client = client;
         _cache = cache;
@@ -211,14 +215,69 @@ internal class RpcResolver : Resolver
                 {
                     var response = call.ResponseStream.Current;
 
+                    var flagsExist = response.Data.Fields.TryGetValue("flags", out ProtoValue val);
+                    var flagsChanged = new List<string>();
+                    if (val != null && val.KindCase == ProtoValue.KindOneofCase.StructValue)
+                    {
+                        foreach (var item in val.StructValue.Fields)
+                        {
+                            flagsChanged.Add(item.Key);
+                        }
+                    }
+
                     switch (response.Type.ToLower())
                     {
                         case "configuration_change":
-                            HandleConfigurationChangeEvent(response.Data);
-                            break;
+                            {
+                                var flagdEvent = new FlagdProviderEvent
+                                {
+                                    EventType = ProviderEventTypes.ProviderConfigurationChanged,
+                                    FlagsChanged = flagsChanged,
+                                    SyncMetadata = Structure.Empty
+                                };
+                                this._flagdEventPublisher(flagdEvent);
+
+                                if (!_config.CacheEnabled)
+                                {
+                                    break;
+                                }
+
+                                // if we have a cache, remove the changed flags from the cache
+                                try
+                                {
+                                    foreach (var flag in flagsChanged)
+                                    {
+                                        this._cache.Delete(flag);
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    this._cache.Purge();
+                                }
+
+                                break;
+                            }
+
                         case "provider_ready":
-                            HandleProviderReadyEvent();
-                            break;
+                            {
+                                _eventStreamRetries = 0;
+                                _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+
+                                var flagdEvent = new FlagdProviderEvent
+                                {
+                                    EventType = ProviderEventTypes.ProviderReady,
+                                    FlagsChanged = flagsChanged,
+                                    SyncMetadata = Structure.Empty
+                                };
+                                this._flagdEventPublisher(flagdEvent);
+
+                                if (_config.CacheEnabled)
+                                {
+                                    _cache.Purge();
+                                }
+
+                                break;
+                            }
                         default:
                             break;
                     }
@@ -230,71 +289,24 @@ internal class RpcResolver : Resolver
             }
             catch (RpcException)
             {
-                // Handle the dropped connection by reconnecting and retrying the stream
-                await HandleErrorEvent().ConfigureAwait(false);
-            }
-        }
-    }
-
-    private void HandleConfigurationChangeEvent(Struct data)
-    {
-        _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderConfigurationChanged, ProviderName = _providerMetadata.Name });
-        // if we don't have a cache, we don't need to remove anything
-        if (!_config.CacheEnabled || !data.Fields.ContainsKey("flags"))
-        {
-            return;
-        }
-
-        try
-        {
-            if (data.Fields.TryGetValue("flags", out ProtoValue val))
-            {
-                if (val.KindCase == ProtoValue.KindOneofCase.StructValue)
+                if (_eventStreamRetries > _config.MaxEventStreamRetries)
                 {
-                    val.StructValue.Fields.ToList().ForEach(flag =>
-                    {
-                        _cache.Delete(flag.Key);
-                    });
+                    return;
                 }
-                var structVal = val.StructValue;
+
+                var flagdEvent = new FlagdProviderEvent
+                {
+                    EventType = ProviderEventTypes.ProviderError,
+                    FlagsChanged = new List<string>(),
+                    SyncMetadata = Structure.Empty
+                };
+                this._flagdEventPublisher(flagdEvent);
+
+                // Handle the dropped connection by reconnecting and retrying the stream
+                _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
+                await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
             }
         }
-        catch (Exception)
-        {
-            if (_config.CacheEnabled)
-            {
-                // purge the cache if we could not handle the configuration change event
-                _cache.Purge();
-            }
-        }
-    }
-
-    private void HandleProviderReadyEvent()
-    {
-        _mtx.WaitOne();
-        _eventStreamRetries = 0;
-        _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-        _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderReady, ProviderName = _providerMetadata.Name });
-        _mtx.ReleaseMutex();
-        if (_config.CacheEnabled)
-        {
-            _cache.Purge();
-        }
-    }
-
-    private async Task HandleErrorEvent()
-    {
-        _mtx.WaitOne();
-        _eventStreamRetries++;
-
-        if (_eventStreamRetries > _config.MaxEventStreamRetries)
-        {
-            return;
-        }
-        _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
-        _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name });
-        _mtx.ReleaseMutex();
-        await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
     }
 
     /// <summary>

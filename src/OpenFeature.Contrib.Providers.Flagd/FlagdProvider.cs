@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
+using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 using OpenFeature.Model;
@@ -18,6 +21,7 @@ public sealed class FlagdProvider : FeatureProvider
     private readonly FlagdConfig _config;
     private readonly Metadata _providerMetadata = new Metadata(ProviderName);
     private readonly Resolver.Resolver _resolver;
+    private readonly List<Hook> _hooks = new List<Hook>();
 
     /// <summary>
     ///     Constructor of the provider. This constructor uses the value of the following
@@ -68,12 +72,14 @@ public sealed class FlagdProvider : FeatureProvider
         if (_config.ResolverType == ResolverType.IN_PROCESS)
         {
             var jsonSchemaValidator = new JsonSchemaValidator(null, _config.Logger);
-            _resolver = new InProcessResolver(_config, EventChannel, _providerMetadata, jsonSchemaValidator);
+            _resolver = new InProcessResolver(_config, jsonSchemaValidator, this.OnProviderEvent);
         }
         else
         {
-            _resolver = new RpcResolver(config, EventChannel, _providerMetadata);
+            _resolver = new RpcResolver(config, this.OnProviderEvent);
         }
+
+        _hooks.Add(new SyncMetadataHook(() => this._enrichedContext));
     }
 
     // just for testing, internal but visible in tests
@@ -102,6 +108,87 @@ public sealed class FlagdProvider : FeatureProvider
     ///     Return the resolver of the provider
     /// </summary>
     internal Resolver.Resolver GetResolver() => _resolver;
+
+    /// <inheritdoc/>
+    public override IImmutableList<Hook> GetProviderHooks()
+    {
+        return this._hooks.ToImmutableList();
+    }
+
+    private EvaluationContext _enrichedContext = EvaluationContext.Empty;
+
+    private bool _connected;
+
+    private void OnProviderEvent(FlagdProviderEvent payload)
+    {
+        switch (payload.EventType)
+        {
+            case ProviderEventTypes.ProviderConfigurationChanged:
+                {
+                    var context = EvaluationContext.Builder();
+                    foreach (var item in payload.SyncMetadata.AsDictionary())
+                    {
+                        context.Set(item.Key, item.Value);
+                    }
+                    this._enrichedContext = context.Build();
+
+                    if (this._connected)
+                    {
+                        this.EventChannel.Writer.TryWrite(new ProviderEventPayload
+                        {
+                            Type = ProviderEventTypes.ProviderConfigurationChanged,
+                            ProviderName = this._providerMetadata.Name
+                        });
+
+                        break;
+                    }
+
+                    this.EventChannel.Writer.TryWrite(new ProviderEventPayload
+                    {
+                        Type = ProviderEventTypes.ProviderReady,
+                        ProviderName = this._providerMetadata.Name
+                    });
+
+                    this._connected = true;
+
+                    break;
+                }
+
+            case ProviderEventTypes.ProviderReady:
+                {
+                    var context = EvaluationContext.Builder();
+                    foreach (var item in payload.SyncMetadata.AsDictionary())
+                    {
+                        context.Set(item.Key, item.Value);
+                    }
+                    this._enrichedContext = context.Build();
+
+                    this.EventChannel.Writer.TryWrite(new ProviderEventPayload
+                    {
+                        Type = ProviderEventTypes.ProviderReady,
+                        ProviderName = this._providerMetadata.Name
+                    });
+
+                    this._connected = true;
+
+                    break;
+                }
+
+            case ProviderEventTypes.ProviderError:
+                {
+                    this.EventChannel.Writer.TryWrite(new ProviderEventPayload
+                    {
+                        Type = ProviderEventTypes.ProviderError,
+                        ProviderName = this._providerMetadata.Name
+                    });
+
+                    break;
+                }
+
+            default:
+                break;
+        }
+    }
 
     /// <inheritdoc/>
     public override async Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)

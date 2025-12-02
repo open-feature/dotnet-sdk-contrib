@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 #if NET462_OR_GREATER
 using System.Linq;
@@ -34,16 +34,13 @@ internal class InProcessResolver : Resolver
     private int _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
     private readonly FlagdConfig _config;
     private GrpcChannel _channel;
-    private Channel<object> _eventChannel;
-    private Model.Metadata _providerMetadata;
     private readonly IJsonSchemaValidator _jsonSchemaValidator;
-    private bool connected = false;
+    private readonly Action<FlagdProviderEvent> _flagdEventPublisher;
 
-    internal InProcessResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata, IJsonSchemaValidator jsonSchemaValidator)
+    internal InProcessResolver(FlagdConfig config, IJsonSchemaValidator jsonSchemaValidator, Action<FlagdProviderEvent> flagdEventPublisher)
     {
-        _eventChannel = eventChannel;
-        _providerMetadata = providerMetadata;
         _jsonSchemaValidator = jsonSchemaValidator;
+        this._flagdEventPublisher = flagdEventPublisher;
         _config = config;
         _client = BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
         _mtx = new Mutex();
@@ -53,10 +50,8 @@ internal class InProcessResolver : Resolver
     internal InProcessResolver(
         FlagSyncService.FlagSyncServiceClient client,
         FlagdConfig config,
-        Channel<object> eventChannel,
-        Model.Metadata providerMetadata,
         IJsonSchemaValidator jsonSchemaValidator)
-            : this(config, eventChannel, providerMetadata, jsonSchemaValidator)
+            : this(config, jsonSchemaValidator, (evt) => { })
     {
         _client = client;
     }
@@ -131,12 +126,51 @@ internal class InProcessResolver : Resolver
                 {
                     var response = call.ResponseStream.Current;
                     _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
+
                     if (!latch.IsSet)
                     {
                         latch.Signal();
                     }
-                    HandleProviderReadyEvent();
-                    HandleProviderChangeEvent();
+
+                    // Reset delay backoff on successful response
+                    _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
+
+                    var metadata = Structure.Builder();
+                    if (response.SyncContext != null)
+                    {
+                        foreach (var item in response.SyncContext.Fields)
+                        {
+                            switch (item.Value.KindCase)
+                            {
+                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.NullValue:
+                                    metadata.Set(item.Key, new Value());
+                                    break;
+                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.BoolValue:
+                                    metadata.Set(item.Key, new Value(item.Value.BoolValue));
+                                    break;
+                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.NumberValue:
+                                    metadata.Set(item.Key, new Value(item.Value.NumberValue));
+                                    break;
+                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.StringValue:
+                                    metadata.Set(item.Key, new Value(item.Value.StringValue));
+                                    break;
+                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.StructValue:
+                                    //metadata.Set(item.Key, new Value(JsonUtils.ConvertStructToDictionary(item.Value.StructValue)));
+                                    break;
+                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.ListValue:
+                                    //metadata.Set(item.Key, new Value(JsonUtils.ConvertListValueToList(item.Value.ListValue)));
+                                    break;
+                            }
+                        }
+                    }
+
+                    var flagdEvent = new FlagdProviderEvent
+                    {
+                        EventType = ProviderEventTypes.ProviderConfigurationChanged,
+                        FlagsChanged = new List<string>(_evaluator.Flags.Keys),
+                        SyncMetadata = metadata.Build()
+                    };
+                    this._flagdEventPublisher(flagdEvent);
                 }
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
@@ -145,47 +179,20 @@ internal class InProcessResolver : Resolver
             }
             catch (RpcException)
             {
+                var flagdEvent = new FlagdProviderEvent
+                {
+                    EventType = ProviderEventTypes.ProviderError,
+                    FlagsChanged = new List<string>(),
+                    SyncMetadata = Structure.Empty
+                };
+                this._flagdEventPublisher(flagdEvent);
+
                 // Handle the dropped connection by reconnecting and retrying the stream
-                await HandleErrorEvent().ConfigureAwait(false);
+                _eventStreamRetryBackoff = Math.Min(_eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
+                await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
             }
         }
     }
-
-    private void HandleProviderReadyEvent()
-    {
-        _mtx.WaitOne();
-        _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
-        if (!connected)
-        {
-            connected = true;
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderReady, ProviderName = _providerMetadata.Name });
-        }
-        _mtx.ReleaseMutex();
-    }
-
-    private async Task HandleErrorEvent()
-    {
-        _mtx.WaitOne();
-        _eventStreamRetryBackoff = Math.Min(_eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
-        if (connected)
-        {
-            connected = false;
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name });
-        }
-        _mtx.ReleaseMutex();
-        await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
-    }
-
-    private void HandleProviderChangeEvent()
-    {
-        _mtx.WaitOne();
-        if (connected)
-        {
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderConfigurationChanged, ProviderName = _providerMetadata.Name });
-        }
-        _mtx.ReleaseMutex();
-    }
-
     private T BuildClient<T>(FlagdConfig config, Func<GrpcChannel, T> constructorFunc)
     {
         var useUnixSocket = config.GetUri().ToString().StartsWith("unix://");
