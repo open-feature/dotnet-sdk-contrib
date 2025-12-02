@@ -30,7 +30,6 @@ internal class InProcessResolver : Resolver
     readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly FlagSyncService.FlagSyncServiceClient _client;
     private readonly JsonEvaluator _evaluator;
-    private readonly Mutex _mtx;
     private int _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
     private readonly FlagdConfig _config;
     private GrpcChannel _channel;
@@ -43,7 +42,6 @@ internal class InProcessResolver : Resolver
         this._flagdEventPublisher = flagdEventPublisher;
         _config = config;
         _client = BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
-        _mtx = new Mutex();
         _evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
     }
 

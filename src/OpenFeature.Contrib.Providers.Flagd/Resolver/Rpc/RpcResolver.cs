@@ -24,7 +24,6 @@ internal class RpcResolver : Resolver
     private readonly FlagdConfig _config;
     private readonly ICache<string, object> _cache;
     private readonly Service.ServiceClient _client;
-    private readonly Mutex _mtx;
     private int _eventStreamRetries;
     private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
     private GrpcChannel _channel;
@@ -42,7 +41,6 @@ internal class RpcResolver : Resolver
         _config = config;
         this._flagdEventPublisher = flagdEventPublisher;
         _client = BuildClientForPlatform(_config);
-        _mtx = new Mutex();
 
         if (_config.CacheEnabled)
         {
@@ -215,13 +213,16 @@ internal class RpcResolver : Resolver
                 {
                     var response = call.ResponseStream.Current;
 
-                    var flagsExist = response.Data.Fields.TryGetValue("flags", out ProtoValue val);
                     var flagsChanged = new List<string>();
-                    if (val != null && val.KindCase == ProtoValue.KindOneofCase.StructValue)
+                    if (response.Data != null && response.Data.Fields.ContainsKey("flags"))
                     {
-                        foreach (var item in val.StructValue.Fields)
+                        var flagsExist = response.Data.Fields.TryGetValue("flags", out ProtoValue val);
+                        if (flagsExist && val.KindCase == ProtoValue.KindOneofCase.StructValue)
                         {
-                            flagsChanged.Add(item.Key);
+                            foreach (var item in val.StructValue.Fields)
+                            {
+                                flagsChanged.Add(item.Key);
+                            }
                         }
                     }
 
@@ -229,53 +230,13 @@ internal class RpcResolver : Resolver
                     {
                         case "configuration_change":
                             {
-                                var flagdEvent = new FlagdProviderEvent
-                                {
-                                    EventType = ProviderEventTypes.ProviderConfigurationChanged,
-                                    FlagsChanged = flagsChanged,
-                                    SyncMetadata = Structure.Empty
-                                };
-                                this._flagdEventPublisher(flagdEvent);
-
-                                if (!_config.CacheEnabled)
-                                {
-                                    break;
-                                }
-
-                                // if we have a cache, remove the changed flags from the cache
-                                try
-                                {
-                                    foreach (var flag in flagsChanged)
-                                    {
-                                        this._cache.Delete(flag);
-                                    }
-                                }
-                                catch (Exception)
-                                {
-                                    this._cache.Purge();
-                                }
-
+                                this.HandleConfigurationChangedEvent(flagsChanged);
                                 break;
                             }
 
                         case "provider_ready":
                             {
-                                _eventStreamRetries = 0;
-                                _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
-
-                                var flagdEvent = new FlagdProviderEvent
-                                {
-                                    EventType = ProviderEventTypes.ProviderReady,
-                                    FlagsChanged = flagsChanged,
-                                    SyncMetadata = Structure.Empty
-                                };
-                                this._flagdEventPublisher(flagdEvent);
-
-                                if (_config.CacheEnabled)
-                                {
-                                    _cache.Purge();
-                                }
-
+                                this.HandleProviderReadyEvent(flagsChanged);
                                 break;
                             }
                         default:
@@ -289,24 +250,79 @@ internal class RpcResolver : Resolver
             }
             catch (RpcException)
             {
-                if (_eventStreamRetries > _config.MaxEventStreamRetries)
-                {
-                    return;
-                }
-
-                var flagdEvent = new FlagdProviderEvent
-                {
-                    EventType = ProviderEventTypes.ProviderError,
-                    FlagsChanged = new List<string>(),
-                    SyncMetadata = Structure.Empty
-                };
-                this._flagdEventPublisher(flagdEvent);
-
-                // Handle the dropped connection by reconnecting and retrying the stream
-                _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
-                await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
+                await this.HandleErrorEvent().ConfigureAwait(false);
             }
         }
+    }
+
+    private void HandleConfigurationChangedEvent(List<string> flagsChanged)
+    {
+        var flagdEvent = new FlagdProviderEvent
+        {
+            EventType = ProviderEventTypes.ProviderConfigurationChanged,
+            FlagsChanged = flagsChanged,
+            SyncMetadata = Structure.Empty
+        };
+        this._flagdEventPublisher(flagdEvent);
+
+        if (!_config.CacheEnabled)
+        {
+            return;
+        }
+
+        // if we have a cache, remove the changed flags from the cache
+        try
+        {
+            foreach (var flag in flagsChanged)
+            {
+                this._cache.Delete(flag);
+            }
+        }
+        catch (Exception)
+        {
+            this._cache.Purge();
+        }
+    }
+
+    private void HandleProviderReadyEvent(List<string> flagsChanged)
+    {
+        _eventStreamRetries = 0;
+        _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+
+        var flagdEvent = new FlagdProviderEvent
+        {
+            EventType = ProviderEventTypes.ProviderReady,
+            FlagsChanged = flagsChanged,
+            SyncMetadata = Structure.Empty
+        };
+        this._flagdEventPublisher(flagdEvent);
+
+        if (_config.CacheEnabled)
+        {
+            _cache.Purge();
+        }
+    }
+
+    private async Task HandleErrorEvent()
+    {
+        _eventStreamRetries++;
+
+        if (_eventStreamRetries > _config.MaxEventStreamRetries)
+        {
+            return;
+        }
+
+        var flagdEvent = new FlagdProviderEvent
+        {
+            EventType = ProviderEventTypes.ProviderError,
+            FlagsChanged = new List<string>(),
+            SyncMetadata = Structure.Empty
+        };
+        this._flagdEventPublisher(flagdEvent);
+
+        // Handle the dropped connection by reconnecting and retrying the stream
+        _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
+        await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
     }
 
     /// <summary>
