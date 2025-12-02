@@ -3,6 +3,7 @@
   <!-- TODO: add remaining tests -->
   <ItemGroup>
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/evaluation.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/contextEnrichment.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
