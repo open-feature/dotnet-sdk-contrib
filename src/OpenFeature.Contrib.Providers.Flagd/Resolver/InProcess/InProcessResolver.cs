@@ -48,8 +48,9 @@ internal class InProcessResolver : Resolver
     internal InProcessResolver(
         FlagSyncService.FlagSyncServiceClient client,
         FlagdConfig config,
-        IJsonSchemaValidator jsonSchemaValidator)
-            : this(config, jsonSchemaValidator, (evt) => { })
+        IJsonSchemaValidator jsonSchemaValidator,
+        Action<FlagdProviderEvent> flagdEventPublisher)
+            : this(config, jsonSchemaValidator, flagdEventPublisher)
     {
         this._client = client;
     }

@@ -115,11 +115,11 @@ public sealed class FlagdProvider : FeatureProvider
         return this._hooks.ToImmutableList();
     }
 
-    private EvaluationContext _enrichedContext = EvaluationContext.Empty;
+    internal EvaluationContext _enrichedContext = EvaluationContext.Empty;
 
     private bool _connected;
 
-    private void OnProviderEvent(FlagdProviderEvent payload)
+    internal void OnProviderEvent(FlagdProviderEvent payload)
     {
         switch (payload.EventType)
         {

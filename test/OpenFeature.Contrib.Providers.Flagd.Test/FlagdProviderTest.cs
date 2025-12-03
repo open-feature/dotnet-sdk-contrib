@@ -186,7 +186,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(substituteGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(substituteGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // resolve with default set to false to make sure we return what the grpc server gives us
@@ -215,7 +215,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveStringRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveStringValueAsync("my-key", "");
@@ -244,7 +244,7 @@ public class UnitTestFlagdProvider
         subGrpcClient.ResolveIntAsync(Arg.Any<ResolveIntRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveIntegerValueAsync("my-key", 0);
@@ -273,7 +273,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveDoubleValueAsync("my-key", 0.0);
@@ -305,7 +305,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveStructureValueAsync("my-key", null);
@@ -331,7 +331,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveBooleanAsync(
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None).Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -366,7 +366,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -401,7 +401,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -436,7 +436,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -517,7 +517,7 @@ public class UnitTestFlagdProvider
         config.CacheEnabled = true;
         config.MaxEventStreamRetries = 1;
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -583,7 +583,7 @@ public class UnitTestFlagdProvider
             MaxEventStreamRetries = 1
         };
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -681,7 +681,7 @@ public class UnitTestFlagdProvider
         config.CacheEnabled = true;
         config.MaxEventStreamRetries = 1;
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
+        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -748,7 +748,7 @@ public class UnitTestFlagdProvider
         config.MaxEventStreamRetries = 1;
         config.SourceSelector = "source-selector";
 
-        var rpcResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        var rpcResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator, evt => { });
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -808,7 +808,7 @@ public class UnitTestFlagdProvider
         config.MaxEventStreamRetries = 1;
         config.SourceSelector = "source-selector";
 
-        var inProcessResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        var inProcessResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator, evt => { });
         var flagdProvider = new FlagdProvider(inProcessResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -823,5 +823,194 @@ public class UnitTestFlagdProvider
         mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
 
         await flagdProvider.ShutdownAsync();
+    }
+
+    [Fact]
+    public void GetProviderHooks_ReturnsSyncMetadataHook()
+    {
+        // Arrange
+        var flagdProvider = new FlagdProvider(new FlagdConfig());
+
+        // Act
+        var hooks = flagdProvider.GetProviderHooks();
+
+        // Assert
+        Assert.Contains(hooks, hook => hook is SyncMetadataHook);
+    }
+
+    [Fact]
+    public void OnProviderEvent_PublishesProviderReadyEventToEventChannel()
+    {
+        // Arrange
+        var resolver = Substitute.For<Flagd.Resolver.Resolver>();
+        var flagdProvider = new FlagdProvider(resolver);
+        var flagsChanged = new List<string>() { "flag1", "flag2" };
+        var metadata = Structure.Builder()
+            .Build();
+
+        var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, metadata);
+
+        // Act
+        flagdProvider.OnProviderEvent(payload);
+
+        // Assert
+
+        var channel = flagdProvider.GetEventChannel();
+        var eventPublished = channel.Reader.TryRead(out var item);
+        Assert.True(eventPublished);
+
+        var providerEvent = item as ProviderEventPayload;
+        Assert.NotNull(providerEvent);
+        Assert.Equal(ProviderEventTypes.ProviderReady, providerEvent.Type);
+        Assert.Equal("flagd Provider", providerEvent.ProviderName);
+    }
+
+    [Fact]
+    public async Task OnProviderEvent_WhenProviderConfigChanged_OverwritesEnrichedContext()
+    {
+        // Arrange
+        var resolver = Substitute.For<Flagd.Resolver.Resolver>();
+        var flagdProvider = new FlagdProvider(resolver);
+        var flagsChanged = new List<string>() { "flag1", "flag2" };
+        var metadata = Structure.Builder()
+            .Set("key1", "value1")
+            .Build();
+
+        var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, metadata);
+
+        // Act
+        flagdProvider.OnProviderEvent(payload);
+
+        // Assert
+        Assert.Equal(1, flagdProvider._enrichedContext.Count);
+
+        var expected = flagdProvider._enrichedContext.GetValue("key1");
+        Assert.Equal("value1", expected.AsString);
+    }
+
+    [Fact]
+    public async Task OnProviderEvent_WhenProviderReady_OverwritesEnrichedContext()
+    {
+        // Arrange
+        var resolver = Substitute.For<Flagd.Resolver.Resolver>();
+        var flagdProvider = new FlagdProvider(resolver);
+        var flagsChanged = new List<string>() { "flag1", "flag2" };
+        var metadata = Structure.Builder()
+            .Set("key1", "value1")
+            .Build();
+
+        var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderReady, flagsChanged, metadata);
+
+        // Act
+        flagdProvider.OnProviderEvent(payload);
+
+        // Assert
+        Assert.Equal(1, flagdProvider._enrichedContext.Count);
+
+        var expected = flagdProvider._enrichedContext.GetValue("key1");
+        Assert.Equal("value1", expected.AsString);
+    }
+
+    [Fact]
+    public void OnProviderEvent_WithConfigChangedTwice_PublishesProviderConfigurationChangedEventToEventChannel()
+    {
+        // Arrange
+        var resolver = Substitute.For<Flagd.Resolver.Resolver>();
+        var flagdProvider = new FlagdProvider(resolver);
+        var flagsChanged1 = new List<string>() { "flag1", "flag2" };
+        var flagsChanged2 = new List<string>() { "flag1" };
+        var metadata = Structure.Builder()
+            .Build();
+
+        var payload1 = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged1, metadata);
+        var payload2 = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged2, metadata);
+
+        var channel = flagdProvider.GetEventChannel();
+
+        // Act
+        flagdProvider.OnProviderEvent(payload1);
+        channel.Reader.TryRead(out var _); // clear first event
+
+        flagdProvider.OnProviderEvent(payload2);
+
+        // Assert
+        var eventPublished = channel.Reader.TryRead(out var item);
+        Assert.True(eventPublished);
+
+        var providerEvent = item as ProviderEventPayload;
+        Assert.NotNull(providerEvent);
+        Assert.Equal(ProviderEventTypes.ProviderConfigurationChanged, providerEvent.Type);
+        Assert.Equal("flagd Provider", providerEvent.ProviderName);
+    }
+
+    [Fact]
+    public async Task OnProviderEvent_WhenProviderErrors_PublishesProviderErrorEventToEventChannel()
+    {
+        // Arrange
+        var resolver = Substitute.For<Flagd.Resolver.Resolver>();
+        var flagdProvider = new FlagdProvider(resolver);
+        var flagsChanged = new List<string>() { "flag1", "flag2" };
+        var metadata = Structure.Builder()
+            .Set("key1", "value1")
+            .Build();
+
+        var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderError, flagsChanged, metadata);
+
+        // Act
+        flagdProvider.OnProviderEvent(payload);
+
+        // Assert
+        var channel = flagdProvider.GetEventChannel();
+        var eventPublished = channel.Reader.TryRead(out var item);
+        Assert.True(eventPublished);
+
+        var providerEvent = item as ProviderEventPayload;
+        Assert.NotNull(providerEvent);
+        Assert.Equal(ProviderEventTypes.ProviderError, providerEvent.Type);
+        Assert.Equal("flagd Provider", providerEvent.ProviderName);
+    }
+
+    [Fact]
+    public async Task OnProviderEvent_WhenProviderErrors_DoesNotOverwriteEnrichedContext()
+    {
+        // Arrange
+        var resolver = Substitute.For<Flagd.Resolver.Resolver>();
+        var flagdProvider = new FlagdProvider(resolver);
+        var flagsChanged = new List<string>() { "flag1", "flag2" };
+        var metadata = Structure.Builder()
+            .Set("key1", "value1")
+            .Build();
+
+        var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderError, flagsChanged, metadata);
+
+        // Act
+        flagdProvider.OnProviderEvent(payload);
+
+        // Assert
+        Assert.Equal(0, flagdProvider._enrichedContext.Count);
+    }
+
+    [Fact]
+    public async Task OnProviderEvent_WhenProviderStale_DoNothing()
+    {
+        // Arrange
+        var resolver = Substitute.For<Flagd.Resolver.Resolver>();
+        var flagdProvider = new FlagdProvider(resolver);
+        var flagsChanged = new List<string>() { "flag1", "flag2" };
+        var metadata = Structure.Builder()
+            .Set("key1", "value1")
+            .Build();
+
+        var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderStale, flagsChanged, metadata);
+
+        // Act
+        flagdProvider.OnProviderEvent(payload);
+
+        // Assert
+        var channel = flagdProvider.GetEventChannel();
+        var eventPublished = channel.Reader.TryRead(out var _);
+        Assert.False(eventPublished);
+
+        Assert.Equal(0, flagdProvider._enrichedContext.Count);
     }
 }

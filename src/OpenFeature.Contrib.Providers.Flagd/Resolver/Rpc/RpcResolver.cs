@@ -51,8 +51,9 @@ internal class RpcResolver : Resolver
     internal RpcResolver(
         Service.ServiceClient client,
         FlagdConfig config,
-        ICache<string, object> cache)
-        : this(config, (evt) => { })
+        ICache<string, object> cache,
+        Action<FlagdProviderEvent> flagdEventPublisher)
+        : this(config, flagdEventPublisher)
     {
         this._client = client;
         this._cache = cache;
