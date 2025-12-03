@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #if NET462_OR_GREATER
-using System.Linq;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -138,27 +138,7 @@ internal class InProcessResolver : Resolver
                     {
                         foreach (var item in response.SyncContext.Fields)
                         {
-                            switch (item.Value.KindCase)
-                            {
-                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.NullValue:
-                                    metadata.Set(item.Key, new Value());
-                                    break;
-                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.BoolValue:
-                                    metadata.Set(item.Key, new Value(item.Value.BoolValue));
-                                    break;
-                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.NumberValue:
-                                    metadata.Set(item.Key, new Value(item.Value.NumberValue));
-                                    break;
-                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.StringValue:
-                                    metadata.Set(item.Key, new Value(item.Value.StringValue));
-                                    break;
-                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.StructValue:
-                                    //metadata.Set(item.Key, new Value(JsonUtils.ConvertStructToDictionary(item.Value.StructValue)));
-                                    break;
-                                case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.ListValue:
-                                    //metadata.Set(item.Key, new Value(JsonUtils.ConvertListValueToList(item.Value.ListValue)));
-                                    break;
-                            }
+                            metadata.Set(item.Key, ExtractValue(item.Value));
                         }
                     }
 
@@ -181,6 +161,36 @@ internal class InProcessResolver : Resolver
             }
         }
     }
+
+    private static Value ExtractValue(Google.Protobuf.WellKnownTypes.Value value)
+    {
+        switch (value.KindCase)
+        {
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.BoolValue:
+                return new Value(value.BoolValue);
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.NumberValue:
+                return new Value(value.NumberValue);
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.StringValue:
+                return new Value(value.StringValue);
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.StructValue:
+                {
+                    var val = Structure.Builder();
+                    foreach (var item in value.StructValue.Fields)
+                    {
+                        val.Set(item.Key, ExtractValue(item.Value));
+                    }
+                    return new Value(val.Build());
+                }
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.ListValue:
+                return new Value(value.ListValue.Values.Select(ExtractValue));
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.NullValue:
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.None:
+                break;
+        }
+
+        return new Value();
+    }
+
     private T BuildClient<T>(FlagdConfig config, Func<GrpcChannel, T> constructorFunc)
     {
         var useUnixSocket = config.GetUri().ToString().StartsWith("unix://");
