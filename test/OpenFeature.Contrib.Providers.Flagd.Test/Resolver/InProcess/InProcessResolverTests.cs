@@ -50,7 +50,7 @@ public class InProcessResolverTests
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
         // Assert
-        await Utils.AssertUntilAsync(async (ct) => Assert.NotNull(flagdProviderEvent));
+        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
 
         Assert.Equal(Constant.ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
         Assert.Contains("validFlag", flagdProviderEvent.FlagsChanged);
@@ -85,7 +85,7 @@ public class InProcessResolverTests
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
         // Assert
-        await Utils.AssertUntilAsync(async (ct) => Assert.NotNull(flagdProviderEvent));
+        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
 
         Assert.Equal(Constant.ProviderEventTypes.ProviderError, flagdProviderEvent.EventType);
         Assert.Empty(flagdProviderEvent.FlagsChanged);
@@ -120,7 +120,7 @@ public class InProcessResolverTests
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
         // Assert
-        await Utils.AssertUntilAsync(async (ct) => Assert.Equal(0, counter));
+        await Utils.AssertUntilAsync((ct) => { Assert.Equal(0, counter); return Task.CompletedTask; });
 
         await resolver.Shutdown();
     }

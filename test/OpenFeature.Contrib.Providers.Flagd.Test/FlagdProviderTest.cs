@@ -866,7 +866,7 @@ public class UnitTestFlagdProvider
     }
 
     [Fact]
-    public async Task OnProviderEvent_WhenProviderConfigChanged_OverwritesEnrichedContext()
+    public Task OnProviderEvent_WhenProviderConfigChanged_OverwritesEnrichedContext()
     {
         // Arrange
         var resolver = Substitute.For<Flagd.Resolver.Resolver>();
@@ -886,10 +886,11 @@ public class UnitTestFlagdProvider
 
         var expected = flagdProvider._enrichedContext.GetValue("key1");
         Assert.Equal("value1", expected.AsString);
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task OnProviderEvent_WhenProviderReady_OverwritesEnrichedContext()
+    public Task OnProviderEvent_WhenProviderReady_OverwritesEnrichedContext()
     {
         // Arrange
         var resolver = Substitute.For<Flagd.Resolver.Resolver>();
@@ -909,6 +910,7 @@ public class UnitTestFlagdProvider
 
         var expected = flagdProvider._enrichedContext.GetValue("key1");
         Assert.Equal("value1", expected.AsString);
+        return Task.CompletedTask;
     }
 
     [Fact]
@@ -944,7 +946,7 @@ public class UnitTestFlagdProvider
     }
 
     [Fact]
-    public async Task OnProviderEvent_WhenProviderErrors_PublishesProviderErrorEventToEventChannel()
+    public Task OnProviderEvent_WhenProviderErrors_PublishesProviderErrorEventToEventChannel()
     {
         // Arrange
         var resolver = Substitute.For<Flagd.Resolver.Resolver>();
@@ -968,10 +970,11 @@ public class UnitTestFlagdProvider
         Assert.NotNull(providerEvent);
         Assert.Equal(ProviderEventTypes.ProviderError, providerEvent.Type);
         Assert.Equal("flagd Provider", providerEvent.ProviderName);
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task OnProviderEvent_WhenProviderErrors_DoesNotOverwriteEnrichedContext()
+    public Task OnProviderEvent_WhenProviderErrors_DoesNotOverwriteEnrichedContext()
     {
         // Arrange
         var resolver = Substitute.For<Flagd.Resolver.Resolver>();
@@ -988,10 +991,11 @@ public class UnitTestFlagdProvider
 
         // Assert
         Assert.Equal(0, flagdProvider._enrichedContext.Count);
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task OnProviderEvent_WhenProviderStale_DoNothing()
+    public Task OnProviderEvent_WhenProviderStale_DoNothing()
     {
         // Arrange
         var resolver = Substitute.For<Flagd.Resolver.Resolver>();
@@ -1012,5 +1016,6 @@ public class UnitTestFlagdProvider
         Assert.False(eventPublished);
 
         Assert.Equal(0, flagdProvider._enrichedContext.Count);
+        return Task.CompletedTask;
     }
 }

@@ -58,13 +58,13 @@ public class RpcResolverTests
         var config = new FlagdConfig();
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new RpcResolver(mockGrpcClient, config, null,  ctx => flagdProviderEvent = ctx);
+        var resolver = new RpcResolver(mockGrpcClient, config, null, ctx => flagdProviderEvent = ctx);
 
         // Act
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync(async (ct) => Assert.NotNull(flagdProviderEvent));
+        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
 
         Assert.Equal(Constant.ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
         Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
@@ -101,7 +101,7 @@ public class RpcResolverTests
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync(async (ct) => Assert.NotNull(flagdProviderEvent));
+        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
 
         Assert.Equal(Constant.ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
         Assert.Empty(flagdProviderEvent.FlagsChanged);
@@ -139,7 +139,7 @@ public class RpcResolverTests
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync(async (ct) => Assert.NotNull(flagdProviderEvent));
+        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
 
         Assert.Equal(Constant.ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
         Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
@@ -186,7 +186,7 @@ public class RpcResolverTests
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync(async (ct) => Assert.NotNull(flagdProviderEvent));
+        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
 
         Assert.True(purgedCalled);
     }
@@ -231,7 +231,7 @@ public class RpcResolverTests
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync(async (ct) => Assert.NotNull(flagdProviderEvent));
+        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
 
         Assert.True(deletedCalled);
     }
