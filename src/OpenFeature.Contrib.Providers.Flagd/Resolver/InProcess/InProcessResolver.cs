@@ -38,11 +38,11 @@ internal class InProcessResolver : Resolver
 
     internal InProcessResolver(FlagdConfig config, IJsonSchemaValidator jsonSchemaValidator, Action<FlagdProviderEvent> flagdEventPublisher)
     {
-        _jsonSchemaValidator = jsonSchemaValidator;
+        this._jsonSchemaValidator = jsonSchemaValidator;
         this._flagdEventPublisher = flagdEventPublisher;
-        _config = config;
-        _client = BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
-        _evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
+        this._config = config;
+        this._client = this.BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
+        this._evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
     }
 
     internal InProcessResolver(
@@ -51,7 +51,7 @@ internal class InProcessResolver : Resolver
         IJsonSchemaValidator jsonSchemaValidator)
             : this(config, jsonSchemaValidator, (evt) => { })
     {
-        _client = client;
+        this._client = client;
     }
 
     public async Task Init()
@@ -123,7 +123,7 @@ internal class InProcessResolver : Resolver
                 while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
-                    _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
+                    this._evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
 
                     if (!latch.IsSet)
                     {
@@ -131,7 +131,7 @@ internal class InProcessResolver : Resolver
                     }
 
                     // Reset delay backoff on successful response
-                    _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
+                    this._eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
 
                     var metadata = Structure.Builder();
                     if (response.SyncContext != null)
@@ -142,7 +142,7 @@ internal class InProcessResolver : Resolver
                         }
                     }
 
-                    var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(_evaluator.Flags.Keys), metadata.Build());
+                    var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(this._evaluator.Flags.Keys), metadata.Build());
                     this._flagdEventPublisher(flagdEvent);
                 }
             }
@@ -156,8 +156,8 @@ internal class InProcessResolver : Resolver
                 this._flagdEventPublisher(flagdEvent);
 
                 // Handle the dropped connection by reconnecting and retrying the stream
-                _eventStreamRetryBackoff = Math.Min(_eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
-                await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
+                this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
+                await Task.Delay(this._eventStreamRetryBackoff * 1000).ConfigureAwait(false);
             }
         }
     }

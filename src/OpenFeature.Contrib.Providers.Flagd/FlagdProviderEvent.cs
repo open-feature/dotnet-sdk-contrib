@@ -10,7 +10,7 @@ namespace OpenFeature.Contrib.Providers.Flagd;
 /// <remarks>Use this class to receive detailed information about provider events, including which flags have
 /// changed and any associated synchronization metadata. Instances of this class are typically created by the provider
 /// and supplied to event handlers or listeners to notify consumers of relevant changes.</remarks>
-public sealed class FlagdProviderEvent
+internal sealed class FlagdProviderEvent
 {
     /// <summary>
     /// The type of provider event that occurred.

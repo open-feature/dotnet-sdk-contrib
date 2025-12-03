@@ -38,13 +38,13 @@ internal class RpcResolver : Resolver
             throw new ArgumentNullException(nameof(config));
         }
 
-        _config = config;
+        this._config = config;
         this._flagdEventPublisher = flagdEventPublisher;
-        _client = BuildClientForPlatform(_config);
+        this._client = this.BuildClientForPlatform(_config);
 
-        if (_config.CacheEnabled)
+        if (this._config.CacheEnabled)
         {
-            _cache = new LRUCache<string, object>(_config.MaxCacheSize);
+            this._cache = new LRUCache<string, object>(this._config.MaxCacheSize);
         }
     }
 
@@ -54,8 +54,8 @@ internal class RpcResolver : Resolver
         ICache<string, object> cache)
         : this(config, (evt) => { })
     {
-        _client = client;
-        _cache = cache;
+        this._client = client;
+        this._cache = cache;
     }
 
     public Task Init()
@@ -260,7 +260,7 @@ internal class RpcResolver : Resolver
         var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, Structure.Empty);
         this._flagdEventPublisher(flagdEvent);
 
-        if (!_config.CacheEnabled)
+        if (!this._config.CacheEnabled)
         {
             return;
         }
@@ -287,17 +287,17 @@ internal class RpcResolver : Resolver
         var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderReady, flagsChanged, Structure.Empty);
         this._flagdEventPublisher(flagdEvent);
 
-        if (_config.CacheEnabled)
+        if (this._config.CacheEnabled)
         {
-            _cache.Purge();
+            this._cache.Purge();
         }
     }
 
     private async Task HandleErrorEvent()
     {
-        _eventStreamRetries++;
+        this._eventStreamRetries++;
 
-        if (_eventStreamRetries > _config.MaxEventStreamRetries)
+        if (this._eventStreamRetries > this._config.MaxEventStreamRetries)
         {
             return;
         }
@@ -306,8 +306,8 @@ internal class RpcResolver : Resolver
         this._flagdEventPublisher(flagdEvent);
 
         // Handle the dropped connection by reconnecting and retrying the stream
-        _eventStreamRetryBackoff = _eventStreamRetryBackoff * 2;
-        await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
+        this._eventStreamRetryBackoff = this._eventStreamRetryBackoff * 2;
+        await Task.Delay(this._eventStreamRetryBackoff * 1000).ConfigureAwait(false);
     }
 
     /// <summary>
