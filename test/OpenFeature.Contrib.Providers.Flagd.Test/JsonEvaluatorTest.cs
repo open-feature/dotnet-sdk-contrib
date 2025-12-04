@@ -34,6 +34,19 @@ public class UnitTestJsonEvaluator
     }
 
     [Fact]
+    public void Flags_ReturnsFlags()
+    {
+        // Arrange
+        this._jsonEvaluator.Sync(FlagConfigurationUpdateType.ADD, Utils.validFlagConfig);
+
+        // Act
+        var flags = this._jsonEvaluator.Flags;
+
+        // Assert
+        Assert.Single(flags);
+    }
+
+    [Fact]
     public void TestJsonEvaluatorAddStaticStringEvaluation()
     {
         _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);

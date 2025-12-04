@@ -50,6 +50,9 @@ internal enum FlagConfigurationUpdateType
 internal class JsonEvaluator
 {
     private Dictionary<string, FlagConfiguration> _flags = new Dictionary<string, FlagConfiguration>();
+
+    public IReadOnlyDictionary<string, FlagConfiguration> Flags { get => _flags; }
+
     private Dictionary<string, JsonElement> _flagSetMetadata = new Dictionary<string, JsonElement>();
 
     private string _selector;
