@@ -16,17 +16,16 @@ internal static class MetadataExtensions
     {
         return metadata.ToDictionary(
             kvp => kvp.Key,
-            kvp => ExtractPrimitiveValue(kvp.Key, kvp.Value)
+            kvp => ExtractPrimitiveValue(kvp.Value)
         );
     }
 
     /// <summary>
     /// Extracts a primitive value from an object that may be a JsonElement.
     /// </summary>
-    /// <param name="key">The key for error reporting purposes.</param>
     /// <param name="value">The value to extract.</param>
     /// <returns>The extracted primitive value.</returns>
-    private static object ExtractPrimitiveValue(string key, object value)
+    private static object ExtractPrimitiveValue(object value)
     {
         if (value is JsonElement jsonElement)
         {
