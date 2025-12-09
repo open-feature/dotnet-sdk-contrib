@@ -33,7 +33,7 @@ The Dev Container includes:
 
 If you prefer not to use the Dev Container, ensure you have the following installed:
 
-- .NET SDK 8.0 or later
+- .NET SDK 10.0 or later
 - Docker (for running E2E tests)
 
 ## Adding a project
