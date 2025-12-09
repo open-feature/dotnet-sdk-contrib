@@ -1,4 +1,5 @@
 using System.Text.Json;
+using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Extensions;
 using Xunit;
 
@@ -115,10 +116,10 @@ public class MetadataExtensionsTest
     }
 
     [Fact]
-    public void ToPrimitiveTypes_ShouldHandleJsonElementObject_AsString()
+    public void ToPrimitiveTypes_ShouldHandleJsonElementObject_AsDictionary()
     {
         // Arrange
-        var json = JsonSerializer.Deserialize<JsonElement>("{\"nested\": \"value\"}");
+        var json = JsonSerializer.Deserialize<JsonElement>("{\"nested\": \"value\", \"number\": 42}");
         var metadata = new Dictionary<string, object>
         {
             { "objectKey", json }
@@ -128,12 +129,36 @@ public class MetadataExtensionsTest
         var result = metadata.ToPrimitiveTypes();
 
         // Assert
-        Assert.IsType<string>(result["objectKey"]);
-        Assert.Contains("nested", (string)result["objectKey"]);
+        Assert.IsType<Dictionary<string, object>>(result["objectKey"]);
+        var dict = (Dictionary<string, object>)result["objectKey"];
+        Assert.Equal(2, dict.Count);
+        Assert.Equal("value", dict["nested"]);
+        Assert.Equal(42.0, dict["number"]);
     }
 
     [Fact]
-    public void ToPrimitiveTypes_ShouldHandleJsonElementArray_AsString()
+    public void ToPrimitiveTypes_ShouldHandleNestedJsonObject()
+    {
+        // Arrange
+        var json = JsonSerializer.Deserialize<JsonElement>("{\"outer\": {\"inner\": \"value\"}}");
+        var metadata = new Dictionary<string, object>
+        {
+            { "objectKey", json }
+        };
+
+        // Act
+        var result = metadata.ToPrimitiveTypes();
+
+        // Assert
+        Assert.IsType<Dictionary<string, object>>(result["objectKey"]);
+        var outerDict = (Dictionary<string, object>)result["objectKey"];
+        Assert.IsType<Dictionary<string, object>>(outerDict["outer"]);
+        var innerDict = (Dictionary<string, object>)outerDict["outer"];
+        Assert.Equal("value", innerDict["inner"]);
+    }
+
+    [Fact]
+    public void ToPrimitiveTypes_ShouldHandleJsonElementArray_AsList()
     {
         // Arrange
         var json = JsonSerializer.Deserialize<JsonElement>("[1, 2, 3]");
@@ -146,8 +171,82 @@ public class MetadataExtensionsTest
         var result = metadata.ToPrimitiveTypes();
 
         // Assert
-        Assert.IsType<string>(result["arrayKey"]);
-        Assert.Contains("1", (string)result["arrayKey"]);
+        Assert.IsType<List<object>>(result["arrayKey"]);
+        var list = (List<object>)result["arrayKey"];
+        Assert.Equal(3, list.Count);
+        Assert.Equal(1.0, list[0]);
+        Assert.Equal(2.0, list[1]);
+        Assert.Equal(3.0, list[2]);
+    }
+
+    [Fact]
+    public void ToPrimitiveTypes_ShouldHandleMixedTypeArray()
+    {
+        // Arrange
+        var json = JsonSerializer.Deserialize<JsonElement>("[\"hello\", 42, true, null]");
+        var metadata = new Dictionary<string, object>
+        {
+            { "arrayKey", json }
+        };
+
+        // Act
+        var result = metadata.ToPrimitiveTypes();
+
+        // Assert
+        Assert.IsType<List<object>>(result["arrayKey"]);
+        var list = (List<object>)result["arrayKey"];
+        Assert.Equal(4, list.Count);
+        Assert.Equal("hello", list[0]);
+        Assert.Equal(42.0, list[1]);
+        Assert.Equal(true, list[2]);
+        Assert.Equal(string.Empty, list[3]); // null converts to empty string
+    }
+
+    [Fact]
+    public void ToPrimitiveTypes_ShouldHandleNestedArrays()
+    {
+        // Arrange
+        var json = JsonSerializer.Deserialize<JsonElement>("[[1, 2], [3, 4]]");
+        var metadata = new Dictionary<string, object>
+        {
+            { "arrayKey", json }
+        };
+
+        // Act
+        var result = metadata.ToPrimitiveTypes();
+
+        // Assert
+        Assert.IsType<List<object>>(result["arrayKey"]);
+        var outerList = (List<object>)result["arrayKey"];
+        Assert.Equal(2, outerList.Count);
+        Assert.IsType<List<object>>(outerList[0]);
+        var innerList = (List<object>)outerList[0];
+        Assert.Equal(1.0, innerList[0]);
+        Assert.Equal(2.0, innerList[1]);
+    }
+
+    [Fact]
+    public void ToPrimitiveTypes_ShouldHandleArrayOfObjects()
+    {
+        // Arrange
+        var json = JsonSerializer.Deserialize<JsonElement>("[{\"name\": \"Alice\"}, {\"name\": \"Bob\"}]");
+        var metadata = new Dictionary<string, object>
+        {
+            { "arrayKey", json }
+        };
+
+        // Act
+        var result = metadata.ToPrimitiveTypes();
+
+        // Assert
+        Assert.IsType<List<object>>(result["arrayKey"]);
+        var list = (List<object>)result["arrayKey"];
+        Assert.Equal(2, list.Count);
+        Assert.IsType<Dictionary<string, object>>(list[0]);
+        var firstItem = (Dictionary<string, object>)list[0];
+        Assert.Equal("Alice", firstItem["name"]);
+        var secondItem = (Dictionary<string, object>)list[1];
+        Assert.Equal("Bob", secondItem["name"]);
     }
 
     [Fact]
