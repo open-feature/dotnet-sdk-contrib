@@ -84,7 +84,7 @@ public class OfrepOptionsEnvironmentTest : IDisposable
     public void ParseHeaders_ShouldReturnEmptyDictionary_WhenInputIsNullOrEmpty(string? input)
     {
         // Act
-        var headers = OfrepOptions.ParseHeaders(input!);
+        var headers = OfrepOptions.ParseHeaders(input);
 
         // Assert
         Assert.Empty(headers);
