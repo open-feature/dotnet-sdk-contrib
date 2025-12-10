@@ -191,6 +191,7 @@ public class OfrepOptions
     private static string GetEndpointValue(IConfiguration? configuration = null)
     {
         var value = configuration != null ? GetConfigValue(configuration, EnvVarEndpoint) : Environment.GetEnvironmentVariable(EnvVarEndpoint);
+        value ??= string.Empty;
         if (string.IsNullOrWhiteSpace(value))
         {
             throw new ArgumentException($"Configuration key '{EnvVarEndpoint}' or environment variable {EnvVarEndpoint} is required but was not set or is empty.", EnvVarEndpoint);
@@ -209,6 +210,7 @@ public class OfrepOptions
     {
         logger ??= NullLogger.Instance;
         var headers = new Dictionary<string, string>();
+        headersString ??= string.Empty;
 
         if (string.IsNullOrWhiteSpace(headersString))
         {
@@ -274,7 +276,7 @@ public class OfrepOptions
             if (parts.Count >= maxParts - 1)
             {
                 // Last part: take the rest of the string
-                current.Append(input.AsSpan(i));
+                current.Append(input.Substring(i));
                 break;
             }
 
