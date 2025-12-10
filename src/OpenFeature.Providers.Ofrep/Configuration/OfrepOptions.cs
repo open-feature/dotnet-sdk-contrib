@@ -171,7 +171,7 @@ public class OfrepOptions
     /// <summary>
     /// Gets a configuration value by key, falling back to environment variable if IConfiguration is not available or doesn't contain the key.
     /// </summary>
-    private static string? GetConfigValue(IConfiguration? configuration, string key)
+    internal static string? GetConfigValue(IConfiguration? configuration, string key)
     {
         // Try IConfiguration first
         var value = configuration?[key];

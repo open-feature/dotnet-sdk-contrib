@@ -25,7 +25,7 @@ internal class OfrepProviderOptionsValidator : IValidateOptions<OfrepProviderOpt
         // If BaseUrl is not set, check if configuration/environment variable is available as fallback
         if (string.IsNullOrWhiteSpace(options.BaseUrl))
         {
-            var configEndpoint = this.GetConfigurationValue(OfrepOptions.EnvVarEndpoint);
+            var configEndpoint = OfrepOptions.GetConfigValue(this._configuration, OfrepOptions.EnvVarEndpoint);
             if (string.IsNullOrWhiteSpace(configEndpoint))
             {
                 return ValidateOptionsResult.Fail(
@@ -62,21 +62,5 @@ internal class OfrepProviderOptionsValidator : IValidateOptions<OfrepProviderOpt
         }
 
         return ValidateOptionsResult.Success;
-    }
-
-    /// <summary>
-    /// Gets a configuration value by key, falling back to environment variable if IConfiguration is not available.
-    /// </summary>
-    private string? GetConfigurationValue(string key)
-    {
-        // Try IConfiguration first (which can include environment variables if AddEnvironmentVariables() was called)
-        var value = this._configuration?[key];
-        if (!string.IsNullOrWhiteSpace(value))
-        {
-            return value;
-        }
-
-        // Fall back to direct environment variable access
-        return Environment.GetEnvironmentVariable(key);
     }
 }
