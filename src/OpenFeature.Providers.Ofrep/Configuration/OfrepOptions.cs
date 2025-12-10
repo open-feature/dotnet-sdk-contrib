@@ -6,6 +6,22 @@ namespace OpenFeature.Providers.Ofrep.Configuration;
 public class OfrepOptions
 {
     /// <summary>
+    /// Environment variable name for the OFREP endpoint URL.
+    /// </summary>
+    public const string EnvVarEndpoint = "OFREP_ENDPOINT";
+
+    /// <summary>
+    /// Environment variable name for the OFREP headers.
+    /// Format: "Key1=Value1,Key2=Value2". Use backslash to escape special characters: \\ for \, \, for comma, \= for equals.
+    /// </summary>
+    public const string EnvVarHeaders = "OFREP_HEADERS";
+
+    /// <summary>
+    /// Environment variable name for the OFREP timeout in milliseconds.
+    /// </summary>
+    public const string EnvVarTimeout = "OFREP_TIMEOUT";
+
+    /// <summary>
     /// Gets or sets the base URL for the OFREP API.
     /// </summary>
     public string BaseUrl { get; set; }
