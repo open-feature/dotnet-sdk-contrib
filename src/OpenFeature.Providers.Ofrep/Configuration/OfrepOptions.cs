@@ -34,7 +34,7 @@ public class OfrepOptions
     /// <summary>
     /// Gets or sets the timeout for HTTP requests. Default is 10 seconds.
     /// </summary>
-    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(10);
+    public TimeSpan Timeout { get; set; } = DefaultTimeout;
 
     /// <summary>
     /// Gets or sets additional HTTP headers to include in requests.
@@ -254,6 +254,8 @@ public class OfrepOptions
 
         return headers;
     }
+
+    internal static TimeSpan DefaultTimeout => TimeSpan.FromSeconds(10);
 
     /// <summary>
     /// Splits a string by an unescaped delimiter character.

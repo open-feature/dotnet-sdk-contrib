@@ -55,7 +55,7 @@ public static class FeatureBuilderExtensions
             ofrepOptions = OfrepOptions.FromConfiguration(configuration, logger);
 
             // Apply any DI-configured overrides (timeout, headers) if they differ from defaults
-            if (opts.Timeout != TimeSpan.FromSeconds(10))
+            if (opts.Timeout != OfrepOptions.DefaultTimeout)
             {
                 ofrepOptions.Timeout = opts.Timeout;
             }
