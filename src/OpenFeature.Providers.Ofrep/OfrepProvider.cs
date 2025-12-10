@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client;
@@ -16,6 +17,45 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
 
     private const string Name = "OpenFeature Remote Evaluation Protocol Server";
     private bool _disposed;
+
+    /// <summary>
+    /// Creates new instance of <see cref="OfrepProvider"/> using environment variables for configuration.
+    /// </summary>
+    /// <param name="logger">Optional logger for warnings about malformed environment variable values.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the OFREP_ENDPOINT environment variable is not set, empty, or not a valid absolute URI.
+    /// </exception>
+    /// <remarks>
+    /// Reads configuration from the following environment variables:
+    /// <list type="bullet">
+    /// <item><description>OFREP_ENDPOINT (required): The OFREP server endpoint URL.</description></item>
+    /// <item><description>OFREP_HEADERS (optional): HTTP headers in format "Key1=Value1,Key2=Value2".</description></item>
+    /// <item><description>OFREP_TIMEOUT (optional): Request timeout in milliseconds.</description></item>
+    /// </list>
+    /// </remarks>
+    public OfrepProvider(ILogger<OfrepProvider> logger)
+        : this(OfrepOptions.FromEnvironment(logger), null)
+    {
+    }
+
+    /// <summary>
+    /// Creates new instance of <see cref="OfrepProvider"/> using environment variables for configuration.
+    /// </summary>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the OFREP_ENDPOINT environment variable is not set, empty, or not a valid absolute URI.
+    /// </exception>
+    /// <remarks>
+    /// Reads configuration from the following environment variables:
+    /// <list type="bullet">
+    /// <item><description>OFREP_ENDPOINT (required): The OFREP server endpoint URL.</description></item>
+    /// <item><description>OFREP_HEADERS (optional): HTTP headers in format "Key1=Value1,Key2=Value2".</description></item>
+    /// <item><description>OFREP_TIMEOUT (optional): Request timeout in milliseconds.</description></item>
+    /// </list>
+    /// </remarks>
+    public OfrepProvider()
+    : this(OfrepOptions.FromEnvironment(null), null)
+    {
+    }
 
     /// <summary>
     /// Creates new instance of <see cref="OfrepProvider"/>
