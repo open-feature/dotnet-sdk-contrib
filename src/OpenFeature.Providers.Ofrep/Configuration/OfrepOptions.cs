@@ -82,15 +82,9 @@ public class OfrepOptions
     {
         logger ??= NullLogger.Instance;
 
-        var endpoint = Environment.GetEnvironmentVariable(EnvVarEndpoint);
-        if (string.IsNullOrWhiteSpace(endpoint))
-        {
-            throw new ArgumentException(
-                $"Environment variable {EnvVarEndpoint} is required but was not set or is empty.",
-                EnvVarEndpoint);
-        }
+        var endpoint = GetEndpointValue();
 
-        var options = new OfrepOptions(endpoint!);
+        var options = new OfrepOptions(endpoint);
 
         // Parse timeout
         var timeoutStr = Environment.GetEnvironmentVariable(EnvVarTimeout);
@@ -114,7 +108,7 @@ public class OfrepOptions
         var headersStr = Environment.GetEnvironmentVariable(EnvVarHeaders);
         if (!string.IsNullOrWhiteSpace(headersStr))
         {
-            options.Headers = ParseHeaders(headersStr!, logger);
+            options.Headers = ParseHeaders(headersStr, logger);
         }
 
         return options;
@@ -142,15 +136,9 @@ public class OfrepOptions
     {
         logger ??= NullLogger.Instance;
 
-        var endpoint = GetConfigValue(configuration, EnvVarEndpoint);
-        if (string.IsNullOrWhiteSpace(endpoint))
-        {
-            throw new ArgumentException(
-                $"Configuration key '{EnvVarEndpoint}' or environment variable {EnvVarEndpoint} is required but was not set or is empty.",
-                EnvVarEndpoint);
-        }
+        var endpoint = GetEndpointValue(configuration);
 
-        var options = new OfrepOptions(endpoint!);
+        var options = new OfrepOptions(endpoint);
 
         // Parse timeout
         var timeoutStr = GetConfigValue(configuration, EnvVarTimeout);
@@ -174,7 +162,7 @@ public class OfrepOptions
         var headersStr = GetConfigValue(configuration, EnvVarHeaders);
         if (!string.IsNullOrWhiteSpace(headersStr))
         {
-            options.Headers = ParseHeaders(headersStr!, logger);
+            options.Headers = ParseHeaders(headersStr, logger);
         }
 
         return options;
@@ -197,13 +185,27 @@ public class OfrepOptions
     }
 
     /// <summary>
+    /// Gets a required configuration value, throwing if not present. Returns a non-null string.
+    /// This is a shim for .NET Framework where nullable flow analysis doesn't recognize IsNullOrWhiteSpace guards.
+    /// </summary>
+    private static string GetEndpointValue(IConfiguration? configuration = null)
+    {
+        var value = configuration != null ? GetConfigValue(configuration, EnvVarEndpoint) : Environment.GetEnvironmentVariable(EnvVarEndpoint);
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException($"Configuration key '{EnvVarEndpoint}' or environment variable {EnvVarEndpoint} is required but was not set or is empty.", EnvVarEndpoint);
+        }
+        return value;
+    }
+
+    /// <summary>
     /// Parses a header string in the format "Key1=Value1,Key2=Value2" with escape sequence support.
     /// Escape sequences: \\ for literal backslash, \, for literal comma, \= for literal equals.
     /// </summary>
-    /// <param name="headersString">The headers string to parse.</param>
+    /// <param name="headersString">The headers string to parse. Can be null or empty.</param>
     /// <param name="logger">Optional logger for warnings about malformed entries.</param>
     /// <returns>A dictionary of parsed headers.</returns>
-    internal static Dictionary<string, string> ParseHeaders(string headersString, ILogger? logger = null)
+    internal static Dictionary<string, string> ParseHeaders(string? headersString, ILogger? logger = null)
     {
         logger ??= NullLogger.Instance;
         var headers = new Dictionary<string, string>();
@@ -272,7 +274,7 @@ public class OfrepOptions
             if (parts.Count >= maxParts - 1)
             {
                 // Last part: take the rest of the string
-                current.Append(input.Substring(i));
+                current.Append(input.AsSpan(i));
                 break;
             }
 
