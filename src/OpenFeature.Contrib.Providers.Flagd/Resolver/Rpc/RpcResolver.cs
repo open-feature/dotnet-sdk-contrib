@@ -19,6 +19,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 
 internal class RpcResolver : Resolver
 {
+    private const string FLAGS_RPC_FIELD_NAME = "flags";
+
     static int EventStreamRetryBaseBackoff = 1;
     readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly FlagdConfig _config;
@@ -215,9 +217,9 @@ internal class RpcResolver : Resolver
                     var response = call.ResponseStream.Current;
 
                     var flagsChanged = new List<string>();
-                    if (response.Data != null && response.Data.Fields.ContainsKey("flags"))
+                    if (response.Data != null && response.Data.Fields.ContainsKey(FLAGS_RPC_FIELD_NAME))
                     {
-                        var flagsExist = response.Data.Fields.TryGetValue("flags", out ProtoValue val);
+                        var flagsExist = response.Data.Fields.TryGetValue(FLAGS_RPC_FIELD_NAME, out ProtoValue val);
                         if (flagsExist && val.KindCase == ProtoValue.KindOneofCase.StructValue)
                         {
                             foreach (var item in val.StructValue.Fields)
