@@ -285,8 +285,21 @@ internal class JsonEvaluator
             }
 
             // using the returned variant, go through the available variants and take the correct value if it exists
-            if (variant == null)
+            if (string.IsNullOrEmpty(variant))
             {
+                if (string.IsNullOrEmpty(flagConfiguration.DefaultVariant))
+                {
+                    return new ResolutionDetails<T>(
+                        flagKey: flagKey,
+                        defaultValue,
+                        errorType: ErrorType.FlagNotFound,
+                        errorMessage: $"Flag '{flagKey}' has no default variant defined, will use code default",
+                        reason: Reason.Error,
+                        variant: null,
+                        flagMetadata: flagMetadata
+                    );
+                }
+
                 // if variant is null, revert to default
                 reason = Reason.Default;
                 flagConfiguration.Variants.TryGetValue(flagConfiguration.DefaultVariant,

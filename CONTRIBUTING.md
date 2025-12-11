@@ -4,6 +4,38 @@
 
 Dotnet 8+ is recommended.
 
+## Development Environment
+
+### Dev Container
+
+This repository includes a [Dev Container](https://containers.dev/) configuration that provides a fully configured development environment with all necessary tools and extensions pre-installed.
+
+#### Prerequisites
+
+- [Docker](https://www.docker.com/products/docker-desktop/) installed and running
+- [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+#### Getting Started with Dev Container
+
+1. Clone the repository
+2. Open the repository in VS Code
+3. When prompted, click "Reopen in Container" or run the command `Dev Containers: Reopen in Container` from the Command Palette (F1)
+4. Wait for the container to build and start (this may take a few minutes the first time)
+
+The Dev Container includes:
+
+- .NET SDK 10.0 with .NET 9.0 and 8.0 runtimes
+- GitHub CLI
+- Docker-in-Docker support for running E2E tests
+- Recommended VS Code extensions for C# development
+
+### Manual Setup
+
+If you prefer not to use the Dev Container, ensure you have the following installed:
+
+- .NET SDK 10.0 or later
+- Docker (for running E2E tests)
+
 ## Adding a project
 
 1. Create a new library project under `src/`: `dotnet new classlib -o src/OpenFeature.Contrib.MyComponent`
