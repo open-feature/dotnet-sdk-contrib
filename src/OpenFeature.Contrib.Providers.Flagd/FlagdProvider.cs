@@ -125,12 +125,7 @@ public sealed class FlagdProvider : FeatureProvider
         {
             case ProviderEventTypes.ProviderConfigurationChanged:
                 {
-                    var context = EvaluationContext.Builder();
-                    foreach (var item in payload.SyncMetadata.AsDictionary())
-                    {
-                        context.Set(item.Key, item.Value);
-                    }
-                    this._enrichedContext = context.Build();
+                    this.UpdateEnrichedContext(payload);
 
                     if (this._connected)
                     {
@@ -156,12 +151,7 @@ public sealed class FlagdProvider : FeatureProvider
 
             case ProviderEventTypes.ProviderReady:
                 {
-                    var context = EvaluationContext.Builder();
-                    foreach (var item in payload.SyncMetadata.AsDictionary())
-                    {
-                        context.Set(item.Key, item.Value);
-                    }
-                    this._enrichedContext = context.Build();
+                    this.UpdateEnrichedContext(payload);
 
                     this.EventChannel.Writer.TryWrite(new ProviderEventPayload
                     {
@@ -188,6 +178,16 @@ public sealed class FlagdProvider : FeatureProvider
             default:
                 break;
         }
+    }
+
+    private void UpdateEnrichedContext(FlagdProviderEvent payload)
+    {
+        var context = EvaluationContext.Builder();
+        foreach (var item in payload.SyncMetadata.AsDictionary())
+        {
+            context.Set(item.Key, item.Value);
+        }
+        this._enrichedContext = context.Build();
     }
 
     /// <inheritdoc/>
