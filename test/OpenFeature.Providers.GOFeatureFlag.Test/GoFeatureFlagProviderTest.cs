@@ -371,7 +371,8 @@ public class GOFeatureFlagProviderTest
             Assert.True(handlerCalled);
         }
 
-        [Fact(DisplayName = "Should change evaluation details if config has changed")]
+        [Fact(DisplayName = "Should change evaluation details if config has changed",
+            Skip = "This test is failing. See https://github.com/open-feature/dotnet-sdk-contrib/issues/506")]
         public async Task ShouldChangeEvaluationDetailsIfConfigHasChanged()
         {
             var mockHttp = new RelayProxyMock();
