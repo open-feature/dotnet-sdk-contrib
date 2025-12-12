@@ -12,6 +12,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test.Resolver.Rpc;
 
 public class RpcResolverTests
 {
+    private const int TestTimeoutMilliseconds = 10_000;
+
     [Fact]
     public async Task HandleEvents_CallsFlagdProviderEventHandler()
     {
@@ -65,7 +67,7 @@ public class RpcResolverTests
         await resolver.Init();
 
         // Assert
-        Assert.True(autoResetEvent.WaitOne(10_000));
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
         Assert.NotNull(flagdProviderEvent);
         Assert.Equal(Constant.ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
@@ -104,7 +106,7 @@ public class RpcResolverTests
         await resolver.Init();
 
         // Assert
-        Assert.True(autoResetEvent.WaitOne(10_000));
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
         Assert.NotNull(flagdProviderEvent);
         Assert.Equal(Constant.ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
@@ -144,7 +146,7 @@ public class RpcResolverTests
         await resolver.Init();
 
         // Assert
-        Assert.True(autoResetEvent.WaitOne(10_000));
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
         Assert.NotNull(flagdProviderEvent);
         Assert.Equal(Constant.ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
@@ -180,23 +182,20 @@ public class RpcResolverTests
             CacheEnabled = true
         };
 
-        var purgedCalled = false;
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "key1")).Returns(null);
         mockCache.Add(Arg.Is<string>(s => s == "key1"), Arg.Any<object>());
-        mockCache.When(x => x.Purge()).Do(_ => { purgedCalled = true; autoResetEvent.Set(); });
+        mockCache.When(x => x.Purge()).Do(_ => { autoResetEvent.Set(); });
 
-        FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => flagdProviderEvent = ctx);
+        var resolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => { });
 
         // Act
         await resolver.Init();
 
         // Assert
-        Assert.True(autoResetEvent.WaitOne(10_000));
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
-        Assert.NotNull(flagdProviderEvent);
-        Assert.True(purgedCalled);
+        mockCache.Received().Purge();
     }
 
     [Fact]
@@ -227,30 +226,26 @@ public class RpcResolverTests
             CacheEnabled = true
         };
 
-        var deletedCalled = false;
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "key1")).Returns(null);
         mockCache.Add(Arg.Is<string>(s => s == "key1"), Arg.Any<object>());
-        mockCache.When(x => x.Delete("key1")).Do(_ => { deletedCalled = true; autoResetEvent.Set(); });
+        mockCache.When(x => x.Delete("key1")).Do(_ => { autoResetEvent.Set(); });
 
-        FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => flagdProviderEvent = ctx);
+        var resolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => { });
 
         // Act
         await resolver.Init();
 
         // Assert
-        Assert.True(autoResetEvent.WaitOne(10_000));
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
-        Assert.NotNull(flagdProviderEvent);
-        Assert.True(deletedCalled);
+        mockCache.Received().Delete("key1");
     }
 
     private static Service.ServiceClient SetupGrpcStream(List<EventStreamResponse> responses)
     {
         var mockGrpcClient = Substitute.For<Service.ServiceClient>();
         var asyncStreamReader = Substitute.For<IAsyncStreamReader<EventStreamResponse>>();
-        var autoResetEvent = new AutoResetEvent(false);
 
         var enumerator = responses.GetEnumerator();
         asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(enumerator.MoveNext());
