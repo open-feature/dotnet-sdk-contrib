@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 #if NET462_OR_GREATER
-using System.Linq;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -30,35 +30,29 @@ internal class InProcessResolver : Resolver
     readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly FlagSyncService.FlagSyncServiceClient _client;
     private readonly JsonEvaluator _evaluator;
-    private readonly Mutex _mtx;
     private int _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
     private readonly FlagdConfig _config;
     private GrpcChannel _channel;
-    private Channel<object> _eventChannel;
-    private Model.Metadata _providerMetadata;
     private readonly IJsonSchemaValidator _jsonSchemaValidator;
-    private bool connected = false;
+    private readonly Action<FlagdProviderEvent> _flagdEventPublisher;
 
-    internal InProcessResolver(FlagdConfig config, Channel<object> eventChannel, Model.Metadata providerMetadata, IJsonSchemaValidator jsonSchemaValidator)
+    internal InProcessResolver(FlagdConfig config, IJsonSchemaValidator jsonSchemaValidator, Action<FlagdProviderEvent> flagdEventPublisher)
     {
-        _eventChannel = eventChannel;
-        _providerMetadata = providerMetadata;
-        _jsonSchemaValidator = jsonSchemaValidator;
-        _config = config;
-        _client = BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
-        _mtx = new Mutex();
-        _evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
+        this._jsonSchemaValidator = jsonSchemaValidator;
+        this._flagdEventPublisher = flagdEventPublisher;
+        this._config = config;
+        this._client = this.BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
+        this._evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
     }
 
     internal InProcessResolver(
         FlagSyncService.FlagSyncServiceClient client,
         FlagdConfig config,
-        Channel<object> eventChannel,
-        Model.Metadata providerMetadata,
-        IJsonSchemaValidator jsonSchemaValidator)
-            : this(config, eventChannel, providerMetadata, jsonSchemaValidator)
+        IJsonSchemaValidator jsonSchemaValidator,
+        Action<FlagdProviderEvent> flagdEventPublisher)
+            : this(config, jsonSchemaValidator, flagdEventPublisher)
     {
-        _client = client;
+        this._client = client;
     }
 
     public async Task Init()
@@ -130,13 +124,27 @@ internal class InProcessResolver : Resolver
                 while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
-                    _evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
+                    this._evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
+
                     if (!latch.IsSet)
                     {
                         latch.Signal();
                     }
-                    HandleProviderReadyEvent();
-                    HandleProviderChangeEvent();
+
+                    // Reset delay backoff on successful response
+                    this._eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
+
+                    var metadata = Structure.Builder();
+                    if (response.SyncContext != null)
+                    {
+                        foreach (var item in response.SyncContext.Fields)
+                        {
+                            metadata.Set(item.Key, ExtractValue(item.Value));
+                        }
+                    }
+
+                    var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(this._evaluator.Flags.Keys), metadata.Build());
+                    this._flagdEventPublisher(flagdEvent);
                 }
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
@@ -145,45 +153,43 @@ internal class InProcessResolver : Resolver
             }
             catch (RpcException)
             {
+                var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
+                this._flagdEventPublisher(flagdEvent);
+
                 // Handle the dropped connection by reconnecting and retrying the stream
-                await HandleErrorEvent().ConfigureAwait(false);
+                this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
+                await Task.Delay(this._eventStreamRetryBackoff * 1000).ConfigureAwait(false);
             }
         }
     }
 
-    private void HandleProviderReadyEvent()
+    private static Value ExtractValue(Google.Protobuf.WellKnownTypes.Value value)
     {
-        _mtx.WaitOne();
-        _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
-        if (!connected)
+        switch (value.KindCase)
         {
-            connected = true;
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderReady, ProviderName = _providerMetadata.Name });
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.BoolValue:
+                return new Value(value.BoolValue);
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.NumberValue:
+                return new Value(value.NumberValue);
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.StringValue:
+                return new Value(value.StringValue);
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.StructValue:
+                {
+                    var val = Structure.Builder();
+                    foreach (var item in value.StructValue.Fields)
+                    {
+                        val.Set(item.Key, ExtractValue(item.Value));
+                    }
+                    return new Value(val.Build());
+                }
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.ListValue:
+                return new Value(value.ListValue.Values.Select(ExtractValue));
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.NullValue:
+            case Google.Protobuf.WellKnownTypes.Value.KindOneofCase.None:
+                break;
         }
-        _mtx.ReleaseMutex();
-    }
 
-    private async Task HandleErrorEvent()
-    {
-        _mtx.WaitOne();
-        _eventStreamRetryBackoff = Math.Min(_eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
-        if (connected)
-        {
-            connected = false;
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderError, ProviderName = _providerMetadata.Name });
-        }
-        _mtx.ReleaseMutex();
-        await Task.Delay(_eventStreamRetryBackoff * 1000).ConfigureAwait(false);
-    }
-
-    private void HandleProviderChangeEvent()
-    {
-        _mtx.WaitOne();
-        if (connected)
-        {
-            _eventChannel.Writer.TryWrite(new ProviderEventPayload { Type = ProviderEventTypes.ProviderConfigurationChanged, ProviderName = _providerMetadata.Name });
-        }
-        _mtx.ReleaseMutex();
+        return new Value();
     }
 
     private T BuildClient<T>(FlagdConfig config, Func<GrpcChannel, T> constructorFunc)

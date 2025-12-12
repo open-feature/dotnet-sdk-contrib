@@ -2,6 +2,10 @@
 
 This repository is intended for OpenFeature contributions which are not included in the [OpenFeature SDK](https://github.com/open-feature/dotnet-sdk).
 
+## Development
+
+This repository includes a [Dev Container](https://containers.dev/) configuration for a fully configured development environment. Simply open the repository in VS Code and select "Reopen in Container" when prompted. See the [CONTRIBUTING.md](./CONTRIBUTING.md) guide for more details.
+
 ## Contributing
 
 Interested in contributing? Great, we'd love your help! To get started, take a look at the [CONTRIBUTING.md](./CONTRIBUTING.md) guide.
