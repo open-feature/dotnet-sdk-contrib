@@ -87,6 +87,91 @@ The `OfrepOptions` class supports the following options:
 -   `Timeout` (optional): HTTP client timeout. The default value is 10 seconds.
 -   `Headers` (optional): Additional HTTP headers to include in requests
 
+## Environment Variable Configuration
+
+The OFREP provider supports configuration via environment variables, enabling zero-code configuration for containerized deployments and CI/CD pipelines.
+
+### Supported Environment Variables
+
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `OFREP_ENDPOINT` | Yes | The OFREP server endpoint URL | `http://localhost:8080` |
+| `OFREP_HEADERS` | No | HTTP headers in `Key=Value,Key2=Value2` format | `Authorization=Bearer token,X-Api-Key=abc123` |
+| `OFREP_TIMEOUT` | No | Request timeout in milliseconds (default: 10000) | `5000` |
+
+### Usage with Environment Variables
+
+```csharp
+using OpenFeature;
+using OpenFeature.Providers.Ofrep;
+
+// Create provider using environment variables (no explicit configuration needed)
+var provider = new OfrepProvider();
+await Api.Instance.SetProviderAsync(provider);
+```
+
+Or explicitly load from environment:
+
+```csharp
+using OpenFeature.Providers.Ofrep.Configuration;
+
+// Explicitly create options from environment variables
+var options = OfrepOptions.FromEnvironment();
+var provider = new OfrepProvider(options);
+```
+
+### Header Format and Escape Sequences
+
+The `OFREP_HEADERS` environment variable uses a simple `Key=Value` format separated by commas. To include special characters in header values, use escape sequences:
+
+| Escape | Character |
+|--------|-----------|
+| `\\` | Backslash (`\`) |
+| `\,` | Comma (`,`) |
+| `\=` | Equals (`=`) |
+
+**Examples:**
+
+```bash
+# Simple headers
+export OFREP_HEADERS="Authorization=Bearer token123,Content-Type=application/json"
+
+# Header value containing equals sign (e.g., base64)
+export OFREP_HEADERS="Authorization=Bearer\=abc123"
+
+# Header value containing comma
+export OFREP_HEADERS="X-Custom=value1\,value2"
+
+# Multiple special characters
+export OFREP_HEADERS="X-Path=C:\\Users\\test,X-Data=a\=b\,c"
+```
+
+### Dependency Injection with IConfiguration
+
+When using dependency injection, the provider can read configuration from `IConfiguration`, which supports environment variables via `AddEnvironmentVariables()`:
+
+```csharp
+// In Program.cs or Startup.cs
+builder.Configuration.AddEnvironmentVariables();
+
+builder.Services.AddOpenFeature(featureBuilder =>
+{
+    featureBuilder.AddOfrepProvider(options =>
+    {
+        // Options will fall back to OFREP_ENDPOINT, OFREP_HEADERS, OFREP_TIMEOUT
+        // from IConfiguration (which includes environment variables)
+    });
+});
+```
+
+### Configuration Precedence
+
+When multiple configuration sources are available, the following precedence order applies (highest to lowest):
+
+1. **Programmatic configuration** (explicit `OfrepOptions` or `OfrepProviderOptions` values)
+2. **IConfiguration** (when using DI, includes appsettings.json, user secrets, etc.)
+3. **Environment variables** (direct `Environment.GetEnvironmentVariable` fallback)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

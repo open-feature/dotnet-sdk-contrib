@@ -2,6 +2,8 @@
 using System.Net.Http;
 #endif
 
+using OpenFeature.Providers.Ofrep.Configuration;
+
 namespace OpenFeature.Providers.Ofrep.DependencyInjection;
 
 /// <summary>
@@ -22,7 +24,7 @@ public record OfrepProviderOptions
     /// <summary>
     /// HTTP request timeout. Defaults to 10 seconds.
     /// </summary>
-    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(10);
+    public TimeSpan Timeout { get; set; } = OfrepOptions.DefaultTimeout;
 
     /// <summary>
     /// Optional additional HTTP headers.
