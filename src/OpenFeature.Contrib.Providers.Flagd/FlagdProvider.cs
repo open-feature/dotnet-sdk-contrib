@@ -72,14 +72,15 @@ public sealed class FlagdProvider : FeatureProvider
         if (_config.ResolverType == ResolverType.IN_PROCESS)
         {
             var jsonSchemaValidator = new JsonSchemaValidator(null, _config.Logger);
-            _resolver = new InProcessResolver(_config, jsonSchemaValidator, this.OnProviderEvent);
+            _resolver = new InProcessResolver(_config, jsonSchemaValidator);
         }
         else
         {
-            _resolver = new RpcResolver(config, this.OnProviderEvent);
+            _resolver = new RpcResolver(config);
         }
 
         _hooks.Add(new SyncMetadataHook(() => this._enrichedContext));
+        _resolver.ProviderEvent += (_, e) => this.OnProviderEvent(e);
     }
 
     // just for testing, internal but visible in tests
@@ -118,6 +119,7 @@ public sealed class FlagdProvider : FeatureProvider
     internal EvaluationContext _enrichedContext = EvaluationContext.Empty;
 
     private bool _connected;
+    private ProviderEventTypes _previousEventType;
 
     internal void OnProviderEvent(FlagdProviderEvent payload)
     {
@@ -145,6 +147,7 @@ public sealed class FlagdProvider : FeatureProvider
                     });
 
                     this._connected = true;
+                    this._previousEventType = ProviderEventTypes.ProviderConfigurationChanged;
 
                     break;
                 }
@@ -160,6 +163,7 @@ public sealed class FlagdProvider : FeatureProvider
                     });
 
                     this._connected = true;
+                    this._previousEventType = ProviderEventTypes.ProviderReady;
 
                     break;
                 }
@@ -171,6 +175,8 @@ public sealed class FlagdProvider : FeatureProvider
                         Type = ProviderEventTypes.ProviderError,
                         ProviderName = this._providerMetadata.Name
                     });
+
+                    this._previousEventType = ProviderEventTypes.ProviderError;
 
                     break;
                 }
@@ -200,6 +206,8 @@ public sealed class FlagdProvider : FeatureProvider
     public override async Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
         await _resolver.Shutdown().ConfigureAwait(false);
+
+        _resolver.ProviderEvent -= (_, e) => this.OnProviderEvent(e);
     }
 
     /// <inheritdoc/>
