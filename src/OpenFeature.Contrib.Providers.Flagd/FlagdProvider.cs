@@ -80,7 +80,7 @@ public sealed class FlagdProvider : FeatureProvider
         }
 
         _hooks.Add(new SyncMetadataHook(() => this._enrichedContext));
-        _resolver.ProviderEvent += (_, e) => this.OnProviderEvent(e);
+        this._resolver.ProviderEvent += this.OnProviderEvent;
     }
 
     // just for testing, internal but visible in tests
@@ -119,9 +119,8 @@ public sealed class FlagdProvider : FeatureProvider
     internal EvaluationContext _enrichedContext = EvaluationContext.Empty;
 
     private bool _connected;
-    private ProviderEventTypes _previousEventType;
 
-    internal void OnProviderEvent(FlagdProviderEvent payload)
+    internal void OnProviderEvent(object _, FlagdProviderEvent payload)
     {
         switch (payload.EventType)
         {
@@ -147,7 +146,6 @@ public sealed class FlagdProvider : FeatureProvider
                     });
 
                     this._connected = true;
-                    this._previousEventType = ProviderEventTypes.ProviderConfigurationChanged;
 
                     break;
                 }
@@ -163,7 +161,6 @@ public sealed class FlagdProvider : FeatureProvider
                     });
 
                     this._connected = true;
-                    this._previousEventType = ProviderEventTypes.ProviderReady;
 
                     break;
                 }
@@ -175,8 +172,6 @@ public sealed class FlagdProvider : FeatureProvider
                         Type = ProviderEventTypes.ProviderError,
                         ProviderName = this._providerMetadata.Name
                     });
-
-                    this._previousEventType = ProviderEventTypes.ProviderError;
 
                     break;
                 }
@@ -207,7 +202,7 @@ public sealed class FlagdProvider : FeatureProvider
     {
         await _resolver.Shutdown().ConfigureAwait(false);
 
-        _resolver.ProviderEvent -= (_, e) => this.OnProviderEvent(e);
+        this._resolver.ProviderEvent -= this.OnProviderEvent;
     }
 
     /// <inheritdoc/>

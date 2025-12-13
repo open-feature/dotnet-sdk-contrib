@@ -851,7 +851,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
 
@@ -879,7 +879,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         Assert.Equal(1, flagdProvider._enrichedContext.Count);
@@ -903,7 +903,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderReady, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         Assert.Equal(1, flagdProvider._enrichedContext.Count);
@@ -930,10 +930,10 @@ public class UnitTestFlagdProvider
         var channel = flagdProvider.GetEventChannel();
 
         // Act
-        flagdProvider.OnProviderEvent(payload1);
+        flagdProvider.OnProviderEvent(null, payload1);
         channel.Reader.TryRead(out var _); // clear first event
 
-        flagdProvider.OnProviderEvent(payload2);
+        flagdProvider.OnProviderEvent(null, payload2);
 
         // Assert
         var eventPublished = channel.Reader.TryRead(out var item);
@@ -959,7 +959,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderError, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         var channel = flagdProvider.GetEventChannel();
@@ -987,7 +987,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderError, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         Assert.Equal(0, flagdProvider._enrichedContext.Count);
@@ -1008,7 +1008,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderStale, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         var channel = flagdProvider.GetEventChannel();
