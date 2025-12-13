@@ -186,7 +186,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(substituteGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(substituteGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // resolve with default set to false to make sure we return what the grpc server gives us
@@ -215,7 +215,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveStringRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveStringValueAsync("my-key", "");
@@ -244,7 +244,7 @@ public class UnitTestFlagdProvider
         subGrpcClient.ResolveIntAsync(Arg.Any<ResolveIntRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveIntegerValueAsync("my-key", 0);
@@ -273,7 +273,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveDoubleValueAsync("my-key", 0.0);
@@ -305,7 +305,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveStructureValueAsync("my-key", null);
@@ -331,7 +331,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveBooleanAsync(
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None).Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -366,7 +366,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -401,7 +401,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -436,7 +436,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -517,7 +517,7 @@ public class UnitTestFlagdProvider
         config.CacheEnabled = true;
         config.MaxEventStreamRetries = 1;
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -583,7 +583,7 @@ public class UnitTestFlagdProvider
             MaxEventStreamRetries = 1
         };
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -681,7 +681,7 @@ public class UnitTestFlagdProvider
         config.CacheEnabled = true;
         config.MaxEventStreamRetries = 1;
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => { });
+        var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -748,7 +748,7 @@ public class UnitTestFlagdProvider
         config.MaxEventStreamRetries = 1;
         config.SourceSelector = "source-selector";
 
-        var rpcResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator, evt => { });
+        var rpcResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -808,7 +808,7 @@ public class UnitTestFlagdProvider
         config.MaxEventStreamRetries = 1;
         config.SourceSelector = "source-selector";
 
-        var inProcessResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator, evt => { });
+        var inProcessResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
         var flagdProvider = new FlagdProvider(inProcessResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -851,7 +851,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
 
@@ -879,7 +879,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         Assert.Equal(1, flagdProvider._enrichedContext.Count);
@@ -903,7 +903,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderReady, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         Assert.Equal(1, flagdProvider._enrichedContext.Count);
@@ -930,10 +930,10 @@ public class UnitTestFlagdProvider
         var channel = flagdProvider.GetEventChannel();
 
         // Act
-        flagdProvider.OnProviderEvent(payload1);
+        flagdProvider.OnProviderEvent(null, payload1);
         channel.Reader.TryRead(out var _); // clear first event
 
-        flagdProvider.OnProviderEvent(payload2);
+        flagdProvider.OnProviderEvent(null, payload2);
 
         // Assert
         var eventPublished = channel.Reader.TryRead(out var item);
@@ -959,7 +959,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderError, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         var channel = flagdProvider.GetEventChannel();
@@ -987,7 +987,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderError, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         Assert.Equal(0, flagdProvider._enrichedContext.Count);
@@ -1008,7 +1008,7 @@ public class UnitTestFlagdProvider
         var payload = new FlagdProviderEvent(ProviderEventTypes.ProviderStale, flagsChanged, metadata);
 
         // Act
-        flagdProvider.OnProviderEvent(payload);
+        flagdProvider.OnProviderEvent(null, payload);
 
         // Assert
         var channel = flagdProvider.GetEventChannel();

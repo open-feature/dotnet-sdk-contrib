@@ -58,7 +58,8 @@ public class RpcResolverTests
         var config = new FlagdConfig();
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new RpcResolver(mockGrpcClient, config, null, ctx => flagdProviderEvent = ctx);
+        var resolver = new RpcResolver(mockGrpcClient, config, null);
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
 
         // Act
         await resolver.Init();
@@ -95,7 +96,8 @@ public class RpcResolverTests
         var config = new FlagdConfig();
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new RpcResolver(mockGrpcClient, config, null, ctx => flagdProviderEvent = ctx);
+        var resolver = new RpcResolver(mockGrpcClient, config, null);
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
 
         // Act
         await resolver.Init();
@@ -133,7 +135,8 @@ public class RpcResolverTests
         var config = new FlagdConfig();
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new RpcResolver(mockGrpcClient, config, null, ctx => flagdProviderEvent = ctx);
+        var resolver = new RpcResolver(mockGrpcClient, config, null);
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
 
         // Act
         await resolver.Init();
@@ -180,7 +183,8 @@ public class RpcResolverTests
         mockCache.When(x => x.Purge()).Do(_ => purgedCalled = true);
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => flagdProviderEvent = ctx);
+        var resolver = new RpcResolver(mockGrpcClient, config, mockCache);
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
 
         // Act
         await resolver.Init();
@@ -225,7 +229,8 @@ public class RpcResolverTests
         mockCache.When(x => x.Delete("key1")).Do(_ => deletedCalled = true);
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new RpcResolver(mockGrpcClient, config, mockCache, ctx => flagdProviderEvent = ctx);
+        var resolver = new RpcResolver(mockGrpcClient, config, mockCache);
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
 
         // Act
         await resolver.Init();
