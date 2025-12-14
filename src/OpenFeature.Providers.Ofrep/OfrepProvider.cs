@@ -4,6 +4,7 @@ using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client;
 using OpenFeature.Providers.Ofrep.Client.Constants;
 using OpenFeature.Providers.Ofrep.Configuration;
+using OpenFeature.Providers.Ofrep.Extensions;
 
 namespace OpenFeature.Providers.Ofrep;
 
@@ -169,7 +170,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             reason: response.Reason,
             variant: response.Variant,
             errorMessage: response.ErrorMessage,
-            flagMetadata: response.Metadata != null ? new ImmutableMetadata(response.Metadata) : null);
+            flagMetadata: response.Metadata != null ? new ImmutableMetadata(response.Metadata.ToPrimitiveTypes()) : null);
     }
 
     /// <summary>
@@ -203,7 +204,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             reason: response.Reason,
             variant: response.Variant,
             errorMessage: response.ErrorMessage,
-            flagMetadata: response.Metadata != null ? new ImmutableMetadata(response.Metadata) : null);
+            flagMetadata: response.Metadata != null ? new ImmutableMetadata(response.Metadata.ToPrimitiveTypes()) : null);
     }
 
     /// <summary>
