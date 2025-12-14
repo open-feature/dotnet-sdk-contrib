@@ -24,7 +24,7 @@ public class OfrepOptions
     /// <summary>
     /// Environment variable name for the OFREP timeout in milliseconds.
     /// </summary>
-    public const string EnvVarTimeout = "OFREP_TIMEOUT";
+    public const string EnvVarTimeout = "OFREP_TIMEOUT_MS";
 
     /// <summary>
     /// Gets or sets the base URL for the OFREP API.

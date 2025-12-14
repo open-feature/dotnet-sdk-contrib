@@ -174,7 +174,7 @@ public class OfrepOptionsEnvironmentTest : IDisposable
     {
         Assert.Equal("OFREP_ENDPOINT", OfrepOptions.EnvVarEndpoint);
         Assert.Equal("OFREP_HEADERS", OfrepOptions.EnvVarHeaders);
-        Assert.Equal("OFREP_TIMEOUT", OfrepOptions.EnvVarTimeout);
+        Assert.Equal("OFREP_TIMEOUT_MS", OfrepOptions.EnvVarTimeout);
     }
 
     #endregion
