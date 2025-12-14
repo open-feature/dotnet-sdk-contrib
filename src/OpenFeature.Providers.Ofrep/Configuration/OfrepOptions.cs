@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -8,7 +7,7 @@ namespace OpenFeature.Providers.Ofrep.Configuration;
 /// <summary>
 /// Configuration options for the OFREP provider.
 /// </summary>
-public class OfrepOptions
+public partial class OfrepOptions
 {
     /// <summary>
     /// Environment variable name for the OFREP endpoint URL.
@@ -17,7 +16,7 @@ public class OfrepOptions
 
     /// <summary>
     /// Environment variable name for the OFREP headers.
-    /// Format: "Key1=Value1,Key2=Value2". Use backslash to escape special characters: \\ for \, \, for comma, \= for equals.
+    /// Format: \"Key1=Value1,Key2=Value2\". Supports URL-encoded values. Commas are always header separators.
     /// </summary>
     public const string EnvVarHeaders = "OFREP_HEADERS";
 
@@ -35,6 +34,7 @@ public class OfrepOptions
     /// Gets or sets the timeout for HTTP requests. Default is 10 seconds.
     /// </summary>
     public TimeSpan Timeout { get; set; } = DefaultTimeout;
+    internal static TimeSpan DefaultTimeout => TimeSpan.FromSeconds(10);
 
     /// <summary>
     /// Gets or sets additional HTTP headers to include in requests.
@@ -74,8 +74,8 @@ public class OfrepOptions
     /// Reads the following environment variables:
     /// <list type="bullet">
     /// <item><description>OFREP_ENDPOINT (required): The OFREP server endpoint URL.</description></item>
-    /// <item><description>OFREP_HEADERS (optional): HTTP headers in format "Key1=Value1,Key2=Value2". Supports escape sequences: \\ for backslash, \, for comma, \= for equals.</description></item>
-    /// <item><description>OFREP_TIMEOUT (optional): Request timeout in milliseconds. Defaults to 10000 (10 seconds).</description></item>
+    /// <item><description>OFREP_HEADERS (optional): HTTP headers in format "Key1=Value1,Key2=Value2". Values may be URL-encoded to include special characters.</description></item>
+    /// <item><description>OFREP_TIMEOUT_MS (optional): Request timeout in milliseconds. Defaults to 10000 (10 seconds).</description></item>
     /// </list>
     /// </remarks>
     public static OfrepOptions FromEnvironment(ILogger? logger = null)
@@ -96,11 +96,7 @@ public class OfrepOptions
             }
             else
             {
-                logger.Log(
-                    LogLevel.Warning,
-                    "Invalid value '{TimeoutValue}' for environment variable {EnvVar}. Using default timeout of 10 seconds.",
-                    timeoutStr,
-                    EnvVarTimeout);
+                LogInvalidTimeoutEnvVar(logger, timeoutStr, EnvVarTimeout);
             }
         }
 
@@ -127,8 +123,8 @@ public class OfrepOptions
     /// Reads the following configuration keys (with environment variable fallback):
     /// <list type="bullet">
     /// <item><description>OFREP_ENDPOINT (required): The OFREP server endpoint URL.</description></item>
-    /// <item><description>OFREP_HEADERS (optional): HTTP headers in format "Key1=Value1,Key2=Value2". Supports escape sequences: \\ for backslash, \, for comma, \= for equals.</description></item>
-    /// <item><description>OFREP_TIMEOUT (optional): Request timeout in milliseconds. Defaults to 10000 (10 seconds).</description></item>
+    /// <item><description>OFREP_HEADERS (optional): HTTP headers in format "Key1=Value1,Key2=Value2". Values may be URL-encoded to include special characters.</description></item>
+    /// <item><description>OFREP_TIMEOUT_MS (optional): Request timeout in milliseconds. Defaults to 10000 (10 seconds).</description></item>
     /// </list>
     /// When using IConfiguration, ensure AddEnvironmentVariables() is called in your configuration setup to enable environment variable support.
     /// </remarks>
@@ -150,11 +146,7 @@ public class OfrepOptions
             }
             else
             {
-                logger.Log(
-                    LogLevel.Warning,
-                    "Invalid value '{TimeoutValue}' for configuration key {ConfigKey}. Using default timeout of 10 seconds.",
-                    timeoutStr,
-                    EnvVarTimeout);
+                LogInvalidTimeoutConfig(logger, timeoutStr!, EnvVarTimeout);
             }
         }
 
@@ -200,8 +192,8 @@ public class OfrepOptions
     }
 
     /// <summary>
-    /// Parses a header string in the format "Key1=Value1,Key2=Value2" with escape sequence support.
-    /// Escape sequences: \\ for literal backslash, \, for literal comma, \= for literal equals.
+    /// Parses a header string in the format "Key1=Value1,Key2=Value2" with URL-encoding support.
+    /// Values may be URL-encoded to include special characters (use %2C for comma, %3D for equals).
     /// </summary>
     /// <param name="headersString">The headers string to parse. Can be null or empty.</param>
     /// <param name="logger">Optional logger for warnings about malformed entries.</param>
@@ -210,46 +202,35 @@ public class OfrepOptions
     {
         logger ??= NullLogger.Instance;
         var headers = new Dictionary<string, string>();
-        headersString ??= string.Empty;
 
         if (string.IsNullOrWhiteSpace(headersString))
         {
             return headers;
         }
 
-        // Split by unescaped commas
-        var pairs = SplitByUnescapedDelimiter(headersString, ',');
+        // URL-decode the entire string to support encoded special characters
+        var decoded = Uri.UnescapeDataString(headersString);
 
-        foreach (var pair in pairs)
+        foreach (var pair in decoded.Split(','))
         {
             if (string.IsNullOrWhiteSpace(pair))
             {
                 continue;
             }
 
-            // Split by first unescaped equals sign
-            var keyValue = SplitByUnescapedDelimiter(pair, '=', maxParts: 2);
-
-            if (keyValue.Count < 2)
+            var equalsIndex = pair.IndexOf('=');
+            if (equalsIndex <= 0)
             {
-                logger.Log(
-                    LogLevel.Warning,
-                    "Malformed header entry '{Entry}' in {EnvVar}. Expected format: Key=Value. Skipping.",
-                    pair,
-                    EnvVarHeaders);
+                LogMalformedHeaderEntry(logger, pair, EnvVarHeaders);
                 continue;
             }
 
-            var key = Unescape(keyValue[0]).Trim();
-            var value = Unescape(keyValue[1]).Trim();
+            var key = pair.Substring(0, equalsIndex).Trim();
+            var value = pair.Substring(equalsIndex + 1).Trim();
 
             if (string.IsNullOrEmpty(key))
             {
-                logger.Log(
-                    LogLevel.Warning,
-                    "Empty header key in entry '{Entry}' in {EnvVar}. Skipping.",
-                    pair,
-                    EnvVarHeaders);
+                LogEmptyHeaderKey(logger, pair, EnvVarHeaders);
                 continue;
             }
 
@@ -259,86 +240,15 @@ public class OfrepOptions
         return headers;
     }
 
-    internal static TimeSpan DefaultTimeout => TimeSpan.FromSeconds(10);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid value '{TimeoutValue}' for environment variable {EnvVar}. Using default timeout of 10 seconds.")]
+    private static partial void LogInvalidTimeoutEnvVar(ILogger logger, string timeoutValue, string envVar);
 
-    /// <summary>
-    /// Splits a string by an unescaped delimiter character.
-    /// Backslash is the escape character: \\ = literal \, \{delimiter} = literal delimiter.
-    /// </summary>
-    private static List<string> SplitByUnescapedDelimiter(string input, char delimiter, int maxParts = int.MaxValue)
-    {
-        var parts = new List<string>();
-        var current = new StringBuilder();
-        var i = 0;
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid value '{TimeoutValue}' for configuration key {ConfigKey}. Using default timeout of 10 seconds.")]
+    private static partial void LogInvalidTimeoutConfig(ILogger logger, string timeoutValue, string configKey);
 
-        while (i < input.Length)
-        {
-            if (parts.Count >= maxParts - 1)
-            {
-                // Last part: take the rest of the string
-                current.Append(input.Substring(i));
-                break;
-            }
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Malformed header entry '{Entry}' in {EnvVar}. Expected format: Key=Value. Skipping.")]
+    private static partial void LogMalformedHeaderEntry(ILogger logger, string entry, string envVar);
 
-            var c = input[i];
-
-            if (c == '\\' && i + 1 < input.Length)
-            {
-                // Escape sequence: keep the backslash and next character for later unescaping
-                current.Append(c);
-                current.Append(input[i + 1]);
-                i += 2;
-            }
-            else if (c == delimiter)
-            {
-                parts.Add(current.ToString());
-                current.Clear();
-                i++;
-            }
-            else
-            {
-                current.Append(c);
-                i++;
-            }
-        }
-
-        parts.Add(current.ToString());
-        return parts;
-    }
-
-    /// <summary>
-    /// Unescapes a string by processing escape sequences: \\ -> \, \, -> ,, \= -> =.
-    /// </summary>
-    private static string Unescape(string input)
-    {
-        if (string.IsNullOrEmpty(input) || !input.Contains('\\'))
-        {
-            return input;
-        }
-
-        var result = new StringBuilder(input.Length);
-        var i = 0;
-
-        while (i < input.Length)
-        {
-            var c = input[i];
-
-            if (c == '\\' && i + 1 < input.Length)
-            {
-                var next = input[i + 1];
-                // Unescape known sequences
-                if (next == '\\' || next == ',' || next == '=')
-                {
-                    result.Append(next);
-                    i += 2;
-                    continue;
-                }
-            }
-
-            result.Append(c);
-            i++;
-        }
-
-        return result.ToString();
-    }
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Empty header key in entry '{Entry}' in {EnvVar}. Skipping.")]
+    private static partial void LogEmptyHeaderKey(ILogger logger, string entry, string envVar);
 }

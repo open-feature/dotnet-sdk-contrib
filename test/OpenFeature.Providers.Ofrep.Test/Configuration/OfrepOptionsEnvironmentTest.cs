@@ -91,16 +91,16 @@ public class OfrepOptionsEnvironmentTest : IDisposable
     }
 
     [Fact]
-    public void ParseHeaders_ShouldParseMultipleHeadersWithEscapeSequences()
+    public void ParseHeaders_ShouldParseMultipleHeadersWithUrlEncoding()
     {
-        // Tests: multiple headers, escaped comma, escaped equals, escaped backslash, multiple equals in value
-        var headers = OfrepOptions.ParseHeaders(@"Key1=val\,ue1,Key2=val\=ue2,Key3=C:\\path,Key4=base64==");
+        // Tests: multiple headers, URL-encoded equals (%3D), multiple equals in value
+        // Note: URL-encoded comma (%2C) is decoded before splitting, so commas in values are not supported
+        var headers = OfrepOptions.ParseHeaders("Key1=value1,Key2=val%3Due2,Key3=base64==");
 
-        Assert.Equal(4, headers.Count);
-        Assert.Equal("val,ue1", headers["Key1"]);       // escaped comma
-        Assert.Equal("val=ue2", headers["Key2"]);       // escaped equals
-        Assert.Equal(@"C:\path", headers["Key3"]);      // escaped backslash
-        Assert.Equal("base64==", headers["Key4"]);      // multiple equals in value
+        Assert.Equal(3, headers.Count);
+        Assert.Equal("value1", headers["Key1"]);
+        Assert.Equal("val=ue2", headers["Key2"]);       // URL-encoded equals in value
+        Assert.Equal("base64==", headers["Key3"]);      // multiple equals in value (no encoding needed)
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public class OfrepOptionsEnvironmentTest : IDisposable
         {
             { OfrepOptions.EnvVarEndpoint, "http://config-endpoint:8080" },
             { OfrepOptions.EnvVarTimeout, "3000" },
-            { OfrepOptions.EnvVarHeaders, @"Auth=Bearer\=token" }
+            { OfrepOptions.EnvVarHeaders, "Auth=Bearer%3Dtoken" }
         };
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
@@ -148,7 +148,7 @@ public class OfrepOptionsEnvironmentTest : IDisposable
         // Assert
         Assert.Equal("http://config-endpoint:8080", options.BaseUrl);  // config over env var
         Assert.Equal(TimeSpan.FromMilliseconds(3000), options.Timeout);
-        Assert.Equal("Bearer=token", options.Headers["Auth"]);          // escape sequence parsed
+        Assert.Equal("Bearer=token", options.Headers["Auth"]);          // URL-encoded equals parsed
     }
 
     [Fact]

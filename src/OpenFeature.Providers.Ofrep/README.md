@@ -120,15 +120,9 @@ var options = OfrepOptions.FromEnvironment();
 var provider = new OfrepProvider(options);
 ```
 
-### Header Format and Escape Sequences
+### Header Format and URL Encoding
 
-The `OFREP_HEADERS` environment variable uses a simple `Key=Value` format separated by commas. To include special characters in header values, use escape sequences:
-
-| Escape | Character |
-|--------|-----------|
-| `\\` | Backslash (`\`) |
-| `\,` | Comma (`,`) |
-| `\=` | Equals (`=`) |
+The `OFREP_HEADERS` environment variable uses a simple `Key=Value` format separated by commas. URL encoding is supported for compatibility with systems that encode the entire value, but note that commas are used as header separators and cannot be included in values.
 
 **Examples:**
 
@@ -136,14 +130,14 @@ The `OFREP_HEADERS` environment variable uses a simple `Key=Value` format separa
 # Simple headers
 export OFREP_HEADERS="Authorization=Bearer token123,Content-Type=application/json"
 
-# Header value containing equals sign (e.g., base64)
-export OFREP_HEADERS="Authorization=Bearer\=abc123"
+# Header value containing equals sign (e.g., base64) - no encoding needed for additional = in value
+export OFREP_HEADERS="Authorization=Bearer abc123=="
 
-# Header value containing comma
-export OFREP_HEADERS="X-Custom=value1\,value2"
+# URL-encoded equals sign in the value
+export OFREP_HEADERS="X-Data=key%3Dvalue"
 
-# Multiple special characters
-export OFREP_HEADERS="X-Path=C:\\Users\\test,X-Data=a\=b\,c"
+# Multiple headers with special characters
+export OFREP_HEADERS="Authorization=Bearer token,X-Api-Key=abc123"
 ```
 
 ### Dependency Injection with IConfiguration
