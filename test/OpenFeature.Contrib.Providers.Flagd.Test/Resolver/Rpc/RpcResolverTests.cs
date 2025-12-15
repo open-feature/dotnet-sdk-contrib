@@ -12,6 +12,8 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test.Resolver.Rpc;
 
 public class RpcResolverTests
 {
+    private const int TestTimeoutMilliseconds = 10_000;
+
     [Fact]
     public async Task HandleEvents_CallsFlagdProviderEventHandler()
     {
@@ -53,20 +55,22 @@ public class RpcResolverTests
             }
         };
 
+        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
         var config = new FlagdConfig();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
 
         // Act
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
+        Assert.NotNull(flagdProviderEvent);
         Assert.Equal(Constant.ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
         Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
         Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
@@ -91,20 +95,22 @@ public class RpcResolverTests
             }
         };
 
+        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
         var config = new FlagdConfig();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
 
         // Act
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
+        Assert.NotNull(flagdProviderEvent);
         Assert.Equal(Constant.ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
         Assert.Empty(flagdProviderEvent.FlagsChanged);
         Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
@@ -130,20 +136,22 @@ public class RpcResolverTests
             }
         };
 
+        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
         var config = new FlagdConfig();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
 
         // Act
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
+        Assert.NotNull(flagdProviderEvent);
         Assert.Equal(Constant.ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
         Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
         Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
@@ -169,6 +177,7 @@ public class RpcResolverTests
             }
         };
 
+        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
         var config = new FlagdConfig()
@@ -176,23 +185,22 @@ public class RpcResolverTests
             CacheEnabled = true
         };
 
-        var purgedCalled = false;
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "key1")).Returns(null);
         mockCache.Add(Arg.Is<string>(s => s == "key1"), Arg.Any<object>());
-        mockCache.When(x => x.Purge()).Do(_ => purgedCalled = true);
+        mockCache.When(x => x.Purge()).Do(_ => { autoResetEvent.Set(); });
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, mockCache);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
 
         // Act
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
-        Assert.True(purgedCalled);
+        mockCache.Received().Purge();
     }
 
     [Fact]
@@ -215,6 +223,7 @@ public class RpcResolverTests
             }
         };
 
+        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
         var config = new FlagdConfig()
@@ -222,23 +231,22 @@ public class RpcResolverTests
             CacheEnabled = true
         };
 
-        var deletedCalled = false;
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "key1")).Returns(null);
         mockCache.Add(Arg.Is<string>(s => s == "key1"), Arg.Any<object>());
-        mockCache.When(x => x.Delete("key1")).Do(_ => deletedCalled = true);
+        mockCache.When(x => x.Delete("key1")).Do(_ => { autoResetEvent.Set(); });
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, mockCache);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
 
         // Act
         await resolver.Init();
 
         // Assert
-        await Utils.AssertUntilAsync((ct) => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; });
+        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
-        Assert.True(deletedCalled);
+        mockCache.Received().Delete("key1");
     }
 
     private static Service.ServiceClient SetupGrpcStream(List<EventStreamResponse> responses)
@@ -251,7 +259,8 @@ public class RpcResolverTests
         asyncStreamReader.Current.Returns(_ => enumerator.Current);
 
         var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(asyncStreamReader, null, null, null, null, null);
-        mockGrpcClient.EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None).Returns(grpcEventStreamResp);
+        mockGrpcClient.EventStream(Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None)
+            .Returns(grpcEventStreamResp);
 
         return mockGrpcClient;
     }
