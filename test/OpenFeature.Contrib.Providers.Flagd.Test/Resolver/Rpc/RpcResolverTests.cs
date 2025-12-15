@@ -190,9 +190,7 @@ public class RpcResolverTests
         mockCache.Add(Arg.Is<string>(s => s == "key1"), Arg.Any<object>());
         mockCache.When(x => x.Purge()).Do(_ => { autoResetEvent.Set(); });
 
-        FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, mockCache);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
 
         // Act
         await resolver.Init();
@@ -236,9 +234,7 @@ public class RpcResolverTests
         mockCache.Add(Arg.Is<string>(s => s == "key1"), Arg.Any<object>());
         mockCache.When(x => x.Delete("key1")).Do(_ => { autoResetEvent.Set(); });
 
-        FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, mockCache);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
 
         // Act
         await resolver.Init();
