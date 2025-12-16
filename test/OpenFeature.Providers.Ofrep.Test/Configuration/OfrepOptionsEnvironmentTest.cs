@@ -6,6 +6,7 @@ using Xunit;
 
 namespace OpenFeature.Providers.Ofrep.Test.Configuration;
 
+[Collection("EnvironmentVariableTests")]
 public class OfrepOptionsEnvironmentTest : IDisposable
 {
     public OfrepOptionsEnvironmentTest() => CleanEnvVars();
