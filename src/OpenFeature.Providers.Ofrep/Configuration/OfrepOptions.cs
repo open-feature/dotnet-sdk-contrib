@@ -193,7 +193,8 @@ public partial class OfrepOptions
 
     /// <summary>
     /// Parses a header string in the format "Key1=Value1,Key2=Value2" with URL-encoding support.
-    /// Values may be URL-encoded to include special characters (use %2C for comma, %3D for equals).
+    /// Values may be URL-encoded to include special characters (e.g., use %3D for equals). 
+    /// Note: Commas are always treated as separators and cannot be escaped or encoded into header values.
     /// </summary>
     /// <param name="headersString">The headers string to parse. Can be null or empty.</param>
     /// <param name="logger">Optional logger for warnings about malformed entries.</param>

@@ -45,7 +45,9 @@ public static class FeatureBuilderExtensions
         var loggerFactory = sp.GetService<ILoggerFactory>();
         var logger = loggerFactory?.CreateLogger<OfrepClient>();
 
-        // Options validation is handled by OfrepProviderOptionsValidator during service registration
+        // Options validation is performed by OfrepProviderOptionsValidator when options are retrieved (e.g., via IOptionsMonitor.Get),
+        // not during service registration. Note: validation may fail if IConfiguration is not registered in the DI container,
+        // even if environment variables are set.
         // If BaseUrl is not set, fall back to IConfiguration/environment variables
         OfrepOptions ofrepOptions;
         if (string.IsNullOrWhiteSpace(opts.BaseUrl))

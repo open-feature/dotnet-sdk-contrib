@@ -29,7 +29,7 @@ internal class OfrepProviderOptionsValidator : IValidateOptions<OfrepProviderOpt
             if (string.IsNullOrWhiteSpace(configEndpoint))
             {
                 return ValidateOptionsResult.Fail(
-                    $"Ofrep BaseUrl is required. Set it on OfrepProviderOptions.BaseUrl, via IConfiguration key '{OfrepOptions.EnvVarEndpoint}', or the {OfrepOptions.EnvVarEndpoint} environment variable.");
+                    $"Ofrep BaseUrl is required. Set it on OfrepProviderOptions.BaseUrl, via IConfiguration key '{OfrepOptions.EnvVarEndpoint}', or via the {OfrepOptions.EnvVarEndpoint} environment variable.");
             }
 
             // Validate the configuration value
