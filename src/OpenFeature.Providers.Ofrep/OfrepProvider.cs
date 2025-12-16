@@ -31,7 +31,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     /// <list type="bullet">
     /// <item><description>OFREP_ENDPOINT (required): The OFREP server endpoint URL.</description></item>
     /// <item><description>OFREP_HEADERS (optional): HTTP headers in format "Key1=Value1,Key2=Value2".</description></item>
-    /// <item><description>OFREP_TIMEOUT (optional): Request timeout in milliseconds.</description></item>
+    /// <item><description>OFREP_TIMEOUT_MS (optional): Request timeout in milliseconds.</description></item>
     /// </list>
     /// </remarks>
     public OfrepProvider(ILogger<OfrepProvider> logger)
@@ -50,7 +50,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     /// <list type="bullet">
     /// <item><description>OFREP_ENDPOINT (required): The OFREP server endpoint URL.</description></item>
     /// <item><description>OFREP_HEADERS (optional): HTTP headers in format "Key1=Value1,Key2=Value2".</description></item>
-    /// <item><description>OFREP_TIMEOUT (optional): Request timeout in milliseconds.</description></item>
+    /// <item><description>OFREP_TIMEOUT_MS (optional): Request timeout in milliseconds.</description></item>
     /// </list>
     /// </remarks>
     public OfrepProvider()

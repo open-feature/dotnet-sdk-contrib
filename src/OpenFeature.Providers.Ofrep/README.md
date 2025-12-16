@@ -97,7 +97,7 @@ The OFREP provider supports configuration via environment variables, enabling ze
 |----------|----------|-------------|---------|
 | `OFREP_ENDPOINT` | Yes | The OFREP server endpoint URL | `http://localhost:8080` |
 | `OFREP_HEADERS` | No | HTTP headers in `Key=Value,Key2=Value2` format | `Authorization=Bearer token,X-Api-Key=abc123` |
-| `OFREP_TIMEOUT` | No | Request timeout in milliseconds (default: 10000) | `5000` |
+| `OFREP_TIMEOUT_MS` | No | Request timeout in milliseconds (default: 10000) | `5000` |
 
 ### Usage with Environment Variables
 
@@ -152,7 +152,7 @@ builder.Services.AddOpenFeature(featureBuilder =>
 {
     featureBuilder.AddOfrepProvider(options =>
     {
-        // Options will fall back to OFREP_ENDPOINT, OFREP_HEADERS, OFREP_TIMEOUT
+        // Options will fall back to OFREP_ENDPOINT, OFREP_HEADERS, OFREP_TIMEOUT_MS
         // from IConfiguration (which includes environment variables)
     });
 });
