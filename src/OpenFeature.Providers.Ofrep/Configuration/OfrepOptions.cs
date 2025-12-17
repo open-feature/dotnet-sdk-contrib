@@ -179,15 +179,17 @@ public partial class OfrepOptions
     /// <returns>The parsed TimeSpan, or the default timeout if parsing fails.</returns>
     private static TimeSpan GetTimeout(string? timeoutStr, ILogger logger)
     {
-        if (!string.IsNullOrWhiteSpace(timeoutStr))
+        // Handle null by treating as empty (this fixes nullable flow analysis issues in .NET Framework)
+        var timeoutStringNotNull = timeoutStr ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(timeoutStringNotNull))
         {
-            if (int.TryParse(timeoutStr, out var timeoutMs) && timeoutMs > 0)
+            if (int.TryParse(timeoutStringNotNull, out var timeoutMs) && timeoutMs > 0)
             {
                 return TimeSpan.FromMilliseconds(timeoutMs);
             }
             else
             {
-                LogInvalidTimeout(logger, timeoutStr);
+                LogInvalidTimeout(logger, timeoutStringNotNull);
             }
         }
 
