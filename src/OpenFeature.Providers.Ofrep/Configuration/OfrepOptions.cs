@@ -88,17 +88,7 @@ public partial class OfrepOptions
 
         // Parse timeout
         var timeoutStr = Environment.GetEnvironmentVariable(EnvVarTimeout);
-        if (!string.IsNullOrWhiteSpace(timeoutStr))
-        {
-            if (int.TryParse(timeoutStr, out var timeoutMs) && timeoutMs > 0)
-            {
-                options.Timeout = TimeSpan.FromMilliseconds(timeoutMs);
-            }
-            else
-            {
-                LogInvalidTimeoutEnvVar(logger, timeoutStr, EnvVarTimeout);
-            }
-        }
+        options.Timeout = GetTimeout(timeoutStr, logger);
 
         // Parse headers
         var headersStr = Environment.GetEnvironmentVariable(EnvVarHeaders);
@@ -138,17 +128,7 @@ public partial class OfrepOptions
 
         // Parse timeout
         var timeoutStr = GetConfigValue(configuration, EnvVarTimeout);
-        if (!string.IsNullOrWhiteSpace(timeoutStr))
-        {
-            if (int.TryParse(timeoutStr, out var timeoutMs) && timeoutMs > 0)
-            {
-                options.Timeout = TimeSpan.FromMilliseconds(timeoutMs);
-            }
-            else
-            {
-                LogInvalidTimeoutConfig(logger, timeoutStr!, EnvVarTimeout);
-            }
-        }
+        options.Timeout = GetTimeout(timeoutStr, logger);
 
         // Parse headers
         var headersStr = GetConfigValue(configuration, EnvVarHeaders);
@@ -192,8 +172,31 @@ public partial class OfrepOptions
     }
 
     /// <summary>
+    /// Parses a timeout string in milliseconds, returning a TimeSpan. Logs warnings for invalid values.
+    /// </summary>
+    /// <param name="timeoutStr">The timeout string to parse.</param>
+    /// <param name="logger">The logger to use for warnings.</param>
+    /// <returns>The parsed TimeSpan, or the default timeout if parsing fails.</returns>
+    private static TimeSpan GetTimeout(string? timeoutStr, ILogger logger)
+    {
+        if (!string.IsNullOrWhiteSpace(timeoutStr))
+        {
+            if (int.TryParse(timeoutStr, out var timeoutMs) && timeoutMs > 0)
+            {
+                return TimeSpan.FromMilliseconds(timeoutMs);
+            }
+            else
+            {
+                LogInvalidTimeout(logger, timeoutStr);
+            }
+        }
+
+        return DefaultTimeout;
+    }
+
+    /// <summary>
     /// Parses a header string in the format "Key1=Value1,Key2=Value2" with URL-encoding support.
-    /// Values may be URL-encoded to include special characters (e.g., use %3D for equals). 
+    /// Values may be URL-encoded to include special characters (e.g., use %3D for equals).
     /// Note: Commas are always treated as separators and cannot be escaped or encoded into header values.
     /// </summary>
     /// <param name="headersString">The headers string to parse. Can be null or empty.</param>
@@ -241,11 +244,8 @@ public partial class OfrepOptions
         return headers;
     }
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid value '{TimeoutValue}' for environment variable {EnvVar}. Using default timeout of 10 seconds.")]
-    private static partial void LogInvalidTimeoutEnvVar(ILogger logger, string timeoutValue, string envVar);
-
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid value '{TimeoutValue}' for configuration key {ConfigKey}. Using default timeout of 10 seconds.")]
-    private static partial void LogInvalidTimeoutConfig(ILogger logger, string timeoutValue, string configKey);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid value '{TimeoutValue}'. Using default timeout of 10 seconds.")]
+    private static partial void LogInvalidTimeout(ILogger logger, string timeoutValue);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Malformed header entry '{Entry}' in {EnvVar}. Expected format: Key=Value. Skipping.")]
     private static partial void LogMalformedHeaderEntry(ILogger logger, string entry, string envVar);
