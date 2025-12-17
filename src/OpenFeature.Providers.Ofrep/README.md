@@ -122,7 +122,12 @@ var provider = new OfrepProvider(options);
 
 ### Header Format and URL Encoding
 
-The `OFREP_HEADERS` environment variable uses a simple `Key=Value` format separated by commas. URL encoding is supported for compatibility with systems that encode the entire value, but note that commas are used as header separators and cannot be included in values.
+The `OFREP_HEADERS` environment variable uses a simple `Key=Value` format separated by commas.
+
+**Important parsing rules:**
+- **Commas** are always treated as header separators and **cannot** be included in values, even when URL-encoded (e.g., `%2C` will be decoded to `,` and treated as a separator).
+- **Equals signs** (`=`) in the key are not supported. The first `=` separates the key from the value. Additional `=` characters in the value are allowed without encoding.
+- URL encoding (e.g., `%3D` for `=`) is decoded before parsing, which is useful for systems that encode the entire value, but does not change the comma/equals parsing behavior.
 
 **Examples:**
 
@@ -133,10 +138,10 @@ export OFREP_HEADERS="Authorization=Bearer token123,Content-Type=application/jso
 # Header value containing equals sign (e.g., base64) - no encoding needed for additional = in value
 export OFREP_HEADERS="Authorization=Bearer abc123=="
 
-# URL-encoded equals sign in the value
+# URL-encoded equals sign in the value (decoded to =, then treated as part of the value)
 export OFREP_HEADERS="X-Data=key%3Dvalue"
 
-# Multiple headers with special characters
+# Multiple headers
 export OFREP_HEADERS="Authorization=Bearer token,X-Api-Key=abc123"
 ```
 
