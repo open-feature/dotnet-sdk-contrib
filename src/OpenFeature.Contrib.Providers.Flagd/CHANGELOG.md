@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.4...OpenFeature.Contrib.Providers.Flagd-v0.3.5) (2025-12-22)
+
+
+### 🐛 Bug Fixes
+
+* Fix Flagd InProcess Evaluator when no defaultVariant is specified ([#513](https://github.com/open-feature/dotnet-sdk-contrib/issues/513)) ([5fd7cce](https://github.com/open-feature/dotnet-sdk-contrib/commit/5fd7cce549a7c1f9aaf68d473225ec692fd497ed))
+
+
+### ✨ New Features
+
+* **flagd:** Add code to sync context from Flagd for the InProcess resolver ([#515](https://github.com/open-feature/dotnet-sdk-contrib/issues/515)) ([a9c4bb4](https://github.com/open-feature/dotnet-sdk-contrib/commit/a9c4bb46bc7bc690b1c22cdb65e2c8e65a772d0b))
+
 ## [0.3.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.3...OpenFeature.Contrib.Providers.Flagd-v0.3.4) (2025-10-17)
 
 
