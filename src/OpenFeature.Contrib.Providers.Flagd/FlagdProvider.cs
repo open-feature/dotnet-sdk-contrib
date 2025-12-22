@@ -72,14 +72,15 @@ public sealed class FlagdProvider : FeatureProvider
         if (_config.ResolverType == ResolverType.IN_PROCESS)
         {
             var jsonSchemaValidator = new JsonSchemaValidator(null, _config.Logger);
-            _resolver = new InProcessResolver(_config, jsonSchemaValidator, this.OnProviderEvent);
+            _resolver = new InProcessResolver(_config, jsonSchemaValidator);
         }
         else
         {
-            _resolver = new RpcResolver(config, this.OnProviderEvent);
+            _resolver = new RpcResolver(config);
         }
 
         _hooks.Add(new SyncMetadataHook(() => this._enrichedContext));
+        this._resolver.ProviderEvent += this.OnProviderEvent;
     }
 
     // just for testing, internal but visible in tests
@@ -119,7 +120,7 @@ public sealed class FlagdProvider : FeatureProvider
 
     private bool _connected;
 
-    internal void OnProviderEvent(FlagdProviderEvent payload)
+    internal void OnProviderEvent(object _, FlagdProviderEvent payload)
     {
         switch (payload.EventType)
         {
@@ -200,6 +201,8 @@ public sealed class FlagdProvider : FeatureProvider
     public override async Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
         await _resolver.Shutdown().ConfigureAwait(false);
+
+        this._resolver.ProviderEvent -= this.OnProviderEvent;
     }
 
     /// <inheritdoc/>
