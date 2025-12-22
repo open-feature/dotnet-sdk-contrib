@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenFeature.Hosting;
@@ -41,12 +42,39 @@ public static class FeatureBuilderExtensions
         var monitor = sp.GetRequiredService<IOptionsMonitor<OfrepProviderOptions>>();
         var opts = string.IsNullOrWhiteSpace(domain) ? monitor.Get(OfrepProviderOptions.DefaultName) : monitor.Get(domain);
 
-        // Options validation is handled by OfrepProviderOptionsValidator during service registration
-        var ofrepOptions = new OfrepOptions(opts.BaseUrl)
+        var loggerFactory = sp.GetService<ILoggerFactory>();
+        var logger = loggerFactory?.CreateLogger<OfrepClient>();
+
+        // Options validation is performed by OfrepProviderOptionsValidator when options are retrieved (e.g., via IOptionsMonitor.Get),
+        // not during service registration. Note: validation may fail if IConfiguration is not registered in the DI container,
+        // even if environment variables are set.
+        // If BaseUrl is not set, fall back to IConfiguration/environment variables
+        OfrepOptions ofrepOptions;
+        if (string.IsNullOrWhiteSpace(opts.BaseUrl))
         {
-            Timeout = opts.Timeout,
-            Headers = opts.Headers
-        };
+            // Use IConfiguration with environment variable fallback
+            var configuration = sp.GetService<IConfiguration>();
+            ofrepOptions = OfrepOptions.FromConfiguration(configuration, logger);
+
+            // Apply any DI-configured overrides (timeout, headers) if they differ from defaults
+            if (opts.Timeout != OfrepOptions.DefaultTimeout)
+            {
+                ofrepOptions.Timeout = opts.Timeout;
+            }
+
+            foreach (var header in opts.Headers)
+            {
+                ofrepOptions.Headers[header.Key] = header.Value;
+            }
+        }
+        else
+        {
+            ofrepOptions = new OfrepOptions(opts.BaseUrl)
+            {
+                Timeout = opts.Timeout,
+                Headers = opts.Headers
+            };
+        }
 
         // Resolve or create HttpClient if caller wants to manage it
         HttpClient? httpClient = null;
@@ -83,8 +111,6 @@ public static class FeatureBuilderExtensions
         }
 
         // Build OfrepClient using provided HttpClient and wire into OfrepProvider
-        var loggerFactory = sp.GetService<ILoggerFactory>();
-        var logger = loggerFactory?.CreateLogger<OfrepClient>();
         var timeProvider = sp.GetService<TimeProvider>();
         var ofrepClient = new OfrepClient(httpClient, logger, timeProvider);
         return new OfrepProvider(ofrepClient);
