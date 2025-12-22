@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.3...OpenFeature.Providers.Ofrep-v0.1.4) (2025-12-22)
+
+
+### 🐛 Bug Fixes
+
+* Add MetadataExtensions for converting metadata to primitive types ([#524](https://github.com/open-feature/dotnet-sdk-contrib/issues/524)) ([617c7de](https://github.com/open-feature/dotnet-sdk-contrib/commit/617c7de724db575f4aa099000493bbf04475a29d))
+
 ## [0.1.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.2...OpenFeature.Providers.Ofrep-v0.1.3) (2025-10-17)
 
 
