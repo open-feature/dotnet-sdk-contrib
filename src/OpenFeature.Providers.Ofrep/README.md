@@ -87,6 +87,90 @@ The `OfrepOptions` class supports the following options:
 -   `Timeout` (optional): HTTP client timeout. The default value is 10 seconds.
 -   `Headers` (optional): Additional HTTP headers to include in requests
 
+## Environment Variable Configuration
+
+The OFREP provider supports configuration via environment variables, enabling zero-code configuration for containerized deployments and CI/CD pipelines.
+
+### Supported Environment Variables
+
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `OFREP_ENDPOINT` | Yes | The OFREP server endpoint URL | `http://localhost:8080` |
+| `OFREP_HEADERS` | No | HTTP headers in `Key=Value,Key2=Value2` format | `Authorization=Bearer token,X-Api-Key=abc123` |
+| `OFREP_TIMEOUT_MS` | No | Request timeout in milliseconds (default: 10000) | `5000` |
+
+### Usage with Environment Variables
+
+```csharp
+using OpenFeature;
+using OpenFeature.Providers.Ofrep;
+
+// Create provider using environment variables (no explicit configuration needed)
+var provider = new OfrepProvider();
+await Api.Instance.SetProviderAsync(provider);
+```
+
+Or explicitly load from environment:
+
+```csharp
+using OpenFeature.Providers.Ofrep.Configuration;
+
+// Explicitly create options from environment variables
+var options = OfrepOptions.FromEnvironment();
+var provider = new OfrepProvider(options);
+```
+
+### Header Format and URL Encoding
+
+The `OFREP_HEADERS` environment variable uses a simple `Key=Value` format separated by commas.
+
+**Important parsing rules:**
+- **Commas** are always treated as header separators and **cannot** be included in values, even when URL-encoded (e.g., `%2C` will be decoded to `,` and treated as a separator).
+- **Equals signs** (`=`) in the key are not supported. The first `=` separates the key from the value. Additional `=` characters in the value are allowed without encoding.
+- URL encoding (e.g., `%3D` for `=`) is decoded before parsing, which is useful for systems that encode the entire value, but does not change the comma/equals parsing behavior.
+
+**Examples:**
+
+```bash
+# Simple headers
+export OFREP_HEADERS="Authorization=Bearer token123,Content-Type=application/json"
+
+# Header value containing equals sign (e.g., base64) - no encoding needed for additional = in value
+export OFREP_HEADERS="Authorization=Bearer abc123=="
+
+# URL-encoded equals sign in the value (decoded to =, then treated as part of the value)
+export OFREP_HEADERS="X-Data=key%3Dvalue"
+
+# Multiple headers
+export OFREP_HEADERS="Authorization=Bearer token,X-Api-Key=abc123"
+```
+
+### Dependency Injection with IConfiguration
+
+When using dependency injection, the provider can read configuration from `IConfiguration`, which supports environment variables via `AddEnvironmentVariables()`:
+
+```csharp
+// In Program.cs or Startup.cs
+builder.Configuration.AddEnvironmentVariables();
+
+builder.Services.AddOpenFeature(featureBuilder =>
+{
+    featureBuilder.AddOfrepProvider(options =>
+    {
+        // Options will fall back to OFREP_ENDPOINT, OFREP_HEADERS, OFREP_TIMEOUT_MS
+        // from IConfiguration (which includes environment variables)
+    });
+});
+```
+
+### Configuration Precedence
+
+When multiple configuration sources are available, the following precedence order applies (highest to lowest):
+
+1. **Programmatic configuration** (explicit `OfrepOptions` or `OfrepProviderOptions` values)
+2. **IConfiguration** (when using DI, includes appsettings.json, user secrets, etc.)
+3. **Environment variables** (direct `Environment.GetEnvironmentVariable` fallback)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
