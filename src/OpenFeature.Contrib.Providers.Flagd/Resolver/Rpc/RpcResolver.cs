@@ -29,11 +29,10 @@ internal class RpcResolver : Resolver
     private int _eventStreamRetries;
     private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
     private GrpcChannel _channel;
-    private readonly Action<FlagdProviderEvent> _flagdEventPublisher;
 
-    internal RpcResolver(
-        FlagdConfig config,
-        Action<FlagdProviderEvent> flagdEventPublisher)
+    public event EventHandler<FlagdProviderEvent> ProviderEvent;
+
+    internal RpcResolver(FlagdConfig config)
     {
         if (config == null)
         {
@@ -41,7 +40,6 @@ internal class RpcResolver : Resolver
         }
 
         this._config = config;
-        this._flagdEventPublisher = flagdEventPublisher;
         this._client = this.BuildClientForPlatform(_config);
 
         if (this._config.CacheEnabled)
@@ -53,9 +51,8 @@ internal class RpcResolver : Resolver
     internal RpcResolver(
         Service.ServiceClient client,
         FlagdConfig config,
-        ICache<string, object> cache,
-        Action<FlagdProviderEvent> flagdEventPublisher)
-        : this(config, flagdEventPublisher)
+        ICache<string, object> cache)
+        : this(config)
     {
         this._client = client;
         this._cache = cache;
@@ -261,7 +258,7 @@ internal class RpcResolver : Resolver
     private void HandleConfigurationChangedEvent(List<string> flagsChanged)
     {
         var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, flagsChanged, Structure.Empty);
-        this._flagdEventPublisher(flagdEvent);
+        ProviderEvent?.Invoke(this, flagdEvent);
 
         if (!this._config.CacheEnabled)
         {
@@ -288,7 +285,7 @@ internal class RpcResolver : Resolver
         _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
 
         var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderReady, flagsChanged, Structure.Empty);
-        this._flagdEventPublisher(flagdEvent);
+        ProviderEvent?.Invoke(this, flagdEvent);
 
         if (this._config.CacheEnabled)
         {
@@ -306,7 +303,7 @@ internal class RpcResolver : Resolver
         }
 
         var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
-        this._flagdEventPublisher(flagdEvent);
+        ProviderEvent?.Invoke(this, flagdEvent);
 
         // Handle the dropped connection by reconnecting and retrying the stream
         this._eventStreamRetryBackoff = this._eventStreamRetryBackoff * 2;

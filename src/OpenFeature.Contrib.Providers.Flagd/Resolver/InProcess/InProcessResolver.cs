@@ -34,12 +34,12 @@ internal class InProcessResolver : Resolver
     private readonly FlagdConfig _config;
     private GrpcChannel _channel;
     private readonly IJsonSchemaValidator _jsonSchemaValidator;
-    private readonly Action<FlagdProviderEvent> _flagdEventPublisher;
 
-    internal InProcessResolver(FlagdConfig config, IJsonSchemaValidator jsonSchemaValidator, Action<FlagdProviderEvent> flagdEventPublisher)
+    public event EventHandler<FlagdProviderEvent> ProviderEvent;
+
+    internal InProcessResolver(FlagdConfig config, IJsonSchemaValidator jsonSchemaValidator)
     {
         this._jsonSchemaValidator = jsonSchemaValidator;
-        this._flagdEventPublisher = flagdEventPublisher;
         this._config = config;
         this._client = this.BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
         this._evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
@@ -48,9 +48,8 @@ internal class InProcessResolver : Resolver
     internal InProcessResolver(
         FlagSyncService.FlagSyncServiceClient client,
         FlagdConfig config,
-        IJsonSchemaValidator jsonSchemaValidator,
-        Action<FlagdProviderEvent> flagdEventPublisher)
-            : this(config, jsonSchemaValidator, flagdEventPublisher)
+        IJsonSchemaValidator jsonSchemaValidator)
+            : this(config, jsonSchemaValidator)
     {
         this._client = client;
     }
@@ -144,7 +143,7 @@ internal class InProcessResolver : Resolver
                     }
 
                     var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(this._evaluator.Flags.Keys), metadata.Build());
-                    this._flagdEventPublisher(flagdEvent);
+                    ProviderEvent?.Invoke(this, flagdEvent);
                 }
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
@@ -154,7 +153,7 @@ internal class InProcessResolver : Resolver
             catch (RpcException)
             {
                 var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
-                this._flagdEventPublisher(flagdEvent);
+                ProviderEvent?.Invoke(this, flagdEvent);
 
                 // Handle the dropped connection by reconnecting and retrying the stream
                 this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
