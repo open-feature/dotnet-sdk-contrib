@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common.Utils;
 using Reqnroll;
+using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest;
 
@@ -14,8 +17,13 @@ public class BeforeHooks
     }
 
     [BeforeScenario]
-    public void BeforeScenario()
+    public void BeforeScenario(ScenarioInfo scenarioInfo, FeatureInfo featureInfo)
     {
         this.State.ProviderResolverType = ResolverType.RPC;
+
+        var scenarioTags = scenarioInfo.Tags;
+        var featureTags = featureInfo.Tags;
+        var tags = new HashSet<string>(scenarioTags.Concat(featureTags));
+        Skip.If(!tags.Contains("rpc"), "Skipping scenario because it does not have required tag.");
     }
 }
