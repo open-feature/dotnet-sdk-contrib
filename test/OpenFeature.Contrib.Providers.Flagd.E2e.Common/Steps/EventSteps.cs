@@ -50,6 +50,9 @@ public class EventSteps
 
     private void WaitForEventToBeHandled(ProviderEventTypes eventType, int timeoutMs)
     {
+        Skip.If(this._state.ProviderResolverType == ResolverType.IN_PROCESS,
+            "Stale event is not supported for .NET flagd provider yet.");
+
         using var cancellationTokenSource = new CancellationTokenSource(timeoutMs);
         while (!cancellationTokenSource.IsCancellationRequested)
         {
