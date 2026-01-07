@@ -1,3 +1,6 @@
+#if NETFRAMEWORK
+using System;
+#endif
 using System.Collections.Generic;
 using OpenFeature.Constant;
 using OpenFeature.Model;
@@ -11,6 +14,9 @@ namespace OpenFeature.Contrib.Providers.Flagd;
 /// changed and any associated synchronization metadata. Instances of this class are typically created by the provider
 /// and supplied to event handlers or listeners to notify consumers of relevant changes.</remarks>
 internal sealed class FlagdProviderEvent
+#if NETFRAMEWORK
+    : EventArgs
+#endif
 {
     /// <summary>
     /// The type of provider event that occurred.

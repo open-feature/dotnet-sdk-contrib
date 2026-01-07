@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using OpenFeature.Providers.Ofrep.Configuration;
 
 namespace OpenFeature.Providers.Ofrep.DependencyInjection;
 
@@ -7,11 +9,44 @@ namespace OpenFeature.Providers.Ofrep.DependencyInjection;
 /// </summary>
 internal class OfrepProviderOptionsValidator : IValidateOptions<OfrepProviderOptions>
 {
+    private readonly IConfiguration? _configuration;
+
+    /// <summary>
+    /// Creates a new instance of <see cref="OfrepProviderOptionsValidator"/>.
+    /// </summary>
+    /// <param name="configuration">Optional configuration for fallback values.</param>
+    public OfrepProviderOptionsValidator(IConfiguration? configuration = null)
+    {
+        this._configuration = configuration;
+    }
+
     public ValidateOptionsResult Validate(string? name, OfrepProviderOptions options)
     {
+        // If BaseUrl is not set, check if configuration/environment variable is available as fallback
         if (string.IsNullOrWhiteSpace(options.BaseUrl))
         {
-            return ValidateOptionsResult.Fail("Ofrep BaseUrl is required. Set it on OfrepProviderOptions.BaseUrl.");
+            var configEndpoint = OfrepOptions.GetConfigValue(this._configuration, OfrepOptions.EnvVarEndpoint);
+            if (string.IsNullOrWhiteSpace(configEndpoint))
+            {
+                return ValidateOptionsResult.Fail(
+                    $"Ofrep BaseUrl is required. Set it on OfrepProviderOptions.BaseUrl, via IConfiguration key '{OfrepOptions.EnvVarEndpoint}', or via the {OfrepOptions.EnvVarEndpoint} environment variable.");
+            }
+
+            // Validate the configuration value
+            if (!Uri.TryCreate(configEndpoint, UriKind.Absolute, out var configUri))
+            {
+                return ValidateOptionsResult.Fail(
+                    $"Configuration key '{OfrepOptions.EnvVarEndpoint}' must be a valid absolute URI.");
+            }
+
+            if (configUri.Scheme != Uri.UriSchemeHttp && configUri.Scheme != Uri.UriSchemeHttps)
+            {
+                return ValidateOptionsResult.Fail(
+                    $"Configuration key '{OfrepOptions.EnvVarEndpoint}' must use HTTP or HTTPS scheme.");
+            }
+
+            // Configuration value is valid, allow fallback
+            return ValidateOptionsResult.Success;
         }
 
         // Validate that it's a valid absolute URI

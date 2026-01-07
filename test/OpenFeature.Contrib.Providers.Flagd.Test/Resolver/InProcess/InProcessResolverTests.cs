@@ -42,7 +42,8 @@ public class InProcessResolverTests
         };
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator, (evt) => flagdProviderEvent = evt);
+        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        resolver.ProviderEvent += (sender, evt) => flagdProviderEvent = evt;
 
         // Act
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -77,7 +78,8 @@ public class InProcessResolverTests
         };
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator, (evt) => flagdProviderEvent = evt);
+        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        resolver.ProviderEvent += (sender, evt) => flagdProviderEvent = evt;
 
         // Act
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -112,7 +114,8 @@ public class InProcessResolverTests
         };
 
         var counter = 0;
-        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator, (evt) => { counter++; });
+        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        resolver.ProviderEvent += (sender, evt) => { counter++; };
 
         // Act
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
