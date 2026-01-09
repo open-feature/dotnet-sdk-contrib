@@ -120,7 +120,7 @@ public class FlagSteps
         {
             errorType = EnumHelpers.ParseFromDescription<ErrorType>(error);
         }
-        
+
         switch (this._state.Flag!.Type)
         {
             case FlagType.Integer:

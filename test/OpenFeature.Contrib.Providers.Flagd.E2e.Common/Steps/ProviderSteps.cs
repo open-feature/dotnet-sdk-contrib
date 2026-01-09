@@ -68,7 +68,7 @@ public class ProviderSteps
             default:
                 throw new NotImplementedException("Provider type not supported.");
         }
-        
+
         await StartFlagdTestBedAsync(config, host);
 
         var flagdProvider = new FlagdProvider(builder.Build());
