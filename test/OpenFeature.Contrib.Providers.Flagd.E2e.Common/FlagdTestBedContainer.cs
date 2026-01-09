@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
@@ -21,13 +20,7 @@ public class FlagdTestBedContainer
             .WithResourceMapping(new DirectoryInfo("./flags"), "/flags")
             .WithWaitStrategy(
                 Wait.ForUnixContainer()
-                    .UntilHttpRequestIsSucceeded(
-                        s => s.ForPort(8014).ForPath("/healthz"),
-                        r => r
-                            .WithInterval(TimeSpan.FromSeconds(10))
-                            .WithTimeout(TimeSpan.FromSeconds(5))
-                            .WithRetries(3)
-                    )
+                    .AddCustomWaitStrategy(new FlagdHealthWaitStrategy())
             )
             .Build();
     }
