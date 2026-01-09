@@ -45,19 +45,23 @@ public class FlagSteps
         {
             case FlagType.Boolean:
                 this._state.FlagEvaluationDetailsResult = await this._state.Client!
-                    .GetBooleanDetailsAsync(flag.Key, bool.Parse(flag.DefaultValue), this._state.EvaluationContext);
+                    .GetBooleanDetailsAsync(flag.Key, bool.Parse(flag.DefaultValue), this._state.EvaluationContext)
+                    .ConfigureAwait(false);
                 break;
             case FlagType.Float:
                 this._state.FlagEvaluationDetailsResult = await this._state.Client!
-                    .GetDoubleDetailsAsync(flag.Key, double.Parse(flag.DefaultValue), this._state.EvaluationContext);
+                    .GetDoubleDetailsAsync(flag.Key, double.Parse(flag.DefaultValue), this._state.EvaluationContext)
+                    .ConfigureAwait(false);
                 break;
             case FlagType.Integer:
                 this._state.FlagEvaluationDetailsResult = await this._state.Client!
-                    .GetIntegerDetailsAsync(flag.Key, int.Parse(flag.DefaultValue), this._state.EvaluationContext);
+                    .GetIntegerDetailsAsync(flag.Key, int.Parse(flag.DefaultValue), this._state.EvaluationContext)
+                    .ConfigureAwait(false);
                 break;
             case FlagType.String:
                 this._state.FlagEvaluationDetailsResult = await this._state.Client!
-                    .GetStringDetailsAsync(flag.Key, flag.DefaultValue, this._state.EvaluationContext);
+                    .GetStringDetailsAsync(flag.Key, flag.DefaultValue, this._state.EvaluationContext)
+                    .ConfigureAwait(false);
                 break;
         }
     }

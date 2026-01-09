@@ -14,12 +14,12 @@ public class BeforeHooks
     public static async Task BeforeTestRunAsync()
     {
 #if NET8_0_OR_GREATER
-        var version = await File.ReadAllTextAsync("flagd-testbed-version.txt");
+        var version = await File.ReadAllTextAsync("flagd-testbed-version.txt").ConfigureAwait(false);
 #else
         var version = File.ReadAllText("flagd-testbed-version.txt");
 #endif
         var container = new FlagdTestBedContainer(version.Trim());
-        await container.Container.StartAsync();
+        await container.Container.StartAsync().ConfigureAwait(false);
 
         SharedContext.Container = container;
     }
@@ -27,8 +27,8 @@ public class BeforeHooks
     [AfterTestRun]
     public static async Task AfterTestRunAsync()
     {
-        await SharedContext.Container.Container.StopAsync();
-        await SharedContext.Container.Container.DisposeAsync();
+        await SharedContext.Container.Container.StopAsync().ConfigureAwait(false);
+        await SharedContext.Container.Container.DisposeAsync().ConfigureAwait(false);
 
         SharedContext.Container = null;
     }

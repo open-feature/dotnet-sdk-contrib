@@ -32,13 +32,13 @@ public class EventSteps
     [When("a {} event was fired")]
     public async Task WhenAnEventWasFired(ProviderEventTypes eventType)
     {
-        await this.WaitForEventToBeHandledAsync(eventType, DefaultEventFiredTimeoutMs);
+        await this.WaitForEventToBeHandledAsync(eventType, DefaultEventFiredTimeoutMs).ConfigureAwait(false);
     }
 
     [Then("the {} event handler should have been executed within {int}ms")]
     public async Task ThenTheEventHandlerShouldHaveBeenExecutedWithinMs(ProviderEventTypes eventType, int timeoutMs)
     {
-        await this.WaitForEventToBeHandledAsync(eventType, timeoutMs);
+        await this.WaitForEventToBeHandledAsync(eventType, timeoutMs).ConfigureAwait(false);
     }
 
     [StepArgumentTransformation(@"^(ready|stale|change)$")]

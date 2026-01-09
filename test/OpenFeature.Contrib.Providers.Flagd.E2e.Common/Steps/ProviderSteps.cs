@@ -69,19 +69,19 @@ public class ProviderSteps
                 throw new NotImplementedException("Provider type not supported.");
         }
 
-        await StartFlagdTestBedAsync(config, host);
+        await StartFlagdTestBedAsync(config, host).ConfigureAwait(false);
 
         await Task.Delay(50); // Wait for flagd to be ready
 
         var flagdProvider = new FlagdProvider(builder.Build());
-        await api.SetProviderAsync(flagdProvider);
+        await api.SetProviderAsync(flagdProvider).ConfigureAwait(false);
 
         this._state.Client = Api.Instance.GetClient("TestClient", "1.0.0");
     }
 
     private static async Task StartFlagdTestBedAsync(string config, string host)
     {
-        using var result = await SendRequestToFlagdContainerAsync($"start?config={config}");
+        using var result = await SendRequestToFlagdContainerAsync($"start?config={config}").ConfigureAwait(false);
 
         Assert.True(result.IsSuccessStatusCode, "Failed to start flagd");
 
@@ -91,7 +91,7 @@ public class ProviderSteps
     [When("the connection is lost")]
     public async Task WhenTheConnectionIsLost()
     {
-        using var result = await SendRequestToFlagdContainerAsync("stop");
+        using var result = await SendRequestToFlagdContainerAsync("stop").ConfigureAwait(false);
 
         Assert.True(result.IsSuccessStatusCode, "Failed to stop flagd");
 
@@ -101,7 +101,7 @@ public class ProviderSteps
     [When("the connection is lost for {int}s")]
     public async Task WhenTheConnectionIsLostFor(int seconds)
     {
-        using var result = await SendRequestToFlagdContainerAsync($"restart?seconds={seconds}");
+        using var result = await SendRequestToFlagdContainerAsync($"restart?seconds={seconds}").ConfigureAwait(false);
 
         Assert.True(result.IsSuccessStatusCode, "Failed to restart flagd");
 
@@ -111,7 +111,7 @@ public class ProviderSteps
     [When("the flag was modified")]
     public async Task TheFlagWasModified()
     {
-        using var result = await SendRequestToFlagdContainerAsync("change");
+        using var result = await SendRequestToFlagdContainerAsync("change").ConfigureAwait(false);
 
         Assert.True(result.IsSuccessStatusCode, "Failed to modify flags");
 
@@ -131,7 +131,7 @@ public class ProviderSteps
         do
         {
             var content = new StringContent(string.Empty);
-            result = await client.PostAsync(requestUri, content);
+            result = await client.PostAsync(requestUri, content).ConfigureAwait(false);
 
             if (result.IsSuccessStatusCode)
             {
