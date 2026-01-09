@@ -71,6 +71,8 @@ public class ProviderSteps
 
         await StartFlagdTestBedAsync(config, host);
 
+        await Task.Delay(50); // Wait for flagd to be ready
+
         var flagdProvider = new FlagdProvider(builder.Build());
         await api.SetProviderAsync(flagdProvider);
 

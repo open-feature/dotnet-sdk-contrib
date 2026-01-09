@@ -14,7 +14,17 @@ public class ConfigSteps
     }
 
     [Given("an option {string} of type {string} with value {string}")]
-    public void GivenAnOptionOfTypeWithValue(string cache, string cacheType, string disabled)
+    public void GivenAnOptionOfTypeWithValue(string option, string type, string value)
     {
+        if (this._state.FlagdConfig == null)
+        {
+            this._state.FlagdConfig = FlagdConfig.Builder();
+        }
+
+        if (option == "cache")
+        {
+            var enabled = value == "enabled";
+            this._state.FlagdConfig = this._state.FlagdConfig.WithCache(enabled);
+        }
     }
 }
