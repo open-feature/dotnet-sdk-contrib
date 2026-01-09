@@ -51,6 +51,8 @@ public class ProviderSteps
 
         Assert.True(result.IsSuccessStatusCode, "Failed to start flagd");
 
+        await Task.Delay(50); // Wait for flagd to be ready
+
         await api.SetProviderAsync(flagdProvider);
 
         this._state.Client = Api.Instance.GetClient("TestClient", "1.0.0");
