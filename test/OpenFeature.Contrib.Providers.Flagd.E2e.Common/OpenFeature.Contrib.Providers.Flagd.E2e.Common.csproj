@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/version.txt" Link="flagd-testbed-version.txt" DestinationFolder="." CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/ssl/custom-root-cert.crt" Link="custom-root-cert.crt" DestinationFolder="." CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/flags/*" Link="flags/%(Filename)%(Extension)" DestinationFolder="./flags" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
