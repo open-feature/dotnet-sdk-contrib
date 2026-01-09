@@ -24,6 +24,7 @@ public class ContextSteps
             case "String":
                 context.Set(key, new Value(value));
                 break;
+
             default:
                 break;
         }
