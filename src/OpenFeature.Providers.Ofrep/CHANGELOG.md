@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.3...OpenFeature.Providers.Ofrep-v0.1.4) (2026-01-08)
+
+
+### 🐛 Bug Fixes
+
+* Add MetadataExtensions for converting metadata to primitive types ([#524](https://github.com/open-feature/dotnet-sdk-contrib/issues/524)) ([617c7de](https://github.com/open-feature/dotnet-sdk-contrib/commit/617c7de724db575f4aa099000493bbf04475a29d))
+
+
+### ✨ New Features
+
+* Add environment variable support for OFREP configuration ([#525](https://github.com/open-feature/dotnet-sdk-contrib/issues/525)) ([d5484f6](https://github.com/open-feature/dotnet-sdk-contrib/commit/d5484f692a686f0522c3f172fec03f694144aa39))
+* Update Target Framework to include net10.0 ([#538](https://github.com/open-feature/dotnet-sdk-contrib/issues/538)) ([bb1304b](https://github.com/open-feature/dotnet-sdk-contrib/commit/bb1304bbf63e3ba60648c5293e9901add305d5c6))
+
 ## [0.1.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.2...OpenFeature.Providers.Ofrep-v0.1.3) (2025-10-17)
 
 
