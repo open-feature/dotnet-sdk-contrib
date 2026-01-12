@@ -35,7 +35,9 @@ public class ProviderSteps
         };
 
         var host = SharedContext.Container.Container.Hostname;
-        var builder = FlagdConfig.Builder()
+        var builder = this._state.FlagdConfig ?? FlagdConfig.Builder();
+
+        builder
             .WithHost(host)
             .WithPort(port)
             .WithResolverType(resolverType);
@@ -94,8 +96,6 @@ public class ProviderSteps
         using var result = await SendRequestToFlagdContainerAsync("stop").ConfigureAwait(false);
 
         Assert.True(result.IsSuccessStatusCode, "Failed to stop flagd");
-
-        await Task.Delay(50); // Wait for flagd to be ready
     }
 
     [When("the connection is lost for {int}s")]
@@ -105,7 +105,7 @@ public class ProviderSteps
 
         Assert.True(result.IsSuccessStatusCode, "Failed to restart flagd");
 
-        await Task.Delay(50); // Wait for flagd to be ready
+        await Task.Delay(50); // Wait for flagd to be shutdown
     }
 
     [When("the flag was modified")]
