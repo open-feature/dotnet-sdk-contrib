@@ -274,8 +274,39 @@ internal class JsonEvaluator
                 var contextObj = JsonNode.Parse(JsonSerializer.Serialize(ConvertToDynamicObject(contextDictionary)));
 
                 // convert whatever is returned to a string to try to use it as an index to Variants
-                var ruleResult = JsonLogic.Apply(rule, contextObj);
-                if (ruleResult is bool)
+                JsonNode ruleResult;
+                try
+                {
+                    ruleResult = JsonLogic.Apply(rule, contextObj);
+                }
+                catch (Exception ex)
+                {
+                    throw new FeatureProviderException(
+                        ErrorType.ParseError,
+                        $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.",
+                        ex);
+                }
+
+                if (ruleResult == null)
+                {
+                    throw new FeatureProviderException(ErrorType.ParseError,
+                        $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.");
+                }
+
+                // JsonLogic must resolve to a primitive variant selector (string/bool/number/null).
+                // If it resolves to an object/array, it's an invalid targeting expression (e.g. unknown operator).
+                var kind = ruleResult.GetValueKind();
+                if (kind != JsonValueKind.String
+                    && kind != JsonValueKind.Number
+                    && kind != JsonValueKind.True
+                    && kind != JsonValueKind.False
+                    && kind != JsonValueKind.Null)
+                {
+                    throw new FeatureProviderException(ErrorType.ParseError,
+                        $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.");
+                }
+
+                if (kind == JsonValueKind.True || kind == JsonValueKind.False)
                 {
                     // if this was a bool, convert from "True" to "true" to match JSON
                     variant = Convert.ToString(ruleResult).ToLower();
