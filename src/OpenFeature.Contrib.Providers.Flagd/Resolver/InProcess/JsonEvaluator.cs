@@ -285,7 +285,7 @@ internal class JsonEvaluator
                         $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.", ex);
                 }
 
-                if (ruleResult == null)
+                if (ruleResult == null || ruleResult.GetValueKind() == JsonValueKind.Null)
                 {
                     variant = null;
                 }
@@ -297,8 +297,7 @@ internal class JsonEvaluator
                     if (kind != JsonValueKind.String
                         && kind != JsonValueKind.Number
                         && kind != JsonValueKind.True
-                        && kind != JsonValueKind.False
-                        && kind != JsonValueKind.Null)
+                        && kind != JsonValueKind.False)
                     {
                         throw new FeatureProviderException(ErrorType.ParseError,
                             $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.");
