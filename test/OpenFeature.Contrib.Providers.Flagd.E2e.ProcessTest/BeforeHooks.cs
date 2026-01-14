@@ -1,22 +1,29 @@
-using System;
-using OpenFeature.Contrib.Providers.Flagd.E2e.Common;
+using System.Collections.Generic;
+using System.Linq;
+using OpenFeature.Contrib.Providers.Flagd.E2e.Common.Utils;
 using Reqnroll;
+using Xunit;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest;
 
 [Binding]
 public class BeforeHooks
 {
-    private readonly TestContext _context;
+    private State State { get; set; }
 
-    public BeforeHooks(TestContext context)
+    public BeforeHooks(State state)
     {
-        this._context = context ?? throw new ArgumentNullException(nameof(context));
+        this.State = state;
     }
 
-    [BeforeScenario]
-    public void BeforeScenario()
+    [BeforeScenario(Order = 1)]
+    public void BeforeScenario(ScenarioInfo scenarioInfo, FeatureInfo featureInfo)
     {
-        this._context.ProviderResolverType = ResolverType.IN_PROCESS;
+        this.State.ProviderResolverType = ResolverType.IN_PROCESS;
+
+        var scenarioTags = scenarioInfo.Tags;
+        var featureTags = featureInfo.Tags;
+        var tags = new HashSet<string>(scenarioTags.Concat(featureTags));
+        Skip.If(!tags.Contains("in-process"), "Skipping scenario because it does not have required tag.");
     }
 }

@@ -11,13 +11,14 @@
 
   <ItemGroup>
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/version.txt" Link="flagd-testbed-version.txt" DestinationFolder="." CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/ssl/custom-root-cert.crt" Link="custom-root-cert.crt" DestinationFolder="." CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/flags/*" Link="flags/%(Filename)%(Extension)" DestinationFolder="./flags" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-    <PackageReference Include="Reqnroll.Microsoft.Extensions.DependencyInjection" Version="2.4.1" />
     <PackageReference Include="Reqnroll.xUnit" Version="2.4.1" />
     <PackageReference Include="Testcontainers" Version="4.9.0" />
   </ItemGroup>
