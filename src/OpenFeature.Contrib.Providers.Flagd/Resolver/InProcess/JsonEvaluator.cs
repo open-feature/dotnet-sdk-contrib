@@ -281,10 +281,8 @@ internal class JsonEvaluator
                 }
                 catch (Exception ex)
                 {
-                    throw new FeatureProviderException(
-                        ErrorType.ParseError,
-                        $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.",
-                        ex);
+                    throw new FeatureProviderException(ErrorType.ParseError,
+                        $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.", ex);
                 }
 
                 if (ruleResult == null)
