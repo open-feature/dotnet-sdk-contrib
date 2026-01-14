@@ -287,32 +287,33 @@ internal class JsonEvaluator
 
                 if (ruleResult == null)
                 {
-                    throw new FeatureProviderException(ErrorType.ParseError,
-                        $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.");
-                }
-
-                // JsonLogic must resolve to a primitive variant selector (string/bool/number/null).
-                // If it resolves to an object/array, it's an invalid targeting expression (e.g. unknown operator).
-                var kind = ruleResult.GetValueKind();
-                if (kind != JsonValueKind.String
-                    && kind != JsonValueKind.Number
-                    && kind != JsonValueKind.True
-                    && kind != JsonValueKind.False
-                    && kind != JsonValueKind.Null)
-                {
-                    throw new FeatureProviderException(ErrorType.ParseError,
-                        $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.");
-                }
-
-                if (kind == JsonValueKind.True || kind == JsonValueKind.False)
-                {
-                    // if this was a bool, convert from "True" to "true" to match JSON
-                    variant = Convert.ToString(ruleResult).ToLower();
+                    variant = null;
                 }
                 else
                 {
-                    // convert whatever is returned to a string to support shorthand
-                    variant = Convert.ToString(ruleResult);
+                    // JsonLogic must resolve to a primitive variant selector (string/bool/number/null).
+                    // If it resolves to an object/array, it's an invalid targeting expression (e.g. unknown operator).
+                    var kind = ruleResult.GetValueKind();
+                    if (kind != JsonValueKind.String
+                        && kind != JsonValueKind.Number
+                        && kind != JsonValueKind.True
+                        && kind != JsonValueKind.False
+                        && kind != JsonValueKind.Null)
+                    {
+                        throw new FeatureProviderException(ErrorType.ParseError,
+                            $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.");
+                    }
+
+                    if (kind == JsonValueKind.True || kind == JsonValueKind.False)
+                    {
+                        // if this was a bool, convert from "True" to "true" to match JSON
+                        variant = Convert.ToString(ruleResult).ToLower();
+                    }
+                    else
+                    {
+                        // convert whatever is returned to a string to support shorthand
+                        variant = Convert.ToString(ruleResult);
+                    }
                 }
             }
 
