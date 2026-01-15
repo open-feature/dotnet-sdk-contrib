@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reqnroll.xUnit" Version="2.4.1" />
+    <PackageReference Include="Reqnroll.xUnit" Version="3.3.2" />
   </ItemGroup>
 
   <ItemGroup>
