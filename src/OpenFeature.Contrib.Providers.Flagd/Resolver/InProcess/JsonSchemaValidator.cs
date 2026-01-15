@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -8,62 +7,29 @@ using NJsonSchema.Generation;
 
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 
-internal interface IJsonSchemaValidator
-{
-    Task InitializeAsync(CancellationToken cancellationToken = default);
-    void Validate(string configuration);
-}
-
 internal class JsonSchemaValidator : IJsonSchemaValidator
 {
-    private readonly HttpClient _client;
     private readonly ILogger _logger;
+    private readonly IFlagdJsonSchemaProvider _flagdJsonSchemaProvider;
+
     private JsonSchema _validator;
 
-    internal JsonSchemaValidator(HttpClient client, ILogger logger)
+    internal JsonSchemaValidator(ILogger logger)
+        : this(logger, new FlagdJsonSchemaEmbeddedResourceReader())
     {
-        if (client == null)
-        {
-            client = new HttpClient
-            {
-                BaseAddress = new Uri("https://flagd.dev"),
-            };
-        }
+    }
 
-        _client = client;
-        _logger = logger;
+    internal JsonSchemaValidator(ILogger logger, IFlagdJsonSchemaProvider flagdJsonSchemaProvider)
+    {
+        this._logger = logger;
+        this._flagdJsonSchemaProvider = flagdJsonSchemaProvider;
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            var targetingTask = _client.GetAsync("/schema/v0/targeting.json", cancellationToken);
-            var flagTask = _client.GetAsync("/schema/v0/flags.json", cancellationToken);
-
-            await Task.WhenAll(targetingTask, flagTask).ConfigureAwait(false);
-
-            var targeting = targetingTask.Result;
-            var flag = flagTask.Result;
-
-            if (!targeting.IsSuccessStatusCode)
-            {
-                _logger.LogWarning("Unable to retrieve Flagd targeting JSON Schema, status code: {StatusCode}", targeting.StatusCode);
-                return;
-            }
-
-            if (!flag.IsSuccessStatusCode)
-            {
-                _logger.LogWarning("Unable to retrieve Flagd flags JSON Schema, status code: {StatusCode}", flag.StatusCode);
-                return;
-            }
-
-#if NET5_0_OR_GREATER
-            var targetingJson = await targeting.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-#else
-            var targetingJson = await targeting.Content.ReadAsStringAsync().ConfigureAwait(false);
-#endif
-
+            var targetingJson = await this._flagdJsonSchemaProvider.ReadTargetingSchemaAsync(cancellationToken).ConfigureAwait(false);
             var targetingSchema = await JsonSchema.FromJsonAsync(targetingJson, "targeting.json", schema =>
             {
                 var schemaResolver = new JsonSchemaResolver(schema, new SystemTextJsonSchemaGeneratorSettings());
@@ -72,11 +38,7 @@ internal class JsonSchemaValidator : IJsonSchemaValidator
                 return resolver;
             }, cancellationToken).ConfigureAwait(false);
 
-#if NET5_0_OR_GREATER
-            var flagJson = await flag.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-#else
-            var flagJson = await flag.Content.ReadAsStringAsync().ConfigureAwait(false);
-#endif
+            var flagJson = await this._flagdJsonSchemaProvider.ReadFlagSchemaAsync(cancellationToken).ConfigureAwait(false);
             var flagSchema = await JsonSchema.FromJsonAsync(flagJson, "flags.json", schema =>
             {
                 var schemaResolver = new JsonSchemaResolver(schema, new SystemTextJsonSchemaGeneratorSettings());

@@ -21,6 +21,10 @@
     <PackageReference Include="System.Net.Http.WinHttpHandler" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\flags.json" />
+    <EmbeddedResource Include="Resources\targeting.json" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- The schema.proto file referenced here will be used to automatically generate the Grpc
     client when executing 'dotnet build' -->
     <!-- The generated files will be placed in ./obj/Debug/netstandard2.0/Protos -->
