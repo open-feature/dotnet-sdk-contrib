@@ -35,7 +35,7 @@ public class JsonSchemaValidatorTests
         var failingSchemaProvider = Substitute.For<IFlagdJsonSchemaProvider>();
         var validator = new JsonSchemaValidator(logger, failingSchemaProvider);
 
-        failingSchemaProvider.ReadFlagSchemaAsync(Arg.Any<CancellationToken>())
+        failingSchemaProvider.ReadTargetingSchemaAsync(Arg.Any<CancellationToken>())
             .Throws(new Exception("Simulated failure"));
 
         // Act
@@ -59,6 +59,9 @@ public class JsonSchemaValidatorTests
         var logger = new FakeLogger<JsonSchemaValidatorTests>();
         var failingSchemaProvider = Substitute.For<IFlagdJsonSchemaProvider>();
         var validator = new JsonSchemaValidator(logger, failingSchemaProvider);
+
+        failingSchemaProvider.ReadTargetingSchemaAsync(Arg.Any<CancellationToken>())
+            .Returns("{$id\": \"https://flagd.dev/schema/v0/targeting.json\"}");
 
         failingSchemaProvider.ReadFlagSchemaAsync(Arg.Any<CancellationToken>())
             .Throws(new Exception("Simulated failure"));

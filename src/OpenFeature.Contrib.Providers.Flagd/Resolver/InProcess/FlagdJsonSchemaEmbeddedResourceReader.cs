@@ -26,7 +26,7 @@ internal sealed class FlagdJsonSchemaEmbeddedResourceReader : IFlagdJsonSchemaPr
         var assembly = Assembly.GetAssembly(typeof(FlagdJsonSchemaEmbeddedResourceReader));
         if (assembly == null)
         {
-            throw new InvalidOperationException($"Unable to locate assembly for {nameof(JsonSchemaValidator)}.");
+            throw new InvalidOperationException($"Unable to locate assembly for {nameof(FlagdJsonSchemaEmbeddedResourceReader)}.");
         }
 
         using var stream = assembly.GetManifestResourceStream(resourceName);
