@@ -22,8 +22,8 @@
     <PackageReference Include="System.Net.Http.WinHttpHandler" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\flags.json" />
-    <EmbeddedResource Include="Resources\targeting.json" />
+    <EmbeddedResource Include="schemas\json\flags.json" Link="Resources\flags.json" />
+    <EmbeddedResource Include="schemas\json\targeting.json" Link="Resources\targeting.json" />
   </ItemGroup>
   <ItemGroup>
     <!-- The schema.proto file referenced here will be used to automatically generate the Grpc
