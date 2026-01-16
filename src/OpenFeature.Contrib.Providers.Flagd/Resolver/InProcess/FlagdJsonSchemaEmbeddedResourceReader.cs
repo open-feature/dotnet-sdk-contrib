@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +22,7 @@ internal sealed class FlagdJsonSchemaEmbeddedResourceReader : IFlagdJsonSchemaPr
 
     private async Task<string> ReadAsStringAsync(string resourceName, CancellationToken cancellationToken = default)
     {
-        var assembly = Assembly.GetAssembly(typeof(FlagdJsonSchemaEmbeddedResourceReader));
+        var assembly = typeof(FlagdJsonSchemaEmbeddedResourceReader).Assembly;
         if (assembly == null)
         {
             throw new InvalidOperationException($"Unable to locate assembly for {nameof(FlagdJsonSchemaEmbeddedResourceReader)}.");
