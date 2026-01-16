@@ -418,4 +418,39 @@ public class UnitTestJsonEvaluator
         Assert.False(result.Value);
         Assert.Equal(ErrorType.FlagNotFound, result.ErrorType);
     }
+
+    [Fact]
+    public void TestJsonEvaluatorFlagWithInvalidVariantReturnsParseError()
+    {
+        // Arrange
+        var flag = //lang=json
+            """
+            {
+              "flags": {
+                "error-targeting-flag": {
+                  "defaultVariant": "two",
+                  "state": "ENABLED",
+                  "targeting": {
+                    "invalid": [
+                      "this is not valid targeting"
+                    ]
+                  },
+                  "variants": {
+                    "one": 1,
+                    "two": 2
+                  }
+                }
+              }
+            }
+            """;
+
+        this._jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, flag);
+
+        var context = EvaluationContext.Builder()
+            .SetTargetingKey("targetingKey")
+            .Build();
+
+        // Act & Assert
+        Assert.Throws<FeatureProviderException>(() => this._jsonEvaluator.ResolveStringValueAsync("error-targeting-flag", "one", context));
+    }
 }
