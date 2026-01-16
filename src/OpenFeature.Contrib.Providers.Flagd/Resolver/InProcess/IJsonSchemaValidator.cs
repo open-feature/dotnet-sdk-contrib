@@ -1,6 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 
 internal interface IJsonSchemaValidator

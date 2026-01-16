@@ -3,6 +3,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 
 internal sealed class FlagdJsonSchemaEmbeddedResourceReader : IFlagdJsonSchemaProvider
