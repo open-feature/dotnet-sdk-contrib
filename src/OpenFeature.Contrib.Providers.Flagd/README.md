@@ -1,5 +1,7 @@
 # flagd .NET Provider
 
+> **⚠️ DEPRECATED**: This package will be renamed to `OpenFeature.Providers.Flagd` (removing the "Contrib" suffix) in a future release. The current package name will be deprecated in favour of the new package name.
+
 The flagd Flag provider allows you to connect to your flagd instance.
 
 ## Requirements
