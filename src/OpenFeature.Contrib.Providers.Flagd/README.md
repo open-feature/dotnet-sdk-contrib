@@ -1,8 +1,6 @@
 # flagd .NET Provider
 
-The flagd Flag provider allows you to connect to your flagd instance.  
-
-# .Net SDK usage
+The flagd Flag provider allows you to connect to your flagd instance.
 
 ## Requirements
 
@@ -189,7 +187,7 @@ Alternatively, if you would like to pass the URI directly, you can initialise it
 var flagdProvider = new FlagdProvider(new Uri("http://localhost:8013"));
 
 // ... or use the unix:// prefix if the provider should communicate via a unix socket
-var unixFlagdProvider = new FlagdProvider(new Uri("unix://socket.tmp"));  
+var unixFlagdProvider = new FlagdProvider(new Uri("unix://socket.tmp"));
 ```
 
 ## In-process resolver type
@@ -241,10 +239,9 @@ namespace OpenFeatureTestApp
 
 By default the in-process provider will attempt to validate the flag configurations against the [Flags](https://flagd.dev/schema/v0/flags.json) and [targeting](https://flagd.dev/schema/v0/targeting.json) schemas. If validation fails a warning log will be generated. You must configure a logger using the FlagdConfigBuilder. The in-process provider uses the Microsoft.Extensions.Logging abstractions.
 
-```
+```csharp
 var logger = loggerFactory.CreateLogger<Program>();
 var flagdConfig = new FlagdConfigBuilder()
     .WithLogger(logger)
     .Build();
 ```
-
