@@ -490,6 +490,6 @@ public class UnitTestJsonEvaluator
         var ex = Assert.Throws<FeatureProviderException>(() => this._jsonEvaluator.ResolveIntegerValueAsync("missing-variant-targeting-flag", 3, context));
 
         Assert.Equal(ErrorType.General, ex.ErrorType);
-        Assert.Equal("TARGETING_MATCH_ERROR: flag 'missing-variant-targeting-flag' targeting resolved to variant.", ex.Message);
+        Assert.Equal("TARGETING_MATCH_ERROR: flag 'missing-variant-targeting-flag' targeting resolved to variant 'three', but it could not be found.", ex.Message);
     }
 }

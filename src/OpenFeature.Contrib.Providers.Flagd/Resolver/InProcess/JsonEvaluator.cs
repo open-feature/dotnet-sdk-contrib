@@ -366,7 +366,7 @@ internal class JsonEvaluator
             else
             {
                 throw new FeatureProviderException(ErrorType.General,
-                    "TARGETING_MATCH_ERROR: flag '" + flagKey + "' targeting resolved to variant.");
+                    $"TARGETING_MATCH_ERROR: flag '{flagKey}' targeting resolved to variant '{variant}', but it could not be found.");
             }
         }
 
