@@ -451,6 +451,45 @@ public class UnitTestJsonEvaluator
             .Build();
 
         // Act & Assert
-        Assert.Throws<FeatureProviderException>(() => this._jsonEvaluator.ResolveStringValueAsync("error-targeting-flag", "one", context));
+        var ex = Assert.Throws<FeatureProviderException>(() => this._jsonEvaluator.ResolveStringValueAsync("error-targeting-flag", "one", context));
+
+        Assert.Equal(ErrorType.ParseError, ex.ErrorType);
+        Assert.Equal("PARSE_ERROR: flag 'error-targeting-flag' has invalid targeting rule.", ex.Message);
+    }
+
+    [Fact]
+    public void TestJsonEvaluatorFlagWithMissingVariantReturnsGeneralError()
+    {
+        // Arrange
+        var flag = //lang=json
+            """
+            {
+              "flags": {
+                "missing-variant-targeting-flag": {
+                  "state": "ENABLED",
+                  "variants": {
+                    "one": 1,
+                    "two": 2
+                  },
+                  "defaultVariant": "two",
+                  "targeting": {
+                    "if": [true, "three", "one"]
+                  }
+                }
+              }
+            }
+            """;
+
+        this._jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, flag);
+
+        var context = EvaluationContext.Builder()
+            .SetTargetingKey("three")
+            .Build();
+
+        // Act & Assert
+        var ex = Assert.Throws<FeatureProviderException>(() => this._jsonEvaluator.ResolveIntegerValueAsync("missing-variant-targeting-flag", 3, context));
+
+        Assert.Equal(ErrorType.General, ex.ErrorType);
+        Assert.Equal("TARGETING_MATCH_ERROR: flag 'missing-variant-targeting-flag' targeting resolved to variant.", ex.Message);
     }
 }

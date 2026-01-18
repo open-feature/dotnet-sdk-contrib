@@ -363,6 +363,11 @@ internal class JsonEvaluator
                     flagMetadata: flagMetadata
                 );
             }
+            else
+            {
+                throw new FeatureProviderException(ErrorType.General,
+                    "TARGETING_MATCH_ERROR: flag '" + flagKey + "' targeting resolved to variant.");
+            }
         }
 
         throw new FeatureProviderException(ErrorType.FlagNotFound,
