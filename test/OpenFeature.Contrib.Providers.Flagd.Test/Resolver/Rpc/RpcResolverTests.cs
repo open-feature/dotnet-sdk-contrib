@@ -3,7 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
+using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc.Evaluation;
 using OpenFeature.Model;
 using Xunit;
@@ -243,6 +246,27 @@ public class RpcResolverTests
         Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
         mockCache.Received().Delete("key1");
+    }
+
+    [Fact]
+    public async Task ResolveValue_WhenDataLossError_ReturnsParseError()
+    {
+        // Arrange
+        var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+
+        mockGrpcClient.ResolveIntAsync(Arg.Is<ResolveIntRequest>(r => r.FlagKey == "key2"))
+            .Throws(new RpcException(new Status(StatusCode.DataLoss, "Parse error")));
+
+        var config = new FlagdConfig();
+
+        var resolver = new RpcResolver(mockGrpcClient, config, null);
+
+        // Act
+        var ex = await Assert.ThrowsAsync<FeatureProviderException>(() => resolver.ResolveIntegerValueAsync("key2", 3));
+
+        // Assert
+        Assert.Equal(ErrorType.ParseError, ex.ErrorType);
+        Assert.Equal("Parse error", ex.Message);
     }
 
     private static Service.ServiceClient SetupGrpcStream(List<EventStreamResponse> responses)
