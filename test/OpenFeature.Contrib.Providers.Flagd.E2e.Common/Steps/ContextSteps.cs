@@ -17,10 +17,7 @@ public class ContextSteps
     [Given("a context containing a key {string}, with type {string} and with value {string}")]
     public void GivenAContextContainingAKeyWithTypeAndWithValue(string key, string type, string value)
     {
-        if (this._state.EvaluationContext == null)
-        {
-            this._state.EvaluationContext = EvaluationContext.Builder();
-        }
+        this._state.EvaluationContext ??= EvaluationContext.Builder();
 
         switch (type)
         {
@@ -44,10 +41,7 @@ public class ContextSteps
             .Set(innerKey, new Value(value))
             .Build();
 
-        if (this._state.EvaluationContext == null)
-        {
-            this._state.EvaluationContext = EvaluationContext.Builder();
-        }
+        this._state.EvaluationContext ??= EvaluationContext.Builder();
 
         this._state.EvaluationContext.Set(key, new Value(nestedContext));
     }
@@ -55,10 +49,7 @@ public class ContextSteps
     [Given("a context containing a targeting key with value {string}")]
     public void GivenAContextContainingATargetingKeyWithValue(string value)
     {
-        if (this._state.EvaluationContext == null)
-        {
-            this._state.EvaluationContext = EvaluationContext.Builder();
-        }
+        this._state.EvaluationContext ??= EvaluationContext.Builder();
 
         this._state.EvaluationContext.SetTargetingKey(value);
     }
