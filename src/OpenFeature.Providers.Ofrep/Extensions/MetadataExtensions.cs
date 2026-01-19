@@ -47,10 +47,10 @@ internal static class MetadataExtensions
         return value switch
         {
             null => string.Empty,
-            Dictionary<string, object?> dict => dict.ToDictionary(
+            Dictionary<string, object> dict => dict.ToDictionary(
                 kvp => kvp.Key,
                 kvp => ConvertNullsToEmptyString(kvp.Value) ?? string.Empty),
-            List<object?> list => list.Select(item => ConvertNullsToEmptyString(item) ?? string.Empty).ToList(),
+            IList<object?> list => list.Select(item => ConvertNullsToEmptyString(item) ?? string.Empty).ToList(),
             _ => value
         };
     }
