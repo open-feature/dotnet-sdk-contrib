@@ -12,6 +12,6 @@ public class State
     public FlagState? Flag { get; set; }
     public object? FlagEvaluationDetailsResult { get; set; }
     public object? FlagResult { get; set; }
-    public EvaluationContext EvaluationContext { get; set; } = EvaluationContext.Empty;
+    public EvaluationContextBuilder EvaluationContext { get; set; }
     public List<Event> Events { get; } = new();
 }
