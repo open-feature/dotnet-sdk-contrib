@@ -444,6 +444,8 @@ internal class RpcResolver : Resolver
                 return new FeatureProviderException(ErrorType.ProviderNotReady, e.Status.Detail, e);
             case StatusCode.InvalidArgument:
                 return new FeatureProviderException(ErrorType.TypeMismatch, e.Status.Detail, e);
+            case StatusCode.DataLoss:
+                return new FeatureProviderException(ErrorType.ParseError, e.Status.Detail, e);
             default:
                 return new FeatureProviderException(ErrorType.General, e.Status.Detail, e);
         }

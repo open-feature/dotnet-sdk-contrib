@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
+using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc.Evaluation;
 using OpenFeature.Model;
 using Xunit;
@@ -71,7 +75,7 @@ public class RpcResolverTests
         Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
         Assert.NotNull(flagdProviderEvent);
-        Assert.Equal(Constant.ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
+        Assert.Equal(ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
         Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
         Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
         Assert.Contains("key2", flagdProviderEvent.FlagsChanged);
@@ -111,7 +115,7 @@ public class RpcResolverTests
         Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
         Assert.NotNull(flagdProviderEvent);
-        Assert.Equal(Constant.ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
+        Assert.Equal(ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
         Assert.Empty(flagdProviderEvent.FlagsChanged);
         Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
     }
@@ -152,7 +156,7 @@ public class RpcResolverTests
         Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
         Assert.NotNull(flagdProviderEvent);
-        Assert.Equal(Constant.ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
+        Assert.Equal(ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
         Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
         Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
     }
@@ -243,6 +247,58 @@ public class RpcResolverTests
         Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
 
         mockCache.Received().Delete("key1");
+    }
+
+    [Theory]
+    [MemberData(nameof(ResolveValueDataLossData))]
+    internal async Task ResolveValue_WhenDataLossError_ReturnsParseError(Func<RpcResolver, Task> act, Action<Service.ServiceClient> setup)
+    {
+        // Arrange
+        var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+        setup(mockGrpcClient);
+
+        var config = new FlagdConfig();
+        var resolver = new RpcResolver(mockGrpcClient, config, null);
+
+        // Act
+        var ex = await Assert.ThrowsAsync<FeatureProviderException>(() => act(resolver));
+
+        // Assert
+        Assert.Equal(ErrorType.ParseError, ex.ErrorType);
+        Assert.Equal("Parse error", ex.Message);
+    }
+
+    public static IEnumerable<object[]> ResolveValueDataLossData()
+    {
+        const string flagKey = "key";
+        const string errorMessage = "Parse error";
+        var rpcException = new RpcException(new Status(StatusCode.DataLoss, errorMessage));
+
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task>(r => r.ResolveBooleanValueAsync(flagKey, false)),
+            new Action<Service.ServiceClient>(client => client.ResolveBooleanAsync(Arg.Any<ResolveBooleanRequest>()).Throws(rpcException))
+        };
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task>(r => r.ResolveStringValueAsync(flagKey, "def")),
+            new Action<Service.ServiceClient>(client => client.ResolveStringAsync(Arg.Any<ResolveStringRequest>()).Throws(rpcException))
+        };
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task>(r => r.ResolveIntegerValueAsync(flagKey, 3)),
+            new Action<Service.ServiceClient>(client => client.ResolveIntAsync(Arg.Any<ResolveIntRequest>()).Throws(rpcException))
+        };
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task>(r => r.ResolveDoubleValueAsync(flagKey, 3.5)),
+            new Action<Service.ServiceClient>(client => client.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>()).Throws(rpcException))
+        };
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task>(r => r.ResolveStructureValueAsync(flagKey, new Value(Structure.Builder().Set("value1", true).Build()))),
+            new Action<Service.ServiceClient>(client => client.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>()).Throws(rpcException))
+        };
     }
 
     private static Service.ServiceClient SetupGrpcStream(List<EventStreamResponse> responses)
