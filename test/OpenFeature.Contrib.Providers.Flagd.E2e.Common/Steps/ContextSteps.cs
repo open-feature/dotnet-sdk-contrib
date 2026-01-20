@@ -17,16 +17,14 @@ public class ContextSteps
     [Given("a context containing a key {string}, with type {string} and with value {string}")]
     public void GivenAContextContainingAKeyWithTypeAndWithValue(string key, string type, string value)
     {
-        this._state.EvaluationContext ??= EvaluationContext.Builder();
-
         switch (type)
         {
             case "String":
-                this._state.EvaluationContext.Set(key, new Value(value));
+                this._state.EvaluationContextBuilder.Set(key, new Value(value));
                 break;
 
             case "Integer":
-                this._state.EvaluationContext.Set(key, new Value(long.Parse(value)));
+                this._state.EvaluationContextBuilder.Set(key, new Value(long.Parse(value)));
                 break;
 
             default:
@@ -41,16 +39,12 @@ public class ContextSteps
             .Set(innerKey, new Value(value))
             .Build();
 
-        this._state.EvaluationContext ??= EvaluationContext.Builder();
-
-        this._state.EvaluationContext.Set(key, new Value(nestedContext));
+        this._state.EvaluationContextBuilder.Set(key, new Value(nestedContext));
     }
 
     [Given("a context containing a targeting key with value {string}")]
     public void GivenAContextContainingATargetingKeyWithValue(string value)
     {
-        this._state.EvaluationContext ??= EvaluationContext.Builder();
-
-        this._state.EvaluationContext.SetTargetingKey(value);
+        this._state.EvaluationContextBuilder.SetTargetingKey(value);
     }
 }

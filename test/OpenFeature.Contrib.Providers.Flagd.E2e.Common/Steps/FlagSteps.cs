@@ -40,7 +40,7 @@ public class FlagSteps
     public async Task WhenTheFlagWasEvaluatedWithDetails()
     {
         var flag = this._state.Flag!;
-        var contextBuilder = this._state.EvaluationContext
+        var contextBuilder = this._state.EvaluationContextBuilder
             ?? EvaluationContext.Builder();
         var context = contextBuilder.Build();
 
