@@ -1,3 +1,4 @@
+using System.Text.Json;
 using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Model;
@@ -207,10 +208,11 @@ public class OfrepProviderTest : IDisposable
         var defaultValue = new Value("default");
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var expectedResponse = new OfrepResponse<object?>(flagKey, 123) { Variant = "object1" };
+        var jsonElement = JsonSerializer.Deserialize<JsonElement>("{\"property1\": \"value1\", \"property2\": 123}");
+        var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElement) { Variant = "object1" };
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue.AsObject, context, Arg.Any<CancellationToken>())
+            .EvaluateFlag<JsonElement?>(flagKey, null, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -221,22 +223,73 @@ public class OfrepProviderTest : IDisposable
         // Assert
         Assert.Equal(flagKey, result.FlagKey);
         Assert.NotNull(result.Value);
+        Assert.True(result.Value.IsStructure);
+        Assert.Equal("value1", result.Value.AsStructure?.GetValue("property1").AsString);
+        Assert.Equal(123, result.Value.AsStructure?.GetValue("property2").AsInteger);
         Assert.Equal(ErrorType.None, result.ErrorType);
         Assert.Equal("object1", result.Variant);
     }
 
+    /// <summary>
+    /// Test case from GitHub issue #552 - verifies that JSON object values from OFREP backend
+    /// are correctly converted to OpenFeature Value/Structure types.
+    /// </summary>
     [Fact]
-    public async Task ResolveStructureValueAsync_ShouldReturnEmptyStringValue_WhenClientReturnsNullValue()
+    public async Task ResolveStructureValueAsync_ShouldHandleIssue552Example_WhenBackendReturnsJsonObject()
+    {
+        // Arrange - exact example from issue #552
+        const string flagKey = "my-object-flag";
+        var defaultValue = new Value(Structure.Builder()
+            .Set("property1", new Value("default"))
+            .Build());
+        var context = EvaluationContext.Builder().Set("userId", "123").Build();
+
+        // Simulates OFREP backend response: {"property1": "value1", "property2": 123, "property3": true}
+        var jsonElement = JsonSerializer.Deserialize<JsonElement>(
+            "{\"property1\": \"value1\", \"property2\": 123, \"property3\": true}");
+        var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElement)
+        {
+            Variant = "default",
+            Reason = "STATIC"
+        };
+
+        this._mockClient
+            .EvaluateFlag<JsonElement?>(flagKey, null, context, Arg.Any<CancellationToken>())
+            .Returns(expectedResponse);
+
+        this._provider = this.CreateProviderWithMockClient();
+
+        // Act
+        var result = await this._provider.ResolveStructureValueAsync(flagKey, defaultValue, context);
+
+        // Assert - should successfully convert JsonElement to Structure
+        Assert.Equal(flagKey, result.FlagKey);
+        Assert.NotNull(result.Value);
+        Assert.True(result.Value.IsStructure);
+
+        var structure = result.Value.AsStructure;
+        Assert.NotNull(structure);
+        Assert.Equal("value1", structure.GetValue("property1").AsString);
+        Assert.Equal(123, structure.GetValue("property2").AsInteger);
+        Assert.True(structure.GetValue("property3").AsBoolean);
+
+        Assert.Equal(ErrorType.None, result.ErrorType);
+        Assert.Equal("default", result.Variant);
+        Assert.Equal("STATIC", result.Reason);
+    }
+
+    [Fact]
+    public async Task ResolveStructureValueAsync_ShouldReturnDefaultValue_WhenClientReturnsNullValue()
     {
         // Arrange
         const string flagKey = "test-flag";
         var defaultValue = new Value("default");
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
 
-        var expectedResponse = new OfrepResponse<object?>(flagKey, null!) { Variant = "null" };
+        var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, null) { Variant = "null" };
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue.AsObject, context, Arg.Any<CancellationToken>())
+            .EvaluateFlag<JsonElement?>(flagKey, null, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -246,7 +299,7 @@ public class OfrepProviderTest : IDisposable
 
         // Assert
         Assert.Equal(flagKey, result.FlagKey);
-        Assert.Equal(string.Empty, result.Value.AsString);
+        Assert.Equal("default", result.Value.AsString);
         Assert.Equal(ErrorType.None, result.ErrorType);
         Assert.Equal("null", result.Variant);
     }
@@ -432,10 +485,11 @@ public class OfrepProviderTest : IDisposable
         var context = EvaluationContext.Builder().Set("userId", "123").Build();
         var cancellationToken = CancellationToken.None;
 
-        var expectedResponse = new OfrepResponse<object?>(flagKey, "value");
+        var jsonElement = JsonSerializer.Deserialize<JsonElement>("\"value\"");
+        var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElement);
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue.AsObject, context, cancellationToken)
+            .EvaluateFlag<JsonElement?>(flagKey, null, context, cancellationToken)
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -444,7 +498,7 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveStructureValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue.AsObject, context, cancellationToken);
+        await this._mockClient.Received(1).EvaluateFlag<JsonElement?>(flagKey, null, context, cancellationToken);
     }
 
     [Fact]
@@ -478,10 +532,11 @@ public class OfrepProviderTest : IDisposable
         const string flagKey = "test-flag";
         var defaultValue = new Value("default");
 
-        var expectedResponse = new OfrepResponse<object?>(flagKey, "value");
+        var jsonElement = JsonSerializer.Deserialize<JsonElement>("\"value\"");
+        var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElement);
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue.AsObject, null, Arg.Any<CancellationToken>())
+            .EvaluateFlag<JsonElement?>(flagKey, null, null, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Model;
@@ -159,13 +160,20 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             throw new ArgumentNullException(nameof(flagKey));
         }
 
+        // We request JsonElement? with null default to get the raw JSON from the server.
+        // This avoids type mismatch issues when deserializing object values as System.Text.Json
+        // returns JsonElement for object types, which is not a valid Value constructor parameter.
         var response =
-            await this._client.EvaluateFlag(flagKey, defaultValue.AsObject,
+            await this._client.EvaluateFlag<JsonElement?>(flagKey, null,
                 context, cancellationToken).ConfigureAwait(false);
+
+        var resolvedValue = response.Value.HasValue
+            ? response.Value.Value.ToValue()
+            : defaultValue;
 
         return new ResolutionDetails<Value>(
             flagKey,
-            response.Value != null ? new Value(response.Value) : new Value(String.Empty),
+            resolvedValue,
             MapErrorType(response.ErrorCode ?? string.Empty),
             reason: response.Reason,
             variant: response.Variant,
