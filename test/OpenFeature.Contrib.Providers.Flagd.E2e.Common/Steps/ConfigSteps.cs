@@ -26,5 +26,10 @@ public class ConfigSteps
             var enabled = value == "enabled";
             this._state.FlagdConfig = this._state.FlagdConfig.WithCache(enabled);
         }
+
+        if (option == "selector")
+        {
+            this._state.FlagdConfig = this._state.FlagdConfig.WithSourceSelector(value);
+        }
     }
 }
