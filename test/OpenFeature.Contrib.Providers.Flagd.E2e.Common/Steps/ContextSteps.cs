@@ -17,18 +17,34 @@ public class ContextSteps
     [Given("a context containing a key {string}, with type {string} and with value {string}")]
     public void GivenAContextContainingAKeyWithTypeAndWithValue(string key, string type, string value)
     {
-        var context = EvaluationContext.Builder();
-
         switch (type)
         {
             case "String":
-                context.Set(key, new Value(value));
+                this._state.EvaluationContextBuilder.Set(key, new Value(value));
+                break;
+
+            case "Integer":
+                this._state.EvaluationContextBuilder.Set(key, new Value(long.Parse(value)));
                 break;
 
             default:
                 break;
         }
+    }
 
-        this._state.EvaluationContext = context.Build();
+    [Given("a context containing a nested property with outer key {string} and inner key {string}, with value {string}")]
+    public void GivenAContextContainingANestedPropertyWithOuterKeyAndInnerKeyWithValue(string key, string innerKey, string value)
+    {
+        var nestedContext = Structure.Builder()
+            .Set(innerKey, new Value(value))
+            .Build();
+
+        this._state.EvaluationContextBuilder.Set(key, new Value(nestedContext));
+    }
+
+    [Given("a context containing a targeting key with value {string}")]
+    public void GivenAContextContainingATargetingKeyWithValue(string value)
+    {
+        this._state.EvaluationContextBuilder.SetTargetingKey(value);
     }
 }
