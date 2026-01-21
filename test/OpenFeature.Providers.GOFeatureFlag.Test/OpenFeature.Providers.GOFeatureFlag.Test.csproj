@@ -6,7 +6,7 @@
     <ProjectReference Include="..\..\src\OpenFeature.Providers.GOFeatureFlag\OpenFeature.Providers.GOFeatureFlag.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Wasmtime" Version="22.0.0"/>
+    <PackageReference Include="Wasmtime" Version="34.0.2"/>
     <PackageReference Include="RichardSzalay.MockHttp" Version="7.0.0"/>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
   </ItemGroup>
