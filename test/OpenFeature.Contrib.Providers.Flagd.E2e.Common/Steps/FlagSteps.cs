@@ -153,9 +153,9 @@ public class FlagSteps
     {
         foreach (var row in dataTable.Rows)
         {
-            var key = row[0];
-            var type = row[1];
-            var value = row[2];
+            var key = row["key"];
+            var type = row["metadata_type"];
+            var value = row["value"];
 
             switch (this._state.Flag!.Type)
             {
