@@ -1,0 +1,66 @@
+name: Build & Test
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: Runner image (e.g. ubuntu-latest, windows-latest)
+        required: true
+        type: string
+      name:
+        description: Friendly component name for logging
+        required: true
+        type: string
+      mainProject:
+        description: Path to the main project .csproj
+        required: true
+        type: string
+      testProject:
+        description: Path to the test project .csproj
+        required: true
+        type: string
+
+jobs:
+  build_test:
+    name: ${{ inputs.name }} • ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+      pull-requests: write
+      packages: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          global-json-file: global.json
+          source-url: https://nuget.pkg.github.com/open-feature/index.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore ${{ inputs.mainProject }} ${{ inputs.testProject }}
+
+      - name: Build
+        run: |
+          dotnet build ${{ inputs.mainProject }} --no-restore
+          dotnet build ${{ inputs.testProject }} --no-restore
+
+      - name: Test
+        run: dotnet test ${{ inputs.testProject }} --no-build --no-restore --logger GitHubActions

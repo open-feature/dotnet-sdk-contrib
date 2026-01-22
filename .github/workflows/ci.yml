@@ -117,132 +117,140 @@ jobs:
               - 'src/OpenFeature.Providers.Ofrep/**'
               - 'test/OpenFeature.Providers.Ofrep.Test/**'
 
-  build:
+  configcat:
+    name: ConfigCat
     needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.configcat == 'true'
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            name: ConfigCat
-            filterKey: configcat
-            testProject: test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj
-          - os: windows-latest
-            name: ConfigCat
-            filterKey: configcat
-            testProject: test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: ConfigCat
+      mainProject: src/OpenFeature.Contrib.Providers.ConfigCat/OpenFeature.Contrib.Providers.ConfigCat.csproj
+      testProject: test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj
+    secrets: inherit
 
-          - os: ubuntu-latest
-            name: EnvVar
-            filterKey: envvar
-            testProject: test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj
-          - os: windows-latest
-            name: EnvVar
-            filterKey: envvar
-            testProject: test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj
+  envvar:
+    name: EnvVar
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.envvar == 'true'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: EnvVar
+      mainProject: src/OpenFeature.Contrib.Providers.EnvVar/OpenFeature.Contrib.Providers.EnvVar.csproj
+      testProject: test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj
+    secrets: inherit
 
-          - os: ubuntu-latest
-            name: FeatureManagement
-            filterKey: featuremanagement
-            testProject: test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj
-          - os: windows-latest
-            name: FeatureManagement
-            filterKey: featuremanagement
-            testProject: test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj
+  featuremanagement:
+    name: FeatureManagement
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.featuremanagement == 'true'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: FeatureManagement
+      mainProject: src/OpenFeature.Contrib.Providers.FeatureManagement/OpenFeature.Contrib.Providers.FeatureManagement.csproj
+      testProject: test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj
+    secrets: inherit
 
-          - os: ubuntu-latest
-            name: Flagd (unit)
-            filterKey: flagd_unit
-            testProject: test/OpenFeature.Contrib.Providers.Flagd.Test/OpenFeature.Contrib.Providers.Flagd.Test.csproj
-          - os: windows-latest
-            name: Flagd (unit)
-            filterKey: flagd_unit
-            testProject: test/OpenFeature.Contrib.Providers.Flagd.Test/OpenFeature.Contrib.Providers.Flagd.Test.csproj
+  flagd_unit:
+    name: Flagd (unit)
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.flagd_unit == 'true'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: Flagd (unit)
+      mainProject: src/OpenFeature.Contrib.Providers.Flagd/OpenFeature.Contrib.Providers.Flagd.csproj
+      testProject: test/OpenFeature.Contrib.Providers.Flagd.Test/OpenFeature.Contrib.Providers.Flagd.Test.csproj
+    secrets: inherit
 
-          - os: ubuntu-latest
-            name: Flagsmith
-            filterKey: flagsmith
-            testProject: test/OpenFeature.Contrib.Providers.Flagsmith.Test/OpenFeature.Contrib.Providers.Flagsmith.Test.csproj
-          - os: windows-latest
-            name: Flagsmith
-            filterKey: flagsmith
-            testProject: test/OpenFeature.Contrib.Providers.Flagsmith.Test/OpenFeature.Contrib.Providers.Flagsmith.Test.csproj
+  flagsmith:
+    name: Flagsmith
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.flagsmith == 'true'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: Flagsmith
+      mainProject: src/OpenFeature.Contrib.Providers.Flagsmith/OpenFeature.Contrib.Providers.Flagsmith.csproj
+      testProject: test/OpenFeature.Contrib.Providers.Flagsmith.Test/OpenFeature.Contrib.Providers.Flagsmith.Test.csproj
+    secrets: inherit
 
-          - os: ubuntu-latest
-            name: Flipt
-            filterKey: flipt
-            testProject: test/OpenFeature.Contrib.Providers.Flipt.Test/OpenFeature.Contrib.Providers.Flipt.Test.csproj
-          - os: windows-latest
-            name: Flipt
-            filterKey: flipt
-            testProject: test/OpenFeature.Contrib.Providers.Flipt.Test/OpenFeature.Contrib.Providers.Flipt.Test.csproj
+  flipt:
+    name: Flipt
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.flipt == 'true'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: Flipt
+      mainProject: src/OpenFeature.Contrib.Providers.Flipt/OpenFeature.Contrib.Providers.Flipt.csproj
+      testProject: test/OpenFeature.Contrib.Providers.Flipt.Test/OpenFeature.Contrib.Providers.Flipt.Test.csproj
+    secrets: inherit
 
-          - os: ubuntu-latest
-            name: Statsig
-            filterKey: statsig
-            testProject: test/OpenFeature.Contrib.Providers.Statsig.Test/OpenFeature.Contrib.Providers.Statsig.Test.csproj
-          - os: windows-latest
-            name: Statsig
-            filterKey: statsig
-            testProject: test/OpenFeature.Contrib.Providers.Statsig.Test/OpenFeature.Contrib.Providers.Statsig.Test.csproj
+  statsig:
+    name: Statsig
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.statsig == 'true'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: Statsig
+      mainProject: src/OpenFeature.Contrib.Providers.Statsig/OpenFeature.Contrib.Providers.Statsig.csproj
+      testProject: test/OpenFeature.Contrib.Providers.Statsig.Test/OpenFeature.Contrib.Providers.Statsig.Test.csproj
+    secrets: inherit
 
-          - os: ubuntu-latest
-            name: GOFeatureFlag
-            filterKey: gofeatureflag
-            testProject: test/OpenFeature.Providers.GOFeatureFlag.Test/OpenFeature.Providers.GOFeatureFlag.Test.csproj
-          - os: windows-latest
-            name: GOFeatureFlag
-            filterKey: gofeatureflag
-            testProject: test/OpenFeature.Providers.GOFeatureFlag.Test/OpenFeature.Providers.GOFeatureFlag.Test.csproj
+  gofeatureflag:
+    name: GOFeatureFlag
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.gofeatureflag == 'true'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: GOFeatureFlag
+      mainProject: src/OpenFeature.Providers.GOFeatureFlag/OpenFeature.Providers.GOFeatureFlag.csproj
+      testProject: test/OpenFeature.Providers.GOFeatureFlag.Test/OpenFeature.Providers.GOFeatureFlag.Test.csproj
+    secrets: inherit
 
-          - os: ubuntu-latest
-            name: OFREP
-            filterKey: ofrep
-            testProject: test/OpenFeature.Providers.Ofrep.Test/OpenFeature.Providers.Ofrep.Test.csproj
-          - os: windows-latest
-            name: OFREP
-            filterKey: ofrep
-            testProject: test/OpenFeature.Providers.Ofrep.Test/OpenFeature.Providers.Ofrep.Test.csproj
-
-    name: Build & Test (${{ matrix.name }} • ${{ matrix.os }})
-
-    if: needs.changes.outputs.all == 'true' || needs.changes.outputs[matrix.filterKey] == 'true'
-
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
-
-    permissions:
-      contents: read
-      pull-requests: write
-      packages: read
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          global-json-file: global.json
-          source-url: https://nuget.pkg.github.com/open-feature/index.json
-
-      - name: Cache NuGet packages
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      - name: Restore
-        run: dotnet restore ${{ matrix.testProject }}
-
-      - name: Test
-        run: dotnet test ${{ matrix.testProject }} --no-restore --logger GitHubActions
+  ofrep:
+    name: OFREP
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.ofrep == 'true'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build-test.yml
+    with:
+      os: ${{ matrix.os }}
+      name: OFREP
+      mainProject: src/OpenFeature.Providers.Ofrep/OpenFeature.Providers.Ofrep.csproj
+      testProject: test/OpenFeature.Providers.Ofrep.Test/OpenFeature.Providers.Ofrep.Test.csproj
+    secrets: inherit
 
   e2e:
     needs: changes
@@ -271,8 +279,44 @@ jobs:
       - name: Test
         run: dotnet build && E2E=true dotnet test --logger GitHubActions
 
+  build_gate:
+    name: Build/Test gate
+    needs:
+      - changes
+      - configcat
+      - envvar
+      - featuremanagement
+      - flagd_unit
+      - flagsmith
+      - flipt
+      - statsig
+      - gofeatureflag
+      - ofrep
+      - e2e
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fail if any build/test job failed
+        run: |
+          echo "needs results:"
+          echo "- configcat: ${{ needs.configcat.result }}"
+          echo "- envvar: ${{ needs.envvar.result }}"
+          echo "- featuremanagement: ${{ needs.featuremanagement.result }}"
+          echo "- flagd_unit: ${{ needs.flagd_unit.result }}"
+          echo "- flagsmith: ${{ needs.flagsmith.result }}"
+          echo "- flipt: ${{ needs.flipt.result }}"
+          echo "- statsig: ${{ needs.statsig.result }}"
+          echo "- gofeatureflag: ${{ needs.gofeatureflag.result }}"
+          echo "- ofrep: ${{ needs.ofrep.result }}"
+          echo "- e2e: ${{ needs.e2e.result }}"
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" || "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "At least one build/test job failed or was cancelled."
+            exit 1
+          fi
+
   packaging:
-    needs: [changes, build]
+    needs: [changes, build_gate]
     if: needs.changes.outputs.packaging == 'true'
 
     permissions:
