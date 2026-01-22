@@ -10,8 +10,7 @@ public class FlagdTestBedContainer
 
     public FlagdTestBedContainer(string version)
     {
-        Container = new ContainerBuilder()
-            .WithImage($"ghcr.io/open-feature/flagd-testbed:v{version}")
+        Container = new ContainerBuilder($"ghcr.io/open-feature/flagd-testbed:v{version}")
             .WithPortBinding(8013, true)
             .WithPortBinding(8014, true)
             .WithPortBinding(8015, true)
