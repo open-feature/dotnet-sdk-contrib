@@ -54,13 +54,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore
-        run: dotnet restore ${{ inputs.mainProject }} ${{ inputs.testProject }}
+      - name: Restore src
+        run: dotnet restore ${{ inputs.mainProject }}
 
-      - name: Build
-        run: |
-          dotnet build ${{ inputs.mainProject }} --no-restore
-          dotnet build ${{ inputs.testProject }} --no-restore
+      - name: Build src
+        run: dotnet build ${{ inputs.mainProject }} --no-restore
+
+      - name: Restore test
+        run: dotnet restore ${{ inputs.testProject }}
+
+      - name: Build test
+        run: dotnet build ${{ inputs.testProject }} --no-restore
 
       - name: Test
         run: dotnet test ${{ inputs.testProject }} --no-build --no-restore --logger GitHubActions

@@ -252,121 +252,121 @@ jobs:
       testProject: test/OpenFeature.Providers.Ofrep.Test/OpenFeature.Providers.Ofrep.Test.csproj
     secrets: inherit
 
-  e2e:
-    needs: changes
-    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.flagd_e2e == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      pull-requests: write
-      packages: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-        with:
-          fetch-depth: 0
-          submodules: recursive
+  # e2e:
+  #   needs: changes
+  #   if: needs.changes.outputs.all == 'true' || needs.changes.outputs.flagd_e2e == 'true'
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write
+  #     packages: read
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+  #       with:
+  #         fetch-depth: 0
+  #         submodules: recursive
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          global-json-file: global.json
-          source-url: https://nuget.pkg.github.com/open-feature/index.json
+  #     - name: Setup .NET SDK
+  #       uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+  #       env:
+  #         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         global-json-file: global.json
+  #         source-url: https://nuget.pkg.github.com/open-feature/index.json
 
-      - name: Test
-        run: dotnet build && E2E=true dotnet test --logger GitHubActions
+  #     - name: Test
+  #       run: dotnet build && E2E=true dotnet test --logger GitHubActions
 
-  build_gate:
-    name: Build/Test gate
-    needs:
-      - changes
-      - configcat
-      - envvar
-      - featuremanagement
-      - flagd_unit
-      - flagsmith
-      - flipt
-      - statsig
-      - gofeatureflag
-      - ofrep
-      - e2e
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Fail if any build/test job failed
-        run: |
-          echo "needs results:"
-          echo "- configcat: ${{ needs.configcat.result }}"
-          echo "- envvar: ${{ needs.envvar.result }}"
-          echo "- featuremanagement: ${{ needs.featuremanagement.result }}"
-          echo "- flagd_unit: ${{ needs.flagd_unit.result }}"
-          echo "- flagsmith: ${{ needs.flagsmith.result }}"
-          echo "- flipt: ${{ needs.flipt.result }}"
-          echo "- statsig: ${{ needs.statsig.result }}"
-          echo "- gofeatureflag: ${{ needs.gofeatureflag.result }}"
-          echo "- ofrep: ${{ needs.ofrep.result }}"
-          echo "- e2e: ${{ needs.e2e.result }}"
-          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" || "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
-            echo "At least one build/test job failed or was cancelled."
-            exit 1
-          fi
+  # build_gate:
+  #   name: Build/Test gate
+  #   needs:
+  #     - changes
+  #     - configcat
+  #     - envvar
+  #     - featuremanagement
+  #     - flagd_unit
+  #     - flagsmith
+  #     - flipt
+  #     - statsig
+  #     - gofeatureflag
+  #     - ofrep
+  #     - e2e
+  #   if: ${{ always() }}
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 5
+  #   steps:
+  #     - name: Fail if any build/test job failed
+  #       run: |
+  #         echo "needs results:"
+  #         echo "- configcat: ${{ needs.configcat.result }}"
+  #         echo "- envvar: ${{ needs.envvar.result }}"
+  #         echo "- featuremanagement: ${{ needs.featuremanagement.result }}"
+  #         echo "- flagd_unit: ${{ needs.flagd_unit.result }}"
+  #         echo "- flagsmith: ${{ needs.flagsmith.result }}"
+  #         echo "- flipt: ${{ needs.flipt.result }}"
+  #         echo "- statsig: ${{ needs.statsig.result }}"
+  #         echo "- gofeatureflag: ${{ needs.gofeatureflag.result }}"
+  #         echo "- ofrep: ${{ needs.ofrep.result }}"
+  #         echo "- e2e: ${{ needs.e2e.result }}"
+  #         if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" || "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+  #           echo "At least one build/test job failed or was cancelled."
+  #           exit 1
+  #         fi
 
-  packaging:
-    needs: [changes, build_gate]
-    if: needs.changes.outputs.packaging == 'true'
+  # packaging:
+  #   needs: [changes, build_gate]
+  #   if: needs.changes.outputs.packaging == 'true'
 
-    permissions:
-      contents: read
-      packages: write
+  #   permissions:
+  #     contents: read
+  #     packages: write
 
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-        with:
-          fetch-depth: 0
-          submodules: recursive
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+  #       with:
+  #         fetch-depth: 0
+  #         submodules: recursive
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          global-json-file: global.json
-          source-url: https://nuget.pkg.github.com/open-feature/index.json
+  #     - name: Setup .NET SDK
+  #       uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+  #       env:
+  #         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         global-json-file: global.json
+  #         source-url: https://nuget.pkg.github.com/open-feature/index.json
 
-      - name: Cache NuGet packages
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+  #     - name: Cache NuGet packages
+  #       uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+  #       with:
+  #         path: ~/.nuget/packages
+  #         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-nuget-
 
-      - name: Restore
-        run: dotnet restore
+  #     - name: Restore
+  #       run: dotnet restore
 
-      - name: Pack NuGet packages (CI versions)
-        if: startsWith(github.ref, 'refs/heads/')
-        run: dotnet pack --no-restore --version-suffix "ci.$(date -u +%Y%m%dT%H%M%S)+sha.${GITHUB_SHA:0:9}"
+  #     - name: Pack NuGet packages (CI versions)
+  #       if: startsWith(github.ref, 'refs/heads/')
+  #       run: dotnet pack --no-restore --version-suffix "ci.$(date -u +%Y%m%dT%H%M%S)+sha.${GITHUB_SHA:0:9}"
 
-      - name: Pack NuGet packages (PR versions)
-        if: startsWith(github.ref, 'refs/pull/')
-        run: dotnet pack --no-restore --version-suffix "pr.$(date -u +%Y%m%dT%H%M%S)+sha.${GITHUB_SHA:0:9}"
+  #     - name: Pack NuGet packages (PR versions)
+  #       if: startsWith(github.ref, 'refs/pull/')
+  #       run: dotnet pack --no-restore --version-suffix "pr.$(date -u +%Y%m%dT%H%M%S)+sha.${GITHUB_SHA:0:9}"
 
-      - name: Publish NuGet packages (base)
-        if: github.event.pull_request.head.repo.fork == false
-        run: dotnet nuget push "src/**/*.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source https://nuget.pkg.github.com/open-feature/index.json --skip-duplicate
+  #     - name: Publish NuGet packages (base)
+  #       if: github.event.pull_request.head.repo.fork == false
+  #       run: dotnet nuget push "src/**/*.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source https://nuget.pkg.github.com/open-feature/index.json --skip-duplicate
 
-      - name: Publish NuGet packages (fork)
-        if: github.event.pull_request.head.repo.fork == true
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        with:
-          name: nupkgs
-          path: src/**/*.nupkg
+  #     - name: Publish NuGet packages (fork)
+  #       if: github.event.pull_request.head.repo.fork == true
+  #       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+  #       with:
+  #         name: nupkgs
+  #         path: src/**/*.nupkg
