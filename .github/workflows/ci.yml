@@ -13,13 +13,199 @@ on:
       - reopened
     branches:
       - main
+    paths-ignore:
+      - "**.md"
   merge_group:
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+      pull-requests: read
+
+    outputs:
+      all: ${{ steps.filter.outputs.all }}
+      packaging: ${{ steps.filter.outputs.packaging }}
+      configcat: ${{ steps.filter.outputs.configcat }}
+      envvar: ${{ steps.filter.outputs.envvar }}
+      featuremanagement: ${{ steps.filter.outputs.featuremanagement }}
+      flagd_unit: ${{ steps.filter.outputs.flagd_unit }}
+      flagd_e2e: ${{ steps.filter.outputs.flagd_e2e }}
+      flagsmith: ${{ steps.filter.outputs.flagsmith }}
+      flipt: ${{ steps.filter.outputs.flipt }}
+      statsig: ${{ steps.filter.outputs.statsig }}
+      gofeatureflag: ${{ steps.filter.outputs.gofeatureflag }}
+      ofrep: ${{ steps.filter.outputs.ofrep }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        with:
+          filters: |
+            all:
+              - '.github/workflows/**'
+              - 'global.json'
+              - 'nuget.config'
+              - 'build/**'
+              - 'src/Directory.Build.props'
+              - 'src/Directory.Build.targets'
+              - 'test/Directory.Build.props'
+              - 'DotnetSdkContrib.slnx'
+              - 'src/**/Directory.Build.props'
+              - 'src/**/Directory.Build.targets'
+              - 'test/**/Directory.Build.props'
+
+            packaging:
+              - 'src/**'
+              - '.github/workflows/**'
+              - 'global.json'
+              - 'nuget.config'
+              - 'build/**'
+
+            configcat:
+              - 'src/OpenFeature.Contrib.Providers.ConfigCat/**'
+              - 'test/OpenFeature.Contrib.Providers.ConfigCat.Test/**'
+
+            envvar:
+              - 'src/OpenFeature.Contrib.Providers.EnvVar/**'
+              - 'test/OpenFeature.Contrib.Providers.EnvVar.Test/**'
+
+            featuremanagement:
+              - 'src/OpenFeature.Contrib.Providers.FeatureManagement/**'
+              - 'test/OpenFeature.Contrib.Providers.FeatureManagement.Test/**'
+
+            flagd_unit:
+              - 'src/OpenFeature.Contrib.Providers.Flagd/**'
+              - 'test/OpenFeature.Contrib.Providers.Flagd.Test/**'
+
+            flagd_e2e:
+              - 'src/OpenFeature.Contrib.Providers.Flagd/**'
+              - 'test/OpenFeature.Contrib.Providers.Flagd.E2e.Common/**'
+              - 'test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/**'
+              - 'test/OpenFeature.Contrib.Providers.Flagd.E2e.RpcTest/**'
+              - 'test/OpenFeature.Contrib.Providers.Flagd.E2e.Test/**'
+              - 'samples/Flagd/**'
+
+            flagsmith:
+              - 'src/OpenFeature.Contrib.Providers.Flagsmith/**'
+              - 'test/OpenFeature.Contrib.Providers.Flagsmith.Test/**'
+
+            flipt:
+              - 'src/OpenFeature.Contrib.Providers.Flipt/**'
+              - 'test/OpenFeature.Contrib.Providers.Flipt.Test/**'
+
+            statsig:
+              - 'src/OpenFeature.Contrib.Providers.Statsig/**'
+              - 'test/OpenFeature.Contrib.Providers.Statsig.Test/**'
+
+            gofeatureflag:
+              - 'src/OpenFeature.Providers.GOFeatureFlag/**'
+              - 'test/OpenFeature.Providers.GOFeatureFlag.Test/**'
+
+            ofrep:
+              - 'src/OpenFeature.Providers.Ofrep/**'
+              - 'test/OpenFeature.Providers.Ofrep.Test/**'
+
   build:
+    needs: changes
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            name: ConfigCat
+            filterKey: configcat
+            testProject: test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj
+          - os: windows-latest
+            name: ConfigCat
+            filterKey: configcat
+            testProject: test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj
+
+          - os: ubuntu-latest
+            name: EnvVar
+            filterKey: envvar
+            testProject: test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj
+          - os: windows-latest
+            name: EnvVar
+            filterKey: envvar
+            testProject: test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj
+
+          - os: ubuntu-latest
+            name: FeatureManagement
+            filterKey: featuremanagement
+            testProject: test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj
+          - os: windows-latest
+            name: FeatureManagement
+            filterKey: featuremanagement
+            testProject: test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj
+
+          - os: ubuntu-latest
+            name: Flagd (unit)
+            filterKey: flagd_unit
+            testProject: test/OpenFeature.Contrib.Providers.Flagd.Test/OpenFeature.Contrib.Providers.Flagd.Test.csproj
+          - os: windows-latest
+            name: Flagd (unit)
+            filterKey: flagd_unit
+            testProject: test/OpenFeature.Contrib.Providers.Flagd.Test/OpenFeature.Contrib.Providers.Flagd.Test.csproj
+
+          - os: ubuntu-latest
+            name: Flagsmith
+            filterKey: flagsmith
+            testProject: test/OpenFeature.Contrib.Providers.Flagsmith.Test/OpenFeature.Contrib.Providers.Flagsmith.Test.csproj
+          - os: windows-latest
+            name: Flagsmith
+            filterKey: flagsmith
+            testProject: test/OpenFeature.Contrib.Providers.Flagsmith.Test/OpenFeature.Contrib.Providers.Flagsmith.Test.csproj
+
+          - os: ubuntu-latest
+            name: Flipt
+            filterKey: flipt
+            testProject: test/OpenFeature.Contrib.Providers.Flipt.Test/OpenFeature.Contrib.Providers.Flipt.Test.csproj
+          - os: windows-latest
+            name: Flipt
+            filterKey: flipt
+            testProject: test/OpenFeature.Contrib.Providers.Flipt.Test/OpenFeature.Contrib.Providers.Flipt.Test.csproj
+
+          - os: ubuntu-latest
+            name: Statsig
+            filterKey: statsig
+            testProject: test/OpenFeature.Contrib.Providers.Statsig.Test/OpenFeature.Contrib.Providers.Statsig.Test.csproj
+          - os: windows-latest
+            name: Statsig
+            filterKey: statsig
+            testProject: test/OpenFeature.Contrib.Providers.Statsig.Test/OpenFeature.Contrib.Providers.Statsig.Test.csproj
+
+          - os: ubuntu-latest
+            name: GOFeatureFlag
+            filterKey: gofeatureflag
+            testProject: test/OpenFeature.Providers.GOFeatureFlag.Test/OpenFeature.Providers.GOFeatureFlag.Test.csproj
+          - os: windows-latest
+            name: GOFeatureFlag
+            filterKey: gofeatureflag
+            testProject: test/OpenFeature.Providers.GOFeatureFlag.Test/OpenFeature.Providers.GOFeatureFlag.Test.csproj
+
+          - os: ubuntu-latest
+            name: OFREP
+            filterKey: ofrep
+            testProject: test/OpenFeature.Providers.Ofrep.Test/OpenFeature.Providers.Ofrep.Test.csproj
+          - os: windows-latest
+            name: OFREP
+            filterKey: ofrep
+            testProject: test/OpenFeature.Providers.Ofrep.Test/OpenFeature.Providers.Ofrep.Test.csproj
+
+    name: Build & Test (${{ matrix.name }} • ${{ matrix.os }})
+
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs[matrix.filterKey] == 'true'
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
@@ -53,15 +239,14 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --no-restore
+        run: dotnet restore ${{ matrix.testProject }}
 
       - name: Test
-        run: dotnet test --no-build --logger GitHubActions
+        run: dotnet test ${{ matrix.testProject }} --no-restore --logger GitHubActions
 
   e2e:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.flagd_e2e == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -87,7 +272,8 @@ jobs:
         run: dotnet build && E2E=true dotnet test --logger GitHubActions
 
   packaging:
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.packaging == 'true'
 
     permissions:
       contents: read
