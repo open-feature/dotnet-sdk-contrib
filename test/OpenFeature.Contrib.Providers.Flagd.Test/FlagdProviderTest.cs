@@ -739,7 +739,7 @@ public class UnitTestFlagdProvider
             );
 
         mockGrpcClient.SyncFlags(
-            Arg.Any<SyncFlagsRequest>(), null, null, CancellationToken.None)
+            Arg.Any<SyncFlagsRequest>(), null, null, Arg.Any<CancellationToken>())
             .Returns(grpcEventStreamResp);
 
 
@@ -760,7 +760,7 @@ public class UnitTestFlagdProvider
                 Assert.True(val.Value);
             });
 
-        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
+        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, Arg.Any<CancellationToken>());
 
         await flagdProvider.ShutdownAsync();
     }
@@ -799,7 +799,7 @@ public class UnitTestFlagdProvider
             );
 
         mockGrpcClient.SyncFlags(
-            Arg.Any<SyncFlagsRequest>(), null, null, CancellationToken.None)
+            Arg.Any<SyncFlagsRequest>(), null, null, Arg.Any<CancellationToken>())
             .Returns(grpcEventStreamResp);
 
 
@@ -820,7 +820,7 @@ public class UnitTestFlagdProvider
                 Assert.Equal(ErrorType.FlagNotFound, exception.ErrorType);
             });
 
-        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, CancellationToken.None);
+        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, Arg.Any<CancellationToken>());
 
         await flagdProvider.ShutdownAsync();
     }
