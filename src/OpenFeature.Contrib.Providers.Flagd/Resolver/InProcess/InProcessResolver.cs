@@ -152,6 +152,12 @@ internal class InProcessResolver : Resolver
             }
             catch (RpcException)
             {
+                // Signal latch on error so Init() completes - provider is "ready" but in error state
+                if (!latch.IsSet)
+                {
+                    latch.Signal();
+                }
+
                 var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
                 ProviderEvent?.Invoke(this, flagdEvent);
 
