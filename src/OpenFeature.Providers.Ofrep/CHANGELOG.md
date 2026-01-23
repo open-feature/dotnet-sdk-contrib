@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.4...OpenFeature.Providers.Ofrep-v0.1.5) (2026-01-23)
+
+
+### 🐛 Bug Fixes
+
+* Fix bug ResolveStructureValueAsync failing with TypeMismatch ([#556](https://github.com/open-feature/dotnet-sdk-contrib/issues/556)) ([ff202b4](https://github.com/open-feature/dotnet-sdk-contrib/commit/ff202b47b2d2690adabb12d510071094fdb58b13))
+
 ## [0.1.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.3...OpenFeature.Providers.Ofrep-v0.1.4) (2026-01-08)
 
 
