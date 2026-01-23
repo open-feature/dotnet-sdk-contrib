@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Google.Protobuf;
 using Grpc.Core;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -299,6 +300,105 @@ public class RpcResolverTests
             new Func<RpcResolver, Task>(r => r.ResolveStructureValueAsync(flagKey, new Value(Structure.Builder().Set("value1", true).Build()))),
             new Action<Service.ServiceClient>(client => client.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>()).Throws(rpcException))
         };
+    }
+
+    [Theory]
+    [MemberData(nameof(ResolveValueFlagdMetadata))]
+    internal async Task ResolveValueAsync_AddsFlagMetadata<T>(Func<RpcResolver, Task<ResolutionDetails<T>>> act,
+        Action<Service.ServiceClient, Google.Protobuf.WellKnownTypes.Struct> setup)
+    {
+        // Arrange
+        var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+
+        var setupMetadata = new Google.Protobuf.WellKnownTypes.Struct()
+        {
+            Fields =
+                {
+                    { "key1", Google.Protobuf.WellKnownTypes.Value.ForString("value1") },
+                    { "key2", Google.Protobuf.WellKnownTypes.Value.ForString(string.Empty) },
+                    { "key3", Google.Protobuf.WellKnownTypes.Value.ForBool(true) },
+                    { "key4", Google.Protobuf.WellKnownTypes.Value.ForBool(false) },
+                    { "key5", Google.Protobuf.WellKnownTypes.Value.ForNumber(1) },
+                    { "key6", Google.Protobuf.WellKnownTypes.Value.ForNumber(3.14) },
+                    { "key7", Google.Protobuf.WellKnownTypes.Value.ForNumber(-0.531921) },
+                    { "key8", Google.Protobuf.WellKnownTypes.Value.ForList(Google.Protobuf.WellKnownTypes.Value.ForString("1"), Google.Protobuf.WellKnownTypes.Value.ForString("2")) },
+                    { "key9", Google.Protobuf.WellKnownTypes.Value.ForNull() },
+                    { "key10", Google.Protobuf.WellKnownTypes.Value.ForStruct(new Google.Protobuf.WellKnownTypes.Struct()
+                    {
+                        Fields = { { "innerkey", Google.Protobuf.WellKnownTypes.Value.ForBool(true) } }
+                    }) },
+                }
+        };
+
+        setup(mockGrpcClient, setupMetadata);
+
+        var config = new FlagdConfig();
+        var resolver = new RpcResolver(mockGrpcClient, config, null);
+
+        // Act
+        var value = await act(resolver);
+
+        // Assert
+        var metadata = value.FlagMetadata;
+        Assert.NotNull(metadata);
+        Assert.Equal("value1", metadata.GetString("key1"));
+        Assert.Equal(string.Empty, metadata.GetString("key2"));
+        Assert.True(metadata.GetBool("key3"));
+        Assert.False(metadata.GetBool("key4"));
+        Assert.Equal(1, metadata.GetInt("key5"));
+        Assert.Equal(3.14, metadata.GetDouble("key6"));
+        Assert.Equal(-0.531921, metadata.GetDouble("key7"));
+        Assert.Null(metadata.GetString("key8"));
+        Assert.Null(metadata.GetString("key9"));
+        Assert.Null(metadata.GetString("key10"));
+    }
+
+    public static IEnumerable<object[]> ResolveValueFlagdMetadata()
+    {
+        const string flagKey = "test-key";
+
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task<ResolutionDetails<bool>>>(r => r.ResolveBooleanValueAsync(flagKey, false)),
+            new Action<Service.ServiceClient, Google.Protobuf.WellKnownTypes.Struct>((client, metadata) => client.ResolveBooleanAsync(Arg.Any<ResolveBooleanRequest>())
+                .Returns(CreateRpcResponse(new ResolveBooleanResponse() { Value = true, Variant = "true", Reason = "TARGETING_MATCH", Metadata = metadata })))
+        };
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task<ResolutionDetails<string>>>(r => r.ResolveStringValueAsync(flagKey, "def")),
+            new Action<Service.ServiceClient, Google.Protobuf.WellKnownTypes.Struct>((client, metadata) => client.ResolveStringAsync(Arg.Any<ResolveStringRequest>())
+                .Returns(CreateRpcResponse(new ResolveStringResponse() { Value = "one", Variant = "default", Reason = "TARGETING_MATCH", Metadata = metadata })))
+        };
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task<ResolutionDetails<int>>>(r => r.ResolveIntegerValueAsync(flagKey, 3)),
+            new Action<Service.ServiceClient, Google.Protobuf.WellKnownTypes.Struct>((client, metadata) => client.ResolveIntAsync(Arg.Any<ResolveIntRequest>())
+                .Returns(CreateRpcResponse(new ResolveIntResponse() { Value = 1, Variant = "one", Reason = "TARGETING_MATCH", Metadata = metadata })))
+        };
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task<ResolutionDetails<double>>>(r => r.ResolveDoubleValueAsync(flagKey, 3.5)),
+            new Action<Service.ServiceClient, Google.Protobuf.WellKnownTypes.Struct>((client, metadata) => client.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>())
+                .Returns(CreateRpcResponse(new ResolveFloatResponse() { Value = 1.61, Variant = "one", Reason = "TARGETING_MATCH", Metadata = metadata })))
+        };
+        yield return new object[]
+        {
+            new Func<RpcResolver, Task<ResolutionDetails<Value>>>(r => r.ResolveStructureValueAsync(flagKey, new Value(Structure.Builder().Set("value1", true).Build()))),
+            new Action<Service.ServiceClient, Google.Protobuf.WellKnownTypes.Struct>((client, metadata) => client.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>())
+                .Returns(CreateRpcResponse(new ResolveObjectResponse()
+                {
+                    Value = new Google.Protobuf.WellKnownTypes.Struct(),
+                    Variant = "one",
+                    Reason = "TARGETING_MATCH",
+                    Metadata = metadata
+                })))
+        };
+    }
+
+    private static AsyncUnaryCall<T> CreateRpcResponse<T>(T resp)
+        where T : IMessage<T>, IBufferMessage
+    {
+        return new AsyncUnaryCall<T>(Task.FromResult(resp), Task.FromResult(Grpc.Core.Metadata.Empty), () => Status.DefaultSuccess, () => Grpc.Core.Metadata.Empty, () => { });
     }
 
     private static Service.ServiceClient SetupGrpcStream(List<EventStreamResponse> responses)
