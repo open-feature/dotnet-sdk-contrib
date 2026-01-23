@@ -3,6 +3,7 @@ using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common.Utils;
 
+#nullable enable
 public class State
 {
     public ResolverType? ProviderResolverType { get; set; }
