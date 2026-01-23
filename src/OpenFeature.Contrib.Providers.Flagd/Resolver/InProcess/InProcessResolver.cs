@@ -109,13 +109,13 @@ internal class InProcessResolver : Resolver
         CancellationToken token = _cancellationTokenSource.Token;
         while (!token.IsCancellationRequested)
         {
-            var call = _client.SyncFlags(new SyncFlagsRequest
-            {
-                Selector = _config.SourceSelector
-            });
             try
             {
-                // Read the response stream asynchronously
+                var call = _client.SyncFlags(new SyncFlagsRequest
+                {
+                    Selector = _config.SourceSelector
+                }, cancellationToken: token);
+
                 while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
@@ -141,21 +141,33 @@ internal class InProcessResolver : Resolver
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
             {
-                // do nothing, we've been shutdown
+                // The operation was cancelled, which is expected during shutdown.
+                break;
             }
             catch (RpcException)
             {
-                // Signal completion on error so Init() completes - provider is "ready" but in error state
+                // This is a transient error, so we signal that Init() can complete,
+                // but the provider is in an error state. We will then retry.
                 tcs.TrySetResult(true);
 
                 var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
                 ProviderEvent?.Invoke(this, flagdEvent);
 
-                // Handle the dropped connection by reconnecting and retrying the stream
                 this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
-                await Task.Delay(this._eventStreamRetryBackoff * 1000).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(this._eventStreamRetryBackoff), token).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                // This is an unexpected and likely non-transient error.
+                // We should fail Init() and stop the event loop.
+                tcs.TrySetException(ex);
+                // It would be good to log the exception here.
+                return;
             }
         }
+
+        // If the loop exits cleanly (e.g., via cancellation), ensure the TCS is completed.
+        tcs.TrySetResult(true);
     }
 
     private static Value ExtractValue(Google.Protobuf.WellKnownTypes.Value value)
