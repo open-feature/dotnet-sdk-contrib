@@ -5,6 +5,7 @@ using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common.Utils;
 
+#nullable enable
 public class BeforeHook : Hook
 {
     private readonly EvaluationContext context;
