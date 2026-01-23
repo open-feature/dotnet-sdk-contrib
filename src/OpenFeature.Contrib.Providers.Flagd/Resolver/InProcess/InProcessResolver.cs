@@ -58,13 +58,9 @@ internal class InProcessResolver : Resolver
     {
         await _jsonSchemaValidator.InitializeAsync().ConfigureAwait(false);
 
-        var latch = new CountdownEvent(1);
-        var handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
-        {
-            IsBackground = true
-        };
-        handleEventsThread.Start();
-        await Task.Run(() => latch.Wait()).ConfigureAwait(false);
+        var initComplete = new TaskCompletionSource<bool>();
+        _ = Task.Run(() => HandleEvents(initComplete));
+        await initComplete.Task.ConfigureAwait(false);
     }
 
     public async Task Shutdown()
@@ -108,7 +104,7 @@ internal class InProcessResolver : Resolver
         return Task.FromResult(_evaluator.ResolveStructureValueAsync(flagKey, defaultValue, context));
     }
 
-    private async Task HandleEvents(CountdownEvent latch)
+    private async Task HandleEvents(TaskCompletionSource<bool> tcs)
     {
         CancellationToken token = _cancellationTokenSource.Token;
         while (!token.IsCancellationRequested)
@@ -125,10 +121,7 @@ internal class InProcessResolver : Resolver
                     var response = call.ResponseStream.Current;
                     this._evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
 
-                    if (!latch.IsSet)
-                    {
-                        latch.Signal();
-                    }
+                    tcs.TrySetResult(true);
 
                     // Reset delay backoff on successful response
                     this._eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
@@ -152,11 +145,8 @@ internal class InProcessResolver : Resolver
             }
             catch (RpcException)
             {
-                // Signal latch on error so Init() completes - provider is "ready" but in error state
-                if (!latch.IsSet)
-                {
-                    latch.Signal();
-                }
+                // Signal completion on error so Init() completes - provider is "ready" but in error state
+                tcs.TrySetResult(true);
 
                 var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
                 ProviderEvent?.Invoke(this, flagdEvent);
