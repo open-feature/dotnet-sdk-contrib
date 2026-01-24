@@ -459,14 +459,9 @@ internal class RpcResolver : Resolver
 #nullable enable
     private static ImmutableMetadata? BuildFlagMetadata(Struct? metadata)
     {
-        if (metadata == null || metadata.Fields.Count == 0)
-        {
-            return null;
-        }
-
         var items = new Dictionary<string, object>();
 
-        foreach (var entry in metadata.Fields)
+        foreach (var entry in metadata?.Fields ?? [])
         {
             switch (entry.Value.KindCase)
             {
@@ -490,7 +485,7 @@ internal class RpcResolver : Resolver
             }
         }
 
-        return new ImmutableMetadata(items);
+        return items.Count > 0 ? new ImmutableMetadata(items) : null;
     }
 #nullable disable
 
