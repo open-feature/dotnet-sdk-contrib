@@ -487,7 +487,7 @@ internal class RpcResolver : Resolver
 
         return items.Count > 0 ? new ImmutableMetadata(items) : null;
     }
-#nullable disable
+#nullable restore
 
     private Service.ServiceClient BuildClientForPlatform(FlagdConfig config)
     {
