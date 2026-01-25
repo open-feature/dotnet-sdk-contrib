@@ -24,6 +24,6 @@ public class BeforeHooks
         var scenarioTags = scenarioInfo.Tags;
         var featureTags = featureInfo.Tags;
         var tags = new HashSet<string>(scenarioTags.Concat(featureTags));
-        Skip.If(!tags.Contains("rpc"), "Skipping scenario because it does not have required tag.");
+        Skip.If(!tags.Contains("rpc"), "Skipping scenario because it is not for the rpc resolver.");
     }
 }
