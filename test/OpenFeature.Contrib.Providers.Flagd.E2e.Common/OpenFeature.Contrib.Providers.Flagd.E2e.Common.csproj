@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-    <PackageReference Include="Reqnroll.xUnit" Version="3.3.2" />
+    <PackageReference Include="Reqnroll.xUnit" Version="3.3.3" />
     <PackageReference Include="Testcontainers" Version="4.10.0" />
   </ItemGroup>
 
