@@ -30,6 +30,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="schemas\json\flags.json" Link="Resources\flags.json" />
+    <EmbeddedResource Include="schemas\json\targeting.json" Link="Resources\targeting.json" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- The schema.proto file referenced here will be used to automatically generate the Grpc
     client when executing 'dotnet build' -->
     <!-- The generated files will be placed in ./obj/Debug/netstandard2.0/Protos -->

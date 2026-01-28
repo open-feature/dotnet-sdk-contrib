@@ -71,7 +71,7 @@ public sealed class FlagdProvider : FeatureProvider
 
         if (_config.ResolverType == ResolverType.IN_PROCESS)
         {
-            var jsonSchemaValidator = new JsonSchemaValidator(null, _config.Logger);
+            var jsonSchemaValidator = new JsonSchemaValidator(_config.Logger);
             _resolver = new InProcessResolver(_config, jsonSchemaValidator);
         }
         else
