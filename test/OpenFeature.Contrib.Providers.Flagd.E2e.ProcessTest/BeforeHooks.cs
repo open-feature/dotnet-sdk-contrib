@@ -24,6 +24,9 @@ public class BeforeHooks
         var scenarioTags = scenarioInfo.Tags;
         var featureTags = featureInfo.Tags;
         var tags = new HashSet<string>(scenarioTags.Concat(featureTags));
-        Skip.If(!tags.Contains("in-process"), "Skipping scenario because it does not have required tag.");
+        Skip.If(!tags.Contains("in-process"), "Skipping scenario because it is not for the in-process resolver.");
+
+        // TODO: https://github.com/open-feature/dotnet-sdk-contrib/issues/478
+        Skip.If(tags.Contains("sync-port"), "Skipping sync-port as it is not supported.");
     }
 }
