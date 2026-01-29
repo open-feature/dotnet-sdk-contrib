@@ -3,6 +3,7 @@ using OpenFeature.Model;
 
 namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common.Utils;
 
+#nullable enable
 public class State
 {
     public ResolverType? ProviderResolverType { get; set; }
@@ -12,6 +13,6 @@ public class State
     public FlagState? Flag { get; set; }
     public object? FlagEvaluationDetailsResult { get; set; }
     public object? FlagResult { get; set; }
-    public EvaluationContext EvaluationContext { get; set; } = EvaluationContext.Empty;
+    public EvaluationContextBuilder EvaluationContextBuilder { get; set; } = EvaluationContext.Builder();
     public List<Event> Events { get; } = new();
 }

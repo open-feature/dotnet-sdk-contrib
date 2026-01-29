@@ -40,27 +40,30 @@ public class FlagSteps
     public async Task WhenTheFlagWasEvaluatedWithDetails()
     {
         var flag = this._state.Flag!;
+        var contextBuilder = this._state.EvaluationContextBuilder
+            ?? EvaluationContext.Builder();
+        var context = contextBuilder.Build();
 
         switch (flag.Type)
         {
             case FlagType.Boolean:
                 this._state.FlagEvaluationDetailsResult = await this._state.Client!
-                    .GetBooleanDetailsAsync(flag.Key, bool.Parse(flag.DefaultValue), this._state.EvaluationContext)
+                    .GetBooleanDetailsAsync(flag.Key, bool.Parse(flag.DefaultValue), context)
                     .ConfigureAwait(false);
                 break;
             case FlagType.Float:
                 this._state.FlagEvaluationDetailsResult = await this._state.Client!
-                    .GetDoubleDetailsAsync(flag.Key, double.Parse(flag.DefaultValue), this._state.EvaluationContext)
+                    .GetDoubleDetailsAsync(flag.Key, double.Parse(flag.DefaultValue), context)
                     .ConfigureAwait(false);
                 break;
             case FlagType.Integer:
                 this._state.FlagEvaluationDetailsResult = await this._state.Client!
-                    .GetIntegerDetailsAsync(flag.Key, int.Parse(flag.DefaultValue), this._state.EvaluationContext)
+                    .GetIntegerDetailsAsync(flag.Key, int.Parse(flag.DefaultValue), context)
                     .ConfigureAwait(false);
                 break;
             case FlagType.String:
                 this._state.FlagEvaluationDetailsResult = await this._state.Client!
-                    .GetStringDetailsAsync(flag.Key, flag.DefaultValue, this._state.EvaluationContext)
+                    .GetStringDetailsAsync(flag.Key, flag.DefaultValue, context)
                     .ConfigureAwait(false);
                 break;
         }
@@ -145,11 +148,129 @@ public class FlagSteps
         }
     }
 
+    [Then("the resolved metadata should contain")]
+    public void ThenTheResolvedMetadataShouldContain(DataTable dataTable)
+    {
+        foreach (var row in dataTable.Rows)
+        {
+            var key = row["key"];
+            var type = row["metadata_type"];
+            var value = row["value"];
+
+            switch (this._state.Flag!.Type)
+            {
+                case FlagType.Integer:
+                    this.AssertMetadata<int>(key, type, value);
+                    break;
+                case FlagType.Float:
+                    this.AssertMetadata<double>(key, type, value);
+                    break;
+                case FlagType.String:
+                    this.AssertMetadata<string>(key, type, value);
+                    break;
+                case FlagType.Boolean:
+                    this.AssertMetadata<bool>(key, type, value);
+                    break;
+                default:
+                    Assert.Fail("FlagType not yet supported.");
+                    break;
+            }
+        }
+    }
+
+    [Then("the resolved metadata is empty")]
+    public void ThenTheResolvedMetadataIsEmpty()
+    {
+        switch (this._state.Flag!.Type)
+        {
+            case FlagType.Integer:
+                this.AssertEmptyMetadata<int>();
+                break;
+            case FlagType.Float:
+                this.AssertEmptyMetadata<double>();
+                break;
+            case FlagType.String:
+                this.AssertEmptyMetadata<string>();
+                break;
+            case FlagType.Boolean:
+                this.AssertEmptyMetadata<bool>();
+                break;
+            default:
+                Assert.Fail("FlagType not yet supported.");
+                break;
+        }
+    }
+
     private void AssertOnDetails<T>(Action<FlagEvaluationDetails<T>> assertion)
     {
         var details = this._state.FlagEvaluationDetailsResult as FlagEvaluationDetails<T>;
 
         Assert.NotNull(details);
         assertion(details);
+    }
+
+    private void AssertEmptyMetadata<T>()
+    {
+        var details = this._state.FlagEvaluationDetailsResult as FlagEvaluationDetails<T>;
+
+        Assert.NotNull(details);
+        Assert.NotNull(details.FlagMetadata);
+
+        var count = typeof(ImmutableMetadata)
+            .GetProperty("Count", System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic)
+            .GetValue(details.FlagMetadata) as int?;
+
+        Assert.NotNull(count);
+        Assert.Equal(0, count);
+    }
+
+    private void AssertMetadata<T>(string key, string type, string value)
+    {
+        var details = this._state.FlagEvaluationDetailsResult as FlagEvaluationDetails<T>;
+
+        Assert.NotNull(details);
+        Assert.NotNull(details.FlagMetadata);
+
+        switch (type)
+        {
+            case "Boolean":
+                {
+                    var expectedValue = bool.Parse(value);
+                    var actualValue = details.FlagMetadata.GetBool(key);
+                    Assert.NotNull(actualValue);
+                    Assert.Equal(expectedValue, actualValue);
+                    break;
+                }
+            case "String":
+                {
+                    var expectedValue = value;
+                    var actualValue = details.FlagMetadata.GetString(key);
+                    Assert.NotNull(actualValue);
+                    Assert.Equal(expectedValue, actualValue);
+                    break;
+                }
+            case "Integer":
+                {
+                    var expectedValue = int.Parse(value);
+                    var actualValue = details.FlagMetadata.GetInt(key);
+                    Assert.NotNull(actualValue);
+                    Assert.Equal(expectedValue, actualValue);
+                    break;
+                }
+            case "Float":
+                {
+                    var expectedValue = double.Parse(value);
+                    var actualValue = details.FlagMetadata.GetDouble(key);
+                    Assert.NotNull(actualValue);
+                    Assert.Equal(expectedValue, actualValue);
+                    break;
+                }
+            default:
+                {
+                    Assert.Fail($"Metadata type '{type}' not supported.");
+                    break;
+                }
+        }
     }
 }
