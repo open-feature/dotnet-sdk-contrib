@@ -58,13 +58,9 @@ internal class InProcessResolver : Resolver
     {
         await _jsonSchemaValidator.InitializeAsync().ConfigureAwait(false);
 
-        var latch = new CountdownEvent(1);
-        var handleEventsThread = new Thread(async () => await HandleEvents(latch).ConfigureAwait(false))
-        {
-            IsBackground = true
-        };
-        handleEventsThread.Start();
-        await Task.Run(() => latch.Wait()).ConfigureAwait(false);
+        var initComplete = new TaskCompletionSource<bool>();
+        _ = Task.Run(() => HandleEvents(initComplete));
+        await initComplete.Task.ConfigureAwait(false);
     }
 
     public async Task Shutdown()
@@ -108,27 +104,24 @@ internal class InProcessResolver : Resolver
         return Task.FromResult(_evaluator.ResolveStructureValueAsync(flagKey, defaultValue, context));
     }
 
-    private async Task HandleEvents(CountdownEvent latch)
+    private async Task HandleEvents(TaskCompletionSource<bool> tcs)
     {
         CancellationToken token = _cancellationTokenSource.Token;
         while (!token.IsCancellationRequested)
         {
-            var call = _client.SyncFlags(new SyncFlagsRequest
-            {
-                Selector = _config.SourceSelector
-            });
             try
             {
-                // Read the response stream asynchronously
+                var call = _client.SyncFlags(new SyncFlagsRequest
+                {
+                    Selector = _config.SourceSelector
+                }, cancellationToken: token);
+
                 while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
                     this._evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
 
-                    if (!latch.IsSet)
-                    {
-                        latch.Signal();
-                    }
+                    tcs.TrySetResult(true);
 
                     // Reset delay backoff on successful response
                     this._eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
@@ -148,18 +141,36 @@ internal class InProcessResolver : Resolver
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
             {
-                // do nothing, we've been shutdown
+                // The operation was cancelled, which is expected during shutdown.
+                break;
             }
             catch (RpcException)
             {
+                // This is a transient error, so we signal that Init() can complete,
+                // but the provider is in an error state. We will then retry.
+                // Emit the error event first, so that the error state is propagated
+                // before Init() completes. This avoids a race condition where the
+                // provider appears ready but hasn't signaled the error yet.
                 var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
                 ProviderEvent?.Invoke(this, flagdEvent);
 
-                // Handle the dropped connection by reconnecting and retrying the stream
+                tcs.TrySetResult(true);
+
                 this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
-                await Task.Delay(this._eventStreamRetryBackoff * 1000).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(this._eventStreamRetryBackoff), token).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                // This is an unexpected and likely non-transient error.
+                // We should fail Init() and stop the event loop.
+                tcs.TrySetException(ex);
+                // It would be good to log the exception here.
+                return;
             }
         }
+
+        // If the loop exits cleanly (e.g., via cancellation), ensure the TCS is completed.
+        tcs.TrySetResult(true);
     }
 
     private static Value ExtractValue(Google.Protobuf.WellKnownTypes.Value value)
