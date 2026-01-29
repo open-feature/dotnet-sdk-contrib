@@ -327,6 +327,7 @@ public class RpcResolverTests
                     {
                         Fields = { { "innerkey", Google.Protobuf.WellKnownTypes.Value.ForBool(true) } }
                     }) },
+                    { "key11", Google.Protobuf.WellKnownTypes.Value.ForNumber(int.MaxValue) }
                 }
         };
 
@@ -351,6 +352,7 @@ public class RpcResolverTests
         Assert.Null(metadata.GetString("key8"));
         Assert.Null(metadata.GetString("key9"));
         Assert.Null(metadata.GetString("key10"));
+        Assert.Equal(int.MaxValue, metadata.GetInt("key11"));
     }
 
     public static IEnumerable<object[]> ResolveValueFlagdMetadata()
