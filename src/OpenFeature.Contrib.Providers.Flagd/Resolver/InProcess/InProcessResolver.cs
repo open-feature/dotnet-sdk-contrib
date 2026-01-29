@@ -148,10 +148,13 @@ internal class InProcessResolver : Resolver
             {
                 // This is a transient error, so we signal that Init() can complete,
                 // but the provider is in an error state. We will then retry.
-                tcs.TrySetResult(true);
-
+                // Emit the error event first, so that the error state is propagated
+                // before Init() completes. This avoids a race condition where the
+                // provider appears ready but hasn't signaled the error yet.
                 var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderError, new List<string>(), Structure.Empty);
                 ProviderEvent?.Invoke(this, flagdEvent);
+
+                tcs.TrySetResult(true);
 
                 this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
                 await Task.Delay(TimeSpan.FromSeconds(this._eventStreamRetryBackoff), token).ConfigureAwait(false);
