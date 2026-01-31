@@ -24,11 +24,7 @@ internal sealed class FlagdJsonSchemaEmbeddedResourceReader : IFlagdJsonSchemaPr
 
     private async Task<string> ReadAsStringAsync(string resourceName, CancellationToken cancellationToken = default)
     {
-        var assembly = typeof(FlagdJsonSchemaEmbeddedResourceReader).Assembly;
-        if (assembly == null)
-        {
-            throw new InvalidOperationException($"Unable to locate assembly for {nameof(FlagdJsonSchemaEmbeddedResourceReader)}.");
-        }
+        var assembly = typeof(FlagdJsonSchemaEmbeddedResourceReader).Assembly!;
 
         using var stream = assembly.GetManifestResourceStream(resourceName);
         if (stream == null)
