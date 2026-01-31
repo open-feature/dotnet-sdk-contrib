@@ -29,7 +29,7 @@ internal class JsonSchemaValidator : IJsonSchemaValidator
     {
         try
         {
-            var targetingJson = await this._flagdJsonSchemaProvider.ReadTargetingSchemaAsync(cancellationToken).ConfigureAwait(false);
+            var targetingJson = await this._flagdJsonSchemaProvider.ReadSchemaAsync(FlagdSchema.Targeting, cancellationToken).ConfigureAwait(false);
             var targetingSchema = await JsonSchema.FromJsonAsync(targetingJson, "targeting.json", schema =>
             {
                 var schemaResolver = new JsonSchemaResolver(schema, new SystemTextJsonSchemaGeneratorSettings());
@@ -38,7 +38,7 @@ internal class JsonSchemaValidator : IJsonSchemaValidator
                 return resolver;
             }, cancellationToken).ConfigureAwait(false);
 
-            var flagJson = await this._flagdJsonSchemaProvider.ReadFlagSchemaAsync(cancellationToken).ConfigureAwait(false);
+            var flagJson = await this._flagdJsonSchemaProvider.ReadSchemaAsync(FlagdSchema.Flags, cancellationToken).ConfigureAwait(false);
             var flagSchema = await JsonSchema.FromJsonAsync(flagJson, "flags.json", schema =>
             {
                 var schemaResolver = new JsonSchemaResolver(schema, new SystemTextJsonSchemaGeneratorSettings());

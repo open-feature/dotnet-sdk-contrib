@@ -12,14 +12,14 @@ internal sealed class FlagdJsonSchemaEmbeddedResourceReader : IFlagdJsonSchemaPr
     const string TargetingJsonResourceName = "OpenFeature.Contrib.Providers.Flagd.Resources.targeting.json";
     const string FlagJsonResourceName = "OpenFeature.Contrib.Providers.Flagd.Resources.flags.json";
 
-    public Task<string> ReadTargetingSchemaAsync(CancellationToken cancellationToken = default)
+    public Task<string> ReadSchemaAsync(FlagdSchema flagdSchema, CancellationToken cancellationToken = default)
     {
-        return this.ReadAsStringAsync(TargetingJsonResourceName, cancellationToken);
-    }
-
-    public Task<string> ReadFlagSchemaAsync(CancellationToken cancellationToken = default)
-    {
-        return this.ReadAsStringAsync(FlagJsonResourceName, cancellationToken);
+        return flagdSchema switch
+        {
+            FlagdSchema.Targeting => this.ReadAsStringAsync(TargetingJsonResourceName, cancellationToken),
+            FlagdSchema.Flags => this.ReadAsStringAsync(FlagJsonResourceName, cancellationToken),
+            _ => throw new ArgumentOutOfRangeException(nameof(flagdSchema), flagdSchema, null)
+        };
     }
 
     private async Task<string> ReadAsStringAsync(string resourceName, CancellationToken cancellationToken = default)

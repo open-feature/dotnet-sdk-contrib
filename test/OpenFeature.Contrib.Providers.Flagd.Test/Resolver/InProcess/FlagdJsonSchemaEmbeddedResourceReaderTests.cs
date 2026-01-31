@@ -8,11 +8,11 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test.Resolver.InProcess;
 public class FlagdJsonSchemaEmbeddedResourceReaderTests
 {
     [Fact]
-    public async Task ReadTargetingSchemaAsyncReturnsJson()
+    public async Task ReadSchemaAsync_WithTargetingSchema_ReturnsJson()
     {
         var reader = new FlagdJsonSchemaEmbeddedResourceReader();
 
-        var schema = await reader.ReadTargetingSchemaAsync();
+        var schema = await reader.ReadSchemaAsync(FlagdSchema.Targeting);
 
         Assert.False(string.IsNullOrWhiteSpace(schema));
 
@@ -20,11 +20,11 @@ public class FlagdJsonSchemaEmbeddedResourceReaderTests
     }
 
     [Fact]
-    public async Task ReadFlagSchemaAsyncReturnsJson()
+    public async Task ReadSchemaAsync_WithFlagSchema_ReturnsJson()
     {
         var reader = new FlagdJsonSchemaEmbeddedResourceReader();
 
-        var schema = await reader.ReadFlagSchemaAsync();
+        var schema = await reader.ReadSchemaAsync(FlagdSchema.Flags);
 
         Assert.False(string.IsNullOrWhiteSpace(schema));
 
