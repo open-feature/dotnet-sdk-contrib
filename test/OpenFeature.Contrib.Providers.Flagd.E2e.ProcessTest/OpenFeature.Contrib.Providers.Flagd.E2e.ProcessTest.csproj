@@ -5,6 +5,7 @@
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/evaluation.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/targeting.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/selector.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/metadata.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/contextEnrichment.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/config.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
@@ -15,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reqnroll.xUnit" Version="3.3.2" />
+    <PackageReference Include="Reqnroll.xUnit" Version="3.3.3" />
   </ItemGroup>
 
   <ItemGroup>
