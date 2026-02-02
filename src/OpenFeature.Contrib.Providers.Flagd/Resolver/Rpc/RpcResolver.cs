@@ -89,10 +89,11 @@ internal class RpcResolver : Resolver
 
             return new ResolutionDetails<bool>(
                 flagKey: flagKey,
-                value: (bool)resolveBooleanResponse.Value,
+                value: resolveBooleanResponse.Value,
                 reason: resolveBooleanResponse.Reason,
-                variant: resolveBooleanResponse.Variant
-                );
+                variant: resolveBooleanResponse.Variant,
+                flagMetadata: BuildFlagMetadata(resolveBooleanResponse.Metadata)
+            );
         }, context).ConfigureAwait(false);
     }
 
@@ -110,8 +111,9 @@ internal class RpcResolver : Resolver
                 flagKey: flagKey,
                 value: resolveStringResponse.Value,
                 reason: resolveStringResponse.Reason,
-                variant: resolveStringResponse.Variant
-                );
+                variant: resolveStringResponse.Variant,
+                flagMetadata: BuildFlagMetadata(resolveStringResponse.Metadata)
+            );
         }, context).ConfigureAwait(false);
     }
 
@@ -129,8 +131,9 @@ internal class RpcResolver : Resolver
                 flagKey: flagKey,
                 value: (int)resolveIntResponse.Value,
                 reason: resolveIntResponse.Reason,
-                variant: resolveIntResponse.Variant
-                );
+                variant: resolveIntResponse.Variant,
+                flagMetadata: BuildFlagMetadata(resolveIntResponse.Metadata)
+            );
         }, context).ConfigureAwait(false);
     }
 
@@ -148,8 +151,9 @@ internal class RpcResolver : Resolver
                 flagKey: flagKey,
                 value: resolveDoubleResponse.Value,
                 reason: resolveDoubleResponse.Reason,
-                variant: resolveDoubleResponse.Variant
-                );
+                variant: resolveDoubleResponse.Variant,
+                flagMetadata: BuildFlagMetadata(resolveDoubleResponse.Metadata)
+            );
         }, context).ConfigureAwait(false);
     }
 
@@ -167,8 +171,9 @@ internal class RpcResolver : Resolver
                 flagKey: flagKey,
                 value: ConvertObjectToValue(resolveObjectResponse.Value),
                 reason: resolveObjectResponse.Reason,
-                variant: resolveObjectResponse.Variant
-                );
+                variant: resolveObjectResponse.Variant,
+                flagMetadata: BuildFlagMetadata(resolveObjectResponse.Metadata)
+            );
         }, context).ConfigureAwait(false);
     }
 
@@ -450,6 +455,39 @@ internal class RpcResolver : Resolver
                 return new FeatureProviderException(ErrorType.General, e.Status.Detail, e);
         }
     }
+
+#nullable enable
+    private static ImmutableMetadata? BuildFlagMetadata(Struct? metadata)
+    {
+        var items = new Dictionary<string, object>();
+
+        foreach (var entry in metadata?.Fields ?? [])
+        {
+            switch (entry.Value.KindCase)
+            {
+                case ProtoValue.KindOneofCase.NumberValue:
+                    items.Add(entry.Key, entry.Value.NumberValue);
+                    break;
+                case ProtoValue.KindOneofCase.StringValue:
+                    items.Add(entry.Key, entry.Value.StringValue);
+                    break;
+                case ProtoValue.KindOneofCase.BoolValue:
+                    items.Add(entry.Key, entry.Value.BoolValue);
+                    break;
+
+                // Unsupported types for metadata
+                case ProtoValue.KindOneofCase.None:
+                case ProtoValue.KindOneofCase.NullValue:
+                case ProtoValue.KindOneofCase.StructValue:
+                case ProtoValue.KindOneofCase.ListValue:
+                default:
+                    break;
+            }
+        }
+
+        return items.Count > 0 ? new ImmutableMetadata(items) : null;
+    }
+#nullable restore
 
     private Service.ServiceClient BuildClientForPlatform(FlagdConfig config)
     {
