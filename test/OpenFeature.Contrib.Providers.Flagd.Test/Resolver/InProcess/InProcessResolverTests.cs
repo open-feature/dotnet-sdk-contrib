@@ -34,12 +34,11 @@ public class InProcessResolverTests
         var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
         var (mockGrpcClient, asyncStreamReader) = SetupGrpcStream(responses);
 
-        var config = new FlagdConfig()
-        {
-            CacheEnabled = true,
-            MaxEventStreamRetries = 1,
-            SourceSelector = "source-selector"
-        };
+        var config = FlagdConfig.Builder()
+            .WithCache(true)
+            .WithMaxEventStreamRetries(1)
+            .WithSourceSelector("source-selector")
+            .Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
@@ -70,12 +69,11 @@ public class InProcessResolverTests
         asyncStreamReader.MoveNext(Arg.Any<CancellationToken>())
             .Returns(x => { throw new RpcException(new Status(StatusCode.Internal, "Unable to fetch flags")); }, x => Task.FromResult(false));
 
-        var config = new FlagdConfig()
-        {
-            CacheEnabled = true,
-            MaxEventStreamRetries = 1,
-            SourceSelector = "source-selector"
-        };
+        var config = FlagdConfig.Builder()
+            .WithCache(true)
+            .WithMaxEventStreamRetries(1)
+            .WithSourceSelector("source-selector")
+            .Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
@@ -106,12 +104,11 @@ public class InProcessResolverTests
         asyncStreamReader.MoveNext(Arg.Any<CancellationToken>())
             .Returns(x => { throw new RpcException(new Status(StatusCode.Cancelled, "Request cancelled")); }, x => Task.FromResult(false));
 
-        var config = new FlagdConfig()
-        {
-            CacheEnabled = true,
-            MaxEventStreamRetries = 1,
-            SourceSelector = "source-selector"
-        };
+        var config = FlagdConfig.Builder()
+            .WithCache(true)
+            .WithMaxEventStreamRetries(1)
+            .WithSourceSelector("source-selector")
+            .Build();
 
         var counter = 0;
         var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);

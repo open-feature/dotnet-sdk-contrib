@@ -51,6 +51,20 @@ public class FlagdConfig
         return new FlagdConfigBuilder();
     }
 
+    internal static FlagdConfigBuilder Builder(Uri uri)
+    {
+        if (uri == null)
+        {
+            throw new ArgumentNullException(nameof(uri));
+        }
+
+        return new FlagdConfigBuilder()
+            .WithHost(uri.Host)
+            .WithPort(uri.Port)
+            .WithTls(string.Equals(uri.Scheme, "https", StringComparison.OrdinalIgnoreCase))
+            .WithSocketPath(string.Equals(uri.Scheme, "unix", StringComparison.OrdinalIgnoreCase) ? uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "");
+    }
+
     /// <summary>
     ///     The host for the provider to connect to.
     /// </summary>
@@ -181,33 +195,6 @@ public class FlagdConfig
         _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
         _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
         _logger = NullLogger.Instance;
-        var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
-
-        if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))
-        {
-            _cache = true;
-            _maxCacheSize = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize), out var maxCacheSize) ? maxCacheSize : CacheSizeDefault;
-            _maxEventStreamRetries = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries), out var maxEventStreamRetries) ? maxEventStreamRetries : 3;
-        }
-
-        var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
-        _resolverType = string.Equals(resolverTypeStr, InProcessResolverValue, StringComparison.OrdinalIgnoreCase) ? ResolverType.IN_PROCESS : ResolverType.RPC;
-    }
-
-    internal FlagdConfig(Uri url)
-    {
-        if (url == null)
-        {
-            throw new ArgumentNullException(nameof(url));
-        }
-
-        _host = url.Host;
-        _port = url.Port;
-        _useTLS = string.Equals(url.Scheme, "https", StringComparison.OrdinalIgnoreCase);
-        _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
-        _socketPath = string.Equals(url.Scheme, "unix", StringComparison.OrdinalIgnoreCase) ? url.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "";
-        _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
-
         var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
         if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))

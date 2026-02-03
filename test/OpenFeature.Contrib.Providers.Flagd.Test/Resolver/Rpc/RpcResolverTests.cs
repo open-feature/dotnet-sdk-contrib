@@ -63,7 +63,7 @@ public class RpcResolverTests
         var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
@@ -103,7 +103,7 @@ public class RpcResolverTests
         var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
@@ -144,7 +144,7 @@ public class RpcResolverTests
         var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
@@ -185,10 +185,9 @@ public class RpcResolverTests
         var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
-        var config = new FlagdConfig()
-        {
-            CacheEnabled = true
-        };
+        var config = FlagdConfig.Builder()
+            .WithCache(true)
+            .Build();
 
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "key1")).Returns(null);
@@ -229,10 +228,9 @@ public class RpcResolverTests
         var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
-        var config = new FlagdConfig()
-        {
-            CacheEnabled = true
-        };
+        var config = FlagdConfig.Builder()
+            .WithCache(true)
+            .Build();
 
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "key1")).Returns(null);
@@ -258,7 +256,7 @@ public class RpcResolverTests
         var mockGrpcClient = Substitute.For<Service.ServiceClient>();
         setup(mockGrpcClient);
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
         var resolver = new RpcResolver(mockGrpcClient, config, null);
 
         // Act
@@ -333,7 +331,7 @@ public class RpcResolverTests
 
         setup(mockGrpcClient, setupMetadata);
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
         var resolver = new RpcResolver(mockGrpcClient, config, null);
 
         // Act

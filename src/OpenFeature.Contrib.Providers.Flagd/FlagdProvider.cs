@@ -36,7 +36,7 @@ public sealed class FlagdProvider : FeatureProvider
     ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
     ///     FLAGD_RESOLVER                 - The type of resolver (in-process or rpc) to be used for the provider
     /// </summary>
-    public FlagdProvider() : this(new FlagdConfig())
+    public FlagdProvider() : this(FlagdConfig.Builder().Build())
     {
     }
 
@@ -51,7 +51,7 @@ public sealed class FlagdProvider : FeatureProvider
     ///     <param name="url">The URL of the flagd server</param>
     ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
     /// </summary>
-    public FlagdProvider(Uri url) : this(new FlagdConfig(url))
+    public FlagdProvider(Uri url) : this(FlagdConfig.Builder(url).Build())
     {
     }
 
