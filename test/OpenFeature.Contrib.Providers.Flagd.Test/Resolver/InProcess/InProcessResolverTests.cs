@@ -138,7 +138,7 @@ public class InProcessResolverTests
         asyncStreamReader.Current.Returns(_ => enumerator.Current);
 
         var grpcEventStreamResp = new AsyncServerStreamingCall<SyncFlagsResponse>(asyncStreamReader, null, null, null, null, null);
-        mockGrpcClient.SyncFlags(Arg.Any<SyncFlagsRequest>(), null, null, CancellationToken.None).Returns(grpcEventStreamResp);
+        mockGrpcClient.SyncFlags(Arg.Any<SyncFlagsRequest>(), null, null, Arg.Any<CancellationToken>()).Returns(grpcEventStreamResp);
 
         return (mockGrpcClient, asyncStreamReader);
     }
