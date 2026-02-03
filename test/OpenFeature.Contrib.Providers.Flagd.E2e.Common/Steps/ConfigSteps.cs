@@ -39,6 +39,11 @@ public class ConfigSteps
         "FLAGD_FATAL_STATUS_CODES"
     ];
 
+    private static readonly HashSet<string> _unsupportedEnvironmentVairables =
+    [
+        "FLAGD_PROVIDER_ID"
+    ];
+
     private static readonly HashSet<string> _unsupportedConfigOptions =
     [
         "deadlineMs",
@@ -219,6 +224,8 @@ public class ConfigSteps
     [Given("an environment variable {string} with value {string}")]
     public void GivenAnEnvironmentVariableWithValue(string env, string value)
     {
+        Skip.If(_unsupportedEnvironmentVairables.Contains(env), "Environment variable is not supported");
+
         Assert.Contains(_environmentVariables, e => e == env); // Ensure only known env vars are set
 
         Environment.SetEnvironmentVariable(env, value);
