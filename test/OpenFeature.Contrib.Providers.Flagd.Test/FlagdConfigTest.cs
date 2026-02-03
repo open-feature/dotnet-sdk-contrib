@@ -11,7 +11,7 @@ public class UnitTestFlagdConfig
     public void TestFlagdConfigDefault()
     {
         Utils.CleanEnvVars();
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         Assert.False(config.CacheEnabled);
         Assert.Equal(new Uri("http://localhost:8013"), config.GetUri());
@@ -21,10 +21,22 @@ public class UnitTestFlagdConfig
     public void TestFlagdConfigDefaultLogger()
     {
         Utils.CleanEnvVars();
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         Assert.NotNull(config.Logger);
         Assert.Equal(NullLogger.Instance, config.Logger);
+    }
+
+    [Theory]
+    [InlineData(ResolverType.RPC, 8013)]
+    [InlineData(ResolverType.IN_PROCESS, 8015)]
+    public void WithResolverType_DefaultsPortCorrectly(ResolverType resolverType, int expectedPort)
+    {
+        var config = FlagdConfig.Builder()
+            .WithResolverType(resolverType)
+            .Build();
+
+        Assert.Equal(expectedPort, config.Port);
     }
 
     [Fact]
@@ -33,7 +45,7 @@ public class UnitTestFlagdConfig
         Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "true");
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         Assert.Equal(new Uri("https://localhost:8013"), config.GetUri());
     }
@@ -44,7 +56,7 @@ public class UnitTestFlagdConfig
         Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "tmp.sock");
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         Assert.Equal(new Uri("unix://tmp.sock/"), config.GetUri());
     }
@@ -55,7 +67,7 @@ public class UnitTestFlagdConfig
         Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "lru");
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         Assert.True(config.CacheEnabled);
         Assert.Equal(FlagdConfig.CacheSizeDefault, config.MaxCacheSize);
@@ -68,7 +80,7 @@ public class UnitTestFlagdConfig
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         Assert.True(config.CacheEnabled);
         Assert.Equal(20, config.MaxCacheSize);
@@ -80,14 +92,14 @@ public class UnitTestFlagdConfig
         Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "/cert/path");
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         Assert.Equal("/cert/path", config.CertificatePath);
         Assert.True(config.UseCertificate);
 
         Utils.CleanEnvVars();
 
-        config = new FlagdConfig();
+        config = FlagdConfig.Builder().Build();
 
         Assert.Equal("", config.CertificatePath);
         Assert.False(config.UseCertificate);

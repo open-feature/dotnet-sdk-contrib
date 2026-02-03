@@ -175,7 +175,7 @@ public class FlagdConfig
     internal FlagdConfig()
     {
         _host = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvVarHost)) ? "localhost" : Environment.GetEnvironmentVariable(EnvVarHost);
-        _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 8013;
+        _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 0;
         _useTLS = bool.TryParse(Environment.GetEnvironmentVariable(EnvVarTLS), out var useTLS) ? useTLS : false;
         _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
         _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
@@ -356,6 +356,23 @@ public class FlagdConfigBuilder
     /// </summary>
     public FlagdConfig Build()
     {
-        return _config;
+        this.PreBuild();
+
+        return this._config;
+    }
+
+    private void PreBuild()
+    {
+        if (this._config.Port == 0)
+        {
+            var defaultPortForResolver = this._config.ResolverType switch
+            {
+                ResolverType.RPC => 8013,
+                ResolverType.IN_PROCESS => 8015,
+                _ => throw new NotImplementedException("ResolverType does not use Ports.")
+            };
+
+            this._config.Port = defaultPortForResolver;
+        }
     }
 }
