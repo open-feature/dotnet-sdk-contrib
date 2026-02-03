@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.3.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.4...OpenFeature.Contrib.Providers.Flagd-v0.3.5) (2026-02-03)
+
+
+### 🐛 Bug Fixes
+
+* Fix Flagd InProcess Evaluator when no defaultVariant is specified ([#513](https://github.com/open-feature/dotnet-sdk-contrib/issues/513)) ([5fd7cce](https://github.com/open-feature/dotnet-sdk-contrib/commit/5fd7cce549a7c1f9aaf68d473225ec692fd497ed))
+* flagd not throwing parse error when target key is not a primitive ([#540](https://github.com/open-feature/dotnet-sdk-contrib/issues/540)) ([5d54780](https://github.com/open-feature/dotnet-sdk-contrib/commit/5d5478096018dc946e4ae9bcc408ae0163515a04))
+* **flagd:** Flag metadata not being mapped when using RpcResolver ([#575](https://github.com/open-feature/dotnet-sdk-contrib/issues/575)) ([cc24731](https://github.com/open-feature/dotnet-sdk-contrib/commit/cc24731fa2521ffc48757f8ba13e439b2307b2ae))
+* **flagd:** Return parse error when Rpc Resolver receives a data loss exception ([#554](https://github.com/open-feature/dotnet-sdk-contrib/issues/554)) ([43e9d9c](https://github.com/open-feature/dotnet-sdk-contrib/commit/43e9d9c26c0eb894b913659355c4f53aaad1e31d))
+* **flagd:** Throw general error when targeting variant not found ([#553](https://github.com/open-feature/dotnet-sdk-contrib/issues/553)) ([6b30828](https://github.com/open-feature/dotnet-sdk-contrib/commit/6b30828fa75184e32fa424b150f4e6da611ac647))
+* Handle error state in Init() with TaskCompletionSource ([#571](https://github.com/open-feature/dotnet-sdk-contrib/issues/571)) ([fbcfac8](https://github.com/open-feature/dotnet-sdk-contrib/commit/fbcfac85692b266a41c9ef0baca82029938ed6b6))
+
+
+### ✨ New Features
+
+* **flagd:** Add code to sync context from Flagd for the InProcess resolver ([#515](https://github.com/open-feature/dotnet-sdk-contrib/issues/515)) ([a9c4bb4](https://github.com/open-feature/dotnet-sdk-contrib/commit/a9c4bb46bc7bc690b1c22cdb65e2c8e65a772d0b))
+* Update Target Framework to include net10.0 ([#548](https://github.com/open-feature/dotnet-sdk-contrib/issues/548)) ([5f6ec66](https://github.com/open-feature/dotnet-sdk-contrib/commit/5f6ec66e599245193e0f3202e9ea89da72c7df29))
+
+
+### 🔧 Refactoring
+
+* Decouple event publishing from Flagd Resolver when state changes ([#531](https://github.com/open-feature/dotnet-sdk-contrib/issues/531)) ([c48e25a](https://github.com/open-feature/dotnet-sdk-contrib/commit/c48e25afad6213ae1f8f904eeff77e36514743c5))
+* **flagd:** Remove HTTP call when validating JSON schema ([#547](https://github.com/open-feature/dotnet-sdk-contrib/issues/547)) ([8ed7f04](https://github.com/open-feature/dotnet-sdk-contrib/commit/8ed7f04ad72de9acc60e345f4ab45d5a2ed4a4bb))
+
 ## [0.3.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.3...OpenFeature.Contrib.Providers.Flagd-v0.3.4) (2025-10-17)
 
 
