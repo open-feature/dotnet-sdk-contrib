@@ -14,6 +14,7 @@ public class ConfigSteps
     private readonly State _state;
 
     private FlagdConfig? _config;
+    private bool _errorOccurred;
 
     private static readonly HashSet<string> _environmentVariables =
     [
@@ -38,6 +39,21 @@ public class ConfigSteps
         "FLAGD_FATAL_STATUS_CODES"
     ];
 
+    private static readonly HashSet<string> _unsupportedConfigOptions =
+    [
+        "deadlineMs",
+        "fatalStatusCodes",
+        "targetUri",
+        "providerId",
+        "offlineFlagSourcePath",
+        "offlinePollIntervalMs",
+        "streamDeadlineMs",
+        "keepAliveTime",
+        "retryBackoffMs",
+        "retryBackoffMaxMs",
+        "retryGracePeriod"
+    ];
+
     public ConfigSteps(State state)
     {
         this._state = state;
@@ -53,24 +69,11 @@ public class ConfigSteps
     }
 
     [Given("an option {string} of type {string} with value {string}")]
-    public void GivenAnOptionOfTypeWithValue(string option, string type, string value)
+    public void GivenAnOptionOfTypeWithValue(string option, string _, string value)
     {
-        if (this._state.FlagdConfig == null)
-        {
-            this._state.FlagdConfig = FlagdConfig.Builder();
-        }
+        Skip.If(_unsupportedConfigOptions.Contains(option), "Config option is not supported");
 
-        Skip.If(option == "deadlineMs", "DeadlineMs is not supported.");
-        Skip.If(option == "fatalStatusCodes", "FatalStatusCodes is not supported.");
-        Skip.If(option == "targetUri", "TargetUri is not supported.");
-        Skip.If(option == "providerId", "ProviderId is not supported.");
-        Skip.If(option == "offlineFlagSourcePath", "OfflineFlagSourcePath is not supported.");
-        Skip.If(option == "offlinePollIntervalMs", "OfflinePollIntervalMs is not supported.");
-        Skip.If(option == "streamDeadlineMs", "StreamDeadlineMs is not supported.");
-        Skip.If(option == "keepAliveTime", "KeepAliveTime is not supported.");
-        Skip.If(option == "retryBackoffMs", "RetryBackoffMs is not supported.");
-        Skip.If(option == "retryBackoffMaxMs", "RetryBackoffMaxMs is not supported.");
-        Skip.If(option == "retryGracePeriod", "RetryGracePeriod is not supported.");
+        this._state.FlagdConfig ??= FlagdConfig.Builder();
 
         switch (option)
         {
@@ -132,19 +135,23 @@ public class ConfigSteps
     [When("a config was initialized")]
     public void WhenAConfigWasInitialized()
     {
-        var flagdConfigBuilder = this._state.FlagdConfig ?? FlagdConfig.Builder();
-        this._config = flagdConfigBuilder.Build();
+        try
+        {
+            var flagdConfigBuilder = this._state.FlagdConfig ?? FlagdConfig.Builder();
+            this._config = flagdConfigBuilder.Build();
 
-        Assert.NotNull(this._state);
+            Assert.NotNull(this._config);
+        }
+        catch (Exception)
+        {
+            this._errorOccurred = true;
+        }
     }
 
     [Then("the option {string} of type {string} should have the value {string}")]
-    public void ThenTheOptionOfTypeShouldHaveTheValue(string option, string type, string value)
+    public void ThenTheOptionOfTypeShouldHaveTheValue(string option, string _, string value)
     {
-        Skip.If(option == "deadlineMs", "DeadlineMs is not supported.");
-        Skip.If(option == "fatalStatusCodes", "FatalStatusCodes is not supported.");
-        Skip.If(option == "targetUri", "TargetUri is not supported.");
-        Skip.If(option == "providerId", "ProviderId is not supported.");
+        Skip.If(_unsupportedConfigOptions.Contains(option), "Config option is not supported");
 
         switch (option)
         {
@@ -206,11 +213,14 @@ public class ConfigSteps
     [Then("we should have an error")]
     public void ThenWeShouldHaveAnError()
     {
+        Assert.True(this._errorOccurred);
     }
 
     [Given("an environment variable {string} with value {string}")]
     public void GivenAnEnvironmentVariableWithValue(string env, string value)
     {
+        Assert.Contains(_environmentVariables, e => e == env); // Ensure only known env vars are set
+
         Environment.SetEnvironmentVariable(env, value);
     }
 }
