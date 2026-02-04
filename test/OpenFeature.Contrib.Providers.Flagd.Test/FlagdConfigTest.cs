@@ -7,10 +7,14 @@ namespace OpenFeature.Contrib.Providers.Flagd.Test;
 
 public class UnitTestFlagdConfig
 {
+    public UnitTestFlagdConfig()
+    {
+        Utils.CleanEnvVars();
+    }
+
     [Fact]
     public void TestFlagdConfigDefault()
     {
-        Utils.CleanEnvVars();
         var config = FlagdConfig.Builder().Build();
 
         Assert.False(config.CacheEnabled);
@@ -20,7 +24,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigDefaultLogger()
     {
-        Utils.CleanEnvVars();
         var config = FlagdConfig.Builder().Build();
 
         Assert.NotNull(config.Logger);
@@ -42,7 +45,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigUseTLS()
     {
-        Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarTLS, "true");
 
         var config = FlagdConfig.Builder().Build();
@@ -53,7 +55,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigUnixSocket()
     {
-        Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSocketPath, "tmp.sock");
 
         var config = FlagdConfig.Builder().Build();
@@ -64,7 +65,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigEnabledCacheDefaultCacheSize()
     {
-        Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "lru");
 
         var config = FlagdConfig.Builder().Build();
@@ -76,7 +76,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigEnabledCacheApplyCacheSize()
     {
-        Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
@@ -89,7 +88,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigSetCertificatePath()
     {
-        Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "/cert/path");
 
         var config = FlagdConfig.Builder().Build();
@@ -108,7 +106,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigFromUriHttp()
     {
-        Utils.CleanEnvVars();
         var config = FlagdConfig.Builder(new Uri("http://domain:8123")).Build();
 
         Assert.False(config.CacheEnabled);
@@ -118,7 +115,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigFromUriHttps()
     {
-        Utils.CleanEnvVars();
         var config = FlagdConfig.Builder(new Uri("https://domain:8123")).Build();
 
         Assert.False(config.CacheEnabled);
@@ -128,7 +124,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigFromUriUnix()
     {
-        Utils.CleanEnvVars();
         var config = FlagdConfig.Builder(new Uri("unix:///var/run/tmp.sock")).Build();
 
         Assert.False(config.CacheEnabled);
@@ -136,9 +131,16 @@ public class UnitTestFlagdConfig
     }
 
     [Fact]
+    public void TestFlagdConfigWithNullUri_ThrowsArgumentNullException()
+    {
+        var ex = Assert.ThrowsAny<ArgumentNullException>(() => FlagdConfig.Builder(null).Build());
+
+        Assert.Equal("uri", ex.ParamName);
+    }
+
+    [Fact]
     public void TestFlagdConfigFromUriSetCertificatePath()
     {
-        Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "/cert/path");
 
         var config = FlagdConfig.Builder(new Uri("http://localhost:8013")).Build();
@@ -169,7 +171,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigFromUriEnabledCacheApplyCacheSize()
     {
-        Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
@@ -182,7 +183,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigResolverType()
     {
-        Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "in-process");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceSelector, "source-selector");
 
@@ -195,8 +195,6 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigBuilder()
     {
-        Utils.CleanEnvVars();
-
         var logger = new FakeLogger<UnitTestFlagdConfig>();
         var config = new FlagdConfigBuilder()
             .WithCache(true)
