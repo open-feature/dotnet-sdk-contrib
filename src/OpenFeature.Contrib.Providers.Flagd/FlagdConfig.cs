@@ -62,7 +62,7 @@ public class FlagdConfig
             .WithHost(uri.Host)
             .WithPort(uri.Port)
             .WithTls(string.Equals(uri.Scheme, "https", StringComparison.OrdinalIgnoreCase))
-            .WithSocketPath(string.Equals(uri.Scheme, "unix", StringComparison.OrdinalIgnoreCase) ? uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "");
+            .WithSocketPath(string.Equals(uri.Scheme, "unix", StringComparison.OrdinalIgnoreCase) ? uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : string.Empty);
     }
 
     /// <summary>
