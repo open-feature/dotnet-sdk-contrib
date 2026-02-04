@@ -109,11 +109,7 @@ public class UnitTestFlagdConfig
     public void TestFlagdConfigFromUriHttp()
     {
         Utils.CleanEnvVars();
-        var config = FlagdConfig.Builder()
-            .WithHost("domain")
-            .WithPort(8123)
-            .WithTls(false)
-            .Build();
+        var config = FlagdConfig.Builder(new Uri("http://domain:8123")).Build();
 
         Assert.False(config.CacheEnabled);
         Assert.Equal(new Uri("http://domain:8123"), config.GetUri());
@@ -123,11 +119,7 @@ public class UnitTestFlagdConfig
     public void TestFlagdConfigFromUriHttps()
     {
         Utils.CleanEnvVars();
-        var config = FlagdConfig.Builder()
-            .WithHost("domain")
-            .WithPort(8123)
-            .WithTls(true)
-            .Build();
+        var config = FlagdConfig.Builder(new Uri("https://domain:8123")).Build();
 
         Assert.False(config.CacheEnabled);
         Assert.Equal(new Uri("https://domain:8123"), config.GetUri());
@@ -137,9 +129,7 @@ public class UnitTestFlagdConfig
     public void TestFlagdConfigFromUriUnix()
     {
         Utils.CleanEnvVars();
-        var config = FlagdConfig.Builder()
-            .WithSocketPath("/var/run/tmp.sock")
-            .Build();
+        var config = FlagdConfig.Builder(new Uri("unix:///var/run/tmp.sock")).Build();
 
         Assert.False(config.CacheEnabled);
         Assert.Equal(new Uri("unix:///var/run/tmp.sock"), config.GetUri());
@@ -151,22 +141,14 @@ public class UnitTestFlagdConfig
         Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "/cert/path");
 
-        var config = FlagdConfig.Builder()
-            .WithHost("localhost")
-            .WithPort(8013)
-            .WithTls(false)
-            .Build();
+        var config = FlagdConfig.Builder(new Uri("http://localhost:8013")).Build();
 
         Assert.Equal("/cert/path", config.CertificatePath);
         Assert.True(config.UseCertificate);
 
         Utils.CleanEnvVars();
 
-        config = FlagdConfig.Builder()
-            .WithHost("localhost")
-            .WithPort(8013)
-            .WithTls(false)
-            .Build();
+        config = FlagdConfig.Builder(new Uri("http://localhost:8013")).Build();
 
         Assert.Equal("", config.CertificatePath);
         Assert.False(config.UseCertificate);
@@ -178,11 +160,7 @@ public class UnitTestFlagdConfig
         Utils.CleanEnvVars();
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
 
-        var config = FlagdConfig.Builder()
-            .WithHost("localhost")
-            .WithPort(8013)
-            .WithTls(false)
-            .Build();
+        var config = FlagdConfig.Builder(new Uri("http://localhost:8013")).Build();
 
         Assert.True(config.CacheEnabled);
         Assert.Equal(FlagdConfig.CacheSizeDefault, config.MaxCacheSize);
@@ -195,11 +173,7 @@ public class UnitTestFlagdConfig
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarCache, "LRU");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "20");
 
-        var config = FlagdConfig.Builder()
-            .WithHost("localhost")
-            .WithPort(8013)
-            .WithTls(false)
-            .Build();
+        var config = FlagdConfig.Builder(new Uri("http://localhost:8013")).Build();
 
         Assert.True(config.CacheEnabled);
         Assert.Equal(20, config.MaxCacheSize);
@@ -212,11 +186,7 @@ public class UnitTestFlagdConfig
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "in-process");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceSelector, "source-selector");
 
-        var config = FlagdConfig.Builder()
-            .WithHost("localhost")
-            .WithPort(8013)
-            .WithTls(false)
-            .Build();
+        var config = FlagdConfig.Builder(new Uri("http://localhost:8013")).Build();
 
         Assert.Equal(ResolverType.IN_PROCESS, config.ResolverType);
         Assert.Equal("source-selector", config.SourceSelector);
