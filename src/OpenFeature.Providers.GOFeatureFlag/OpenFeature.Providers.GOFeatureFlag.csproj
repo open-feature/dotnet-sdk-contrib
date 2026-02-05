@@ -10,7 +10,7 @@
     <Authors>Thomas Poignant</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <WasmVersion>0.1.3</WasmVersion>
+    <WasmVersion>0.1.4</WasmVersion>
     <OutputDirectory>$(ProjectDir)WasmModules</OutputDirectory>
     <SourceFile>$(ProjectDir)wasm-releases/evaluation/gofeatureflag-evaluation_$(WasmVersion).wasi</SourceFile>
     <DestinationFile>$(OutputDirectory)\gofeatureflag-evaluation.wasi</DestinationFile>
