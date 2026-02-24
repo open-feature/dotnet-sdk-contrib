@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.5...OpenFeature.Contrib.Providers.Flagd-v0.3.6) (2026-02-24)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** Default to correct Port when only Resolver is set ([#585](https://github.com/open-feature/dotnet-sdk-contrib/issues/585)) ([8a1d97c](https://github.com/open-feature/dotnet-sdk-contrib/commit/8a1d97c817bca8575efd6f4a13dbc2d79c446b73))
+
 ## [0.3.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.4...OpenFeature.Contrib.Providers.Flagd-v0.3.5) (2026-02-03)
 
 
