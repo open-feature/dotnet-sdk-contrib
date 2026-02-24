@@ -7,6 +7,7 @@
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/selector.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/metadata.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/contextEnrichment.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed/gherkin/config.feature" Link="../../../Features/%(Filename)%(Extension)" DestinationFolder="../../../Features/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
