@@ -92,7 +92,7 @@ public class UnitTestFlagdProvider
     public void TestGetProviderWithConfig()
     {
         // Create a config with default values set
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
 
         // Set env variables (should be ignored by the constructor)
         Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "path");
@@ -186,7 +186,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(substituteGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(substituteGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // resolve with default set to false to make sure we return what the grpc server gives us
@@ -215,7 +215,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveStringRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(subGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveStringValueAsync("my-key", "");
@@ -244,7 +244,7 @@ public class UnitTestFlagdProvider
         subGrpcClient.ResolveIntAsync(Arg.Any<ResolveIntRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(subGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(subGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveIntegerValueAsync("my-key", 0);
@@ -273,7 +273,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveFloatAsync(Arg.Any<ResolveFloatRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveDoubleValueAsync("my-key", 0.0);
@@ -305,7 +305,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveObjectAsync(Arg.Any<ResolveObjectRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         var val = await flagdProvider.ResolveStructureValueAsync("my-key", null);
@@ -331,7 +331,7 @@ public class UnitTestFlagdProvider
         mockGrpcClient.ResolveBooleanAsync(
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None).Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -366,7 +366,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -401,7 +401,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -436,7 +436,7 @@ public class UnitTestFlagdProvider
                 Arg.Any<ResolveBooleanRequest>(), null, null, CancellationToken.None)
             .Returns(grpcResp);
 
-        var rpcResolver = new RpcResolver(mockGrpcClient, new FlagdConfig(), null);
+        var rpcResolver = new RpcResolver(mockGrpcClient, FlagdConfig.Builder().Build(), null);
         var flagdProvider = new FlagdProvider(rpcResolver);
 
         // make sure the correct exception is thrown
@@ -513,9 +513,10 @@ public class UnitTestFlagdProvider
         mockCache.Add(Arg.Is<string>(s => s == "my-key"), Arg.Any<object>());
 
 
-        var config = new FlagdConfig();
-        config.CacheEnabled = true;
-        config.MaxEventStreamRetries = 1;
+        var config = FlagdConfig.Builder()
+            .WithCache(true)
+            .WithMaxEventStreamRetries(1)
+            .Build();
 
         var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
         var flagdProvider = new FlagdProvider(rpcResolver);
@@ -577,11 +578,10 @@ public class UnitTestFlagdProvider
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet("my-key").Returns(new ResolutionDetails<bool>("my-key", true));
 
-        var config = new FlagdConfig
-        {
-            CacheEnabled = true,
-            MaxEventStreamRetries = 1
-        };
+        var config = FlagdConfig.Builder()
+            .WithCache(true)
+            .WithMaxEventStreamRetries(1)
+            .Build();
 
         var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
         var flagdProvider = new FlagdProvider(rpcResolver);
@@ -677,9 +677,10 @@ public class UnitTestFlagdProvider
         });
 
 
-        var config = new FlagdConfig();
-        config.CacheEnabled = true;
-        config.MaxEventStreamRetries = 1;
+        var config = FlagdConfig.Builder()
+            .WithCache(true)
+            .WithMaxEventStreamRetries(1)
+            .Build();
 
         var rpcResolver = new RpcResolver(mockGrpcClient, config, mockCache);
         var flagdProvider = new FlagdProvider(rpcResolver);
@@ -743,7 +744,7 @@ public class UnitTestFlagdProvider
             .Returns(grpcEventStreamResp);
 
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
         config.CacheEnabled = true;
         config.MaxEventStreamRetries = 1;
         config.SourceSelector = "source-selector";
@@ -803,7 +804,7 @@ public class UnitTestFlagdProvider
             .Returns(grpcEventStreamResp);
 
 
-        var config = new FlagdConfig();
+        var config = FlagdConfig.Builder().Build();
         config.CacheEnabled = true;
         config.MaxEventStreamRetries = 1;
         config.SourceSelector = "source-selector";
@@ -829,7 +830,7 @@ public class UnitTestFlagdProvider
     public void GetProviderHooks_ReturnsSyncMetadataHook()
     {
         // Arrange
-        var flagdProvider = new FlagdProvider(new FlagdConfig());
+        var flagdProvider = new FlagdProvider(FlagdConfig.Builder().Build());
 
         // Act
         var hooks = flagdProvider.GetProviderHooks();

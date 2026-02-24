@@ -51,6 +51,20 @@ public class FlagdConfig
         return new FlagdConfigBuilder();
     }
 
+    internal static FlagdConfigBuilder Builder(Uri uri)
+    {
+        if (uri == null)
+        {
+            throw new ArgumentNullException(nameof(uri));
+        }
+
+        return new FlagdConfigBuilder()
+            .WithHost(uri.Host)
+            .WithPort(uri.Port)
+            .WithTls(string.Equals(uri.Scheme, "https", StringComparison.OrdinalIgnoreCase))
+            .WithSocketPath(string.Equals(uri.Scheme, "unix", StringComparison.OrdinalIgnoreCase) ? uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : string.Empty);
+    }
+
     /// <summary>
     ///     The host for the provider to connect to.
     /// </summary>
@@ -175,39 +189,12 @@ public class FlagdConfig
     internal FlagdConfig()
     {
         _host = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvVarHost)) ? "localhost" : Environment.GetEnvironmentVariable(EnvVarHost);
-        _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 8013;
+        _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 0;
         _useTLS = bool.TryParse(Environment.GetEnvironmentVariable(EnvVarTLS), out var useTLS) ? useTLS : false;
         _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
         _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
         _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
         _logger = NullLogger.Instance;
-        var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
-
-        if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))
-        {
-            _cache = true;
-            _maxCacheSize = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxCacheSize), out var maxCacheSize) ? maxCacheSize : CacheSizeDefault;
-            _maxEventStreamRetries = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries), out var maxEventStreamRetries) ? maxEventStreamRetries : 3;
-        }
-
-        var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
-        _resolverType = string.Equals(resolverTypeStr, InProcessResolverValue, StringComparison.OrdinalIgnoreCase) ? ResolverType.IN_PROCESS : ResolverType.RPC;
-    }
-
-    internal FlagdConfig(Uri url)
-    {
-        if (url == null)
-        {
-            throw new ArgumentNullException(nameof(url));
-        }
-
-        _host = url.Host;
-        _port = url.Port;
-        _useTLS = string.Equals(url.Scheme, "https", StringComparison.OrdinalIgnoreCase);
-        _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
-        _socketPath = string.Equals(url.Scheme, "unix", StringComparison.OrdinalIgnoreCase) ? url.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Scheme, UriFormat.UriEscaped) : "";
-        _sourceSelector = Environment.GetEnvironmentVariable(EnvVarSourceSelector) ?? "";
-
         var cacheStr = Environment.GetEnvironmentVariable(EnvVarCache) ?? "";
 
         if (string.Equals(cacheStr, LruCacheValue, StringComparison.OrdinalIgnoreCase))
@@ -356,6 +343,23 @@ public class FlagdConfigBuilder
     /// </summary>
     public FlagdConfig Build()
     {
-        return _config;
+        this.PreBuild();
+
+        return this._config;
+    }
+
+    private void PreBuild()
+    {
+        if (this._config.Port == 0)
+        {
+            var defaultPortForResolver = this._config.ResolverType switch
+            {
+                ResolverType.RPC => 8013,
+                ResolverType.IN_PROCESS => 8015,
+                _ => throw new NotImplementedException("ResolverType does not use Ports.")
+            };
+
+            this._config.Port = defaultPortForResolver;
+        }
     }
 }
