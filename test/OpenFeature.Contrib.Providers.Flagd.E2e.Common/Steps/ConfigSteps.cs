@@ -11,6 +11,16 @@ namespace OpenFeature.Contrib.Providers.Flagd.E2e.Common.Steps;
 [Binding]
 public class ConfigSteps
 {
+    private const string HostKey = "host";
+    private const string PortKey = "port";
+    private const string TlsKey = "tls";
+    private const string CertPathKey = "certPath";
+    private const string SocketPathKey = "socketPath";
+    private const string CacheKey = "cache";
+    private const string MaxCacheSizeKey = "maxCacheSize";
+    private const string SelectorKey = "selector";
+    private const string ResolverKey = "resolver";
+
     private readonly State _state;
 
     private FlagdConfig? _config;
@@ -82,51 +92,51 @@ public class ConfigSteps
 
         switch (option)
         {
-            case "host":
+            case HostKey:
                 {
                     this._state.FlagdConfig = this._state.FlagdConfig.WithHost(value);
                     break;
                 }
-            case "port":
+            case PortKey:
                 {
                     var port = int.Parse(value);
                     this._state.FlagdConfig = this._state.FlagdConfig.WithPort(port);
                     break;
                 }
-            case "tls":
+            case TlsKey:
                 {
                     var useTls = bool.Parse(value);
                     this._state.FlagdConfig = this._state.FlagdConfig.WithTls(useTls);
                     break;
                 }
-            case "certPath":
+            case CertPathKey:
                 {
                     this._state.FlagdConfig = this._state.FlagdConfig.WithCertificatePath(value);
                     break;
                 }
-            case "socketPath":
+            case SocketPathKey:
                 {
                     this._state.FlagdConfig = this._state.FlagdConfig.WithSocketPath(value);
                     break;
                 }
-            case "cache":
+            case CacheKey:
                 {
                     var enabled = value == "enabled";
                     this._state.FlagdConfig = this._state.FlagdConfig.WithCache(enabled);
                     break;
                 }
-            case "maxCacheSize":
+            case MaxCacheSizeKey:
                 {
                     var maxCacheSize = int.Parse(value);
                     this._state.FlagdConfig = this._state.FlagdConfig.WithMaxCacheSize(maxCacheSize);
                     break;
                 }
-            case "selector":
+            case SelectorKey:
                 {
                     this._state.FlagdConfig = this._state.FlagdConfig.WithSourceSelector(value);
                     break;
                 }
-            case "resolver":
+            case ResolverKey:
                 {
                     var resolverType = value == "rpc" ? ResolverType.RPC : ResolverType.IN_PROCESS;
                     this._state.FlagdConfig = this._state.FlagdConfig.WithResolverType(resolverType);
@@ -160,49 +170,49 @@ public class ConfigSteps
 
         switch (option)
         {
-            case "resolver":
+            case ResolverKey:
                 {
                     var expected = value.ToLower();
                     var actual = this._config!.ResolverType == ResolverType.RPC ? "rpc" : "in-process";
                     Assert.Equal(expected, actual);
                     break;
                 }
-            case "host":
+            case HostKey:
                 {
                     var expected = value;
                     var actual = this._config!.Host;
                     Assert.Equal(expected, actual);
                     break;
                 }
-            case "port":
+            case PortKey:
                 {
                     var expected = int.Parse(value);
                     var actual = this._config!.Port;
                     Assert.Equal(expected, actual);
                     break;
                 }
-            case "tls":
+            case TlsKey:
                 {
                     var expected = bool.Parse(value);
                     var actual = this._config!.UseTls;
                     Assert.Equal(expected, actual);
                     break;
                 }
-            case "certPath":
+            case CertPathKey:
                 {
                     var expected = value == "null" ? string.Empty : value;
                     var actual = this._config!.CertificatePath;
                     Assert.Equal(expected, actual);
                     break;
                 }
-            case "socketPath":
+            case SocketPathKey:
                 {
                     var expected = value == "null" ? string.Empty : value;
                     var actual = this._config!.SocketPath;
                     Assert.Equal(expected, actual);
                     break;
                 }
-            case "selector":
+            case SelectorKey:
                 {
                     var expected = value == "null" ? string.Empty : value;
                     var actual = this._config!.SourceSelector;
