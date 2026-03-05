@@ -36,7 +36,7 @@ safe-outputs:
       - provider:ofrep
       - duplicate-candidate
       - needs-info
-    max: 6
+    max: 4
   remove-labels:
     allowed:
       - type:build
@@ -59,7 +59,7 @@ safe-outputs:
       - provider:ofrep
       - duplicate-candidate
       - needs-info
-    max: 6
+    max: 4
   add-comment:
     max: 3
   noop:
