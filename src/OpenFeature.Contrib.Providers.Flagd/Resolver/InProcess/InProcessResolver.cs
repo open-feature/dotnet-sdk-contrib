@@ -111,10 +111,17 @@ internal class InProcessResolver : Resolver
         {
             try
             {
-                var call = _client.SyncFlags(new SyncFlagsRequest
+                var headers = new Grpc.Core.Metadata()
                 {
-                    Selector = _config.SourceSelector
-                }, cancellationToken: token);
+                    { "Flagd-Selector", this._config.SourceSelector }
+                };
+#pragma warning disable CS0612 // Type or member is obsolete
+                var request = new SyncFlagsRequest()
+                {
+                    Selector = this._config.SourceSelector
+                };
+#pragma warning restore CS0612 // Type or member is obsolete
+                var call = _client.SyncFlags(request, headers, null, cancellationToken: token);
 
                 while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
