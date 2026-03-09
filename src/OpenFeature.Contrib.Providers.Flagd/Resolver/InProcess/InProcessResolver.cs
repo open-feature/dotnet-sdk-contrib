@@ -120,7 +120,7 @@ internal class InProcessResolver : Resolver
                 {
                     Selector = this._config.SourceSelector
                 };
-// support the old format as well for backwards compatibility
+                // support the old format as well for backwards compatibility
 #pragma warning restore CS0612 // Type or member is obsolete
                 var call = _client.SyncFlags(request, headers, null, cancellationToken: token);
 
