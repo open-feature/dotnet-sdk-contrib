@@ -79,7 +79,7 @@ internal class RpcResolver : Resolver
 
     public async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
     {
-        return await ResolveValue(flagKey, defaultValue, async contextStruct =>
+        return await ResolveValue(flagKey, async contextStruct =>
         {
             var resolveBooleanResponse = await _client.ResolveBooleanAsync(new ResolveBooleanRequest
             {
@@ -102,7 +102,7 @@ internal class RpcResolver : Resolver
 
     public async Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
     {
-        return await ResolveValue(flagKey, defaultValue, async contextStruct =>
+        return await ResolveValue(flagKey, async contextStruct =>
         {
             var resolveStringResponse = await _client.ResolveStringAsync(new ResolveStringRequest
             {
@@ -125,7 +125,7 @@ internal class RpcResolver : Resolver
 
     public async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
     {
-        return await ResolveValue(flagKey, defaultValue, async contextStruct =>
+        return await ResolveValue(flagKey, async contextStruct =>
         {
             var resolveIntResponse = await _client.ResolveIntAsync(new ResolveIntRequest
             {
@@ -148,7 +148,7 @@ internal class RpcResolver : Resolver
 
     public async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
     {
-        return await ResolveValue(flagKey, defaultValue, async contextStruct =>
+        return await ResolveValue(flagKey, async contextStruct =>
         {
             var resolveDoubleResponse = await _client.ResolveFloatAsync(new ResolveFloatRequest
             {
@@ -171,7 +171,7 @@ internal class RpcResolver : Resolver
 
     public async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
     {
-        return await ResolveValue(flagKey, defaultValue, async contextStruct =>
+        return await ResolveValue(flagKey, async contextStruct =>
         {
             var resolveObjectResponse = await _client.ResolveObjectAsync(new ResolveObjectRequest
             {
@@ -192,7 +192,7 @@ internal class RpcResolver : Resolver
         }, context).ConfigureAwait(false);
     }
 
-    private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, T defaultValue, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
+    private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, Func<Struct, Task<ResolutionDetails<T>>> resolveDelegate, EvaluationContext context = null)
     {
         try
         {

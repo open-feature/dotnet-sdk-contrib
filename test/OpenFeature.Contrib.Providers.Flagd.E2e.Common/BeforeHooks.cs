@@ -43,7 +43,7 @@ public class BeforeHooks
             .Build();
 
         Skip.If(configuration["E2E"] != "true", "Skipping test as E2E tests are disabled, enable them by updating the appsettings.json.");
-        
+
         // Skip deprecated tests
         Skip.If(scenarioContext.ScenarioInfo.Tags.Contains("deprecated"), "Skipping deprecated test scenario.");
     }
