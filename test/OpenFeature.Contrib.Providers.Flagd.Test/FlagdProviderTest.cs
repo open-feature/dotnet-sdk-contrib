@@ -754,7 +754,7 @@ public class UnitTestFlagdProvider
 #pragma warning disable CS0612 // Type or member is obsolete
         mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(
             Arg.Is<SyncFlagsRequest>(r => r.Selector == "source-selector"),
-            Arg.Is<Metadata>(m => m.Get("Flagd-Selector") != null && m.Get("Flagd-Selector").Value == "source-selector"),
+            Arg.Is<Metadata>(m => m.Get("flagd-selector") != null && m.Get("flagd-selector").Value == "source-selector"),
             null,
             Arg.Any<CancellationToken>());
 #pragma warning restore CS0612 // Type or member is obsolete
@@ -809,7 +809,7 @@ public class UnitTestFlagdProvider
 #pragma warning disable CS0612 // Type or member is obsolete
         mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(
             Arg.Is<SyncFlagsRequest>(r => r.Selector == "source-selector"),
-            Arg.Is<Metadata>(m => m.Get("Flagd-Selector") != null && m.Get("Flagd-Selector").Value == "source-selector"),
+            Arg.Is<Metadata>(m => m.Get("flagd-selector") != null && m.Get("flagd-selector").Value == "source-selector"),
             null,
             Arg.Any<CancellationToken>());
 #pragma warning restore CS0612 // Type or member is obsolete

@@ -111,16 +111,17 @@ internal class InProcessResolver : Resolver
         {
             try
             {
-                var headers = new Grpc.Core.Metadata()
+                var headers = new Grpc.Core.Metadata();
+                if (!string.IsNullOrEmpty(this._config.SourceSelector))
                 {
-                    { "Flagd-Selector", this._config.SourceSelector }
-                };
+                    headers.Add(FlagdConfig.FlagdSelectorHeaderName, this._config.SourceSelector);
+                }
+                // Support the old format as well for backwards compatibility
 #pragma warning disable CS0612 // Type or member is obsolete
                 var request = new SyncFlagsRequest()
                 {
                     Selector = this._config.SourceSelector
                 };
-                // support the old format as well for backwards compatibility
 #pragma warning restore CS0612 // Type or member is obsolete
                 var call = _client.SyncFlags(request, headers, null, cancellationToken: token);
 
