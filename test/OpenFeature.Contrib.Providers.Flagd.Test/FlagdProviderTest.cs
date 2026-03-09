@@ -665,7 +665,7 @@ public class UnitTestFlagdProvider
 
         mockGrpcClient.EventStream(
             Arg.Any<EventStreamRequest>(), null, null, CancellationToken.None)
-            .Returns(grpcEventStreamResp);
+                .Returns(grpcEventStreamResp);
 
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "my-key")).Returns(null);
@@ -719,30 +719,19 @@ public class UnitTestFlagdProvider
 
         var l = new List<SyncFlagsResponse>
         {
-            new SyncFlagsResponse{
-                FlagConfiguration = Utils.flags
-            }
+            new SyncFlagsResponse() { FlagConfiguration = Utils.flags }
         };
 
         var enumerator = l.GetEnumerator();
-
-
         asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(enumerator.MoveNext());
         asyncStreamReader.Current.Returns(_ => enumerator.Current);
 
         var grpcEventStreamResp = new AsyncServerStreamingCall<SyncFlagsResponse>(
-            asyncStreamReader,
-            null,
-            null,
-            null,
-            null,
-            null
-            );
+            asyncStreamReader, null, null, null, null, null);
 
         mockGrpcClient.SyncFlags(
-            Arg.Any<SyncFlagsRequest>(), null, null, Arg.Any<CancellationToken>())
-            .Returns(grpcEventStreamResp);
-
+            Arg.Any<SyncFlagsRequest>(), Arg.Any<Metadata>(), null, Arg.Any<CancellationToken>())
+                .Returns(grpcEventStreamResp);
 
         var config = FlagdConfig.Builder().Build();
         config.CacheEnabled = true;
@@ -761,7 +750,14 @@ public class UnitTestFlagdProvider
                 Assert.True(val.Value);
             });
 
-        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, Arg.Any<CancellationToken>());
+
+#pragma warning disable CS0612 // Type or member is obsolete
+        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(
+            Arg.Is<SyncFlagsRequest>(r => r.Selector == "source-selector"),
+            Arg.Is<Metadata>(m => m.Get("flagd-selector") != null && m.Get("flagd-selector").Value == "source-selector"),
+            null,
+            Arg.Any<CancellationToken>());
+#pragma warning restore CS0612 // Type or member is obsolete
 
         await flagdProvider.ShutdownAsync();
     }
@@ -779,30 +775,19 @@ public class UnitTestFlagdProvider
 
         var l = new List<SyncFlagsResponse>
         {
-            new SyncFlagsResponse{
-                FlagConfiguration = Utils.flags
-            }
+            new SyncFlagsResponse() { FlagConfiguration = Utils.flags }
         };
 
         var enumerator = l.GetEnumerator();
-
-
         asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(enumerator.MoveNext());
         asyncStreamReader.Current.Returns(_ => enumerator.Current);
 
         var grpcEventStreamResp = new AsyncServerStreamingCall<SyncFlagsResponse>(
-            asyncStreamReader,
-            null,
-            null,
-            null,
-            null,
-            null
-            );
+            asyncStreamReader, null, null, null, null, null);
 
         mockGrpcClient.SyncFlags(
-            Arg.Any<SyncFlagsRequest>(), null, null, Arg.Any<CancellationToken>())
-            .Returns(grpcEventStreamResp);
-
+            Arg.Any<SyncFlagsRequest>(), Arg.Any<Metadata>(), null, Arg.Any<CancellationToken>())
+                .Returns(grpcEventStreamResp);
 
         var config = FlagdConfig.Builder().Build();
         config.CacheEnabled = true;
@@ -821,7 +806,13 @@ public class UnitTestFlagdProvider
                 Assert.Equal(ErrorType.FlagNotFound, exception.ErrorType);
             });
 
-        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, Arg.Any<CancellationToken>());
+#pragma warning disable CS0612 // Type or member is obsolete
+        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(
+            Arg.Is<SyncFlagsRequest>(r => r.Selector == "source-selector"),
+            Arg.Is<Metadata>(m => m.Get("flagd-selector") != null && m.Get("flagd-selector").Value == "source-selector"),
+            null,
+            Arg.Any<CancellationToken>());
+#pragma warning restore CS0612 // Type or member is obsolete
 
         await flagdProvider.ShutdownAsync();
     }
