@@ -10,7 +10,7 @@ using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 using OpenFeature.Error;
-using OpenFeature.Flagd.Grpc.Evaluation;
+using OpenFeature.Flagd.Grpc.Evaluation.V2;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
 using Xunit;
@@ -750,6 +750,7 @@ public class UnitTestFlagdProvider
                 Assert.True(val.Value);
             });
 
+<<<<<<< HEAD
 
 #pragma warning disable CS0612 // Type or member is obsolete
         mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(
@@ -758,6 +759,11 @@ public class UnitTestFlagdProvider
             null,
             Arg.Any<CancellationToken>());
 #pragma warning restore CS0612 // Type or member is obsolete
+=======
+#pragma warning disable CS0612
+        mockGrpcClient.Received(Quantity.AtLeastOne()).SyncFlags(Arg.Is<SyncFlagsRequest>(req => req.Selector == "source-selector"), null, null, Arg.Any<CancellationToken>());
+#pragma warning restore CS0612
+>>>>>>> 5d22d51 (feat: graceful fallback to code default when no default variant resolved)
 
         await flagdProvider.ShutdownAsync();
     }

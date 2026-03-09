@@ -9,7 +9,7 @@ using NSubstitute.ExceptionExtensions;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 using OpenFeature.Error;
-using OpenFeature.Flagd.Grpc.Evaluation;
+using OpenFeature.Flagd.Grpc.Evaluation.V2;
 using OpenFeature.Model;
 using Xunit;
 
