@@ -38,6 +38,7 @@ public class FlagdConfig
     internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
     internal const string EnvVarResolverType = "FLAGD_RESOLVER";
     internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
+    internal const string FlagdSelectorHeaderName = "flagd-selector";
     internal static int CacheSizeDefault = 10;
     internal static string InProcessResolverValue = "in-process";
     internal static string LruCacheValue = "lru";
