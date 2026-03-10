@@ -84,7 +84,7 @@ jobs:
           dotnet nuget push "${{ matrix.release }}/**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
 
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3.2.0
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
         with:
           subject-path: "${{ matrix.release }}/**/*.nupkg"
 
@@ -101,8 +101,8 @@ jobs:
           json: true
           github-bearer-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Attest package
-        uses: actions/attest-sbom@4651f806c01d8637787e274ac3bdf724ef169f34 # v3.0.0
+      - name: Attest SBOM package
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
         with:
           subject-path: "${{ matrix.release }}/**/*.nupkg"
           sbom-path: bom.json
