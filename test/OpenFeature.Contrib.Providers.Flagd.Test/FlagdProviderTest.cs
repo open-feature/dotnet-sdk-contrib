@@ -10,7 +10,7 @@ using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Contrib.Providers.Flagd.Resolver.Rpc;
 using OpenFeature.Error;
-using OpenFeature.Flagd.Grpc.Evaluation;
+using OpenFeature.Flagd.Grpc.Evaluation.V2;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
 using Xunit;

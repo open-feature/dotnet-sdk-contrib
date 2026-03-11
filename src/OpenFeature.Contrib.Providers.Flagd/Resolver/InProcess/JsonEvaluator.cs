@@ -321,12 +321,11 @@ internal class JsonEvaluator
             {
                 if (string.IsNullOrEmpty(flagConfiguration.DefaultVariant))
                 {
+                    // No default variant defined, return code default with DEFAULT reason
                     return new ResolutionDetails<T>(
                         flagKey: flagKey,
                         defaultValue,
-                        errorType: ErrorType.FlagNotFound,
-                        errorMessage: $"Flag '{flagKey}' has no default variant defined, will use code default",
-                        reason: Reason.Error,
+                        reason: Reason.Default,
                         variant: null,
                         flagMetadata: flagMetadata
                     );

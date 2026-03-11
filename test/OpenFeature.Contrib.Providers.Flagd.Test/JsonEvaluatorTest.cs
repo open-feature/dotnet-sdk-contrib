@@ -379,9 +379,9 @@ public class UnitTestJsonEvaluator
         // Assert
         Assert.False(result.Value);
         Assert.Equal("flag-with-no-default-variant", result.FlagKey);
-        Assert.Equal("ERROR", result.Reason);
-        Assert.Equal(ErrorType.FlagNotFound, result.ErrorType);
-        Assert.Equal("Flag 'flag-with-no-default-variant' has no default variant defined, will use code default", result.ErrorMessage);
+        Assert.Equal("DEFAULT", result.Reason);
+        Assert.Equal(ErrorType.None, result.ErrorType);
+        Assert.Null(result.ErrorMessage);
         Assert.Null(result.Variant);
         Assert.NotNull(result.FlagMetadata);
         Assert.Equal("1.0.2", result.FlagMetadata.GetString("string"));
@@ -416,7 +416,8 @@ public class UnitTestJsonEvaluator
 
         // Assert
         Assert.False(result.Value);
-        Assert.Equal(ErrorType.FlagNotFound, result.ErrorType);
+        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal(ErrorType.None, result.ErrorType);
     }
 
     [Fact]
