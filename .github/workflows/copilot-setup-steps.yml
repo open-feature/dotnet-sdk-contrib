@@ -25,9 +25,9 @@ jobs:
           submodules: recursive
 
       - name: Install gh-aw extension
-        uses: github/gh-aw/actions/setup-cli@32b3a711a9ee97d38e3989c90af0385aff0066a7 # v0.57.2
+        uses: github/gh-aw-actions/setup-cli@be0029bbbaeef8c6bea6825f31d9593219b2dc28 # v0.61.1
         with:
-          version: v0.57.2
+          version: v0.61.1
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
