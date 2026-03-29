@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.FeatureManagement-v0.1.1...OpenFeature.Contrib.Providers.FeatureManagement-v0.2.0) (2026-03-29)
+
+
+### ✨ New Features
+
+* update Feature Management dependency ([#618](https://github.com/open-feature/dotnet-sdk-contrib/issues/618)) ([ae20048](https://github.com/open-feature/dotnet-sdk-contrib/commit/ae20048a79f319ceba813ab5dd51347ec6568b47))
+
 ## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.FeatureManagement-v0.1.0...OpenFeature.Contrib.Providers.FeatureManagement-v0.1.1) (2025-05-30)
 
 
