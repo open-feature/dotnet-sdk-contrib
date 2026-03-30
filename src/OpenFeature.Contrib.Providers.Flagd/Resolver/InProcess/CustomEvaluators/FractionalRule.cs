@@ -97,15 +97,14 @@ internal sealed class FractionalEvaluator : IRule
                 {
                     var weightDouble = weightNode.GetValue<double>();
 
-                    // weights must be integers
-                    if (double.IsNaN(weightDouble) || double.IsInfinity(weightDouble)
-                        || weightDouble != Math.Floor(weightDouble))
+                    // weights must be integers within valid range
+                    if (weightDouble != Math.Floor(weightDouble) || weightDouble > MaxWeight)
                     {
                         return null;
                     }
 
                     // clamp negative weights to 0
-                    weight = Math.Max(0, (int)weightDouble);
+                    weight = (int)Math.Max(0, weightDouble);
                 }
             }
 
