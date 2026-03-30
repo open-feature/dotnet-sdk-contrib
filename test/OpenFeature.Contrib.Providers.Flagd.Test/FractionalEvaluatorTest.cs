@@ -12,17 +12,17 @@ internal class FractionalEvaluationTestData
 {
     public static IEnumerable<object[]> FractionalEvaluationContext()
     {
-        yield return new object[] { "rachel@faas.com", "headerColor", "yellow" };
-        yield return new object[] { "monica@faas.com", "headerColor", "blue" };
+        yield return new object[] { "rachel@faas.com", "headerColor", "blue" };
+        yield return new object[] { "monica@faas.com", "headerColor", "yellow" };
         yield return new object[] { "joey@faas.com", "headerColor", "red" };
-        yield return new object[] { "ross@faas.com", "headerColor", "green" };
-        yield return new object[] { "ross@faas.com", "footerColor", "red" };
+        yield return new object[] { "ross@faas.com", "headerColor", "blue" };
+        yield return new object[] { "ross@faas.com", "footerColor", "yellow" };
     }
 
     public static IEnumerable<object[]> FractionalEvaluationWithTargetingKeyContext()
     {
-        yield return new object[] { "headerColor", "yellow" };
-        yield return new object[] { "footerColor", "yellow" };
+        yield return new object[] { "headerColor", "blue" };
+        yield return new object[] { "footerColor", "green" };
     }
 }
 public class FractionalEvaluatorTest
@@ -147,5 +147,204 @@ public class FractionalEvaluatorTest
 
         // Assert
         Assert.Equal(expected, result.ToString());
+    }
+
+    [Fact]
+    public void EvaluateSingleBucket()
+    {
+        // Arrange
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+
+        var targetingString = @"{""fractional"": [
+              [""only"", 100]
+            ]}";
+
+        var rule = JsonNode.Parse(targetingString);
+
+        var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            { "targetingKey", "user1" },
+            { "$flagd", new Dictionary<string, object> { { "flagKey", "flag1" } } }
+        }));
+
+        // Act
+        var result = JsonLogic.Apply(rule, data);
+
+        // Assert
+        Assert.Equal("only", result.ToString());
+    }
+
+    [Fact]
+    public void EvaluateBooleanVariant()
+    {
+        // Arrange
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+
+        var targetingString = @"{""fractional"": [
+              [true, 100], [false, 0]
+            ]}";
+
+        var rule = JsonNode.Parse(targetingString);
+
+        var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            { "targetingKey", "user1" },
+            { "$flagd", new Dictionary<string, object> { { "flagKey", "flag1" } } }
+        }));
+
+        // Act
+        var result = JsonLogic.Apply(rule, data);
+
+        // Assert
+        Assert.Equal("true", result.ToString());
+    }
+
+    [Fact]
+    public void EvaluateNumberVariant()
+    {
+        // Arrange
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+
+        var targetingString = @"{""fractional"": [
+              [42, 100], [0, 0]
+            ]}";
+
+        var rule = JsonNode.Parse(targetingString);
+
+        var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            { "targetingKey", "user1" },
+            { "$flagd", new Dictionary<string, object> { { "flagKey", "flag1" } } }
+        }));
+
+        // Act
+        var result = JsonLogic.Apply(rule, data);
+
+        // Assert
+        Assert.Equal("42", result.ToString());
+    }
+
+    [Fact]
+    public void EvaluateNullVariant()
+    {
+        // Arrange
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+
+        var targetingString = @"{""fractional"": [
+              [null, 100], [""x"", 0]
+            ]}";
+
+        var rule = JsonNode.Parse(targetingString);
+
+        var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            { "targetingKey", "user1" },
+            { "$flagd", new Dictionary<string, object> { { "flagKey", "flag1" } } }
+        }));
+
+        // Act
+        var result = JsonLogic.Apply(rule, data);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void EvaluateFloatWeightReturnsNull()
+    {
+        // Arrange
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+
+        var targetingString = @"{""fractional"": [
+              [""red"", 25.5], [""blue"", 25]
+            ]}";
+
+        var rule = JsonNode.Parse(targetingString);
+
+        var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            { "targetingKey", "user1" },
+            { "$flagd", new Dictionary<string, object> { { "flagKey", "flag1" } } }
+        }));
+
+        // Act
+        var result = JsonLogic.Apply(rule, data);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void EvaluateNegativeWeightClampedToZero()
+    {
+        // Arrange
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+
+        // "red" has weight -10 (clamped to 0), "blue" has weight 100
+        var targetingString = @"{""fractional"": [
+              [""red"", -10], [""blue"", 100]
+            ]}";
+
+        var rule = JsonNode.Parse(targetingString);
+
+        var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            { "targetingKey", "user1" },
+            { "$flagd", new Dictionary<string, object> { { "flagKey", "flag1" } } }
+        }));
+
+        // Act
+        var result = JsonLogic.Apply(rule, data);
+
+        // Assert: "red" weight is 0, so all traffic goes to "blue"
+        Assert.Equal("blue", result.ToString());
+    }
+
+    [Fact]
+    public void EvaluateZeroTotalWeightReturnsNull()
+    {
+        // Arrange
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+
+        var targetingString = @"{""fractional"": [
+              [""red"", 0], [""blue"", 0]
+            ]}";
+
+        var rule = JsonNode.Parse(targetingString);
+
+        var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            { "targetingKey", "user1" },
+            { "$flagd", new Dictionary<string, object> { { "flagKey", "flag1" } } }
+        }));
+
+        // Act
+        var result = JsonLogic.Apply(rule, data);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void EvaluateEmptyArgsReturnsNull()
+    {
+        // Arrange
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+
+        var targetingString = @"{""fractional"": []}";
+
+        var rule = JsonNode.Parse(targetingString);
+
+        var data = JsonNode.Parse(JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            { "targetingKey", "user1" },
+            { "$flagd", new Dictionary<string, object> { { "flagKey", "flag1" } } }
+        }));
+
+        // Act
+        var result = JsonLogic.Apply(rule, data);
+
+        // Assert
+        Assert.Null(result);
     }
 }

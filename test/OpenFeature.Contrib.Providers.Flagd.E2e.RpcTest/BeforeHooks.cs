@@ -25,5 +25,8 @@ public class BeforeHooks
         var featureTags = featureInfo.Tags;
         var tags = new HashSet<string>(scenarioTags.Concat(featureTags));
         Skip.If(!tags.Contains("rpc"), "Skipping scenario because it does not have required tag.");
+        Skip.If(tags.Contains("fractional-v1"), "Skipping legacy fractional bucketing test; v2 algorithm is implemented.");
+        Skip.If(tags.Contains("fractional-v2"), "Skipping fractional-v2 test; flagd server does not support v2 bucketing yet.");
+        Skip.If(tags.Contains("fractional-nested"), "Skipping fractional-nested test; flagd server does not support nested fractional yet.");
     }
 }
