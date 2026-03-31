@@ -103,7 +103,7 @@ internal sealed class FractionalEvaluator : IRule
                         return null;
                     }
 
-                    // clamp negative weights to 0
+                    // negative weights can be the result of rollout calculations, so we clamp to 0 rather than returning an error
                     weight = (int)Math.Max(0, weightDouble);
                 }
             }

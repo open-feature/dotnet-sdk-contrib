@@ -280,9 +280,9 @@ public class FractionalEvaluatorTest
         // Arrange
         RuleRegistry.AddRule("fractional", new FractionalEvaluator());
 
-        // "red" has weight -10 (clamped to 0), "blue" has weight 100
+        // "red" has weight -1000 (clamped to 0), "blue" has weight 1
         var targetingString = @"{""fractional"": [
-              [""red"", -10], [""blue"", 100]
+              [""red"", -1000], [""blue"", 1]
             ]}";
 
         var rule = JsonNode.Parse(targetingString);
