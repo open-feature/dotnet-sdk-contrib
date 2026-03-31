@@ -2,7 +2,9 @@
 components:
   # src/
   src/OpenFeature.Contrib.Providers.Flagd:
+    - askpt
     - bacherfl
+    - kylejuliandev
     - toddbaert
   src/OpenFeature.Providers.GOFeatureFlag:
     - thomaspoignant
@@ -13,6 +15,7 @@ components:
     - luizbon
     - adams85
   src/OpenFeature.Contrib.Providers.FeatureManagement:
+    - askpt
     - ericpattison
     - toddbaert
   src/OpenFeature.Contrib.Providers.Statsig:
@@ -22,11 +25,14 @@ components:
     - jeandreidc
     - markphelps
   src/OpenFeature.Providers.Ofrep:
+    - askpt
     - weyert
 
   # test/
   test/OpenFeature.Contrib.Providers.Flagd.Test:
+    - askpt
     - bacherfl
+    - kylejuliandev
     - toddbaert
   test/OpenFeature.Providers.GOFeatureFlag.Test:
     - thomaspoignant
@@ -37,6 +43,7 @@ components:
     - luizbon
     - adams85
   test/OpenFeature.Contrib.Providers.FeatureManagement.Test:
+    - askpt
     - ericpattison
     - toddbaert
   test/src/OpenFeature.Contrib.Providers.Statsig.Test:
@@ -46,6 +53,7 @@ components:
     - jeandreidc
     - markphelps
   test/OpenFeature.Providers.Ofrep.Test:
+    - askpt
     - weyert
 
 ignored-authors:
