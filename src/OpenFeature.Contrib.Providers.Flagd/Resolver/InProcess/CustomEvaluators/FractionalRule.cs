@@ -35,7 +35,7 @@ internal sealed class FractionalEvaluator : IRule
         var arg0 = JsonLogic.Apply(args[0], context);
 
         string propertyValue;
-        if (arg0 != null && arg0.GetValueKind() == JsonValueKind.String)
+        if (arg0?.GetValueKind() == JsonValueKind.String)
         {
             propertyValue = arg0.ToString();
             bucketStartIndex = 1;
