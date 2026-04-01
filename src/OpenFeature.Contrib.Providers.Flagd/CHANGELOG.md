@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.4.0...OpenFeature.Contrib.Providers.Flagd-v0.5.0) (2026-04-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* fractional bucketing improvements ([#622](https://github.com/open-feature/dotnet-sdk-contrib/issues/622))
+
+### ✨ New Features
+
+* fractional bucketing improvements ([#622](https://github.com/open-feature/dotnet-sdk-contrib/issues/622)) ([11e5d05](https://github.com/open-feature/dotnet-sdk-contrib/commit/11e5d05fbace70d506198c788ed5e5cd66ef36ff))
+
 ## [0.4.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.5...OpenFeature.Contrib.Providers.Flagd-v0.4.0) (2026-03-11)
 
 
