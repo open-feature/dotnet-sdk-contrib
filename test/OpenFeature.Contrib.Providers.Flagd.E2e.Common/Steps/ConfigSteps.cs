@@ -234,7 +234,7 @@ public class ConfigSteps
     [Given("an environment variable {string} with value {string}")]
     public void GivenAnEnvironmentVariableWithValue(string env, string value)
     {
-        Skip.If(_unsupportedEnvironmentVairables.Contains(env), "Environment variable is not supported");
+        Skip.If(_unsupportedEnvironmentVariables.Contains(env), "Environment variable is not supported");
 
         Assert.Contains(_environmentVariables, e => e == env); // Ensure only known env vars are set
 
