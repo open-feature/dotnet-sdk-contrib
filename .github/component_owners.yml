@@ -1,7 +1,7 @@
 # Keep all in alphabetical order
 components:
   # src/
-  src/OpenFeature.Contrib.Providers.Flagd:
+  src/OpenFeature.Providers.Flagd:
     - askpt
     - bacherfl
     - kylejuliandev
@@ -29,7 +29,7 @@ components:
     - weyert
 
   # test/
-  test/OpenFeature.Contrib.Providers.Flagd.Test:
+  test/OpenFeature.Providers.Flagd.Test:
     - askpt
     - bacherfl
     - kylejuliandev
