@@ -49,7 +49,7 @@ public class ConfigSteps
         "FLAGD_FATAL_STATUS_CODES"
     ];
 
-    private static readonly HashSet<string> _unsupportedEnvironmentVairables =
+    private static readonly HashSet<string> _unsupportedEnvironmentVariables =
     [
         "FLAGD_PROVIDER_ID"
     ];
