@@ -24,6 +24,12 @@ public class BeforeHooks
         var scenarioTags = scenarioInfo.Tags;
         var featureTags = featureInfo.Tags;
         var tags = new HashSet<string>(scenarioTags.Concat(featureTags));
+<<<<<<< add-flagd-config-e2e-tests
         Skip.If(!tags.Contains("rpc"), "Skipping scenario because it is not for the rpc resolver.");
+=======
+        Skip.If(!tags.Contains("rpc"), "Skipping scenario because it does not have required tag.");
+        Skip.If(tags.Contains("fractional-v1"), "Skipping legacy fractional bucketing test; v2 algorithm is implemented.");
+        Skip.If(tags.Contains("operator-errors"), "Skipping operator-errors test; flagd server does not yet fall back to default on operator errors.");
+>>>>>>> main
     }
 }

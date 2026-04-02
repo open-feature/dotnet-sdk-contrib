@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using OpenFeature.Contrib.Providers.Flagd.E2e.Common.Utils;
@@ -34,7 +35,7 @@ public class BeforeHooks
     }
 
     [BeforeScenario]
-    public void BeforeScenario()
+    public void BeforeScenario(ScenarioContext scenarioContext)
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: true)
@@ -42,5 +43,8 @@ public class BeforeHooks
             .Build();
 
         Skip.If(configuration["E2E"] != "true", "Skipping test as E2E tests are disabled, enable them by updating the appsettings.json.");
+
+        // Skip deprecated tests
+        Skip.If(scenarioContext.ScenarioInfo.Tags.Contains("deprecated"), "Skipping deprecated test scenario.");
     }
 }

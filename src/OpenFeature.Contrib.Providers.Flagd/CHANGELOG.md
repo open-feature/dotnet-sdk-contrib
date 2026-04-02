@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.5.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.4.0...OpenFeature.Contrib.Providers.Flagd-v0.5.0) (2026-04-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* fractional bucketing improvements ([#622](https://github.com/open-feature/dotnet-sdk-contrib/issues/622))
+
+### ✨ New Features
+
+* fractional bucketing improvements ([#622](https://github.com/open-feature/dotnet-sdk-contrib/issues/622)) ([11e5d05](https://github.com/open-feature/dotnet-sdk-contrib/commit/11e5d05fbace70d506198c788ed5e5cd66ef36ff))
+
+## [0.4.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.5...OpenFeature.Contrib.Providers.Flagd-v0.4.0) (2026-03-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* graceful fallback to code default when no default variant resolved ([#605](https://github.com/open-feature/dotnet-sdk-contrib/issues/605))
+
+### 🐛 Bug Fixes
+
+* **flagd:** Default to correct Port when only Resolver is set ([#585](https://github.com/open-feature/dotnet-sdk-contrib/issues/585)) ([8a1d97c](https://github.com/open-feature/dotnet-sdk-contrib/commit/8a1d97c817bca8575efd6f4a13dbc2d79c446b73))
+
+
+### ✨ New Features
+
+* Add support for Flagd-Selector header when syncing flags with InProcess resolver ([#604](https://github.com/open-feature/dotnet-sdk-contrib/issues/604)) ([dbf8327](https://github.com/open-feature/dotnet-sdk-contrib/commit/dbf8327a77a409b854e7cf5b6de20b29767e0277))
+* graceful fallback to code default when no default variant resolved ([#605](https://github.com/open-feature/dotnet-sdk-contrib/issues/605)) ([5bd57bd](https://github.com/open-feature/dotnet-sdk-contrib/commit/5bd57bd0eb8ac517ccd26ccec5c4aa3d86c44a73))
+
 ## [0.3.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.3.4...OpenFeature.Contrib.Providers.Flagd-v0.3.5) (2026-02-03)
 
 

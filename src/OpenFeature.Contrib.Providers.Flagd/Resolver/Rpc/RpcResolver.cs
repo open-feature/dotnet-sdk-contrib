@@ -10,7 +10,7 @@ using Grpc.Net.Client;
 using OpenFeature.Constant;
 using OpenFeature.Contrib.Providers.Flagd.Utils;
 using OpenFeature.Error;
-using OpenFeature.Flagd.Grpc.Evaluation;
+using OpenFeature.Flagd.Grpc.Evaluation.V2;
 using OpenFeature.Model;
 using ProtoValue = Google.Protobuf.WellKnownTypes.Value;
 using Value = OpenFeature.Model.Value;
@@ -87,9 +87,12 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
+            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
+            var value = string.IsNullOrEmpty(resolveBooleanResponse.Variant) && resolveBooleanResponse.Reason == Reason.Default ? defaultValue : resolveBooleanResponse.Value;
+
             return new ResolutionDetails<bool>(
                 flagKey: flagKey,
-                value: resolveBooleanResponse.Value,
+                value: value,
                 reason: resolveBooleanResponse.Reason,
                 variant: resolveBooleanResponse.Variant,
                 flagMetadata: BuildFlagMetadata(resolveBooleanResponse.Metadata)
@@ -107,9 +110,12 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
+            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
+            var value = string.IsNullOrEmpty(resolveStringResponse.Variant) && resolveStringResponse.Reason == Reason.Default ? defaultValue : resolveStringResponse.Value;
+
             return new ResolutionDetails<string>(
                 flagKey: flagKey,
-                value: resolveStringResponse.Value,
+                value: value,
                 reason: resolveStringResponse.Reason,
                 variant: resolveStringResponse.Variant,
                 flagMetadata: BuildFlagMetadata(resolveStringResponse.Metadata)
@@ -127,9 +133,12 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
+            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
+            var value = string.IsNullOrEmpty(resolveIntResponse.Variant) && resolveIntResponse.Reason == Reason.Default ? defaultValue : (int)resolveIntResponse.Value;
+
             return new ResolutionDetails<int>(
                 flagKey: flagKey,
-                value: (int)resolveIntResponse.Value,
+                value: value,
                 reason: resolveIntResponse.Reason,
                 variant: resolveIntResponse.Variant,
                 flagMetadata: BuildFlagMetadata(resolveIntResponse.Metadata)
@@ -147,9 +156,12 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
+            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
+            var value = string.IsNullOrEmpty(resolveDoubleResponse.Variant) && resolveDoubleResponse.Reason == Reason.Default ? defaultValue : resolveDoubleResponse.Value;
+
             return new ResolutionDetails<double>(
                 flagKey: flagKey,
-                value: resolveDoubleResponse.Value,
+                value: value,
                 reason: resolveDoubleResponse.Reason,
                 variant: resolveDoubleResponse.Variant,
                 flagMetadata: BuildFlagMetadata(resolveDoubleResponse.Metadata)
@@ -167,9 +179,12 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
+            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
+            var value = string.IsNullOrEmpty(resolveObjectResponse.Variant) && resolveObjectResponse.Reason == Reason.Default ? defaultValue : ConvertObjectToValue(resolveObjectResponse.Value);
+
             return new ResolutionDetails<Value>(
                 flagKey: flagKey,
-                value: ConvertObjectToValue(resolveObjectResponse.Value),
+                value: value,
                 reason: resolveObjectResponse.Reason,
                 variant: resolveObjectResponse.Variant,
                 flagMetadata: BuildFlagMetadata(resolveObjectResponse.Metadata)
