@@ -368,8 +368,8 @@ public class FlagdConfigBuilder
         }
     }
 
-    private static int TryGetEnvironmentVariableOrDefault(string enviromentVariable, int defaultPort)
+    private static int TryGetEnvironmentVariableOrDefault(string environmentVariable, int defaultPort)
     {
-        return int.TryParse(Environment.GetEnvironmentVariable(enviromentVariable), out var p) ? p : defaultPort;
+        return int.TryParse(Environment.GetEnvironmentVariable(environmentVariable), out var p) ? p : defaultPort;
     }
 }

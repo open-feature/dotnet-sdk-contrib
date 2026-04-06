@@ -241,8 +241,8 @@ public class UnitTestFlagdConfig
         finally
         {
             // Cleanup
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, null);
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, null);
         }
     }
 
@@ -265,7 +265,7 @@ public class UnitTestFlagdConfig
         finally
         {
             // Cleanup
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, null);
         }
     }
 
@@ -288,8 +288,8 @@ public class UnitTestFlagdConfig
         finally
         {
             // Cleanup
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, "");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, null);
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, null);
         }
     }
 }
