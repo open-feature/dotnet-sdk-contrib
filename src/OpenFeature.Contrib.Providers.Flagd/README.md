@@ -161,7 +161,7 @@ The URI of the flagd server to which the `flagd Provider` connects to can either
 | Option name                  | Environment variable name      | Type    | Default   | Values          |
 | ---------------------------- | ------------------------------ | ------- | --------- | --------------- |
 | host                         | FLAGD_HOST                     | string  | localhost |                 |
-| port                         | FLAGD_PORT                     | number  | 8013      |                 |
+| port                         | FLAGD_PORT (FLAGD_SYNC_PORT when resolver is in-process)   | number  | 8013 (8015 when resolver in in-process)      |                 |
 | tls                          | FLAGD_TLS                      | boolean | false     |                 |
 | tls certPath                 | FLAGD_SERVER_CERT_PATH         | string  |           |                 |
 | unix socket path             | FLAGD_SOCKET_PATH              | string  |           |                 |
