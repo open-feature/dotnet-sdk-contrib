@@ -38,10 +38,10 @@ If you prefer not to use the Dev Container, ensure you have the following instal
 
 ## Adding a project
 
-1. Create a new library project under `src/`: `dotnet new classlib -o src/OpenFeature.Contrib.MyComponent`
-2. Create a new test project under `test/`: `dotnet new xunit -o test/OpenFeature.Contrib.MyComponent.Test`
-3. Add the library project to the solution: `dotnet sln DotnetSdkContrib.slnx add src/OpenFeature.Contrib.MyComponent/OpenFeature.Contrib.MyComponent.csproj`
-4. Add the test project to the solution: `dotnet sln DotnetSdkContrib.slnx add test/OpenFeature.Contrib.MyComponent.Test/OpenFeature.Contrib.MyComponent.Test.csproj`
+1. Create a new library project under `src/`: `dotnet new classlib -o src/OpenFeature.MyComponent`
+2. Create a new test project under `test/`: `dotnet new xunit -o test/OpenFeature.MyComponent.Test`
+3. Add the library project to the solution: `dotnet sln DotnetSdkContrib.slnx add src/OpenFeature.MyComponent/OpenFeature.MyComponent.csproj`
+4. Add the test project to the solution: `dotnet sln DotnetSdkContrib.slnx add test/OpenFeature.MyComponent.Test/OpenFeature.MyComponent.Test.csproj`
 5. Add the desired properties to your library's `.csproj` file (see example below).
 6. Remove all content besides the root element from your test project's `.csproj` file (all settings will be inherited).
 7. Add the new library project to `release-please-config.json`.
@@ -54,7 +54,7 @@ Sample `.csproj` file:
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>OpenFeature.Contrib.MyComponent</PackageId>
+    <PackageId>OpenFeature.MyComponent</PackageId>
     <VersionNumber>0.0.1</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
@@ -98,7 +98,7 @@ Each E2E test project contains an `appsettings.json` file. To enable E2E tests, 
 
 You can also set the `E2E` environment variable to `true` if you prefer not to modify the `appsettings.json` file.
 
-An example E2E project are the Flagd Provider E2E tests, found [here](/test/OpenFeature.Contrib.Providers.Flagd.E2e.ProcessTest/appsettings.json).
+An example E2E project are the Flagd Provider E2E tests, found [here](/test/OpenFeature.Providers.Flagd.E2e.ProcessTest/appsettings.json).
 
 If you want to disable E2E tests, set `"E2E": "false"` or remove the setting.
 
