@@ -5,16 +5,11 @@
 
 ### ⚠ BREAKING CHANGES
 
-* remote "contrib" from namespaces and package names ([#625](https://github.com/open-feature/dotnet-sdk-contrib/issues/625))
-* rename namespace, add OpenFeature dependency and readmes.
-* rename namespace, add OpenFeature dep ([#18](https://github.com/open-feature/dotnet-sdk-contrib/issues/18))
+* remove "contrib" from namespaces and package names ([#625](https://github.com/open-feature/dotnet-sdk-contrib/issues/625))
 
 ### ✨ New Features
 
-* add scaffolding and publishing ([#13](https://github.com/open-feature/dotnet-sdk-contrib/issues/13)) ([d56e3fd](https://github.com/open-feature/dotnet-sdk-contrib/commit/d56e3fd09156dd548c4cb826512e319d28dfd961))
-* remote "contrib" from namespaces and package names ([#625](https://github.com/open-feature/dotnet-sdk-contrib/issues/625)) ([a8c97cb](https://github.com/open-feature/dotnet-sdk-contrib/commit/a8c97cbc90d2fea25dac6f2bbb53a47d92d65a30))
-* rename namespace, add OpenFeature dep ([#18](https://github.com/open-feature/dotnet-sdk-contrib/issues/18)) ([3ca3172](https://github.com/open-feature/dotnet-sdk-contrib/commit/3ca31722b83053d4edf2038889c78efa717a7cff))
-* rename namespace, add OpenFeature dependency and readmes. ([3ca3172](https://github.com/open-feature/dotnet-sdk-contrib/commit/3ca31722b83053d4edf2038889c78efa717a7cff))
+* remove "contrib" from namespaces and package names ([#625](https://github.com/open-feature/dotnet-sdk-contrib/issues/625)) ([a8c97cb](https://github.com/open-feature/dotnet-sdk-contrib/commit/a8c97cbc90d2fea25dac6f2bbb53a47d92d65a30))
 
 ## [0.5.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.4.0...OpenFeature.Contrib.Providers.Flagd-v0.5.0) (2026-04-01)
 
