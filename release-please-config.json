@@ -3,14 +3,14 @@
   "separate-pull-requests": true,
   "signoff": "OpenFeature Bot <109696520+openfeaturebot@users.noreply.github.com>",
   "packages": {
-    "src/OpenFeature.Contrib.Providers.Flagd": {
-      "package-name": "OpenFeature.Contrib.Providers.Flagd",
+    "src/OpenFeature.Providers.Flagd": {
+      "package-name": "OpenFeature.Providers.Flagd",
       "release-type": "simple",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
       "extra-files": [
-        "OpenFeature.Contrib.Providers.Flagd.csproj"
+        "OpenFeature.Providers.Flagd.csproj"
       ]
     },
     "src/OpenFeature.Providers.GOFeatureFlag": {
