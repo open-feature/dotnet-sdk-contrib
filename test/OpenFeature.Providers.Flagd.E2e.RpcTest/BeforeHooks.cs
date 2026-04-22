@@ -27,5 +27,9 @@ public class BeforeHooks
         Skip.If(!tags.Contains("rpc"), "Skipping scenario because it does not have required tag.");
         Skip.If(tags.Contains("fractional-v1"), "Skipping legacy fractional bucketing test; v2 algorithm is implemented.");
         Skip.If(tags.Contains("operator-errors"), "Skipping operator-errors test; flagd server does not yet fall back to default on operator errors.");
+        Skip.If(tags.Contains("semver-edge-cases"), "Skipping semver-edge-cases; flagd server not updated.");
+        Skip.If(tags.Contains("evaluator-refs-whitespace"), "Skipping evaluator-refs-whitespace; flagd server not updated.");
+        Skip.If(tags.Contains("non-existent-evaluator-ref"), "Skipping non-existent-evaluator-ref; flagd server not updated.");
+        Skip.If(tags.Contains("fractional-single-entry"), "Skipping fractional-single-entry; flagd server not updated.");
     }
 }

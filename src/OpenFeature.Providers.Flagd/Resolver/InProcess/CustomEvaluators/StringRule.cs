@@ -11,7 +11,7 @@ internal sealed class StartsWithRule : IRule
     {
         if (!StringRule.isValid(args, context, out string operandA, out string operandB))
         {
-            return false;
+            return null;
         }
         return Convert.ToString(operandA).StartsWith(Convert.ToString(operandB));
     }
@@ -23,7 +23,7 @@ internal sealed class EndsWithRule : IRule
     {
         if (!StringRule.isValid(args, context, out string operandA, out string operandB))
         {
-            return false;
+            return null;
         }
         return operandA.EndsWith(operandB);
     }

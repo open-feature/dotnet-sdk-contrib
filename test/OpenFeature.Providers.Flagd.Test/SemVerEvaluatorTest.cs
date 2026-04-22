@@ -301,7 +301,7 @@ public class SemVerEvaluatorTest
 
         // Act & Assert
         var result = JsonLogic.Apply(rule, data);
-        Assert.False(result.GetValue<bool>());
+        Assert.Null(result);
     }
 
     [Fact]
@@ -325,6 +325,6 @@ public class SemVerEvaluatorTest
 
         // Act & Assert
         var result = JsonLogic.Apply(rule, data);
-        Assert.False(result.GetValue<bool>());
+        Assert.Null(result);
     }
 }
