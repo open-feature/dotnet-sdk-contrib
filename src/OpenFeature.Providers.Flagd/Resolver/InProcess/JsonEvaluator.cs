@@ -83,7 +83,7 @@ internal class JsonEvaluator
             {
                 var val = parsed.Evaluators[key];
                 var escapedKey = Regex.Escape(key);
-                var evaluatorRegex = new Regex("{\"\\$ref\"\\s*:\\s*\"" + escapedKey + "\"}");
+                var evaluatorRegex = new Regex("{\"\\$ref\"\\s*:\\s*\"" + escapedKey + "\"}", RegexOptions.Compiled);
                 var serializedVal = JsonSerializer.Serialize(val);
                 transformed = evaluatorRegex.Replace(transformed, new MatchEvaluator(_ => serializedVal));
             }

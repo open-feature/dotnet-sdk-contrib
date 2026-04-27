@@ -42,7 +42,7 @@ internal sealed class FractionalEvaluator : IRule
         }
         else
         {
-            if (string.IsNullOrEmpty(flagdProperties.TargetingKey))
+            if (string.IsNullOrWhiteSpace(flagdProperties.TargetingKey))
             {
                 return null;
             }

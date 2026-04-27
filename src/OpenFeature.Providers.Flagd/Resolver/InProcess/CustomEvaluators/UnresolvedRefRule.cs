@@ -11,9 +11,11 @@ namespace OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 /// </summary>
 internal sealed class UnresolvedRefRule : IRule
 {
+    private const string UnknownEvaluator = "unknown";
+
     public JsonNode Apply(JsonNode args, EvaluationContext context)
     {
-        var evaluatorName = args?.ToString() ?? "unknown";
+        var evaluatorName = args?.ToString() ?? UnknownEvaluator;
         throw new InvalidOperationException(
             $"Unresolved $ref: evaluator '{evaluatorName}' was not found.");
     }
