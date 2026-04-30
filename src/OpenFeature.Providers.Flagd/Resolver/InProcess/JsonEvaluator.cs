@@ -67,6 +67,7 @@ internal class JsonEvaluator
         RuleRegistry.AddRule("ends_with", new EndsWithRule());
         RuleRegistry.AddRule("sem_ver", new SemVerRule());
         RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+        RuleRegistry.AddRule("$ref", new UnresolvedRefRule());
     }
 
     internal FlagSyncData Parse(string flagConfigurations)
@@ -78,12 +79,14 @@ internal class JsonEvaluator
         // replace evaluators
         if (parsed.Evaluators != null && parsed.Evaluators.Count > 0)
         {
-            parsed.Evaluators.Keys.ToList().ForEach(key =>
+            foreach (var key in parsed.Evaluators.Keys)
             {
                 var val = parsed.Evaluators[key];
-                var evaluatorRegex = new Regex("{\"\\$ref\":\"" + key + "\"}");
-                transformed = evaluatorRegex.Replace(transformed, Convert.ToString(val));
-            });
+                var escapedKey = Regex.Escape(key);
+                var evaluatorRegex = new Regex("{\"\\$ref\"\\s*:\\s*\"" + escapedKey + "\"}", RegexOptions.Compiled);
+                var serializedVal = JsonSerializer.Serialize(val);
+                transformed = evaluatorRegex.Replace(transformed, new MatchEvaluator(_ => serializedVal));
+            }
         }
 
         var data = JsonSerializer.Deserialize<FlagSyncData>(transformed);

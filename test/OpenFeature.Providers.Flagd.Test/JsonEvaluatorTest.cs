@@ -459,6 +459,42 @@ public class UnitTestJsonEvaluator
     }
 
     [Fact]
+    public void TestJsonEvaluatorStringValuedEvaluatorRef()
+    {
+        // verifies that string-valued $evaluators are serialized with quotes,
+        // producing valid JSON after $ref substitution
+        var flagConfig = //lang=json
+            """
+            {
+              "$evaluators": {
+                "colorEval": "red"
+              },
+              "flags": {
+                "string-evaluator-flag": {
+                  "state": "ENABLED",
+                  "variants": {
+                    "red": "#CC0000",
+                    "blue": "#0000CC"
+                  },
+                  "defaultVariant": "blue",
+                  "targeting": {
+                    "if": [true, { "$ref": "colorEval" }]
+                  }
+                }
+              }
+            }
+            """;
+
+        _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, flagConfig);
+
+        var result = _jsonEvaluator.ResolveStringValueAsync("string-evaluator-flag", "");
+
+        Assert.Equal("#CC0000", result.Value);
+        Assert.Equal("red", result.Variant);
+        Assert.Equal(Reason.TargetingMatch, result.Reason);
+    }
+
+    [Fact]
     public void TestJsonEvaluatorFlagWithMissingVariantReturnsGeneralError()
     {
         // Arrange
