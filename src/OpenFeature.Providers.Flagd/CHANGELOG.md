@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.6.0...OpenFeature.Providers.Flagd-v0.6.1) (2026-04-30)
+
+
+### 🐛 Bug Fixes
+
+* various custom operator conformance fixes ([#635](https://github.com/open-feature/dotnet-sdk-contrib/issues/635)) ([5db207a](https://github.com/open-feature/dotnet-sdk-contrib/commit/5db207a02279519f65eda0ea567dae33354fd23b))
+
 ## [0.6.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.5.0...OpenFeature.Providers.Flagd-v0.6.0) (2026-04-10)
 
 
