@@ -57,10 +57,10 @@ var providerConfig = new FlagsmithProviderConfiguration();
 // Flagsmith client configuration
 var flagsmithConfig = new FlagsmithConfiguration
 {
-    ApiUrl = "https://edge.api.flagsmith.com/api/v1/",
+    ApiUri = new Uri("https://edge.api.flagsmith.com/api/v1/"),
     EnvironmentKey = "",
-    EnableClientSideEvaluation = false,
-    EnvironmentRefreshIntervalSeconds = 60,
+    EnableLocalEvaluation = false,
+    EnvironmentRefreshInterval = TimeSpan.FromSeconds(60),
     EnableAnalytics = false,
     Retries = 1,
 };
