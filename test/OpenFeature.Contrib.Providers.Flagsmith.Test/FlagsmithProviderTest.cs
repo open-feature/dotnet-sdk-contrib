@@ -16,10 +16,10 @@ public class UnitTestFlagsmithProvider
 {
     private static FlagsmithConfiguration GetDefaultFlagsmithConfiguration() => new()
     {
-        ApiUrl = "https://edge.api.flagsmith.com/api/v1/",
+        ApiUri = new Uri("https://edge.api.flagsmith.com/api/v1/"),
         EnvironmentKey = "some-key",
-        EnableClientSideEvaluation = false,
-        EnvironmentRefreshIntervalSeconds = 60,
+        EnableLocalEvaluation = false,
+        EnvironmentRefreshInterval = TimeSpan.FromSeconds(60),
         EnableAnalytics = false,
         Retries = 1
     };
@@ -48,12 +48,13 @@ public class UnitTestFlagsmithProvider
         var config = GetDefaultFlagsmithConfiguration();
         var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
         using var httpClient = new HttpClient();
+
         // Act
         var flagsmithProvider = new FlagsmithProvider(providerConfig, config, httpClient);
 
-
         // Assert
         Assert.NotNull(flagsmithProvider._flagsmithClient);
+        Assert.Same(httpClient, config.HttpClient);
     }
 
     [Fact]

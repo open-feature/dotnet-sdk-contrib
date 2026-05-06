@@ -33,8 +33,8 @@ public class FlagsmithProvider : FeatureProvider
     /// Creates new instance of <see cref="FlagsmithProvider"/>
     /// </summary>
     /// <param name="providerOptions">Open feature provider options. You can just use <see cref="FlagsmithProviderConfiguration"/> class </param>
-    /// <param name="flagsmithOptions">Flagsmith client options. You can just use <see cref="FlagsmithConfiguration"/> class</param>
-    public FlagsmithProvider(IFlagsmithProviderConfiguration providerOptions, IFlagsmithConfiguration flagsmithOptions)
+    /// <param name="flagsmithOptions">Flagsmith client options.</param>
+    public FlagsmithProvider(IFlagsmithProviderConfiguration providerOptions, FlagsmithConfiguration flagsmithOptions)
     {
         Configuration = providerOptions;
         _flagsmithClient = new FlagsmithClient(flagsmithOptions);
@@ -43,13 +43,14 @@ public class FlagsmithProvider : FeatureProvider
     /// <summary>
     /// Creates new instance of <see cref="FlagsmithProvider"/>
     /// </summary>
-    /// <param name="flagsmithOptions">Flagsmith client options. You can just use <see cref="FlagsmithConfiguration"/> class</param>
+    /// <param name="flagsmithOptions">Flagsmith client options.</param>
     /// <param name="providerOptions">Open feature provider options. You can just use <see cref="FlagsmithProviderConfiguration"/> class </param>
     /// <param name="httpClient">Http client that will be used for flagsmith requests. You also can use it to register <see cref="FeatureProvider"/> as Typed HttpClient with <see cref="FeatureProvider"> as abstraction</see></param>
-    public FlagsmithProvider(IFlagsmithProviderConfiguration providerOptions, IFlagsmithConfiguration flagsmithOptions, HttpClient httpClient)
+    public FlagsmithProvider(IFlagsmithProviderConfiguration providerOptions, FlagsmithConfiguration flagsmithOptions, HttpClient httpClient)
     {
         Configuration = providerOptions;
-        _flagsmithClient = new FlagsmithClient(flagsmithOptions, httpClient);
+        flagsmithOptions.HttpClient = httpClient;
+        _flagsmithClient = new FlagsmithClient(flagsmithOptions);
     }
 
 
