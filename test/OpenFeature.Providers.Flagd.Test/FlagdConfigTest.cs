@@ -266,6 +266,7 @@ public class UnitTestFlagdConfig
         {
             // Cleanup
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, null);
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, null);
         }
     }
 
