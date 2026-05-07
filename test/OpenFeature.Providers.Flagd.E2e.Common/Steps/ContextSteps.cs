@@ -27,6 +27,10 @@ public class ContextSteps
                 this._state.EvaluationContextBuilder.Set(key, new Value(long.Parse(value)));
                 break;
 
+            case "Float":
+                this._state.EvaluationContextBuilder.Set(key, new Value(double.Parse(value)));
+                break;
+
             default:
                 break;
         }

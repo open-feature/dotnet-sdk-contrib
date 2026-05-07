@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.6.0...OpenFeature.Providers.Flagd-v0.6.1) (2026-04-30)
+
+
+### 🐛 Bug Fixes
+
+* various custom operator conformance fixes ([#635](https://github.com/open-feature/dotnet-sdk-contrib/issues/635)) ([5db207a](https://github.com/open-feature/dotnet-sdk-contrib/commit/5db207a02279519f65eda0ea567dae33354fd23b))
+
+## [0.6.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.5.0...OpenFeature.Providers.Flagd-v0.6.0) (2026-04-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove "contrib" from namespaces and package names ([#625](https://github.com/open-feature/dotnet-sdk-contrib/issues/625))
+
+### ✨ New Features
+
+* remove "contrib" from namespaces and package names ([#625](https://github.com/open-feature/dotnet-sdk-contrib/issues/625)) ([a8c97cb](https://github.com/open-feature/dotnet-sdk-contrib/commit/a8c97cbc90d2fea25dac6f2bbb53a47d92d65a30))
+
 ## [0.5.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagd-v0.4.0...OpenFeature.Contrib.Providers.Flagd-v0.5.0) (2026-04-01)
 
 
