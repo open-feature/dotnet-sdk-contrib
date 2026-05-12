@@ -23,6 +23,8 @@ internal static class FlagdProviderOptionsExtensions
             .WithMaxEventStreamRetries(options.MaxEventStreamRetries)
             .WithResolverType(options.ResolverType)
             .WithSourceSelector(options.SourceSelector)
+            .WithSourceFilePath(options.SourceFilePath)
+            .WithUseHashFileChangeDetection(options.UseHashFileChangeDetection)
             .Build();
 
         return config;

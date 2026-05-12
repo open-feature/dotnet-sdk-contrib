@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
@@ -1009,5 +1010,67 @@ public class UnitTestFlagdProvider
 
         Assert.Equal(0, flagdProvider._enrichedContext.Count);
         return Task.CompletedTask;
+    }
+
+    [Fact]
+    public void TestGetProviderWithFileResolverType()
+    {
+        Utils.CleanEnvVars();
+        var tempFile = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(tempFile, Utils.validFlagConfig);
+
+            var config = FlagdConfig.Builder()
+                .WithResolverType(ResolverType.FILE)
+                .WithSourceFilePath(tempFile)
+                .Build();
+
+            var flagdProvider = new FlagdProvider(config);
+
+            var resolver = flagdProvider.GetResolver();
+            Assert.NotNull(resolver);
+            Assert.IsType<FileBasedResolver>(resolver);
+        }
+        finally
+        {
+            File.Delete(tempFile);
+        }
+    }
+
+    [Fact]
+    public void TestGetProviderWithFileResolverType_MissingSourceFilePath_Throws()
+    {
+        Utils.CleanEnvVars();
+        var config = FlagdConfig.Builder()
+            .WithResolverType(ResolverType.FILE)
+            .Build();
+
+        Assert.Throws<ArgumentException>(() => new FlagdProvider(config));
+    }
+
+    [Fact]
+    public void TestGetProviderWithFileResolverTypeFromEnvVar()
+    {
+        Utils.CleanEnvVars();
+        var tempFile = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(tempFile, Utils.validFlagConfig);
+
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "file");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceFilePath, tempFile);
+
+            var flagdProvider = new FlagdProvider();
+
+            var resolver = flagdProvider.GetResolver();
+            Assert.NotNull(resolver);
+            Assert.IsType<FileBasedResolver>(resolver);
+        }
+        finally
+        {
+            Utils.CleanEnvVars();
+            File.Delete(tempFile);
+        }
     }
 }

@@ -20,7 +20,13 @@ public enum ResolverType
     ///     locally for in-process evaluation.
     ///     Evaluations are preformed in-process.
     /// </summary>
-    IN_PROCESS
+    IN_PROCESS,
+    /// <summary>
+    ///     This is the file-based resolving type, where flags are loaded from a local JSON file
+    ///     and evaluated in-process without creating any gRPC streams.
+    ///     Evaluations are preformed in-process.
+    /// </summary>
+    FILE
 }
 
 /// <summary>
@@ -38,9 +44,13 @@ public class FlagdConfig
     internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
     internal const string EnvVarResolverType = "FLAGD_RESOLVER";
     internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
+    internal const string EnvVarSourceFilePath = "FLAGD_SOURCE_FILE_PATH";
+    internal const string EnvVarHashFileChange = "FLAGD_HASH_FILE_CHANGE";
     internal const string FlagdSelectorHeaderName = "flagd-selector";
     internal static int CacheSizeDefault = 10;
     internal static string InProcessResolverValue = "in-process";
+    internal static string RpcResolverValue = "rpc";
+    internal static string FileResolverValue = "file";
     internal static string LruCacheValue = "lru";
 
     /// <summary>
@@ -173,6 +183,28 @@ public class FlagdConfig
         set => _logger = value;
     }
 
+    /// <summary>
+    ///     Path to the flag definition JSON file. Used when ResolverType is FILE.
+    /// </summary>
+    public string SourceFilePath
+    {
+        get => _sourceFilePath;
+        set => _sourceFilePath = value;
+    }
+
+    /// <summary>
+    ///     When true, the file watcher uses content hashing (MurmurHash) to detect changes.
+    ///     When false, the file watcher relies on file system events from the OS.
+    ///     File system events can be unreliable in certain containerized environments or mount types;
+    ///     hashing always works reliably but has a higher I/O cost.
+    ///     Defaults to false. Used when ResolverType is FILE.
+    /// </summary>
+    public bool UseHashFileChangeDetection
+    {
+        get => _useHashFileChangeDetection;
+        set => _useHashFileChangeDetection = value;
+    }
+
     internal bool UseCertificate => _cert.Length > 0;
 
     private string _host;
@@ -186,6 +218,8 @@ public class FlagdConfig
     private string _sourceSelector;
     private ILogger _logger;
     private ResolverType _resolverType;
+    private string _sourceFilePath;
+    private bool _useHashFileChangeDetection;
 
     internal FlagdConfig()
     {
@@ -205,8 +239,9 @@ public class FlagdConfig
             _maxEventStreamRetries = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries), out var maxEventStreamRetries) ? maxEventStreamRetries : 3;
         }
 
-        var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
-        _resolverType = string.Equals(resolverTypeStr, InProcessResolverValue, StringComparison.OrdinalIgnoreCase) ? ResolverType.IN_PROCESS : ResolverType.RPC;
+        _resolverType = GetResolverTypeFromEnvironment();
+        _sourceFilePath = GetSourceFilePathFromEnvironment();
+        _useHashFileChangeDetection = GetUseHashFileChangeDetectionFromEnvironment();
     }
 
     internal Uri GetUri()
@@ -228,6 +263,35 @@ public class FlagdConfig
             uri = new Uri(protocol + "://" + _host + ":" + _port);
         }
         return uri;
+    }
+
+    private static ResolverType GetResolverTypeFromEnvironment()
+    {
+        var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType);
+
+        if (string.IsNullOrWhiteSpace(resolverTypeStr))
+        {
+            return ResolverType.RPC;
+        }
+
+        if (string.Equals(resolverTypeStr, InProcessResolverValue, StringComparison.OrdinalIgnoreCase))
+            return ResolverType.IN_PROCESS;
+        if (string.Equals(resolverTypeStr, FileResolverValue, StringComparison.OrdinalIgnoreCase))
+            return ResolverType.FILE;
+
+        return ResolverType.RPC;
+    }
+
+    private static string GetSourceFilePathFromEnvironment()
+    {
+        var sourceFilePathStr = Environment.GetEnvironmentVariable(EnvVarSourceFilePath);
+        return string.IsNullOrWhiteSpace(sourceFilePathStr) ? string.Empty : sourceFilePathStr;
+    }
+
+    private static bool GetUseHashFileChangeDetectionFromEnvironment()
+    {
+        var value = Environment.GetEnvironmentVariable(EnvVarHashFileChange);
+        return !string.IsNullOrEmpty(value) && bool.TryParse(value, out var parsed) && parsed;
     }
 }
 
@@ -329,6 +393,26 @@ public class FlagdConfigBuilder
     }
 
     /// <summary>
+    ///     Path to the flag definition JSON file for file-based in-memory resolution.
+    /// </summary>
+    public FlagdConfigBuilder WithSourceFilePath(string sourceFilePath)
+    {
+        _config.SourceFilePath = sourceFilePath;
+        return this;
+    }
+
+    /// <summary>
+    ///     Enable or disable content hashing for file change detection.
+    ///     When true, the file watcher uses content hashing (MurmurHash) to detect changes.
+    ///     When false, the file watcher relies on file system events from the OS.
+    /// </summary>
+    public FlagdConfigBuilder WithUseHashFileChangeDetection(bool useHash)
+    {
+        _config.UseHashFileChangeDetection = useHash;
+        return this;
+    }
+
+    /// <summary>
     ///     Provide a <see cref="ILogger"/> to be used by the Flagd provider.
     /// </summary>
     /// <param name="logger"></param>
@@ -351,13 +435,18 @@ public class FlagdConfigBuilder
 
     private void PreBuild()
     {
+        if (this._config.ResolverType == ResolverType.FILE)
+        {
+            return;
+        }
+
         if (this._config.Port == 0)
         {
             var defaultPortForResolver = this._config.ResolverType switch
             {
                 ResolverType.RPC => 8013,
                 ResolverType.IN_PROCESS => 8015,
-                _ => throw new NotImplementedException("ResolverType does not use Ports.")
+                _ => 8013
             };
 
             this._config.Port = defaultPortForResolver;
