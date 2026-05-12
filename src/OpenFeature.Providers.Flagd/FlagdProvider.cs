@@ -34,7 +34,9 @@ public sealed class FlagdProvider : FeatureProvider
     ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
     ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
     ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
-    ///     FLAGD_RESOLVER                 - The type of resolver (in-process or rpc) to be used for the provider
+    ///     FLAGD_RESOLVER                 - The type of resolver (in-process, file or rpc) to be used for the provider
+    ///     FLAGD_SOURCE_FILE_PATH         - The path to the flag definition JSON file (used when FLAGD_RESOLVER="file")
+    ///     FLAGD_HASH_FILE_CHANGE         - Use content hashing for file change detection (default="false", used when FLAGD_RESOLVER="file")
     /// </summary>
     public FlagdProvider() : this(FlagdConfig.Builder().Build())
     {
@@ -47,7 +49,9 @@ public sealed class FlagdProvider : FeatureProvider
     ///     FLAGD_CACHE                    - Enable or disable the cache (default="false")
     ///     FLAGD_MAX_CACHE_SIZE           - The maximum size of the cache (default="10")
     ///     FLAGD_MAX_EVENT_STREAM_RETRIES - The maximum amount of retries for establishing the EventStream
-    ///     FLAGD_RESOLVER            - The type of resolver (in-process or rpc) to be used for the provider
+    ///     FLAGD_RESOLVER                 - The type of resolver (in-process, file or rpc) to be used for the provider
+    ///     FLAGD_SOURCE_FILE_PATH         - The path to the flag definition JSON file (used when FLAGD_RESOLVER="file")
+    ///     FLAGD_HASH_FILE_CHANGE         - Use content hashing for file change detection (default="false", used when FLAGD_RESOLVER="file")
     ///     <param name="url">The URL of the flagd server</param>
     ///     <exception cref="ArgumentNullException">if no url is provided.</exception>
     /// </summary>
@@ -73,6 +77,19 @@ public sealed class FlagdProvider : FeatureProvider
         {
             var jsonSchemaValidator = new JsonSchemaValidator(_config.Logger);
             _resolver = new InProcessResolver(_config, jsonSchemaValidator);
+        }
+        else if (_config.ResolverType == ResolverType.FILE)
+        {
+            if (string.IsNullOrWhiteSpace(_config.SourceFilePath))
+                throw new ArgumentException("SourceFilePath must be set when using ResolverType.FILE");
+
+            var jsonSchemaValidator = new JsonSchemaValidator(_config.Logger);
+            _resolver = new FileBasedResolver(
+                _config.Logger,
+                _config.SourceFilePath,
+                jsonSchemaValidator,
+                _config.SourceSelector,
+                _config.UseHashFileChangeDetection);
         }
         else
         {
@@ -220,7 +237,6 @@ public sealed class FlagdProvider : FeatureProvider
     /// <inheritdoc/>
     public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
     {
-
         return await _resolver.ResolveIntegerValueAsync(flagKey, defaultValue, context).ConfigureAwait(false);
     }
 

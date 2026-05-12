@@ -176,4 +176,36 @@ public class FlagdProviderOptionsExtensionsTests
         // Assert
         Assert.Equal("my-source", config.SourceSelector);
     }
+
+    [Fact]
+    public void Given_SourceFilePath_When_ToFlagdConfig_Then_ReturnsCorrectConfig()
+    {
+        // Arrange
+        var options = new FlagdProviderOptions
+        {
+            SourceFilePath = "/flags/config.json"
+        };
+
+        // Act
+        var config = options.ToFlagdConfig();
+
+        // Assert
+        Assert.Equal("/flags/config.json", config.SourceFilePath);
+    }
+
+    [Fact]
+    public void Given_UseHashFileChangeDetection_When_ToFlagdConfig_Then_ReturnsCorrectConfig()
+    {
+        // Arrange
+        var options = new FlagdProviderOptions
+        {
+            UseHashFileChangeDetection = true
+        };
+
+        // Act
+        var config = options.ToFlagdConfig();
+
+        // Assert
+        Assert.True(config.UseHashFileChangeDetection);
+    }
 }

@@ -445,5 +445,7 @@ public class Utils
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarMaxCacheSize, "");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvCertPart, "");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceFilePath, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHashFileChange, "");
     }
 }

@@ -221,4 +221,85 @@ public class UnitTestFlagdConfig
         Assert.True(config.UseCertificate);
         Assert.Equal(logger, config.Logger);
     }
+
+    [Fact]
+    public void TestFlagdConfigResolverTypeFile()
+    {
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "file");
+
+        var config = FlagdConfig.Builder().Build();
+
+        Assert.Equal(ResolverType.FILE, config.ResolverType);
+    }
+
+    [Fact]
+    public void TestFlagdConfigSourceFilePathFromEnvVar()
+    {
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceFilePath, "/path/to/flags.json");
+
+        var config = FlagdConfig.Builder().Build();
+
+        Assert.Equal("/path/to/flags.json", config.SourceFilePath);
+    }
+
+    [Fact]
+    public void TestFlagdConfigSourceFilePathDefaultEmpty()
+    {
+        var config = FlagdConfig.Builder().Build();
+
+        Assert.Equal(string.Empty, config.SourceFilePath);
+    }
+
+    [Fact]
+    public void TestFlagdConfigUseHashFileChangeDetectionFromEnvVar()
+    {
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHashFileChange, "true");
+
+        var config = FlagdConfig.Builder().Build();
+
+        Assert.True(config.UseHashFileChangeDetection);
+    }
+
+    [Fact]
+    public void TestFlagdConfigUseHashFileChangeDetectionDefaultFalse()
+    {
+        var config = FlagdConfig.Builder().Build();
+
+        Assert.False(config.UseHashFileChangeDetection);
+    }
+
+    [Fact]
+    public void TestFlagdConfigBuilderWithSourceFilePath()
+    {
+        var config = new FlagdConfigBuilder()
+            .WithResolverType(ResolverType.FILE)
+            .WithSourceFilePath("/my/flags.json")
+            .Build();
+
+        Assert.Equal(ResolverType.FILE, config.ResolverType);
+        Assert.Equal("/my/flags.json", config.SourceFilePath);
+    }
+
+    [Fact]
+    public void TestFlagdConfigBuilderWithUseHashFileChangeDetection()
+    {
+        var config = new FlagdConfigBuilder()
+            .WithResolverType(ResolverType.FILE)
+            .WithSourceFilePath("/my/flags.json")
+            .WithUseHashFileChangeDetection(true)
+            .Build();
+
+        Assert.True(config.UseHashFileChangeDetection);
+    }
+
+    [Fact]
+    public void WithResolverType_File_DoesNotSetDefaultPort()
+    {
+        var config = FlagdConfig.Builder()
+            .WithResolverType(ResolverType.FILE)
+            .Build();
+
+        Assert.Equal(ResolverType.FILE, config.ResolverType);
+        Assert.Equal(0, config.Port);
+    }
 }

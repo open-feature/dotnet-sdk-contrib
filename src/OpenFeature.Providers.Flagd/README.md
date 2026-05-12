@@ -156,19 +156,21 @@ namespace OpenFeatureTestApp
 
 The URI of the flagd server to which the `flagd Provider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
 
-| Option name                  | Environment variable name      | Type    | Default   | Values          |
-| ---------------------------- | ------------------------------ | ------- | --------- | --------------- |
-| host                         | FLAGD_HOST                     | string  | localhost |                 |
-| port                         | FLAGD_PORT                     | number  | 8013      |                 |
-| tls                          | FLAGD_TLS                      | boolean | false     |                 |
-| tls certPath                 | FLAGD_SERVER_CERT_PATH         | string  |           |                 |
-| unix socket path             | FLAGD_SOCKET_PATH              | string  |           |                 |
-| Caching                      | FLAGD_CACHE                    | string  |           | lru             |
-| Maximum cache size           | FLAGD_MAX_CACHE_SIZE           | number  | 10        |                 |
-| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |                 |
-| Resolver type                | FLAGD_RESOLVER                 | string  | rpc       | rpc, in-process |
-| Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                 |
-| Logger                       | n/a                            | n/a     |           |                 |
+| Option name                  | Environment variable name      | Type    | Default   | Values                  |
+| ---------------------------- | ------------------------------ | ------- | --------- | ----------------------- |
+| host                         | FLAGD_HOST                     | string  | localhost |                         |
+| port                         | FLAGD_PORT                     | number  | 8013      |                         |
+| tls                          | FLAGD_TLS                      | boolean | false     |                         |
+| tls certPath                 | FLAGD_SERVER_CERT_PATH         | string  |           |                         |
+| unix socket path             | FLAGD_SOCKET_PATH              | string  |           |                         |
+| Caching                      | FLAGD_CACHE                    | string  |           | lru                     |
+| Maximum cache size           | FLAGD_MAX_CACHE_SIZE           | number  | 10        |                         |
+| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |                         |
+| Resolver type                | FLAGD_RESOLVER                 | string  | rpc       | rpc, in-process, file   |
+| Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                         |
+| Source file path              | FLAGD_SOURCE_FILE_PATH         | string  |           |                         |
+| Hash file change detection   | FLAGD_HASH_FILE_CHANGE         | boolean | false     |                         |
+| Logger                       | n/a                            | n/a     |           |                         |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
 
@@ -245,3 +247,56 @@ var flagdConfig = new FlagdConfigBuilder()
     .WithLogger(logger)
     .Build();
 ```
+
+## File resolver type
+
+The flagd provider supports a **file-based resolver mode**, which reads flag definitions from a local JSON file.
+This is useful for local development, testing, or air-gapped environments where flags are distributed as files
+(e.g., via ConfigMaps, volume mounts, or file sync).
+
+The file resolver is activated by setting the `FLAGD_RESOLVER` environment variable to `file` and providing the
+path to the flag definition file via `FLAGD_SOURCE_FILE_PATH`:
+
+```shell
+export FLAGD_RESOLVER=file
+export FLAGD_SOURCE_FILE_PATH=/etc/flags/my-flags.json
+```
+
+Or by configuring the provider programmatically:
+
+```csharp
+using OpenFeature.Providers.Flagd;
+
+var flagdConfig = new FlagdConfigBuilder()
+    .WithResolverType(ResolverType.FILE)
+    .WithSourceFilePath("/etc/flags/my-flags.json")
+    .Build();
+
+var flagdProvider = new FlagdProvider(flagdConfig);
+OpenFeature.Api.Instance.SetProvider(flagdProvider);
+```
+
+The file resolver watches for changes to the flag file and automatically reloads the configuration when changes are
+detected. By default, it uses the operating system's `FileSystemWatcher` for change notification.
+
+### Hash-based file change detection
+
+In some environments (e.g., NFS mounts, certain container runtimes, or network file systems), native file system
+events may not be reliable. For these cases, you can enable content-based change detection using MurmurHash:
+
+```csharp
+var flagdConfig = new FlagdConfigBuilder()
+    .WithResolverType(ResolverType.FILE)
+    .WithSourceFilePath("/etc/flags/my-flags.json")
+    .WithUseHashFileChangeDetection(true)
+    .Build();
+```
+
+Or via environment variable:
+
+```shell
+export FLAGD_HASH_FILE_CHANGE=true
+```
+
+When enabled, the provider polls the file at a regular interval and compares content hashes rather than relying on
+OS-level file change notifications. This is more reliable but has a slightly higher I/O cost due to periodic file reads.

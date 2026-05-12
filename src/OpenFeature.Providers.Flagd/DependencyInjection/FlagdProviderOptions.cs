@@ -61,4 +61,21 @@ public record FlagdProviderOptions
     /// Source selector for the in-process provider. Defaults to empty string.
     /// </summary>
     public string SourceSelector { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Path to the flag definition JSON file for file-based in-memory resolution.
+    /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
+    /// Defaults to empty string.
+    /// </summary>
+    public string SourceFilePath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// When true, the file watcher uses content hashing (MurmurHash) to detect changes.
+    /// When false, the file watcher relies on file system events from the OS.
+    /// File system events can be unreliable in certain containerized environments or mount types;
+    /// hashing always works reliably but has a higher I/O cost.
+    /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
+    /// Defaults to false.
+    /// </summary>
+    public bool UseHashFileChangeDetection { get; set; } = false;
 }
