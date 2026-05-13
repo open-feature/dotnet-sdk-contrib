@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.2.1...OpenFeature.Contrib.Providers.Flagsmith-v0.3.0) (2026-05-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump Flagsmith SDK to 8.x/9.x, drop IFlagsmithConfiguration ([#644](https://github.com/open-feature/dotnet-sdk-contrib/issues/644))
+
+### ✨ New Features
+
+* bump Flagsmith SDK to 8.x/9.x, drop IFlagsmithConfiguration ([#644](https://github.com/open-feature/dotnet-sdk-contrib/issues/644)) ([24959d5](https://github.com/open-feature/dotnet-sdk-contrib/commit/24959d532086e319cca2e80da628e54d06712e71))
+
 ## [0.2.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Flagsmith-v0.2.0...OpenFeature.Contrib.Providers.Flagsmith-v0.2.1) (2025-04-23)
 
 
