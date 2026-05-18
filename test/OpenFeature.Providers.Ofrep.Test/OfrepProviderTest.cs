@@ -85,7 +85,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<bool>(flagKey, expectedValue) { Variant = "enabled" };
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
+            .EvaluateBooleanFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -112,7 +112,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<string>(flagKey, expectedValue) { Variant = "variant1" };
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
+            .EvaluateStringFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -139,7 +139,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<int>(flagKey, expectedValue) { Variant = "high" };
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
+            .EvaluateIntegerFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -166,7 +166,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<double>(flagKey, expectedValue) { Variant = "pi" };
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
+            .EvaluateDoubleFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -212,7 +212,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElement) { Variant = "object1" };
 
         this._mockClient
-            .EvaluateFlag<JsonElement?>(flagKey, null, context, Arg.Any<CancellationToken>())
+            .EvaluateStructureFlag(flagKey, null, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -254,7 +254,7 @@ public class OfrepProviderTest : IDisposable
         };
 
         this._mockClient
-            .EvaluateFlag<JsonElement?>(flagKey, null, context, Arg.Any<CancellationToken>())
+            .EvaluateStructureFlag(flagKey, null, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -289,7 +289,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, null) { Variant = "null" };
 
         this._mockClient
-            .EvaluateFlag<JsonElement?>(flagKey, null, context, Arg.Any<CancellationToken>())
+            .EvaluateStructureFlag(flagKey, null, context, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -319,7 +319,7 @@ public class OfrepProviderTest : IDisposable
         };
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
+            .EvaluateBooleanFlag(flagKey, defaultValue, context, Arg.Any<CancellationToken>())
             .Returns(errorResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -354,7 +354,7 @@ public class OfrepProviderTest : IDisposable
         };
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, null, Arg.Any<CancellationToken>())
+            .EvaluateStringFlag(flagKey, defaultValue, null, Arg.Any<CancellationToken>())
             .Returns(errorResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -392,7 +392,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, cancellationToken)
+            .EvaluateBooleanFlag(flagKey, defaultValue, context, cancellationToken)
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -401,7 +401,8 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveBooleanValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
+        await this._mockClient.Received(1)
+            .EvaluateBooleanFlag(flagKey, defaultValue, context, cancellationToken);
     }
 
     [Fact]
@@ -416,7 +417,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<string>(flagKey, "value");
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, cancellationToken)
+            .EvaluateStringFlag(flagKey, defaultValue, context, cancellationToken)
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -425,7 +426,8 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveStringValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
+        await this._mockClient.Received(1)
+            .EvaluateStringFlag(flagKey, defaultValue, context, cancellationToken);
     }
 
     [Fact]
@@ -440,7 +442,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<int>(flagKey, 42);
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, cancellationToken)
+            .EvaluateIntegerFlag(flagKey, defaultValue, context, cancellationToken)
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -449,7 +451,8 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveIntegerValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
+        await this._mockClient.Received(1)
+            .EvaluateIntegerFlag(flagKey, defaultValue, context, cancellationToken);
     }
 
     [Fact]
@@ -464,7 +467,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<double>(flagKey, 3.14);
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, context, cancellationToken)
+            .EvaluateDoubleFlag(flagKey, defaultValue, context, cancellationToken)
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -473,7 +476,8 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveDoubleValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
+        await this._mockClient.Received(1)
+            .EvaluateDoubleFlag(flagKey, defaultValue, context, cancellationToken);
     }
 
     [Fact]
@@ -489,7 +493,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElement);
 
         this._mockClient
-            .EvaluateFlag<JsonElement?>(flagKey, null, context, cancellationToken)
+            .EvaluateStructureFlag(flagKey, null, context, cancellationToken)
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -498,7 +502,7 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveStructureValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag<JsonElement?>(flagKey, null, context, cancellationToken);
+        await this._mockClient.Received(1).EvaluateStructureFlag(flagKey, null, context, cancellationToken);
     }
 
     [Fact]
@@ -511,7 +515,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<bool>(flagKey, true);
 
         this._mockClient
-            .EvaluateFlag(flagKey, defaultValue, null, Arg.Any<CancellationToken>())
+            .EvaluateBooleanFlag(flagKey, defaultValue, null, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();
@@ -536,7 +540,7 @@ public class OfrepProviderTest : IDisposable
         var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElement);
 
         this._mockClient
-            .EvaluateFlag<JsonElement?>(flagKey, null, null, Arg.Any<CancellationToken>())
+            .EvaluateStructureFlag(flagKey, null, null, Arg.Any<CancellationToken>())
             .Returns(expectedResponse);
 
         this._provider = this.CreateProviderWithMockClient();

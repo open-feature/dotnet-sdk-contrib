@@ -635,10 +635,10 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "object-flag";
-        var defaultValue = new { test = "default" };
-        var expectedValue = new { name = "test", value = 123, enabled = true };
+        var defaultValue = new SampleObject { Name = "default", Value = 0, Enabled = false };
+        var expectedValue = new SampleObject { Name = "test", Value = 123, Enabled = true };
 
-        var expectedResponse = new OfrepResponse<object>(flagKey, expectedValue) { Reason = "DISABLED" };
+        var expectedResponse = new OfrepResponse<SampleObject>(flagKey, expectedValue) { Reason = "DISABLED" };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
@@ -651,6 +651,9 @@ public class OfrepClientTest : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.Value);
+        Assert.Equal(expectedValue.Name, result.Value.Name);
+        Assert.Equal(expectedValue.Value, result.Value.Value);
+        Assert.Equal(expectedValue.Enabled, result.Value.Enabled);
         Assert.Equal("DISABLED", result.Reason);
     }
 
@@ -702,6 +705,15 @@ public class OfrepClientTest : IDisposable
         Assert.Equal("provider_not_ready", result.ErrorCode);
         Assert.Equal("ERROR", result.Reason);
         Assert.Equal("Unauthorized access to flag evaluation.", result.ErrorMessage);
+    }
+
+    private sealed class SampleObject
+    {
+        public string Name { get; init; } = string.Empty;
+
+        public int Value { get; init; }
+
+        public bool Enabled { get; init; }
     }
 
     [Fact]

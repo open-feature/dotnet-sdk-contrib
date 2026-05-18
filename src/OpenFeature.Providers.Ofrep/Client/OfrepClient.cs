@@ -1,16 +1,17 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Text;
 #if NETFRAMEWORK
 using System.Net.Http;
 #endif
-using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OpenFeature.Constant;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Extensions;
 using OpenFeature.Providers.Ofrep.Models;
+using OpenFeature.Providers.Ofrep.Serialization;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client.Constants;
 
@@ -26,8 +27,7 @@ internal sealed partial class OfrepClient : IOfrepClient
     private readonly ILogger _logger;
     private readonly TimeProvider _timeProvider;
     private bool _disposed;
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions LegacyJsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -106,7 +106,55 @@ internal sealed partial class OfrepClient : IOfrepClient
     }
 
     /// <inheritdoc/>
-    public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, T defaultValue,
+    public Task<OfrepResponse<bool>> EvaluateBooleanFlag(string flagKey, bool defaultValue,
+        EvaluationContext? context, CancellationToken cancellationToken = default) =>
+        this.EvaluateFlagInternal(flagKey, defaultValue, context, cancellationToken);
+
+    /// <inheritdoc/>
+    public Task<OfrepResponse<string>> EvaluateStringFlag(string flagKey, string defaultValue,
+        EvaluationContext? context, CancellationToken cancellationToken = default) =>
+        this.EvaluateFlagInternal(flagKey, defaultValue, context, cancellationToken);
+
+    /// <inheritdoc/>
+    public Task<OfrepResponse<int>> EvaluateIntegerFlag(string flagKey, int defaultValue,
+        EvaluationContext? context, CancellationToken cancellationToken = default) =>
+        this.EvaluateFlagInternal(flagKey, defaultValue, context, cancellationToken);
+
+    /// <inheritdoc/>
+    public Task<OfrepResponse<double>> EvaluateDoubleFlag(string flagKey, double defaultValue,
+        EvaluationContext? context, CancellationToken cancellationToken = default) =>
+        this.EvaluateFlagInternal(flagKey, defaultValue, context, cancellationToken);
+
+    /// <inheritdoc/>
+    public Task<OfrepResponse<JsonElement?>> EvaluateStructureFlag(string flagKey, JsonElement? defaultValue,
+        EvaluationContext? context, CancellationToken cancellationToken = default) =>
+        this.EvaluateFlagInternal(flagKey, defaultValue, context, cancellationToken);
+
+    /// <summary>
+    /// Evaluates a flag value using the OFREP API. This generic method is provided for backward compatibility.
+    /// For Native AOT scenarios, use the typed methods (EvaluateBooleanFlag, EvaluateStringFlag, etc.) instead.
+    /// </summary>
+    /// <typeparam name="T">The type of the flag value.</typeparam>
+    /// <param name="flagKey">The key of the flag to evaluate.</param>
+    /// <param name="defaultValue">The default value to return if evaluation fails.</param>
+    /// <param name="context">The evaluation context.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>The evaluated flag response.</returns>
+    /// <remarks>
+    /// This method delegates to the AOT-safe typed implementation for OFREP-supported value types.
+    /// Other generic types use the legacy reflection-based JSON path and are not AOT-safe.
+    /// </remarks>
+    [RequiresDynamicCode(
+        "Generic flag evaluation for arbitrary types requires runtime JSON serialization metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    [RequiresUnreferencedCode(
+        "Generic flag evaluation for arbitrary types may require trimmed type metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    public Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, T defaultValue,
+        EvaluationContext? context, CancellationToken cancellationToken = default) =>
+        IsAotSafeEvaluationType<T>()
+            ? this.EvaluateFlagInternal(flagKey, defaultValue, context, cancellationToken)
+            : this.EvaluateFlagLegacyAsync(flagKey, defaultValue, context, cancellationToken);
+
+    internal async Task<OfrepResponse<T>> EvaluateFlagInternal<T>(string flagKey, T defaultValue,
         EvaluationContext? context, CancellationToken cancellationToken = default)
     {
 #if NET8_0_OR_GREATER
@@ -143,6 +191,81 @@ internal sealed partial class OfrepClient : IOfrepClient
                     .ConfigureAwait(false),
                 HttpStatusCode.BadRequest => await this
                     .ProcessBadRequestResponse(flagKey, defaultValue, response, cancellationToken)
+                    .ConfigureAwait(false),
+                HttpStatusCode.NotFound => ProcessNotFoundResponse(flagKey, defaultValue),
+                HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => ProcessAuthenticationErrorResponse(flagKey,
+                    defaultValue),
+#if NET8_0_OR_GREATER
+                HttpStatusCode.TooManyRequests => this.ProcessTooManyRequestsResponse(flagKey, defaultValue, response),
+#else
+                (HttpStatusCode)429 => this.ProcessTooManyRequestsResponse(flagKey, defaultValue, response),
+#endif
+                _ => ProcessNotMappedErrorResponse(flagKey, defaultValue)
+            };
+        }
+        catch (HttpRequestException ex)
+        {
+            this.LogHttpRequestFailed(flagKey, ex.Message, ex);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
+        }
+        catch (JsonException ex)
+        {
+            this.LogJsonParseError(flagKey, ex.Message, ex);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
+        }
+        catch (OperationCanceledException ex) when (ex.CancellationToken == cancellationToken)
+        {
+            this.LogRequestCancelled(flagKey, ex);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
+        }
+        catch (OperationCanceledException ex)
+        {
+            this.LogRequestTimeout(flagKey, ex.Message, ex);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
+        }
+        catch (Exception ex)
+        {
+            this.LogOperationError(flagKey, ex.Message, ex);
+            return HandleEvaluationError(flagKey, ex, defaultValue);
+        }
+    }
+
+    [RequiresDynamicCode(
+        "Generic flag evaluation for arbitrary types requires runtime JSON serialization metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    [RequiresUnreferencedCode(
+        "Generic flag evaluation for arbitrary types may require trimmed type metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    private async Task<OfrepResponse<T>> EvaluateFlagLegacyAsync<T>(string flagKey, T defaultValue,
+        EvaluationContext? context, CancellationToken cancellationToken = default)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentException.ThrowIfNullOrWhiteSpace(flagKey);
+#else
+        if (string.IsNullOrWhiteSpace(flagKey))
+        {
+            throw new ArgumentException("Flag key cannot be null or whitespace", nameof(flagKey));
+        }
+#endif
+
+        if (this._retryAfterDate.HasValue && this._retryAfterDate.Value > this._timeProvider.GetUtcNow())
+        {
+            return new OfrepResponse<T>(flagKey, defaultValue)
+            {
+                ErrorCode = ErrorCodes.GeneralError,
+                Reason = Reason.Error,
+                ErrorMessage = "Rate limit exceeded."
+            };
+        }
+
+        try
+        {
+            var request = CreateEvaluationRequest(flagKey, context);
+            var response = await this._httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+            return response.StatusCode switch
+            {
+                HttpStatusCode.OK => await this.ProcessOkResponseLegacyAsync(flagKey, defaultValue, response, cancellationToken)
+                    .ConfigureAwait(false),
+                HttpStatusCode.BadRequest => await this.ProcessBadRequestResponseLegacyAsync(flagKey, defaultValue, response, cancellationToken)
                     .ConfigureAwait(false),
                 HttpStatusCode.NotFound => ProcessNotFoundResponse(flagKey, defaultValue),
                 HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => ProcessAuthenticationErrorResponse(flagKey,
@@ -240,9 +363,8 @@ internal sealed partial class OfrepClient : IOfrepClient
         HttpResponseMessage response,
         CancellationToken cancellationToken = default)
     {
-        var evaluationResponse = await response.Content
-            .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
-        if (evaluationResponse == null)
+        var rawResponse = await ReadRawResponseAsync(response, cancellationToken).ConfigureAwait(false);
+        if (rawResponse == null)
         {
             this.LogNullResponse(flagKey);
             return new OfrepResponse<T>(flagKey, defaultValue)
@@ -252,14 +374,36 @@ internal sealed partial class OfrepClient : IOfrepClient
             };
         }
 
-        return evaluationResponse;
+        T resolvedValue = defaultValue;
+        var hasValue = rawResponse.Value.ValueKind != JsonValueKind.Undefined &&
+                       rawResponse.Value.ValueKind != JsonValueKind.Null;
+
+        if (hasValue)
+        {
+            try
+            {
+                resolvedValue = DeserializeResponseValue(rawResponse.Value, defaultValue);
+            }
+            catch (JsonException ex)
+            {
+                this.LogJsonParseError(flagKey, ex.Message, ex);
+            }
+        }
+
+        return new OfrepResponse<T>(rawResponse.Key ?? flagKey, resolvedValue)
+        {
+            ErrorCode = rawResponse.ErrorCode,
+            ErrorMessage = rawResponse.ErrorMessage,
+            Reason = rawResponse.Reason,
+            Variant = rawResponse.Variant,
+            Metadata = rawResponse.Metadata
+        };
     }
 
     private async Task<OfrepResponse<T>> ProcessOkResponseAsync<T>(string flagKey, T defaultValue,
         HttpResponseMessage response, CancellationToken cancellationToken = default)
     {
-        var rawResponse = await response.Content
-            .ReadFromJsonAsync<OfrepResponse<JsonElement>>(JsonOptions, cancellationToken).ConfigureAwait(false);
+        var rawResponse = await ReadRawResponseAsync(response, cancellationToken).ConfigureAwait(false);
         if (rawResponse == null)
         {
             this.LogNullResponse(flagKey);
@@ -278,7 +422,7 @@ internal sealed partial class OfrepClient : IOfrepClient
         {
             try
             {
-                resolvedValue = rawResponse.Value.Deserialize<T>(JsonOptions) ?? defaultValue;
+                resolvedValue = DeserializeResponseValue(rawResponse.Value, defaultValue);
             }
             catch (JsonException ex)
             {
@@ -306,6 +450,109 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
 
         return evaluationResponse;
+    }
+
+    [RequiresDynamicCode(
+        "Generic flag evaluation for arbitrary types requires runtime JSON serialization metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    [RequiresUnreferencedCode(
+        "Generic flag evaluation for arbitrary types may require trimmed type metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    private async Task<OfrepResponse<T>> ProcessBadRequestResponseLegacyAsync<T>(string flagKey, T defaultValue,
+        HttpResponseMessage response,
+        CancellationToken cancellationToken = default)
+    {
+        var rawResponse = await ReadRawResponseAsync(response, cancellationToken).ConfigureAwait(false);
+        if (rawResponse == null)
+        {
+            this.LogNullResponse(flagKey);
+            return new OfrepResponse<T>(flagKey, defaultValue)
+            {
+                ErrorCode = ErrorCodes.ParseError,
+                ErrorMessage = "Received null or empty response from server."
+            };
+        }
+
+        T resolvedValue = defaultValue;
+        var hasValue = rawResponse.Value.ValueKind != JsonValueKind.Undefined &&
+                       rawResponse.Value.ValueKind != JsonValueKind.Null;
+
+        if (hasValue)
+        {
+            resolvedValue = DeserializeLegacyResponseValue(rawResponse.Value, defaultValue);
+        }
+
+        return new OfrepResponse<T>(rawResponse.Key ?? flagKey, resolvedValue)
+        {
+            ErrorCode = rawResponse.ErrorCode,
+            ErrorMessage = rawResponse.ErrorMessage,
+            Reason = rawResponse.Reason,
+            Variant = rawResponse.Variant,
+            Metadata = rawResponse.Metadata
+        };
+    }
+
+    [RequiresDynamicCode(
+        "Generic flag evaluation for arbitrary types requires runtime JSON serialization metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    [RequiresUnreferencedCode(
+        "Generic flag evaluation for arbitrary types may require trimmed type metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    private async Task<OfrepResponse<T>> ProcessOkResponseLegacyAsync<T>(string flagKey, T defaultValue,
+        HttpResponseMessage response, CancellationToken cancellationToken = default)
+    {
+        var rawResponse = await ReadRawResponseAsync(response, cancellationToken).ConfigureAwait(false);
+        if (rawResponse == null)
+        {
+            this.LogNullResponse(flagKey);
+            return new OfrepResponse<T>(flagKey, defaultValue)
+            {
+                ErrorCode = ErrorCodes.ParseError,
+                ErrorMessage = "Received null or empty response from server."
+            };
+        }
+
+        var hasValue = rawResponse.Value.ValueKind != JsonValueKind.Undefined &&
+                       rawResponse.Value.ValueKind != JsonValueKind.Null;
+
+        T resolvedValue;
+        if (hasValue)
+        {
+            try
+            {
+                resolvedValue = DeserializeLegacyResponseValue(rawResponse.Value, defaultValue);
+            }
+            catch (JsonException ex)
+            {
+                this.LogJsonParseError(flagKey, ex.Message, ex);
+                return HandleEvaluationError(flagKey, ex, defaultValue);
+            }
+        }
+        else
+        {
+            resolvedValue = defaultValue;
+        }
+
+        var evaluationResponse = new OfrepResponse<T>(rawResponse.Key ?? flagKey, resolvedValue)
+        {
+            ErrorCode = rawResponse.ErrorCode,
+            ErrorMessage = rawResponse.ErrorMessage,
+            Reason = rawResponse.Reason,
+            Variant = rawResponse.Variant,
+            Metadata = rawResponse.Metadata
+        };
+
+        if (!hasValue)
+        {
+            evaluationResponse.Reason ??= Reason.Default;
+        }
+
+        return evaluationResponse;
+    }
+
+    private static async Task<OfrepResponse<JsonElement>?> ReadRawResponseAsync(HttpResponseMessage response,
+        CancellationToken cancellationToken)
+    {
+        using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        return await JsonSerializer.DeserializeAsync(responseStream,
+                OfrepJsonSerializerContext.Default.OfrepResponseJsonElement, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -339,14 +586,73 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
 
+        var requestBody = JsonSerializer.Serialize(new OfrepRequest { Context = evaluationContextDict },
+            OfrepJsonSerializerContext.Default.OfrepRequest);
+
         var request = new HttpRequestMessage()
         {
             Method = HttpMethod.Post,
             RequestUri = new Uri(path, UriKind.Relative),
-            Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
+            Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
         };
 
         return request;
+    }
+
+    private static T DeserializeResponseValue<T>(JsonElement valueElement, T defaultValue)
+    {
+        if (typeof(T) == typeof(bool))
+        {
+            return (T)(object)valueElement.GetBoolean();
+        }
+
+        if (typeof(T) == typeof(string))
+        {
+            var stringValue = valueElement.GetString();
+            return stringValue is null ? defaultValue : (T)(object)stringValue;
+        }
+
+        if (typeof(T) == typeof(int))
+        {
+            return (T)(object)valueElement.GetInt32();
+        }
+
+        if (typeof(T) == typeof(double))
+        {
+            return (T)(object)valueElement.GetDouble();
+        }
+
+        if (typeof(T) == typeof(JsonElement))
+        {
+            return (T)(object)valueElement;
+        }
+
+        if (typeof(T) == typeof(JsonElement?))
+        {
+            JsonElement? nullableElement = valueElement;
+            return (T)(object)nullableElement;
+        }
+
+        return defaultValue;
+    }
+
+    [RequiresDynamicCode(
+        "Generic flag evaluation for arbitrary types requires runtime JSON serialization metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    [RequiresUnreferencedCode(
+        "Generic flag evaluation for arbitrary types may require trimmed type metadata. Use the typed evaluation methods for Native AOT scenarios.")]
+    private static T DeserializeLegacyResponseValue<T>(JsonElement valueElement, T defaultValue)
+    {
+        return JsonSerializer.Deserialize<T>(valueElement.GetRawText(), LegacyJsonOptions) ?? defaultValue;
+    }
+
+    private static bool IsAotSafeEvaluationType<T>()
+    {
+        return typeof(T) == typeof(bool) ||
+               typeof(T) == typeof(string) ||
+               typeof(T) == typeof(int) ||
+               typeof(T) == typeof(double) ||
+               typeof(T) == typeof(JsonElement) ||
+               typeof(T) == typeof(JsonElement?);
     }
 
     /// <summary>

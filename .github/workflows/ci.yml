@@ -61,6 +61,10 @@ jobs:
       - name: Test
         run: dotnet test --no-build --logger GitHubActions
 
+      - name: OFREP AOT compatibility check
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet publish test/OpenFeature.Providers.Ofrep.AotCompatibility/OpenFeature.Providers.Ofrep.AotCompatibility.csproj -c Release -r linux-x64 --self-contained true -p:TreatWarningsAsErrors=true
+
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 10
