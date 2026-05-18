@@ -5,6 +5,7 @@ using System.Text;
 using System.Net.Http;
 #endif
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OpenFeature.Constant;
