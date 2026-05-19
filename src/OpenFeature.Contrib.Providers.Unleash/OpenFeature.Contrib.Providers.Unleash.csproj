@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Unleash.Client" Version="[6.0,7.0)" />
+    <PackageReference Include="Unleash.Client" Version="[6.2.1,7.0)" />
   </ItemGroup>
 
   <ItemGroup>

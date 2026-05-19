@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Error;
@@ -25,22 +24,8 @@ public class UnleashProviderTest : IAsyncLifetime
             SendMetricsInterval = null
         };
         settings.UseBootstrapFileProvider(bootstrapPath);
-        ApplyFileSystemWorkaround(settings);
 
         this._provider = new UnleashProvider(settings);
-    }
-
-    /// <summary>
-    /// Workaround for https://github.com/Unleash/unleash-dotnet-sdk/issues/141
-    /// The internal FileSystem property is not initialized before ToggleBootstrapFileProvider.Read() is called.
-    /// Fix: https://github.com/Unleash/unleash-dotnet-sdk/pull/347
-    /// </summary>
-    internal static void ApplyFileSystemWorkaround(UnleashSettings settings)
-    {
-        var fileSystemProp = typeof(UnleashSettings).GetProperty("FileSystem", BindingFlags.NonPublic | BindingFlags.Instance);
-        var fileSystemType = typeof(UnleashSettings).Assembly.GetType("Unleash.Internal.FileSystem");
-        var fileSystem = Activator.CreateInstance(fileSystemType, System.Text.Encoding.UTF8);
-        fileSystemProp.SetValue(settings, fileSystem);
     }
 
     public Task InitializeAsync() => this._provider.InitializeAsync(EvaluationContext.Empty);

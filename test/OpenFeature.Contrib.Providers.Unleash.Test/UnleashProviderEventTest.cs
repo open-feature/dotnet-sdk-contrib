@@ -23,7 +23,6 @@ public class UnleashProviderEventTest : IAsyncLifetime
             SendMetricsInterval = null
         };
         settings.UseBootstrapFileProvider(bootstrapPath);
-        UnleashProviderTest.ApplyFileSystemWorkaround(settings);
 
         this._provider = new UnleashProvider(settings);
     }
