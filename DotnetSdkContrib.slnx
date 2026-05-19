@@ -3,6 +3,7 @@
     <Project Path="src/OpenFeature.Contrib.Providers.ConfigCat/OpenFeature.Contrib.Providers.ConfigCat.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.EnvVar/OpenFeature.Contrib.Providers.EnvVar.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.FeatureManagement/OpenFeature.Contrib.Providers.FeatureManagement.csproj" />
+    <Project Path="src/OpenFeature.Contrib.Providers.Unleash/OpenFeature.Contrib.Providers.Unleash.csproj" />
     <Project Path="src/OpenFeature.Providers.Flagd/OpenFeature.Providers.Flagd.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.Flagsmith/OpenFeature.Contrib.Providers.Flagsmith.csproj" />
     <Project Path="src/OpenFeature.Contrib.Providers.Flipt/OpenFeature.Contrib.Providers.Flipt.csproj" />
@@ -14,6 +15,7 @@
     <Project Path="test/OpenFeature.Contrib.Providers.ConfigCat.Test/OpenFeature.Contrib.Providers.ConfigCat.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.EnvVar.Test/OpenFeature.Contrib.Providers.EnvVar.Test.csproj" />
     <Project Path="test/OpenFeature.Contrib.Providers.FeatureManagement.Test/OpenFeature.Contrib.Providers.FeatureManagement.Test.csproj" />
+    <Project Path="test/OpenFeature.Contrib.Providers.Unleash.Test/OpenFeature.Contrib.Providers.Unleash.Test.csproj" />
     <Project Path="test/OpenFeature.Providers.Flagd.E2e.Common/OpenFeature.Providers.Flagd.E2e.Common.csproj" />
     <Project Path="test/OpenFeature.Providers.Flagd.E2e.ProcessTest/OpenFeature.Providers.Flagd.E2e.ProcessTest.csproj" />
     <Project Path="test/OpenFeature.Providers.Flagd.E2e.RpcTest/OpenFeature.Providers.Flagd.E2e.RpcTest.csproj" />
