@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>OpenFeature.Contrib.Providers.Unleash</PackageId>
+    <PackageId>OpenFeature.Providers.Unleash</PackageId>
     <VersionNumber>0.1.0</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
@@ -9,6 +9,7 @@
     <Description>Unleash provider for OpenFeature .NET SDK</Description>
     <Authors>OpenFeature Authors</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>OpenFeature.Providers.Unleash</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

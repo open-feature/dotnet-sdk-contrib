@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OpenFeature.Model;
 using Unleash;
 
-namespace OpenFeature.Contrib.Providers.Unleash;
+namespace OpenFeature.Providers.Unleash;
 
 /// <summary>
 /// Transforms an OpenFeature EvaluationContext into an Unleash UnleashContext.

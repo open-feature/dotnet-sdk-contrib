@@ -6,7 +6,7 @@ using OpenFeature.Model;
 using Unleash;
 using Xunit;
 
-namespace OpenFeature.Contrib.Providers.Unleash.Test;
+namespace OpenFeature.Providers.Unleash.Test;
 
 public class UnleashProviderEventTest : IAsyncLifetime
 {

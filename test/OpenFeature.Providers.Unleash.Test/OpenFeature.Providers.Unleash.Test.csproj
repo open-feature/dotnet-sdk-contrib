@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Unleash\OpenFeature.Contrib.Providers.Unleash.csproj" />
+    <ProjectReference Include="..\..\src\OpenFeature.Providers.Unleash\OpenFeature.Providers.Unleash.csproj" />
   </ItemGroup>
 
   <ItemGroup>

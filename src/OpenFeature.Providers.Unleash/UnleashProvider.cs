@@ -9,7 +9,7 @@ using OpenFeature.Model;
 using Unleash;
 using Unleash.Internal;
 
-namespace OpenFeature.Contrib.Providers.Unleash;
+namespace OpenFeature.Providers.Unleash;
 
 /// <summary>
 /// UnleashProvider is the OpenFeature .NET provider implementation for the Unleash feature flag system.

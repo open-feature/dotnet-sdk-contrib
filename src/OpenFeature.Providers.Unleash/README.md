@@ -16,42 +16,42 @@ The first thing we will do is install the **OpenFeature SDK** and the **Unleash 
 ### .NET Cli
 
 ```shell
-dotnet add package OpenFeature.Contrib.Providers.Unleash
+dotnet add package OpenFeature.Providers.Unleash
 ```
 
 ### Package Manager
 
 ```shell
-NuGet\Install-Package OpenFeature.Contrib.Providers.Unleash
+NuGet\Install-Package OpenFeature.Providers.Unleash
 ```
 
 ### Package Reference
 
 ```xml
-<PackageReference Include="OpenFeature.Contrib.Providers.Unleash" />
+<PackageReference Include="OpenFeature.Providers.Unleash" />
 ```
 
 ### Packet cli
 
 ```shell
-paket add OpenFeature.Contrib.Providers.Unleash
+paket add OpenFeature.Providers.Unleash
 ```
 
 ### Cake
 
 ```shell
-// Install OpenFeature.Contrib.Providers.Unleash as a Cake Addin
-#addin nuget:?package=OpenFeature.Contrib.Providers.Unleash
+// Install OpenFeature.Providers.Unleash as a Cake Addin
+#addin nuget:?package=OpenFeature.Providers.Unleash
 
-// Install OpenFeature.Contrib.Providers.Unleash as a Cake Tool
-#tool nuget:?package=OpenFeature.Contrib.Providers.Unleash
+// Install OpenFeature.Providers.Unleash as a Cake Tool
+#tool nuget:?package=OpenFeature.Providers.Unleash
 ```
 
 ## Using the Unleash Provider with the OpenFeature SDK
 
 ```csharp
 using OpenFeature;
-using OpenFeature.Contrib.Providers.Unleash;
+using OpenFeature.Providers.Unleash;
 using Unleash;
 
 var settings = new UnleashSettings
