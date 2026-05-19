@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -104,7 +105,7 @@ public class UnleashProvider : FeatureProvider
         }
 
         var value = resolution.Value.PayloadValue ?? defaultValue;
-        return Task.FromResult(new ResolutionDetails<string>(flagKey, value, variant: resolution.Value.VariantName));
+        return Task.FromResult(new ResolutionDetails<string>(flagKey, value, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata()));
     }
 
     /// <inheritdoc />
@@ -120,7 +121,7 @@ public class UnleashProvider : FeatureProvider
 
         if (int.TryParse(resolution.Value.PayloadValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
         {
-            return Task.FromResult(new ResolutionDetails<int>(flagKey, parsed, variant: resolution.Value.VariantName));
+            return Task.FromResult(new ResolutionDetails<int>(flagKey, parsed, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata()));
         }
 
         throw new TypeMismatchException($"Cannot parse variant payload '{resolution.Value.PayloadValue}' as integer for flag '{flagKey}'.");
@@ -139,7 +140,7 @@ public class UnleashProvider : FeatureProvider
 
         if (double.TryParse(resolution.Value.PayloadValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
         {
-            return Task.FromResult(new ResolutionDetails<double>(flagKey, parsed, variant: resolution.Value.VariantName));
+            return Task.FromResult(new ResolutionDetails<double>(flagKey, parsed, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata()));
         }
 
         throw new TypeMismatchException($"Cannot parse variant payload '{resolution.Value.PayloadValue}' as double for flag '{flagKey}'.");
@@ -160,7 +161,7 @@ public class UnleashProvider : FeatureProvider
             ? new Value(resolution.Value.PayloadValue)
             : defaultValue;
 
-        return Task.FromResult(new ResolutionDetails<Value>(flagKey, value, variant: resolution.Value.VariantName));
+        return Task.FromResult(new ResolutionDetails<Value>(flagKey, value, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata()));
     }
 
     /// <inheritdoc />
@@ -180,18 +181,33 @@ public class UnleashProvider : FeatureProvider
             return null;
         }
 
-        return new VariantResolution(variant.Name, variant.Payload?.Value);
+        return new VariantResolution(variant.Name, variant.Payload?.Value, variant.Payload?.Type);
     }
 
     private readonly struct VariantResolution
     {
         public string VariantName { get; }
         public string PayloadValue { get; }
+        public string PayloadType { get; }
 
-        public VariantResolution(string variantName, string payloadValue)
+        public VariantResolution(string variantName, string payloadValue, string payloadType)
         {
             this.VariantName = variantName;
             this.PayloadValue = payloadValue;
+            this.PayloadType = payloadType;
+        }
+
+        public ImmutableMetadata GetFlagMetadata()
+        {
+            if (PayloadType == null)
+            {
+                return null;
+            }
+
+            return new ImmutableMetadata(new Dictionary<string, object>
+            {
+                { "payload-type", PayloadType }
+            });
         }
     }
 }

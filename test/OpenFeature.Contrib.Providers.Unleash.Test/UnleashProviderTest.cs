@@ -242,4 +242,22 @@ public class UnleashProviderTest : IAsyncLifetime
 
         Assert.True(result.Value);
     }
+
+    [Fact]
+    public async Task ResolveStringValue_WithVariant_ReturnsPayloadTypeMetadata()
+    {
+        var result = await this._provider.ResolveStringValueAsync("string-flag", "default");
+
+        Assert.NotNull(result.FlagMetadata);
+        Assert.Equal("string", result.FlagMetadata.GetString("payload-type"));
+    }
+
+    [Fact]
+    public async Task ResolveIntegerValue_WithVariant_ReturnsPayloadTypeMetadata()
+    {
+        var result = await this._provider.ResolveIntegerValueAsync("integer-flag", 0);
+
+        Assert.NotNull(result.FlagMetadata);
+        Assert.Equal("number", result.FlagMetadata.GetString("payload-type"));
+    }
 }

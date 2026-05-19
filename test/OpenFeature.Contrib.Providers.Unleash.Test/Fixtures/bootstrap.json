@@ -54,8 +54,8 @@
         {
           "name": "variantInt",
           "weight": 1000,
-          "payload": {
-            "type": "string",
+           "payload": {
+            "type": "number",
             "value": "42"
           }
         }
@@ -75,7 +75,7 @@
           "name": "variantDouble",
           "weight": 1000,
           "payload": {
-            "type": "string",
+            "type": "number",
             "value": "3.14"
           }
         }
