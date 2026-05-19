@@ -1,0 +1,154 @@
+{
+  "version": 2,
+  "features": [
+    {
+      "name": "boolean-flag",
+      "type": "release",
+      "enabled": true,
+      "strategies": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "name": "disabled-flag",
+      "type": "release",
+      "enabled": false,
+      "strategies": [
+        {
+          "name": "default"
+        }
+      ]
+    },
+    {
+      "name": "string-flag",
+      "type": "release",
+      "enabled": true,
+      "strategies": [
+        {
+          "name": "default"
+        }
+      ],
+      "variants": [
+        {
+          "name": "variantA",
+          "weight": 1000,
+          "payload": {
+            "type": "string",
+            "value": "hello"
+          }
+        }
+      ]
+    },
+    {
+      "name": "integer-flag",
+      "type": "release",
+      "enabled": true,
+      "strategies": [
+        {
+          "name": "default"
+        }
+      ],
+      "variants": [
+        {
+          "name": "variantInt",
+          "weight": 1000,
+          "payload": {
+            "type": "string",
+            "value": "42"
+          }
+        }
+      ]
+    },
+    {
+      "name": "double-flag",
+      "type": "release",
+      "enabled": true,
+      "strategies": [
+        {
+          "name": "default"
+        }
+      ],
+      "variants": [
+        {
+          "name": "variantDouble",
+          "weight": 1000,
+          "payload": {
+            "type": "string",
+            "value": "3.14"
+          }
+        }
+      ]
+    },
+    {
+      "name": "json-flag",
+      "type": "release",
+      "enabled": true,
+      "strategies": [
+        {
+          "name": "default"
+        }
+      ],
+      "variants": [
+        {
+          "name": "variantJson",
+          "weight": 1000,
+          "payload": {
+            "type": "json",
+            "value": "{\"key\":\"value\"}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "invalid-int-flag",
+      "type": "release",
+      "enabled": true,
+      "strategies": [
+        {
+          "name": "default"
+        }
+      ],
+      "variants": [
+        {
+          "name": "variantBad",
+          "weight": 1000,
+          "payload": {
+            "type": "string",
+            "value": "not-a-number"
+          }
+        }
+      ]
+    },
+    {
+      "name": "no-payload-flag",
+      "type": "release",
+      "enabled": true,
+      "strategies": [
+        {
+          "name": "default"
+        }
+      ],
+      "variants": [
+        {
+          "name": "variantNoPayload",
+          "weight": 1000
+        }
+      ]
+    },
+    {
+      "name": "user-targeted-flag",
+      "type": "release",
+      "enabled": true,
+      "strategies": [
+        {
+          "name": "userWithId",
+          "parameters": {
+            "userIds": "user-123"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -13,38 +13,74 @@ namespace OpenFeature.Contrib.Providers.Unleash;
 /// <summary>
 /// UnleashProvider is the OpenFeature .NET provider implementation for the Unleash feature flag system.
 /// </summary>
+/// <remarks>
+/// This provider creates and owns its own DefaultUnleash client instance rather than accepting
+/// an external IUnleash instance. This is because the Unleash SDK only allows subscribing to
+/// lifecycle events (ReadyEvent, ErrorEvent) during client construction. Without access to these
+/// events, the provider cannot properly implement the OpenFeature initialization lifecycle
+/// (i.e., signaling readiness only after toggles have been fetched).
+/// </remarks>
 public class UnleashProvider : FeatureProvider
 {
     private static readonly Metadata ProviderMetadata = new("Unleash Provider");
 
-    private readonly IUnleash _unleash;
-    private readonly bool _ownsUnleash;
+    private readonly UnleashSettings _settings;
+    private IUnleash _unleash;
 
     /// <summary>
-    /// Creates a new UnleashProvider wrapping an existing IUnleash instance.
-    /// The caller is responsible for disposing the IUnleash instance.
-    /// </summary>
-    /// <param name="unleash">An existing Unleash client instance.</param>
-    public UnleashProvider(IUnleash unleash)
-    {
-        this._unleash = unleash ?? throw new ArgumentNullException(nameof(unleash));
-        this._ownsUnleash = false;
-    }
-
-    /// <summary>
-    /// Creates a new UnleashProvider that owns and manages an Unleash client created from the given settings.
-    /// The provider will dispose the client on shutdown.
+    /// Creates a new UnleashProvider that will create and own a DefaultUnleash client.
+    /// The client is created during <see cref="InitializeAsync"/> and disposed during <see cref="ShutdownAsync"/>.
     /// </summary>
     /// <param name="settings">Unleash settings used to create the client.</param>
     public UnleashProvider(UnleashSettings settings)
     {
-        if (settings == null) throw new ArgumentNullException(nameof(settings));
-        this._unleash = new DefaultUnleash(settings);
-        this._ownsUnleash = true;
+        this._settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
     public override Metadata GetMetadata() => ProviderMetadata;
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// When <see cref="UnleashSettings.ToggleBootstrapProvider"/> is configured, the provider
+    /// completes initialization immediately after client construction since bootstrap data is
+    /// loaded synchronously. Otherwise, initialization waits for the first successful HTTP fetch
+    /// (ReadyEvent) or propagates any initialization error (ErrorEvent).
+    /// </remarks>
+    public override Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)
+    {
+        if (this._settings.ToggleBootstrapProvider != null)
+        {
+            this._unleash = new DefaultUnleash(this._settings, callback =>
+            {
+                callback.TogglesUpdatedEvent = _ => this.EmitConfigurationChanged();
+            });
+            return Task.CompletedTask;
+        }
+
+        var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        using var registration = cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken));
+
+        this._unleash = new DefaultUnleash(this._settings, callback =>
+        {
+            callback.ReadyEvent = _ => tcs.TrySetResult(true);
+            callback.ErrorEvent = evt => tcs.TrySetException(
+                evt.Error ?? new Exception($"Unleash initialization failed: {evt.ErrorType}"));
+            callback.TogglesUpdatedEvent = _ => this.EmitConfigurationChanged();
+        });
+
+        return tcs.Task;
+    }
+
+    internal void EmitConfigurationChanged()
+    {
+        this.EventChannel.Writer.TryWrite(new ProviderEventPayload
+        {
+            Type = ProviderEventTypes.ProviderConfigurationChanged,
+            ProviderName = ProviderMetadata.Name
+        });
+    }
 
     /// <inheritdoc />
     public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(
@@ -127,15 +163,11 @@ public class UnleashProvider : FeatureProvider
         return Task.FromResult(new ResolutionDetails<Value>(flagKey, value, variant: resolution.Value.VariantName));
     }
 
-    /// <summary>
-    /// Shuts down the provider, disposing the Unleash client if owned by this provider.
-    /// </summary>
-    public void Shutdown()
+    /// <inheritdoc />
+    public override Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
-        if (this._ownsUnleash)
-        {
-            this._unleash.Dispose();
-        }
+        this._unleash?.Dispose();
+        return Task.CompletedTask;
     }
 
     private VariantResolution? EvaluateVariant(string flagKey, EvaluationContext context)

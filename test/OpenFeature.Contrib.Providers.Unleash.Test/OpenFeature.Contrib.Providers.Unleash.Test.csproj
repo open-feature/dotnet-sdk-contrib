@@ -4,4 +4,10 @@
     <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.Unleash\OpenFeature.Contrib.Providers.Unleash.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Fixtures\bootstrap.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
