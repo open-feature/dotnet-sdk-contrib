@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
-using OpenFeature.Error;
 using OpenFeature.Model;
 using Unleash;
 using Unleash.Internal;
@@ -196,7 +195,12 @@ public class UnleashProvider : FeatureProvider
             return new ResolutionDetails<int>(flagKey, parsed, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata());
         }
 
-        throw new TypeMismatchException($"Cannot parse variant payload '{resolution.Value.PayloadValue}' as integer for flag '{flagKey}'.");
+        return new ResolutionDetails<int>(
+            flagKey,
+            defaultValue,
+            reason: Reason.Error,
+            errorType: ErrorType.TypeMismatch,
+            errorMessage: $"Cannot parse variant payload '{resolution.Value.PayloadValue}' as integer for flag '{flagKey}'.");
     }
 
     /// <inheritdoc />
@@ -222,7 +226,12 @@ public class UnleashProvider : FeatureProvider
             return new ResolutionDetails<double>(flagKey, parsed, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata());
         }
 
-        throw new TypeMismatchException($"Cannot parse variant payload '{resolution.Value.PayloadValue}' as double for flag '{flagKey}'.");
+        return new ResolutionDetails<double>(
+            flagKey,
+            defaultValue,
+            reason: Reason.Error,
+            errorType: ErrorType.TypeMismatch,
+            errorMessage: $"Cannot parse variant payload '{resolution.Value.PayloadValue}' as double for flag '{flagKey}'.");
     }
 
     /// <inheritdoc />

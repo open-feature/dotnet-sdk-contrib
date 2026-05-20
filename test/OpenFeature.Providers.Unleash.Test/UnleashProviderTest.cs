@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
-using OpenFeature.Error;
 using OpenFeature.Model;
 using Unleash;
 using Xunit;
@@ -105,10 +104,14 @@ public class UnleashProviderTest : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ResolveIntegerValue_InvalidPayload_ThrowsTypeMismatch()
+    public async Task ResolveIntegerValue_InvalidPayload_ReturnsTypeMismatchError()
     {
-        await Assert.ThrowsAsync<TypeMismatchException>(
-            () => this._provider.ResolveIntegerValueAsync("invalid-int-flag", 0));
+        var result = await this._provider.ResolveIntegerValueAsync("invalid-int-flag", 0);
+
+        Assert.Equal(0, result.Value);
+        Assert.Equal(Reason.Error, result.Reason);
+        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
+        Assert.Contains("integer", result.ErrorMessage);
     }
 
     // Double evaluation tests
@@ -132,10 +135,14 @@ public class UnleashProviderTest : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ResolveDoubleValue_InvalidPayload_ThrowsTypeMismatch()
+    public async Task ResolveDoubleValue_InvalidPayload_ReturnsTypeMismatchError()
     {
-        await Assert.ThrowsAsync<TypeMismatchException>(
-            () => this._provider.ResolveDoubleValueAsync("invalid-int-flag", 0.0));
+        var result = await this._provider.ResolveDoubleValueAsync("invalid-int-flag", 0.0);
+
+        Assert.Equal(0.0, result.Value);
+        Assert.Equal(Reason.Error, result.Reason);
+        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
+        Assert.Contains("double", result.ErrorMessage);
     }
 
     // Structure evaluation tests
@@ -171,17 +178,23 @@ public class UnleashProviderTest : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ResolveIntegerValue_WithNullPayload_ThrowsTypeMismatch()
+    public async Task ResolveIntegerValue_WithNullPayload_ReturnsTypeMismatchError()
     {
-        await Assert.ThrowsAsync<TypeMismatchException>(
-            () => this._provider.ResolveIntegerValueAsync("no-payload-flag", 0));
+        var result = await this._provider.ResolveIntegerValueAsync("no-payload-flag", 0);
+
+        Assert.Equal(0, result.Value);
+        Assert.Equal(Reason.Error, result.Reason);
+        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
     }
 
     [Fact]
-    public async Task ResolveDoubleValue_WithNullPayload_ThrowsTypeMismatch()
+    public async Task ResolveDoubleValue_WithNullPayload_ReturnsTypeMismatchError()
     {
-        await Assert.ThrowsAsync<TypeMismatchException>(
-            () => this._provider.ResolveDoubleValueAsync("no-payload-flag", 0.0));
+        var result = await this._provider.ResolveDoubleValueAsync("no-payload-flag", 0.0);
+
+        Assert.Equal(0.0, result.Value);
+        Assert.Equal(Reason.Error, result.Reason);
+        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
     }
 
     [Fact]
