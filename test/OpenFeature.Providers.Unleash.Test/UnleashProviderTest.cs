@@ -80,7 +80,7 @@ public class UnleashProviderTest : IAsyncLifetime
         var result = await this._provider.ResolveStringValueAsync("disabled-flag", "default");
 
         Assert.Equal("default", result.Value);
-        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal(Reason.Disabled, result.Reason);
     }
 
     // Integer evaluation tests
@@ -100,7 +100,7 @@ public class UnleashProviderTest : IAsyncLifetime
         var result = await this._provider.ResolveIntegerValueAsync("disabled-flag", 99);
 
         Assert.Equal(99, result.Value);
-        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal(Reason.Disabled, result.Reason);
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public class UnleashProviderTest : IAsyncLifetime
         var result = await this._provider.ResolveDoubleValueAsync("disabled-flag", 1.5);
 
         Assert.Equal(1.5, result.Value);
-        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal(Reason.Disabled, result.Reason);
     }
 
     [Fact]
@@ -163,7 +163,7 @@ public class UnleashProviderTest : IAsyncLifetime
         var result = await this._provider.ResolveStructureValueAsync("disabled-flag", defaultValue);
 
         Assert.Equal(defaultValue, result.Value);
-        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal(Reason.Disabled, result.Reason);
     }
 
     // Null payload edge cases

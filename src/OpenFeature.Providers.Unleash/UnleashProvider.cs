@@ -165,7 +165,7 @@ public class UnleashProvider : FeatureProvider
 
         if (resolution == null)
         {
-            return new ResolutionDetails<string>(flagKey, defaultValue, reason: Reason.Default);
+            return new ResolutionDetails<string>(flagKey, defaultValue, reason: Reason.Disabled);
         }
 
         var value = resolution.Value.PayloadValue ?? defaultValue;
@@ -187,7 +187,7 @@ public class UnleashProvider : FeatureProvider
 
         if (resolution == null)
         {
-            return new ResolutionDetails<int>(flagKey, defaultValue, reason: Reason.Default);
+            return new ResolutionDetails<int>(flagKey, defaultValue, reason: Reason.Disabled);
         }
 
         if (int.TryParse(resolution.Value.PayloadValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
@@ -218,7 +218,7 @@ public class UnleashProvider : FeatureProvider
 
         if (resolution == null)
         {
-            return new ResolutionDetails<double>(flagKey, defaultValue, reason: Reason.Default);
+            return new ResolutionDetails<double>(flagKey, defaultValue, reason: Reason.Disabled);
         }
 
         if (double.TryParse(resolution.Value.PayloadValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
@@ -249,7 +249,7 @@ public class UnleashProvider : FeatureProvider
 
         if (resolution == null)
         {
-            return new ResolutionDetails<Value>(flagKey, defaultValue, reason: Reason.Default);
+            return new ResolutionDetails<Value>(flagKey, defaultValue, reason: Reason.Disabled);
         }
 
         var value = resolution.Value.PayloadValue != null
