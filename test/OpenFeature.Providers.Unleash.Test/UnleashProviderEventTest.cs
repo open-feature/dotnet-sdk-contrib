@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Model;
 using Unleash;
+using Unleash.Events;
 using Xunit;
 
 namespace OpenFeature.Providers.Unleash.Test;
@@ -60,5 +61,37 @@ public class UnleashProviderEventTest : IAsyncLifetime
         var secondRead = channel.Reader.TryRead(out _);
         Assert.True(firstRead);
         Assert.False(secondRead);
+    }
+
+    [Fact]
+    public void EmitProviderError_PublishesErrorEventToChannel()
+    {
+        var errorEvent = new ErrorEvent { Error = new Exception("something broke"), ErrorType = global::Unleash.Events.ErrorType.Client };
+
+        this._provider.EmitProviderError(errorEvent);
+
+        var channel = this._provider.GetEventChannel();
+        var eventPublished = channel.Reader.TryRead(out var item);
+        Assert.True(eventPublished);
+
+        var providerEvent = item as ProviderEventPayload;
+        Assert.NotNull(providerEvent);
+        Assert.Equal(ProviderEventTypes.ProviderError, providerEvent.Type);
+        Assert.Equal("Unleash Provider", providerEvent.ProviderName);
+        Assert.Equal("something broke", providerEvent.Message);
+    }
+
+    [Fact]
+    public void EmitProviderError_WithNullError_UsesErrorTypeInMessage()
+    {
+        var errorEvent = new ErrorEvent { Error = null, ErrorType = global::Unleash.Events.ErrorType.Client };
+
+        this._provider.EmitProviderError(errorEvent);
+
+        var channel = this._provider.GetEventChannel();
+        channel.Reader.TryRead(out var item);
+        var providerEvent = item as ProviderEventPayload;
+        Assert.NotNull(providerEvent);
+        Assert.Contains("Client", providerEvent.Message);
     }
 }

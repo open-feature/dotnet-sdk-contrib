@@ -6,9 +6,9 @@ using Unleash;
 namespace OpenFeature.Providers.Unleash;
 
 /// <summary>
-/// Transforms an OpenFeature EvaluationContext into an Unleash UnleashContext.
+/// Extension methods for transforming an OpenFeature EvaluationContext into an Unleash UnleashContext.
 /// </summary>
-internal static class ContextTransformer
+internal static class EvaluationContextExtensions
 {
     private const string UserIdKey = "userId";
     private const string SessionIdKey = "sessionId";
@@ -18,32 +18,62 @@ internal static class ContextTransformer
     private const string CurrentTimeKey = "currentTime";
 
     /// <summary>
-    /// Transforms an OpenFeature EvaluationContext into an Unleash UnleashContext.
+    /// Gets the appName value from the evaluation context, or null if not present.
     /// </summary>
-    /// <param name="context">The OpenFeature evaluation context, may be null.</param>
-    /// <returns>A new UnleashContext populated from the evaluation context.</returns>
-    public static UnleashContext Transform(EvaluationContext context)
+    /// <param name="context">The evaluation context.</param>
+    /// <returns>The appName value, or null.</returns>
+    public static string? GetAppName(this EvaluationContext? context)
     {
         if (context == null)
+        {
+            return null;
+        }
+
+        return context.TryGetValue(AppNameKey, out var value) ? value?.AsString : null;
+    }
+
+    /// <summary>
+    /// Transforms an OpenFeature EvaluationContext into an Unleash UnleashContext.
+    /// If a baseline context is provided, it is merged with the per-call context
+    /// (per-call values take precedence).
+    /// </summary>
+    /// <param name="context">The per-call evaluation context, may be null.</param>
+    /// <param name="baselineContext">The baseline evaluation context from initialization, may be null.</param>
+    /// <returns>A new UnleashContext populated from the merged contexts.</returns>
+    public static UnleashContext ToUnleashContext(this EvaluationContext? context, EvaluationContext? baselineContext = null)
+    {
+        EvaluationContext? merged;
+        if (baselineContext != null && context != null)
+        {
+            merged = EvaluationContext.Builder()
+                .Merge(baselineContext)
+                .Merge(context)
+                .Build();
+        }
+        else
+        {
+            merged = context ?? baselineContext;
+        }
+
+        if (merged == null)
         {
             return new UnleashContext();
         }
 
-        string userId = null;
-        string sessionId = null;
-        string remoteAddress = null;
-        string environment = null;
-        string appName = null;
+        string? userId = null;
+        string? sessionId = null;
+        string? remoteAddress = null;
+        string? environment = null;
+        string? appName = null;
         DateTimeOffset? currentTime = null;
         var properties = new Dictionary<string, string>();
 
-        // Map targeting key to userId if present
-        if (!string.IsNullOrEmpty(context.TargetingKey))
+        if (!string.IsNullOrWhiteSpace(merged.TargetingKey))
         {
-            userId = context.TargetingKey;
+            userId = merged.TargetingKey;
         }
 
-        foreach (var kvp in context)
+        foreach (var kvp in merged)
         {
             var key = kvp.Key;
             var value = kvp.Value;

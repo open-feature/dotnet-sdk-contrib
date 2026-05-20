@@ -229,6 +229,20 @@ public class UnleashProviderTest : IAsyncLifetime
     }
 
     [Fact]
+    public async Task ResolveBooleanValue_WithWhitespaceTargetingKey_DoesNotMapToUserId()
+    {
+        // A whitespace-only targeting key should be treated as absent,
+        // so the user-targeted-flag (which requires userId=user-123) should return false.
+        var context = EvaluationContext.Builder()
+            .SetTargetingKey("   ")
+            .Build();
+
+        var result = await this._provider.ResolveBooleanValueAsync("user-targeted-flag", false, context);
+
+        Assert.False(result.Value);
+    }
+
+    [Fact]
     public async Task ResolveStringValue_WithVariant_ReturnsPayloadTypeMetadata()
     {
         var result = await this._provider.ResolveStringValueAsync("string-flag", "default");

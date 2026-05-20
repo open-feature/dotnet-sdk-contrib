@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenFeature.Providers.Unleash\OpenFeature.Providers.Unleash.csproj" />
   </ItemGroup>
