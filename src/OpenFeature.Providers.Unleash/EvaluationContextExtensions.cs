@@ -34,28 +34,12 @@ internal static class EvaluationContextExtensions
 
     /// <summary>
     /// Transforms an OpenFeature EvaluationContext into an Unleash UnleashContext.
-    /// If a baseline context is provided, it is merged with the per-call context
-    /// (per-call values take precedence).
     /// </summary>
-    /// <param name="context">The per-call evaluation context, may be null.</param>
-    /// <param name="baselineContext">The baseline evaluation context from initialization, may be null.</param>
-    /// <returns>A new UnleashContext populated from the merged contexts.</returns>
-    public static UnleashContext ToUnleashContext(this EvaluationContext? context, EvaluationContext? baselineContext = null)
+    /// <param name="context">The evaluation context, may be null.</param>
+    /// <returns>A new UnleashContext populated from the context.</returns>
+    public static UnleashContext ToUnleashContext(this EvaluationContext? context)
     {
-        EvaluationContext? merged;
-        if (baselineContext != null && context != null)
-        {
-            merged = EvaluationContext.Builder()
-                .Merge(baselineContext)
-                .Merge(context)
-                .Build();
-        }
-        else
-        {
-            merged = context ?? baselineContext;
-        }
-
-        if (merged == null)
+        if (context == null)
         {
             return new UnleashContext();
         }
@@ -68,12 +52,12 @@ internal static class EvaluationContextExtensions
         DateTimeOffset? currentTime = null;
         var properties = new Dictionary<string, string>();
 
-        if (!string.IsNullOrWhiteSpace(merged.TargetingKey))
+        if (!string.IsNullOrWhiteSpace(context.TargetingKey))
         {
-            userId = merged.TargetingKey;
+            userId = context.TargetingKey;
         }
 
-        foreach (var kvp in merged)
+        foreach (var kvp in context)
         {
             var key = kvp.Key;
             var value = kvp.Value;

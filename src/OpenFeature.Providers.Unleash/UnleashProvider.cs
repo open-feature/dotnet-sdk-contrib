@@ -26,7 +26,6 @@ public class UnleashProvider : FeatureProvider
 
     private readonly UnleashSettings _settings;
     private TaskCompletionSource<IUnleash>? _clientTcs;
-    private EvaluationContext? _baselineContext;
 
     /// <summary>
     /// Creates a new UnleashProvider that will create and own a DefaultUnleash client.
@@ -50,8 +49,6 @@ public class UnleashProvider : FeatureProvider
     /// </remarks>
     public override Task InitializeAsync(EvaluationContext context, CancellationToken cancellationToken = default)
     {
-        this._baselineContext = context;
-
         // Apply context fields to UnleashSettings where applicable
         var appName = context.GetAppName();
         if (!string.IsNullOrWhiteSpace(appName))
@@ -144,7 +141,7 @@ public class UnleashProvider : FeatureProvider
         }
 
         var unleash = await clientTask.ConfigureAwait(false);
-        var unleashContext = context.ToUnleashContext(this._baselineContext);
+        var unleashContext = context.ToUnleashContext();
         var result = unleash.IsEnabled(flagKey, unleashContext, defaultValue);
 
         return new ResolutionDetails<bool>(flagKey, result);
@@ -272,7 +269,7 @@ public class UnleashProvider : FeatureProvider
 
     private VariantResolution? EvaluateVariant(IUnleash unleash, string flagKey, EvaluationContext? context)
     {
-        var unleashContext = context.ToUnleashContext(this._baselineContext);
+        var unleashContext = context.ToUnleashContext();
         var variant = unleash.GetVariant(flagKey, unleashContext);
 
         if (variant == null || variant.Name == Variant.DISABLED_VARIANT.Name)
