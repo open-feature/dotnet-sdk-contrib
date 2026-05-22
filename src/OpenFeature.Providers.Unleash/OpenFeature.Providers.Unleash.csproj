@@ -9,9 +9,15 @@
     <Description>Unleash provider for OpenFeature .NET SDK</Description>
     <Authors>OpenFeature Authors</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RootNamespace>OpenFeature.Providers.Unleash</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <!-- documentation -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- make the internal methods visible to our test project -->
