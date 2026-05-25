@@ -245,19 +245,28 @@ public class UnitTestJsonEvaluator
     }
 
     [Fact]
-    public void TestJsonEvaluatorDisabledBoolEvaluation()
+    public void TestJsonEvaluatorDisabledFlagReturnsDisabledReason()
     {
         _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-        attributes.Add("color", new Value("yellow"));
+        var result = _jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false);
 
-        var builder = EvaluationContext.Builder();
-        builder
-            .Set("color", "yellow");
+        Assert.False(result.Value);
+        Assert.Equal(Reason.Disabled, result.Reason);
+        Assert.Null(result.Variant);
+    }
 
-        Assert.Throws<FeatureProviderException>(() =>
-            _jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false, builder.Build()));
+    [Fact]
+    public void TestJsonEvaluatorDisabledFlagIgnoresTargeting()
+    {
+        _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+        var context = EvaluationContext.Builder().Set("color", "yellow").Build();
+        var result = _jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false, context);
+
+        Assert.False(result.Value);
+        Assert.Equal(Reason.Disabled, result.Reason);
+        Assert.Null(result.Variant);
     }
 
     [Fact]
