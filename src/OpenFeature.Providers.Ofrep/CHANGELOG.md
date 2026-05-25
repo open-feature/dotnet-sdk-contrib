@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.5...OpenFeature.Providers.Ofrep-v1.1.0) (2026-05-25)
+
+
+### 🧹 Chore
+
+* release 1.1.0 ([9da19b5](https://github.com/open-feature/dotnet-sdk-contrib/commit/9da19b5c8a561348b8a8f3f326797a0e447d5d8e))
+
 ## [0.1.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.4...OpenFeature.Providers.Ofrep-v0.1.5) (2026-01-23)
 
 
