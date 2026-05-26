@@ -260,6 +260,7 @@ public class UnleashProvider : FeatureProvider
     public override async Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
         var clientTask = this.GetClientTask();
+        Volatile.Write(ref this._clientTcs, null);
         if (clientTask != null)
         {
             var client = await clientTask.ConfigureAwait(false);

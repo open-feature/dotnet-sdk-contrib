@@ -96,6 +96,51 @@ public class UnleashProviderConstructorTest
     }
 
     [Fact]
+    public async Task Evaluation_AfterShutdown_ReturnsProviderNotReady()
+    {
+        var bootstrapPath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "bootstrap.json");
+        var settings = new UnleashSettings
+        {
+            AppName = "test-app",
+            UnleashApi = new Uri("http://unleash.test/api/"),
+            InstanceTag = "test",
+            SendMetricsInterval = null
+        };
+        settings.UseBootstrapFileProvider(bootstrapPath);
+
+        var provider = new UnleashProvider(settings);
+        await provider.InitializeAsync(EvaluationContext.Empty);
+
+        // Verify the provider is working before shutdown
+        var result = await provider.ResolveBooleanValueAsync("boolean-flag", false);
+        Assert.True(result.Value);
+
+        await provider.ShutdownAsync();
+
+        // After shutdown, all evaluations should return ProviderNotReady
+        var boolResult = await provider.ResolveBooleanValueAsync("boolean-flag", false);
+        Assert.False(boolResult.Value);
+        Assert.Equal(Reason.Error, boolResult.Reason);
+        Assert.Equal(ErrorType.ProviderNotReady, boolResult.ErrorType);
+
+        var stringResult = await provider.ResolveStringValueAsync("flag", "default");
+        Assert.Equal("default", stringResult.Value);
+        Assert.Equal(ErrorType.ProviderNotReady, stringResult.ErrorType);
+
+        var intResult = await provider.ResolveIntegerValueAsync("flag", 7);
+        Assert.Equal(7, intResult.Value);
+        Assert.Equal(ErrorType.ProviderNotReady, intResult.ErrorType);
+
+        var doubleResult = await provider.ResolveDoubleValueAsync("flag", 1.5);
+        Assert.Equal(1.5, doubleResult.Value);
+        Assert.Equal(ErrorType.ProviderNotReady, doubleResult.ErrorType);
+
+        var structResult = await provider.ResolveStructureValueAsync("flag", new Value("x"));
+        Assert.Equal("x", structResult.Value.AsString);
+        Assert.Equal(ErrorType.ProviderNotReady, structResult.ErrorType);
+    }
+
+    [Fact]
     public async Task SetReady_BeforeInitialize_MakesClientAvailable()
     {
         var bootstrapPath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "bootstrap.json");
