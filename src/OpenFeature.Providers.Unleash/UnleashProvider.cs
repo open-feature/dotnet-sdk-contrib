@@ -140,7 +140,7 @@ public class UnleashProvider : FeatureProvider
             return new ResolutionDetails<bool>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
         }
 
-        var unleash = await clientTask.ConfigureAwait(false);
+        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
         var unleashContext = context.ToUnleashContext();
         var result = unleash.IsEnabled(flagKey, unleashContext, defaultValue);
 
@@ -157,7 +157,7 @@ public class UnleashProvider : FeatureProvider
             return new ResolutionDetails<string>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
         }
 
-        var unleash = await clientTask.ConfigureAwait(false);
+        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
         var resolution = this.EvaluateVariant(unleash, flagKey, context);
 
         if (resolution == null)
@@ -179,7 +179,7 @@ public class UnleashProvider : FeatureProvider
             return new ResolutionDetails<int>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
         }
 
-        var unleash = await clientTask.ConfigureAwait(false);
+        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
         var resolution = this.EvaluateVariant(unleash, flagKey, context);
 
         if (resolution == null)
@@ -210,7 +210,7 @@ public class UnleashProvider : FeatureProvider
             return new ResolutionDetails<double>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
         }
 
-        var unleash = await clientTask.ConfigureAwait(false);
+        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
         var resolution = this.EvaluateVariant(unleash, flagKey, context);
 
         if (resolution == null)
@@ -241,7 +241,7 @@ public class UnleashProvider : FeatureProvider
             return new ResolutionDetails<Value>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
         }
 
-        var unleash = await clientTask.ConfigureAwait(false);
+        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
         var resolution = this.EvaluateVariant(unleash, flagKey, context);
 
         if (resolution == null)
@@ -260,11 +260,11 @@ public class UnleashProvider : FeatureProvider
     public override async Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
         var clientTask = this.GetClientTask();
-        Volatile.Write(ref this._clientTcs, null);
         if (clientTask != null)
         {
-            var client = await clientTask.ConfigureAwait(false);
-            client?.Dispose();
+            var client = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
+            Volatile.Write(ref this._clientTcs, null);
+            client.Dispose();
         }
     }
 
