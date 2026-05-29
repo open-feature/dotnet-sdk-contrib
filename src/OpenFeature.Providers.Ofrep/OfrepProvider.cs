@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Model;
@@ -124,28 +125,28 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(
         string flagKey, bool defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateBooleanFlag,
+        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateFlag,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<string>> ResolveStringValueAsync(
         string flagKey, string defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateStringFlag,
+        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateFlag,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(
         string flagKey, int defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateIntegerFlag,
+        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateFlag,
             cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(
         string flagKey, double defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateDoubleFlag,
+        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateFlag,
             cancellationToken);
 
     /// <inheritdoc/>
@@ -164,7 +165,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         // This avoids type mismatch issues when deserializing object values as System.Text.Json
         // returns JsonElement for object types, which is not a valid Value constructor parameter.
         var response =
-            await this._client.EvaluateStructureFlag(flagKey, null, context, cancellationToken).ConfigureAwait(false);
+            await this._client.EvaluateFlag<JsonElement?>(flagKey, null, context, cancellationToken).ConfigureAwait(false);
 
         var resolvedValue = response.Value.HasValue
             ? response.Value.Value.ToValue()
