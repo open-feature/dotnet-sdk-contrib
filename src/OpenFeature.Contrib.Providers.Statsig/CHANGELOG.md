@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.1.1...OpenFeature.Contrib.Providers.Statsig-v1.1.0) (2026-06-01)
+
+
+### 🧹 Chore
+
+* release 1.1.0 ([9da19b5](https://github.com/open-feature/dotnet-sdk-contrib/commit/9da19b5c8a561348b8a8f3f326797a0e447d5d8e))
+
 ## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.Statsig-v0.1.0...OpenFeature.Contrib.Providers.Statsig-v0.1.1) (2025-08-06)
 
 
