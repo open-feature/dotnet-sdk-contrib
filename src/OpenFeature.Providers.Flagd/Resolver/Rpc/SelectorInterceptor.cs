@@ -37,7 +37,14 @@ internal class SelectorInterceptor : Interceptor
         where TRequest : class
         where TResponse : class
     {
-        var headers = context.Options.Headers ?? new Metadata();
+        var headers = new Metadata();
+        if (context.Options.Headers != null)
+        {
+            foreach (var entry in context.Options.Headers)
+            {
+                headers.Add(entry);
+            }
+        }
         headers.Add(FlagdConfig.FlagdSelectorHeaderName, _selector);
         var options = context.Options.WithHeaders(headers);
         return new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, options);
