@@ -1,3 +1,4 @@
+using System.Linq;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
 
@@ -38,12 +39,9 @@ internal class SelectorInterceptor : Interceptor
         where TResponse : class
     {
         var headers = new Metadata();
-        if (context.Options.Headers != null)
+        foreach (var entry in context.Options.Headers ?? Enumerable.Empty<Metadata.Entry>())
         {
-            foreach (var entry in context.Options.Headers)
-            {
-                headers.Add(entry);
-            }
+            headers.Add(entry);
         }
         headers.Add(FlagdConfig.FlagdSelectorHeaderName, _selector);
         var options = context.Options.WithHeaders(headers);
