@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Grpc.Core.Interceptors;
 using Grpc.Net.Client;
 using OpenFeature.Constant;
 using OpenFeature.Error;
@@ -559,7 +560,7 @@ internal class RpcResolver : Resolver
             {
                 HttpHandler = handler
             });
-            return new Service.ServiceClient(_channel);
+            return BuildServiceClient(_channel, config);
         }
 
 #if NET5_0_OR_GREATER
@@ -576,9 +577,20 @@ internal class RpcResolver : Resolver
         {
             HttpHandler = socketsHttpHandler,
         });
-        return new Service.ServiceClient(_channel);
+        return BuildServiceClient(_channel, config);
 #endif
         // unix socket support is not available in this dotnet version
         throw new Exception("unix sockets are not supported in this version.");
+    }
+
+    private static Service.ServiceClient BuildServiceClient(GrpcChannel channel, FlagdConfig config)
+    {
+        if (string.IsNullOrEmpty(config.SourceSelector))
+        {
+            return new Service.ServiceClient(channel);
+        }
+
+        var invoker = channel.Intercept(new SelectorInterceptor(config.SourceSelector));
+        return new Service.ServiceClient(invoker);
     }
 }
