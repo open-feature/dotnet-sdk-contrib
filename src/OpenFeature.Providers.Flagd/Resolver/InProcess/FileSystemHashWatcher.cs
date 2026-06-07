@@ -16,10 +16,11 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
     private readonly ILogger _logger;
     private readonly HashAlgorithm _murmur128;
     private Task _watcherTask;
+    private bool _disposed;
 
     private byte[] _lastFileHash = Array.Empty<byte>();
     private DateTime _lastModified = DateTime.MinValue;
-    private int _lastSize;
+    private long _lastSize;
 
     internal static readonly TimeSpan DefaultFileChangePollingInterval = TimeSpan.FromMinutes(1);
 
@@ -60,6 +61,10 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
 
     public async ValueTask DisposeAsync()
     {
+        if (_disposed)
+            return;
+        _disposed = true;
+
         _cts.Cancel();
 
         if (_watcherTask != null)
@@ -111,7 +116,7 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
         }
     }
 
-    private (byte[] Hash, int Size) GetFileContentHash()
+    private (byte[] Hash, long Size) GetFileContentHash()
     {
         RefreshFileSystemCache();
 
@@ -124,7 +129,7 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
                    FileOptions.SequentialScan))
         {
             var hash = _murmur128.ComputeHash(fs);
-            return (hash, (int)fs.Length);
+            return (hash, fs.Length);
         }
     }
 

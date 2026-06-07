@@ -127,7 +127,26 @@ internal class FileBasedResolver : Resolver
             _fileWatcher = null;
         }
 
-        _debounceTimer?.Dispose();
+        // Drain any in-flight debounce timer callback before disposing the
+        // evaluator lock. A callback may be executing LoadFlags() while holding
+        // the write lock; disposing the lock underneath it would throw a
+        // SynchronizationLockException. The WaitHandle overload of
+        // Timer.Dispose signals once all pending callbacks have completed.
+        if (_debounceTimer != null)
+        {
+            using (var timerDisposed = new ManualResetEvent(false))
+            {
+                if (_debounceTimer.Dispose(timerDisposed))
+                {
+                    if (!timerDisposed.WaitOne(TimeSpan.FromSeconds(10)))
+                    {
+                        _logger?.LogWarning("Timed out waiting for in-flight file reload to complete during shutdown for file '{FilePath}'", _filePath);
+                    }
+                }
+            }
+            _debounceTimer = null;
+        }
+
         _evaluatorLock.Dispose();
         _cts.Dispose();
     }
@@ -393,6 +412,15 @@ internal class FileBasedResolver : Resolver
             fileWatcher.Renamed += (object sender, RenamedEventArgs e) =>
             {
                 fileChangeHandler.Invoke(sender, e);
+            };
+
+            // A deleted flag file does not trigger a reload: the last-known-good
+            // configuration is retained (consistent with the hash watcher path).
+            // A subsequent re-creation of the file raises a Created event which
+            // reloads the flags.
+            fileWatcher.Deleted += (object sender, FileSystemEventArgs e) =>
+            {
+                _logger?.LogWarning("Watched file '{FilePath}' was deleted; retaining last-known-good flag configuration", _filePath);
             };
 
             fileWatcher.Error += (object sender, ErrorEventArgs e) =>

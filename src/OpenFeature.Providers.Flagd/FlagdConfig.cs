@@ -448,7 +448,7 @@ public class FlagdConfigBuilder
             {
                 ResolverType.RPC => 8013,
                 ResolverType.IN_PROCESS => 8015,
-                _ => 8013
+                _ => throw new NotImplementedException($"No default port defined for resolver type '{this._config.ResolverType}'.")
             };
 
             this._config.Port = defaultPortForResolver;
