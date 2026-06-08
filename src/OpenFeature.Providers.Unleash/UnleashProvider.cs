@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
+using OpenFeature.Error;
 using OpenFeature.Model;
 using Unleash;
 using Unleash.Internal;
@@ -25,7 +26,7 @@ public class UnleashProvider : FeatureProvider
     private static readonly Metadata ProviderMetadata = new("Unleash Provider");
 
     private readonly UnleashSettings _settings;
-    private TaskCompletionSource<IUnleash>? _clientTcs;
+    private IUnleash? _unleash;
 
     /// <summary>
     /// Creates a new UnleashProvider that will create and own a DefaultUnleash client.
@@ -56,35 +57,33 @@ public class UnleashProvider : FeatureProvider
             this._settings.AppName = appName;
         }
 
-        var tcs = new TaskCompletionSource<IUnleash>(TaskCreationOptions.RunContinuationsAsynchronously);
-        Volatile.Write(ref this._clientTcs, tcs);
+        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         if (this._settings.ToggleBootstrapProvider != null)
         {
-            var unleash = new DefaultUnleash(this._settings, callback =>
+            Volatile.Write(ref this._unleash, new DefaultUnleash(this._settings, callback =>
             {
                 callback.TogglesUpdatedEvent = _ => this.EmitConfigurationChanged();
-            });
-            tcs.TrySetResult(unleash);
+            }));
+            tcs.TrySetResult();
             return Task.CompletedTask;
         }
 
-        IUnleash client = null!;
-        client = new DefaultUnleash(this._settings, callback =>
+        Volatile.Write(ref this._unleash, new DefaultUnleash(this._settings, callback =>
         {
             callback.ReadyEvent = _ =>
             {
-                tcs.TrySetResult(client);
+                tcs.TrySetResult();
             };
             callback.ErrorEvent = evt =>
             {
                 this.EmitProviderError(evt);
-                tcs.TrySetResult(client);
+                tcs.TrySetResult();
             };
             callback.TogglesUpdatedEvent = _ => this.EmitConfigurationChanged();
-        });
+        }));
 
-        var registration = cancellationToken.Register(() => tcs.TrySetResult(client));
+        var registration = cancellationToken.Register(() => tcs.TrySetResult());
         tcs.Task.ContinueWith(_ => registration.Dispose(), TaskContinuationOptions.ExecuteSynchronously);
 
         return tcs.Task;
@@ -109,167 +108,115 @@ public class UnleashProvider : FeatureProvider
         });
     }
 
-    /// <summary>
-    /// Allows tests to simulate the ReadyEvent by providing a client instance.
-    /// </summary>
-    internal void SetReady(IUnleash client)
-    {
-        var tcs = Volatile.Read(ref this._clientTcs);
-        if (tcs == null)
-        {
-            tcs = new TaskCompletionSource<IUnleash>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Interlocked.CompareExchange(ref this._clientTcs, tcs, null);
-            tcs = Volatile.Read(ref this._clientTcs)!;
-        }
-
-        tcs.TrySetResult(client);
-    }
-
-    private Task<IUnleash>? GetClientTask()
-    {
-        return Volatile.Read(ref this._clientTcs)?.Task;
-    }
-
     /// <inheritdoc />
-    public override async Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(
+    public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(
         string flagKey, bool defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        var clientTask = this.GetClientTask();
-        if (clientTask == null)
+        var unleashContext = context.ToUnleashContext();
+
+        if (this._unleash == null)
         {
-            return new ResolutionDetails<bool>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
+            throw new ProviderNotReadyException("Unleash not ready!");
         }
 
-        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-        var unleashContext = context.ToUnleashContext();
-        var result = unleash.IsEnabled(flagKey, unleashContext, defaultValue);
+        var result = this._unleash.IsEnabled(flagKey, unleashContext, defaultValue);
 
-        return new ResolutionDetails<bool>(flagKey, result);
+        return Task.FromResult(new ResolutionDetails<bool>(flagKey, result));
     }
 
     /// <inheritdoc />
-    public override async Task<ResolutionDetails<string>> ResolveStringValueAsync(
+    public override Task<ResolutionDetails<string>> ResolveStringValueAsync(
         string flagKey, string defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        var clientTask = this.GetClientTask();
-        if (clientTask == null)
-        {
-            return new ResolutionDetails<string>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
-        }
-
-        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-        var resolution = this.EvaluateVariant(unleash, flagKey, context);
+        var resolution = this.EvaluateVariant(flagKey, context);
 
         if (resolution == null)
         {
-            return new ResolutionDetails<string>(flagKey, defaultValue, reason: Reason.Disabled);
+            return Task.FromResult(new ResolutionDetails<string>(flagKey, defaultValue, reason: Reason.Disabled));
         }
 
         var value = resolution.Value.PayloadValue ?? defaultValue;
-        return new ResolutionDetails<string>(flagKey, value, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata());
+        return Task.FromResult(new ResolutionDetails<string>(flagKey, value, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata()));
     }
 
     /// <inheritdoc />
-    public override async Task<ResolutionDetails<int>> ResolveIntegerValueAsync(
+    public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(
         string flagKey, int defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        var clientTask = this.GetClientTask();
-        if (clientTask == null)
-        {
-            return new ResolutionDetails<int>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
-        }
-
-        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-        var resolution = this.EvaluateVariant(unleash, flagKey, context);
+        var resolution = this.EvaluateVariant(flagKey, context);
 
         if (resolution == null)
         {
-            return new ResolutionDetails<int>(flagKey, defaultValue, reason: Reason.Disabled);
+            return Task.FromResult(new ResolutionDetails<int>(flagKey, defaultValue, reason: Reason.Disabled));
         }
 
         if (int.TryParse(resolution.Value.PayloadValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
         {
-            return new ResolutionDetails<int>(flagKey, parsed, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata());
+            return Task.FromResult(new ResolutionDetails<int>(flagKey, parsed, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata()));
         }
 
-        return new ResolutionDetails<int>(
+        return Task.FromResult(new ResolutionDetails<int>(
             flagKey,
             defaultValue,
             reason: Reason.Error,
             errorType: ErrorType.TypeMismatch,
-            errorMessage: $"Cannot parse variant payload '{resolution.Value.PayloadValue}' as integer for flag '{flagKey}'.");
+            errorMessage: $"Cannot parse variant payload '{resolution.Value.PayloadValue}' as integer for flag '{flagKey}'."));
     }
 
     /// <inheritdoc />
-    public override async Task<ResolutionDetails<double>> ResolveDoubleValueAsync(
+    public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(
         string flagKey, double defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        var clientTask = this.GetClientTask();
-        if (clientTask == null)
-        {
-            return new ResolutionDetails<double>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
-        }
-
-        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-        var resolution = this.EvaluateVariant(unleash, flagKey, context);
+        var resolution = this.EvaluateVariant(flagKey, context);
 
         if (resolution == null)
         {
-            return new ResolutionDetails<double>(flagKey, defaultValue, reason: Reason.Disabled);
+            return Task.FromResult(new ResolutionDetails<double>(flagKey, defaultValue, reason: Reason.Disabled));
         }
 
         if (double.TryParse(resolution.Value.PayloadValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
         {
-            return new ResolutionDetails<double>(flagKey, parsed, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata());
+            return Task.FromResult(new ResolutionDetails<double>(flagKey, parsed, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata()));
         }
 
-        return new ResolutionDetails<double>(
+        return Task.FromResult(new ResolutionDetails<double>(
             flagKey,
             defaultValue,
             reason: Reason.Error,
             errorType: ErrorType.TypeMismatch,
-            errorMessage: $"Cannot parse variant payload '{resolution.Value.PayloadValue}' as double for flag '{flagKey}'.");
+            errorMessage: $"Cannot parse variant payload '{resolution.Value.PayloadValue}' as double for flag '{flagKey}'."));
     }
 
     /// <inheritdoc />
-    public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(
+    public override Task<ResolutionDetails<Value>> ResolveStructureValueAsync(
         string flagKey, Value defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
-        var clientTask = this.GetClientTask();
-        if (clientTask == null)
-        {
-            return new ResolutionDetails<Value>(flagKey, defaultValue, reason: Reason.Error, errorType: ErrorType.ProviderNotReady);
-        }
-
-        var unleash = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-        var resolution = this.EvaluateVariant(unleash, flagKey, context);
+        var resolution = this.EvaluateVariant(flagKey, context);
 
         if (resolution == null)
         {
-            return new ResolutionDetails<Value>(flagKey, defaultValue, reason: Reason.Disabled);
+            return Task.FromResult(new ResolutionDetails<Value>(flagKey, defaultValue, reason: Reason.Disabled));
         }
 
         var value = resolution.Value.PayloadValue != null
             ? new Value(resolution.Value.PayloadValue)
             : defaultValue;
 
-        return new ResolutionDetails<Value>(flagKey, value, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata());
+        return Task.FromResult(new ResolutionDetails<Value>(flagKey, value, variant: resolution.Value.VariantName, flagMetadata: resolution.Value.GetFlagMetadata()));
     }
 
     /// <inheritdoc />
-    public override async Task ShutdownAsync(CancellationToken cancellationToken = default)
+    public override Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
-        var clientTask = this.GetClientTask();
-        if (clientTask != null)
-        {
-            var client = await clientTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-            Volatile.Write(ref this._clientTcs, null);
-            client.Dispose();
-        }
+        var unleash = Volatile.Read(ref this._unleash);
+        unleash?.Dispose();
+        return Task.CompletedTask;
     }
 
-    private VariantResolution? EvaluateVariant(IUnleash unleash, string flagKey, EvaluationContext? context)
+    private VariantResolution? EvaluateVariant(string flagKey, EvaluationContext? context)
     {
+        var unleash = Volatile.Read(ref this._unleash) ?? throw new ProviderNotReadyException("Unleash not ready!");
+
         var unleashContext = context.ToUnleashContext();
         var variant = unleash.GetVariant(flagKey, unleashContext);
 
