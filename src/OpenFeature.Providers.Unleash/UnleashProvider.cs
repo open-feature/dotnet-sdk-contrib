@@ -21,7 +21,7 @@ namespace OpenFeature.Providers.Unleash;
 /// events, the provider cannot properly implement the OpenFeature initialization lifecycle
 /// (i.e., signaling readiness only after toggles have been fetched).
 /// </remarks>
-public class UnleashProvider : FeatureProvider
+public sealed class UnleashProvider : FeatureProvider
 {
     private static readonly Metadata ProviderMetadata = new("Unleash Provider");
 
