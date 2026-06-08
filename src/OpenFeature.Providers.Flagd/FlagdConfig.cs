@@ -156,7 +156,8 @@ public class FlagdConfig
     }
 
     /// <summary>
-    ///     Source selector for the in-process provider.
+    ///     Selects which flag set the provider sees from the flagd source.
+    ///     Supported by both the in-process and RPC resolvers.
     /// </summary>
     public string SourceSelector
     {
@@ -320,7 +321,8 @@ public class FlagdConfigBuilder
     }
 
     /// <summary>
-    ///     Source selector for the in-process provider.
+    ///     Selects which flag set the provider sees from the flagd source.
+    ///     Supported by both the in-process and RPC resolvers.
     /// </summary>
     public FlagdConfigBuilder WithSourceSelector(string sourceSelector)
     {

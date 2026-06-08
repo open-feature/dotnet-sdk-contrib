@@ -230,8 +230,11 @@ internal class JsonEvaluator
         {
             if ("DISABLED" == flagConfiguration.State)
             {
-                throw new FeatureProviderException(ErrorType.FlagNotFound,
-                    "FLAG_NOT_FOUND: flag '" + flagKey + "' is disabled");
+                return new ResolutionDetails<T>(
+                    flagKey: flagKey,
+                    defaultValue,
+                    reason: Reason.Disabled
+                );
             }
 
             Dictionary<string, object> combinedMetadata = _flagSetMetadata.ToDictionary(
