@@ -7,7 +7,9 @@ using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
 using Unleash;
+using Unleash.Events;
 using Unleash.Internal;
+using ErrorType = OpenFeature.Constant.ErrorType;
 
 namespace OpenFeature.Providers.Unleash;
 
@@ -98,7 +100,7 @@ public sealed class UnleashProvider : FeatureProvider
         });
     }
 
-    internal void EmitProviderError(global::Unleash.Events.ErrorEvent evt)
+    internal void EmitProviderError(ErrorEvent evt)
     {
         this.EventChannel.Writer.TryWrite(new ProviderEventPayload
         {
