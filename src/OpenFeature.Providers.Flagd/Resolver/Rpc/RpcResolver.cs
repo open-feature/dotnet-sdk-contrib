@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Grpc.Core.Interceptors;
 using Grpc.Net.Client;
 using OpenFeature.Constant;
 using OpenFeature.Error;
@@ -87,8 +88,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
-            var value = string.IsNullOrEmpty(resolveBooleanResponse.Variant) && resolveBooleanResponse.Reason == Reason.Default ? defaultValue : resolveBooleanResponse.Value;
+            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
+            var value = string.IsNullOrEmpty(resolveBooleanResponse.Variant) && (resolveBooleanResponse.Reason == Reason.Default || resolveBooleanResponse.Reason == Reason.Disabled) ? defaultValue : resolveBooleanResponse.Value;
 
             return new ResolutionDetails<bool>(
                 flagKey: flagKey,
@@ -110,8 +111,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
-            var value = string.IsNullOrEmpty(resolveStringResponse.Variant) && resolveStringResponse.Reason == Reason.Default ? defaultValue : resolveStringResponse.Value;
+            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
+            var value = string.IsNullOrEmpty(resolveStringResponse.Variant) && (resolveStringResponse.Reason == Reason.Default || resolveStringResponse.Reason == Reason.Disabled) ? defaultValue : resolveStringResponse.Value;
 
             return new ResolutionDetails<string>(
                 flagKey: flagKey,
@@ -133,8 +134,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
-            var value = string.IsNullOrEmpty(resolveIntResponse.Variant) && resolveIntResponse.Reason == Reason.Default ? defaultValue : (int)resolveIntResponse.Value;
+            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
+            var value = string.IsNullOrEmpty(resolveIntResponse.Variant) && (resolveIntResponse.Reason == Reason.Default || resolveIntResponse.Reason == Reason.Disabled) ? defaultValue : (int)resolveIntResponse.Value;
 
             return new ResolutionDetails<int>(
                 flagKey: flagKey,
@@ -156,8 +157,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
-            var value = string.IsNullOrEmpty(resolveDoubleResponse.Variant) && resolveDoubleResponse.Reason == Reason.Default ? defaultValue : resolveDoubleResponse.Value;
+            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
+            var value = string.IsNullOrEmpty(resolveDoubleResponse.Variant) && (resolveDoubleResponse.Reason == Reason.Default || resolveDoubleResponse.Reason == Reason.Disabled) ? defaultValue : resolveDoubleResponse.Value;
 
             return new ResolutionDetails<double>(
                 flagKey: flagKey,
@@ -179,8 +180,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant in flag definition)
-            var value = string.IsNullOrEmpty(resolveObjectResponse.Variant) && resolveObjectResponse.Reason == Reason.Default ? defaultValue : ConvertObjectToValue(resolveObjectResponse.Value);
+            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
+            var value = string.IsNullOrEmpty(resolveObjectResponse.Variant) && (resolveObjectResponse.Reason == Reason.Default || resolveObjectResponse.Reason == Reason.Disabled) ? defaultValue : ConvertObjectToValue(resolveObjectResponse.Value);
 
             return new ResolutionDetails<Value>(
                 flagKey: flagKey,
@@ -559,7 +560,7 @@ internal class RpcResolver : Resolver
             {
                 HttpHandler = handler
             });
-            return new Service.ServiceClient(_channel);
+            return BuildServiceClient(_channel, config);
         }
 
 #if NET5_0_OR_GREATER
@@ -576,9 +577,20 @@ internal class RpcResolver : Resolver
         {
             HttpHandler = socketsHttpHandler,
         });
-        return new Service.ServiceClient(_channel);
+        return BuildServiceClient(_channel, config);
 #endif
         // unix socket support is not available in this dotnet version
         throw new Exception("unix sockets are not supported in this version.");
+    }
+
+    private static Service.ServiceClient BuildServiceClient(GrpcChannel channel, FlagdConfig config)
+    {
+        if (string.IsNullOrEmpty(config.SourceSelector))
+        {
+            return new Service.ServiceClient(channel);
+        }
+
+        var invoker = channel.Intercept(new SelectorInterceptor(config.SourceSelector));
+        return new Service.ServiceClient(invoker);
     }
 }

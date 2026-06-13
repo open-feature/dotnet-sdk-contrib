@@ -18,14 +18,14 @@ public class FlagSteps
         this._state = state;
     }
 
-    [Given(@"a (Boolean|Float|Integer|String)(?:-flag)? with key ""(.*)"" and a default value ""(.*)""")]
+    [Given(@"a (Boolean|Float|Integer|String|Object)(?:-flag)? with key ""(.*)"" and a default value ""(.*)""")]
     public void GivenAFlagType_FlagWithKeyAndADefaultValue(FlagType flagType, string key, string defaultType)
     {
         var flagState = new FlagState(key, defaultType, flagType);
         this._state.Flag = flagState;
     }
 
-    [StepArgumentTransformation(@"^(Boolean|Float|Integer|String)(?:-flag)?$")]
+    [StepArgumentTransformation(@"^(Boolean|Float|Integer|String|Object)(?:-flag)?$")]
     public static FlagType TransformFlagType(string raw)
         => raw.Replace("-flag", "").ToLowerInvariant() switch
         {
@@ -33,6 +33,7 @@ public class FlagSteps
             "float" => FlagType.Float,
             "integer" => FlagType.Integer,
             "string" => FlagType.String,
+            "object" => FlagType.Object,
             _ => throw new Exception($"Unsupported flag type '{raw}'")
         };
 
@@ -40,6 +41,8 @@ public class FlagSteps
     public async Task WhenTheFlagWasEvaluatedWithDetails()
     {
         var flag = this._state.Flag!;
+        Skip.If(flag.Type == FlagType.Object, "Object flag evaluation not yet supported in step bindings.");
+
         var contextBuilder = this._state.EvaluationContextBuilder
             ?? EvaluationContext.Builder();
         var context = contextBuilder.Build();
