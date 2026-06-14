@@ -58,7 +58,14 @@ internal class InProcessResolver : Resolver
     {
         await _jsonSchemaValidator.InitializeAsync().ConfigureAwait(false);
 
-        var initComplete = new TaskCompletionSource<bool>();
+        // RunContinuationsAsynchronously is required: this TCS is completed from inside
+        // the HandleEvents stream-reading loop (on the first received message). Without
+        // it, completing the TCS runs the Init() continuation synchronously on the loop
+        // thread, so the caller's post-initialization work (e.g. running the host) takes
+        // over that thread and the loop never returns to read subsequent SyncFlags
+        // messages. The result is that in-process flag configuration updates are never
+        // observed after the initial sync (until the process/stream restarts).
+        var initComplete = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         _ = Task.Run(() => HandleEvents(initComplete));
         await initComplete.Task.ConfigureAwait(false);
     }
