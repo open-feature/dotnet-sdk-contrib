@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>OpenFeature.Providers.Unleash</PackageId>
+    <VersionNumber>0.1.0</VersionNumber> <!--x-release-please-version -->
+    <VersionPrefix>$(VersionNumber)</VersionPrefix>
+    <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
+    <FileVersion>$(VersionNumber)</FileVersion>
+    <Description>Unleash provider for OpenFeature .NET SDK</Description>
+    <Authors>OpenFeature Authors</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RootNamespace>OpenFeature.Providers.Unleash</RootNamespace>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <!-- documentation -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- make the internal methods visible to our test project -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(MSBuildProjectName).Test</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Unleash.Client" Version="[6.2.1,7.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
+  </ItemGroup>
+
+</Project>
