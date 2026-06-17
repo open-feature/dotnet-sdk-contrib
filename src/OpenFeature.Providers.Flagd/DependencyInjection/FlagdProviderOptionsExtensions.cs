@@ -25,6 +25,8 @@ internal static class FlagdProviderOptionsExtensions
             .WithSourceSelector(options.SourceSelector)
             .WithSourceFilePath(options.SourceFilePath)
             .WithUseHashFileChangeDetection(options.UseHashFileChangeDetection)
+            .WithHashFileChangePollingInterval(options.HashFileChangePollingInterval)
+            .WithFileReadyInterval(options.FileReadyInterval)
             .Build();
 
         return config;

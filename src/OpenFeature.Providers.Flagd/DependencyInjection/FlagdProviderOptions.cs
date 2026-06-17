@@ -1,3 +1,4 @@
+using System;
 using OpenFeature.Providers.Flagd;
 
 namespace OpenFeature.DependencyInjection.Providers.Flagd;
@@ -78,4 +79,20 @@ public record FlagdProviderOptions
     /// Defaults to false.
     /// </summary>
     public bool UseHashFileChangeDetection { get; set; } = false;
+
+    /// <summary>
+    /// The interval at which the file watcher polls the flag file for content changes when
+    /// <see cref="UseHashFileChangeDetection"/> is enabled.
+    /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
+    /// Defaults to 5 seconds.
+    /// </summary>
+    public TimeSpan HashFileChangePollingInterval { get; set; } = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// The maximum time to wait for the flag file to become available during initialization
+    /// before timing out.
+    /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
+    /// Defaults to 5 minutes.
+    /// </summary>
+    public TimeSpan FileReadyInterval { get; set; } = TimeSpan.FromMinutes(5);
 }

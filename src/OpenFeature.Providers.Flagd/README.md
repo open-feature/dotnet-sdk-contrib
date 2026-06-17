@@ -170,6 +170,8 @@ The URI of the flagd server to which the `flagd Provider` connects to can either
 | Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                         |
 | Source file path              | FLAGD_SOURCE_FILE_PATH         | string  |           |                         |
 | Hash file change detection   | FLAGD_HASH_FILE_CHANGE         | boolean | false     |                         |
+| Hash file change interval    | FLAGD_HASH_FILE_CHANGE_INTERVAL_MS | number | 5000 |                      |
+| File ready interval          | FLAGD_FILE_READY_INTERVAL_MS   | number  | 300000    |                         |
 | Logger                       | n/a                            | n/a     |           |                         |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
@@ -300,3 +302,30 @@ export FLAGD_HASH_FILE_CHANGE=true
 
 When enabled, the provider polls the file at a regular interval and compares content hashes rather than relying on
 OS-level file change notifications. This is more reliable but has a slightly higher I/O cost due to periodic file reads.
+
+### Tuning the file watcher intervals
+
+Two timing-related settings can be tuned for the file resolver. Both are expressed in **milliseconds** when set via
+environment variables:
+
+- **Hash file change polling interval** (`FLAGD_HASH_FILE_CHANGE_INTERVAL_MS`, default `5000` / 5 seconds) — how often
+  the hash-based watcher polls the file for content changes. Only applies when hash-based change detection is enabled.
+- **File ready interval** (`FLAGD_FILE_READY_INTERVAL_MS`, default `300000` / 5 minutes) — the maximum time to wait
+  during initialization for the flag file to become available before timing out. Applies regardless of the watcher mode.
+
+```shell
+export FLAGD_HASH_FILE_CHANGE_INTERVAL_MS=30000
+export FLAGD_FILE_READY_INTERVAL_MS=60000
+```
+
+Or programmatically using `TimeSpan` values:
+
+```csharp
+var flagdConfig = new FlagdConfigBuilder()
+    .WithResolverType(ResolverType.FILE)
+    .WithSourceFilePath("/etc/flags/my-flags.json")
+    .WithUseHashFileChangeDetection(true)
+    .WithHashFileChangePollingInterval(TimeSpan.FromSeconds(30))
+    .WithFileReadyInterval(TimeSpan.FromMinutes(1))
+    .Build();
+```

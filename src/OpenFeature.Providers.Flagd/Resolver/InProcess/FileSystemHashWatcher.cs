@@ -22,7 +22,7 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
     private DateTime _lastModified = DateTime.MinValue;
     private long _lastSize;
 
-    internal static readonly TimeSpan DefaultFileChangePollingInterval = TimeSpan.FromMinutes(1);
+    internal static readonly TimeSpan DefaultFileChangePollingInterval = TimeSpan.FromSeconds(5);
 
     public event EventHandler<FileChangedEventArgs> FileChanged;
 
@@ -89,37 +89,8 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
         DisposeAsync().AsTask().GetAwaiter().GetResult();
     }
 
-    /// <summary>
-    /// Forces the revalidation of cached attributes and data.
-    ///
-    /// Two techniques are combined:
-    ///
-    /// 1. Directory.GetFiles triggers READDIRPLUS, refreshing inode attributes.
-    /// 2. Reading FileInfo.Length forces a GETATTR that can invalidate cached
-    ///    data pages when the server reports a different mtime/size.
-    /// </summary>
-    private void RefreshFileSystemCache()
-    {
-        try
-        {
-            var directory = Path.GetDirectoryName(_filePath);
-            if (directory != null)
-            {
-                Directory.GetFiles(directory, Path.GetFileName(_filePath));
-            }
-
-            new FileInfo(_filePath).Refresh();
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogDebug(ex, "File system cache refresh attempt failed for file '{FilePath}'", _filePath);
-        }
-    }
-
     private (byte[] Hash, long Size) GetFileContentHash()
     {
-        RefreshFileSystemCache();
-
         using (var fs = new FileStream(
                    _filePath,
                    FileMode.Open,
@@ -142,27 +113,23 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
                 if (File.Exists(_filePath))
                 {
                     var (currentHash, currentSize) = GetFileContentHash();
-                    var currentModified = File.GetLastWriteTimeUtc(_filePath);
 
                     if (_lastFileHash.Length == 0)
                     {
                         _lastFileHash = currentHash;
                         _lastSize = currentSize;
-                        _lastModified = currentModified;
-                        _logger?.LogInformation("Initial file read for file '{FilePath}', Hash={LastFileHash}, Size={LastFileSize}, Modified={LastModified}.",
-                            _filePath, BitConverter.ToString(currentHash).Replace("-", ""), _lastSize, _lastModified);
+                        _logger?.LogInformation("Initial file read for file '{FilePath}', Hash={LastFileHash}, Size={LastFileSize}.",
+                            _filePath, BitConverter.ToString(currentHash).Replace("-", ""), _lastSize);
                     }
-                    else if (currentModified != _lastModified ||
-                             currentSize != _lastSize ||
+                    else if (currentSize != _lastSize ||
                              !currentHash.AsSpan().SequenceEqual(_lastFileHash))
                     {
                         _lastFileHash = currentHash;
                         _lastSize = currentSize;
-                        _lastModified = currentModified;
-                        _logger?.LogInformation("File content change detected for file '{FilePath}', Hash={LastFileHash}, Size={LastFileSize}, Modified={LastModified}.",
-                            _filePath, BitConverter.ToString(currentHash).Replace("-", ""), _lastSize, _lastModified);
+                        _logger?.LogInformation("File content change detected for file '{FilePath}', Hash={LastFileHash}, Size={LastFileSize}.",
+                            _filePath, BitConverter.ToString(currentHash).Replace("-", ""), _lastSize);
 
-                        RaiseEvent(new FileChangedEventArgs(_filePath, currentModified));
+                        RaiseEvent(new FileChangedEventArgs(_filePath, DateTime.UtcNow));
                     }
                 }
                 else

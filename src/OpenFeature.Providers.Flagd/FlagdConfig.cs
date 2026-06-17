@@ -46,6 +46,8 @@ public class FlagdConfig
     internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
     internal const string EnvVarSourceFilePath = "FLAGD_SOURCE_FILE_PATH";
     internal const string EnvVarHashFileChange = "FLAGD_HASH_FILE_CHANGE";
+    internal const string EnvVarHashFileChangeIntervalMs = "FLAGD_HASH_FILE_CHANGE_INTERVAL_MS";
+    internal const string EnvVarFileReadyIntervalMs = "FLAGD_FILE_READY_INTERVAL_MS";
     internal const string FlagdSelectorHeaderName = "flagd-selector";
     internal static int CacheSizeDefault = 10;
     internal static string InProcessResolverValue = "in-process";
@@ -206,6 +208,27 @@ public class FlagdConfig
         set => _useHashFileChangeDetection = value;
     }
 
+    /// <summary>
+    ///     The interval at which the file watcher polls the flag file for content changes when
+    ///     <see cref="UseHashFileChangeDetection"/> is enabled. When not set, a default of 5 seconds is used.
+    ///     Used when ResolverType is FILE.
+    /// </summary>
+    public TimeSpan? HashFileChangePollingInterval
+    {
+        get => _hashFileChangePollingInterval;
+        set => _hashFileChangePollingInterval = value;
+    }
+
+    /// <summary>
+    ///     The maximum time to wait for the flag file to become available during initialization before
+    ///     timing out. When not set, a default of 5 minutes is used. Used when ResolverType is FILE.
+    /// </summary>
+    public TimeSpan? FileReadyInterval
+    {
+        get => _fileReadyInterval;
+        set => _fileReadyInterval = value;
+    }
+
     internal bool UseCertificate => _cert.Length > 0;
 
     private string _host;
@@ -221,6 +244,8 @@ public class FlagdConfig
     private ResolverType _resolverType;
     private string _sourceFilePath;
     private bool _useHashFileChangeDetection;
+    private TimeSpan? _hashFileChangePollingInterval;
+    private TimeSpan? _fileReadyInterval;
 
     internal FlagdConfig()
     {
@@ -243,6 +268,8 @@ public class FlagdConfig
         _resolverType = GetResolverTypeFromEnvironment();
         _sourceFilePath = GetSourceFilePathFromEnvironment();
         _useHashFileChangeDetection = GetUseHashFileChangeDetectionFromEnvironment();
+        _hashFileChangePollingInterval = GetIntervalFromMillisecondsEnvironment(EnvVarHashFileChangeIntervalMs);
+        _fileReadyInterval = GetIntervalFromMillisecondsEnvironment(EnvVarFileReadyIntervalMs);
     }
 
     internal Uri GetUri()
@@ -293,6 +320,19 @@ public class FlagdConfig
     {
         var value = Environment.GetEnvironmentVariable(EnvVarHashFileChange);
         return !string.IsNullOrEmpty(value) && bool.TryParse(value, out var parsed) && parsed;
+    }
+
+    private static TimeSpan? GetIntervalFromMillisecondsEnvironment(string envVarName)
+    {
+        var value = Environment.GetEnvironmentVariable(envVarName);
+        if (!string.IsNullOrWhiteSpace(value)
+            && int.TryParse(value, out var milliseconds)
+            && milliseconds > 0)
+        {
+            return TimeSpan.FromMilliseconds(milliseconds);
+        }
+
+        return null;
     }
 }
 
@@ -411,6 +451,26 @@ public class FlagdConfigBuilder
     public FlagdConfigBuilder WithUseHashFileChangeDetection(bool useHash)
     {
         _config.UseHashFileChangeDetection = useHash;
+        return this;
+    }
+
+    /// <summary>
+    ///     The interval at which the file watcher polls the flag file for content changes when
+    ///     hash-based change detection is enabled. Defaults to 5 seconds when not set.
+    /// </summary>
+    public FlagdConfigBuilder WithHashFileChangePollingInterval(TimeSpan pollingInterval)
+    {
+        _config.HashFileChangePollingInterval = pollingInterval;
+        return this;
+    }
+
+    /// <summary>
+    ///     The maximum time to wait for the flag file to become available during initialization
+    ///     before timing out. Defaults to 5 minutes when not set.
+    /// </summary>
+    public FlagdConfigBuilder WithFileReadyInterval(TimeSpan fileReadyInterval)
+    {
+        _config.FileReadyInterval = fileReadyInterval;
         return this;
     }
 

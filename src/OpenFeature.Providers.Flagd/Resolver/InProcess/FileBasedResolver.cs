@@ -27,7 +27,7 @@ internal class FileBasedResolver : Resolver
     private Task _fileExistTask;
 
     internal static readonly TimeSpan DefaultWaitForFileReadyInterval = TimeSpan.FromMinutes(5);
-    internal static readonly TimeSpan WaitForFileReadyPollingInterval = TimeSpan.FromSeconds(10);
+    internal static readonly TimeSpan WaitForFileReadyPollingInterval = TimeSpan.FromSeconds(1);
     internal static readonly TimeSpan FileSystemWatcherDebounceInterval = TimeSpan.FromMilliseconds(500);
 
     public event EventHandler<FlagdProviderEvent> ProviderEvent;

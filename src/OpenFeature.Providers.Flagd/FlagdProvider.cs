@@ -89,7 +89,9 @@ public sealed class FlagdProvider : FeatureProvider
                 _config.SourceFilePath,
                 jsonSchemaValidator,
                 _config.SourceSelector,
-                _config.UseHashFileChangeDetection);
+                _config.UseHashFileChangeDetection,
+                _config.FileReadyInterval,
+                _config.HashFileChangePollingInterval);
         }
         else
         {
