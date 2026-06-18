@@ -34,6 +34,7 @@ safe-outputs:
       - provider:statsig
       - provider:gofeatureflag
       - provider:ofrep
+      - provider:unleash
       - duplicate-candidate
       - needs-info
     max: 4
@@ -57,6 +58,7 @@ safe-outputs:
       - provider:statsig
       - provider:gofeatureflag
       - provider:ofrep
+      - provider:unleash
       - duplicate-candidate
       - needs-info
     max: 4
@@ -151,6 +153,7 @@ Provider-to-component mapping:
 - `provider:statsig` -> `src/OpenFeature.Contrib.Providers.Statsig`
 - `provider:gofeatureflag` -> `src/OpenFeature.Providers.GOFeatureFlag`
 - `provider:ofrep` -> `src/OpenFeature.Providers.Ofrep`
+- `provider:unleash` -> `src/OpenFeature.Providers.Unleash`
 
 If you can map provider -> component -> owners, post one concise suggestion comment tagging the owners.
 
