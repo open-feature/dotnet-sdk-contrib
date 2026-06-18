@@ -1,11 +1,11 @@
-[submodule "src/OpenFeature.Contrib.Providers.Flagd/schemas"]
-	path = src/OpenFeature.Contrib.Providers.Flagd/schemas
+[submodule "src/OpenFeature.Providers.Flagd/schemas"]
+	path = src/OpenFeature.Providers.Flagd/schemas
 	url = https://github.com/open-feature/schemas.git
 [submodule "spec"]
 	path = spec
 	url = https://github.com/open-feature/spec.git
-[submodule "src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed"]
-	path = src/OpenFeature.Contrib.Providers.Flagd/flagd-testbed
+[submodule "src/OpenFeature.Providers.Flagd/flagd-testbed"]
+	path = src/OpenFeature.Providers.Flagd/flagd-testbed
 	url = https://github.com/open-feature/flagd-testbed.git
 [submodule "src/OpenFeature.Providers.GOFeatureFlag/wasm-releases"]
 	path = src/OpenFeature.Providers.GOFeatureFlag/wasm-releases

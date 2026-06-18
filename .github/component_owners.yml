@@ -1,8 +1,10 @@
 # Keep all in alphabetical order
 components:
   # src/
-  src/OpenFeature.Contrib.Providers.Flagd:
+  src/OpenFeature.Providers.Flagd:
+    - askpt
     - bacherfl
+    - kylejuliandev
     - toddbaert
   src/OpenFeature.Providers.GOFeatureFlag:
     - thomaspoignant
@@ -13,6 +15,7 @@ components:
     - luizbon
     - adams85
   src/OpenFeature.Contrib.Providers.FeatureManagement:
+    - askpt
     - ericpattison
     - toddbaert
   src/OpenFeature.Contrib.Providers.Statsig:
@@ -22,11 +25,16 @@ components:
     - jeandreidc
     - markphelps
   src/OpenFeature.Providers.Ofrep:
+    - askpt
     - weyert
+  src/OpenFeature.Providers.Unleash:
+    - PSanetra
 
   # test/
-  test/OpenFeature.Contrib.Providers.Flagd.Test:
+  test/OpenFeature.Providers.Flagd.Test:
+    - askpt
     - bacherfl
+    - kylejuliandev
     - toddbaert
   test/OpenFeature.Providers.GOFeatureFlag.Test:
     - thomaspoignant
@@ -37,6 +45,7 @@ components:
     - luizbon
     - adams85
   test/OpenFeature.Contrib.Providers.FeatureManagement.Test:
+    - askpt
     - ericpattison
     - toddbaert
   test/src/OpenFeature.Contrib.Providers.Statsig.Test:
@@ -46,7 +55,10 @@ components:
     - jeandreidc
     - markphelps
   test/OpenFeature.Providers.Ofrep.Test:
+    - askpt
     - weyert
+  test/OpenFeature.Providers.Unleash.Test:
+    - PSanetra
 
 ignored-authors:
   - renovate-bot

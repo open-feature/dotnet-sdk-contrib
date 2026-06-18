@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.Providers.Flagsmith</PackageId>
-    <VersionNumber>0.2.1</VersionNumber> <!--x-release-please-version -->
+    <VersionNumber>0.3.0</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Flagsmith" Version="5.4.3" />
+    <PackageReference Include="Flagsmith" Version="[8.0,10.0)" />
   </ItemGroup>
 
   <ItemGroup>

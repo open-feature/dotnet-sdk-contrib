@@ -1,0 +1,275 @@
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using OpenFeature.Constant;
+using OpenFeature.Model;
+using Unleash;
+using Xunit;
+
+namespace OpenFeature.Providers.Unleash.Test;
+
+public class UnleashProviderTest : IAsyncLifetime
+{
+    private readonly UnleashProvider _provider;
+
+    public UnleashProviderTest()
+    {
+        var bootstrapPath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "bootstrap.json");
+        var settings = new UnleashSettings
+        {
+            AppName = "test-app",
+            UnleashApi = new Uri("http://unleash.test/api/"),
+            InstanceTag = "test",
+            SendMetricsInterval = null
+        };
+        settings.UseBootstrapFileProvider(bootstrapPath);
+
+        this._provider = new UnleashProvider(settings);
+    }
+
+    public Task InitializeAsync() => this._provider.InitializeAsync(EvaluationContext.Empty);
+    public Task DisposeAsync() => this._provider.ShutdownAsync();
+
+    [Fact]
+    public void GetMetadata_ReturnsCorrectName()
+    {
+        Assert.Equal("Unleash Provider", this._provider.GetMetadata().Name);
+    }
+
+    // Boolean evaluation tests
+
+    [Fact]
+    public async Task ResolveBooleanValue_WhenEnabled_ReturnsTrue()
+    {
+        var result = await this._provider.ResolveBooleanValueAsync("boolean-flag", false);
+
+        Assert.True(result.Value);
+        Assert.Equal("boolean-flag", result.FlagKey);
+    }
+
+    [Fact]
+    public async Task ResolveBooleanValue_WhenDisabled_ReturnsFalse()
+    {
+        var result = await this._provider.ResolveBooleanValueAsync("disabled-flag", false);
+
+        Assert.False(result.Value);
+    }
+
+    [Fact]
+    public async Task ResolveBooleanValue_UnknownFlag_ReturnsDefault()
+    {
+        var result = await this._provider.ResolveBooleanValueAsync("nonexistent-flag", true);
+
+        Assert.True(result.Value);
+    }
+
+    // String evaluation tests
+
+    [Fact]
+    public async Task ResolveStringValue_WithVariant_ReturnsPayload()
+    {
+        var result = await this._provider.ResolveStringValueAsync("string-flag", "default");
+
+        Assert.Equal("hello", result.Value);
+        Assert.Equal("variantA", result.Variant);
+    }
+
+    [Fact]
+    public async Task ResolveStringValue_WhenDisabled_ReturnsDefault()
+    {
+        var result = await this._provider.ResolveStringValueAsync("disabled-flag", "default");
+
+        Assert.Equal("default", result.Value);
+        Assert.Equal(Reason.Disabled, result.Reason);
+    }
+
+    // Integer evaluation tests
+
+    [Fact]
+    public async Task ResolveIntegerValue_WithVariant_ReturnsParsedInt()
+    {
+        var result = await this._provider.ResolveIntegerValueAsync("integer-flag", 0);
+
+        Assert.Equal(42, result.Value);
+        Assert.Equal("variantInt", result.Variant);
+    }
+
+    [Fact]
+    public async Task ResolveIntegerValue_WhenDisabled_ReturnsDefault()
+    {
+        var result = await this._provider.ResolveIntegerValueAsync("disabled-flag", 99);
+
+        Assert.Equal(99, result.Value);
+        Assert.Equal(Reason.Disabled, result.Reason);
+    }
+
+    [Fact]
+    public async Task ResolveIntegerValue_InvalidPayload_ReturnsTypeMismatchError()
+    {
+        var result = await this._provider.ResolveIntegerValueAsync("invalid-int-flag", 0);
+
+        Assert.Equal(0, result.Value);
+        Assert.Equal(Reason.Error, result.Reason);
+        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
+        Assert.Contains("integer", result.ErrorMessage);
+    }
+
+    // Double evaluation tests
+
+    [Fact]
+    public async Task ResolveDoubleValue_WithVariant_ReturnsParsedDouble()
+    {
+        var result = await this._provider.ResolveDoubleValueAsync("double-flag", 0.0);
+
+        Assert.Equal(3.14, result.Value);
+        Assert.Equal("variantDouble", result.Variant);
+    }
+
+    [Fact]
+    public async Task ResolveDoubleValue_WhenDisabled_ReturnsDefault()
+    {
+        var result = await this._provider.ResolveDoubleValueAsync("disabled-flag", 1.5);
+
+        Assert.Equal(1.5, result.Value);
+        Assert.Equal(Reason.Disabled, result.Reason);
+    }
+
+    [Fact]
+    public async Task ResolveDoubleValue_InvalidPayload_ReturnsTypeMismatchError()
+    {
+        var result = await this._provider.ResolveDoubleValueAsync("invalid-int-flag", 0.0);
+
+        Assert.Equal(0.0, result.Value);
+        Assert.Equal(Reason.Error, result.Reason);
+        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
+        Assert.Contains("double", result.ErrorMessage);
+    }
+
+    // Structure evaluation tests
+
+    [Fact]
+    public async Task ResolveStructureValue_WithVariant_ReturnsPayloadAsValue()
+    {
+        var result = await this._provider.ResolveStructureValueAsync("json-flag", new Value("default"));
+
+        Assert.Equal("{\"key\":\"value\"}", result.Value.AsString);
+        Assert.Equal("variantJson", result.Variant);
+    }
+
+    [Fact]
+    public async Task ResolveStructureValue_WhenDisabled_ReturnsDefault()
+    {
+        var defaultValue = new Value("default");
+        var result = await this._provider.ResolveStructureValueAsync("disabled-flag", defaultValue);
+
+        Assert.Equal(defaultValue, result.Value);
+        Assert.Equal(Reason.Disabled, result.Reason);
+    }
+
+    // Null payload edge cases
+
+    [Fact]
+    public async Task ResolveStringValue_WithNullPayload_ReturnsDefault()
+    {
+        var result = await this._provider.ResolveStringValueAsync("no-payload-flag", "fallback");
+
+        Assert.Equal("fallback", result.Value);
+        Assert.Equal("variantNoPayload", result.Variant);
+    }
+
+    [Fact]
+    public async Task ResolveIntegerValue_WithNullPayload_ReturnsTypeMismatchError()
+    {
+        var result = await this._provider.ResolveIntegerValueAsync("no-payload-flag", 0);
+
+        Assert.Equal(0, result.Value);
+        Assert.Equal(Reason.Error, result.Reason);
+        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
+    }
+
+    [Fact]
+    public async Task ResolveDoubleValue_WithNullPayload_ReturnsTypeMismatchError()
+    {
+        var result = await this._provider.ResolveDoubleValueAsync("no-payload-flag", 0.0);
+
+        Assert.Equal(0.0, result.Value);
+        Assert.Equal(Reason.Error, result.Reason);
+        Assert.Equal(ErrorType.TypeMismatch, result.ErrorType);
+    }
+
+    [Fact]
+    public async Task ResolveStructureValue_WithNullPayload_ReturnsDefault()
+    {
+        var defaultValue = new Value("default");
+        var result = await this._provider.ResolveStructureValueAsync("no-payload-flag", defaultValue);
+
+        Assert.Equal(defaultValue, result.Value);
+        Assert.Equal("variantNoPayload", result.Variant);
+    }
+
+    // Context transformation tests
+
+    [Fact]
+    public async Task ResolveBooleanValue_WithTargetingKey_MatchesUserStrategy()
+    {
+        var context = EvaluationContext.Builder()
+            .SetTargetingKey("user-123")
+            .Build();
+
+        var result = await this._provider.ResolveBooleanValueAsync("user-targeted-flag", false, context);
+
+        Assert.True(result.Value);
+    }
+
+    [Fact]
+    public async Task ResolveBooleanValue_WithWrongUser_ReturnsFalse()
+    {
+        var context = EvaluationContext.Builder()
+            .SetTargetingKey("wrong-user")
+            .Build();
+
+        var result = await this._provider.ResolveBooleanValueAsync("user-targeted-flag", false, context);
+
+        Assert.False(result.Value);
+    }
+
+    [Fact]
+    public async Task ResolveBooleanValue_WithNullContext_DoesNotThrow()
+    {
+        var result = await this._provider.ResolveBooleanValueAsync("boolean-flag", false, null);
+
+        Assert.True(result.Value);
+    }
+
+    [Fact]
+    public async Task ResolveBooleanValue_WithWhitespaceTargetingKey_DoesNotMapToUserId()
+    {
+        // A whitespace-only targeting key should be treated as absent,
+        // so the user-targeted-flag (which requires userId=user-123) should return false.
+        var context = EvaluationContext.Builder()
+            .SetTargetingKey("   ")
+            .Build();
+
+        var result = await this._provider.ResolveBooleanValueAsync("user-targeted-flag", false, context);
+
+        Assert.False(result.Value);
+    }
+
+    [Fact]
+    public async Task ResolveStringValue_WithVariant_ReturnsPayloadTypeMetadata()
+    {
+        var result = await this._provider.ResolveStringValueAsync("string-flag", "default");
+
+        Assert.NotNull(result.FlagMetadata);
+        Assert.Equal("string", result.FlagMetadata.GetString("payload-type"));
+    }
+
+    [Fact]
+    public async Task ResolveIntegerValue_WithVariant_ReturnsPayloadTypeMetadata()
+    {
+        var result = await this._provider.ResolveIntegerValueAsync("integer-flag", 0);
+
+        Assert.NotNull(result.FlagMetadata);
+        Assert.Equal("number", result.FlagMetadata.GetString("payload-type"));
+    }
+}

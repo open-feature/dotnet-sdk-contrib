@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>OpenFeature.Contrib.Provider.FeatureManagement</PackageId>
-    <VersionNumber>0.1.1</VersionNumber> <!--x-release-please-version -->
+    <VersionNumber>0.1.2</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <VersionSuffix>preview</VersionSuffix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.FeatureManagement" Version="4.0.0" />
+    <PackageReference Include="Microsoft.FeatureManagement" Version="4.4.0" />
     <PackageReference Include="OpenFeature" Version="[2.0,3.0)" />
   </ItemGroup>
 
