@@ -109,14 +109,10 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// <param name="context">The evaluation context.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>The evaluated flag response.</returns>
-    /// <remarks>
-    /// This method delegates to the AOT-safe typed implementation for OFREP-supported value types.
-    /// Other generic types use the legacy reflection-based JSON path and are not AOT-safe.
-    /// </remarks>
     public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, T defaultValue,
         EvaluationContext? context, CancellationToken cancellationToken = default)
     {
-        #if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrWhiteSpace(flagKey);
 #else
         if (string.IsNullOrWhiteSpace(flagKey))

@@ -125,29 +125,25 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(
         string flagKey, bool defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateFlag,
-            cancellationToken);
+        this.ResolveFlag(flagKey, defaultValue, context, cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<string>> ResolveStringValueAsync(
         string flagKey, string defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateFlag,
-            cancellationToken);
+        this.ResolveFlag(flagKey, defaultValue, context, cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(
         string flagKey, int defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateFlag,
-            cancellationToken);
+        this.ResolveFlag(flagKey, defaultValue, context, cancellationToken);
 
     /// <inheritdoc/>
     public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(
         string flagKey, double defaultValue, EvaluationContext? context = null,
         CancellationToken cancellationToken = default) =>
-        this.ResolveFlag(flagKey, defaultValue, context, this._client.EvaluateFlag,
-            cancellationToken);
+        this.ResolveFlag(flagKey, defaultValue, context, cancellationToken);
 
     /// <inheritdoc/>
     public override async Task<ResolutionDetails<Value>>
@@ -188,7 +184,6 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
     /// <param name="flagKey">The unique identifier for the flag</param>
     /// <param name="defaultValue">The default value to return if the flag cannot be resolved</param>
     /// <param name="context">Optional evaluation context with targeting information</param>
-    /// <param name="evaluate">Typed client evaluation function for supported OFREP value types.</param>
     /// <param name="cancellationToken">A token to cancel the operation</param>
     /// <returns>Resolution details containing the flag value and
     /// metadata</returns>
@@ -196,7 +191,6 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
         string flagKey,
         T defaultValue,
         EvaluationContext? context,
-        Func<string, T, EvaluationContext?, CancellationToken, Task<OfrepResponse<T>>> evaluate,
         CancellationToken cancellationToken)
     {
         if (flagKey == null)
@@ -204,7 +198,7 @@ public sealed class OfrepProvider : FeatureProvider, IDisposable
             throw new ArgumentNullException(nameof(flagKey));
         }
 
-        var response = await evaluate(flagKey, defaultValue, context, cancellationToken).ConfigureAwait(false);
+        var response = await this._client.EvaluateFlag(flagKey, defaultValue, context, cancellationToken).ConfigureAwait(false);
 
         return new ResolutionDetails<T>(
             flagKey,

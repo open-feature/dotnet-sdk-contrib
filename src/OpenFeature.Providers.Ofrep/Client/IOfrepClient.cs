@@ -17,10 +17,6 @@ internal interface IOfrepClient : IDisposable
     /// <param name="context">The evaluation context.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>The evaluated flag response.</returns>
-    /// <remarks>
-    /// This generic method is provided for backward compatibility.
-    /// For Native AOT scenarios, use the typed methods (EvaluateBooleanFlag, EvaluateStringFlag, etc.) instead.
-    /// </remarks>
     Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, T defaultValue, EvaluationContext? context,
         CancellationToken cancellationToken);
 }
