@@ -9,6 +9,7 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
+  copilot-requests: write # This enables the workflow to use organization tokens for Copilot requests. See: https://github.blog/changelog/2026-06-11-agentic-workflows-no-longer-need-a-personal-access-token/
 tools:
   github:
     toolsets: [default]
