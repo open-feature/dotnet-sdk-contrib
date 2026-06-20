@@ -4,5 +4,10 @@
     "github>open-feature/community-tooling"
   ],
   "dependencyDashboardApproval": true,
-  "recreateWhen": "never"
+  "recreateWhen": "never",
+  "ignorePaths": [
+    ".github/workflows/*.lock.yml",
+    ".github/workflows/agentics-maintenance.yml",
+    ".github/workflows/copilot-setup-steps.yml"
+  ]
 }

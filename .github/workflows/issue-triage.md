@@ -65,8 +65,10 @@ safe-outputs:
     max: 4
   add-comment:
     max: 3
+  # These settings disable the default behavior of reporting workflow failures as issues, which is not desired for this workflow since it can get quite noisy.
   noop:
-    max: 1
+    report-as-issue: false
+  report-failure-as-issue: false
 ---
 
 # Issue Triage
