@@ -230,7 +230,7 @@ internal class RpcResolver : Resolver
             try
             {
                 // Read the response stream asynchronously
-                while (!token.IsCancellationRequested && call != null && await call.ResponseStream.MoveNext().ConfigureAwait(false))
+                while (!token.IsCancellationRequested && call != null && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
 
@@ -264,6 +264,19 @@ internal class RpcResolver : Resolver
                             break;
                     }
                 }
+
+                // The stream ended gracefully without an exception (the server closed it).
+                // Unless we're shutting down, treat this like a dropped connection and go
+                // through the retry/backoff path instead of immediately reconnecting in a
+                // tight loop.
+                if (!token.IsCancellationRequested)
+                {
+                    await this.HandleErrorEvent().ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // do nothing, we've been shutdown
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
             {
