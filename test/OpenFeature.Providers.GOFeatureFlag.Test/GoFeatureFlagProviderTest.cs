@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using OpenFeature.Constant;
 using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.Exceptions;
@@ -707,8 +707,10 @@ public class GOFeatureFlagProviderTest
                 TrackingEventDetails.Builder().Set("revenue", 123).Set("user_id", "123ABC").Build());
             await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
-            var gotJson = JObject.Parse(got);
-            Assert.NotNull(gotJson["events"].First);
+            var gotJson = JsonNode.Parse(got);
+            var events = gotJson?["events"]?.AsArray();
+            Assert.NotNull(events);
+            Assert.NotEmpty(events!);
         }
 
         [Fact(DisplayName = "Should send the evaluation information to the data collector")]
@@ -732,8 +734,10 @@ public class GOFeatureFlagProviderTest
                 TrackingEventDetails.Builder().Set("revenue", 123).Set("user_id", "123ABC").Build());
             await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
-            var gotJson = JObject.Parse(got);
-            Assert.Single(gotJson["events"]);
+            var gotJson = JsonNode.Parse(got);
+            var events = gotJson?["events"]?.AsArray();
+            Assert.NotNull(events);
+            Assert.Single(events!);
         }
 #endif
     }
@@ -760,8 +764,10 @@ public class GOFeatureFlagProviderTest
             await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
             await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
-            var gotJson = JObject.Parse(got);
-            Assert.Single(gotJson["events"]);
+            var gotJson = JsonNode.Parse(got);
+            var events = gotJson?["events"]?.AsArray();
+            Assert.NotNull(events);
+            Assert.Single(events!);
             await OpenFeatureApi.Instance.ShutdownAsync();
         }
 
@@ -783,8 +789,10 @@ public class GOFeatureFlagProviderTest
             await client.GetBooleanDetailsAsync("bool_flag", false, DefaultEvaluationContext);
             await Task.Delay(TimeSpan.FromMilliseconds(500));
             var got = await mockHttp.LastRequest.Content.ReadAsStringAsync();
-            var gotJson = JObject.Parse(got);
-            Assert.Equal(2, gotJson["events"].Count());
+            var gotJson = JsonNode.Parse(got);
+            var events = gotJson?["events"]?.AsArray();
+            Assert.NotNull(events);
+            Assert.Equal(2, events!.Count);
             await OpenFeatureApi.Instance.ShutdownAsync();
         }
 #endif

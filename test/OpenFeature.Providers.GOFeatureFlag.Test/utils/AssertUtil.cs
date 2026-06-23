@@ -1,5 +1,5 @@
 using System;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using Xunit.Sdk;
 
 namespace OpenFeature.Providers.GOFeatureFlag.Test.Utils;
@@ -16,10 +16,12 @@ public class AssertUtil
             throw new ArgumentException("JSON strings cannot be null or empty.");
         }
 
-        var token1 = JObject.Parse(expectedJson);
-        var token2 = JObject.Parse(actualJson);
+        var token1 = JsonNode.Parse(expectedJson) as JsonObject
+                     ?? throw new ArgumentException("Expected JSON must be an object.");
+        var token2 = JsonNode.Parse(actualJson) as JsonObject
+                     ?? throw new ArgumentException("Actual JSON must be an object.");
 
-        if (!JToken.DeepEquals(token1, token2))
+        if (!JsonNode.DeepEquals(token1, token2))
         {
             throw new EqualException(expectedJson, actualJson);
         }
