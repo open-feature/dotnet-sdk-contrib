@@ -168,10 +168,10 @@ The URI of the flagd server to which the `flagd Provider` connects to can either
 | Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |                         |
 | Resolver type                | FLAGD_RESOLVER                 | string  | rpc       | rpc, in-process, file   |
 | Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                         |
-| Source file path              | FLAGD_SOURCE_FILE_PATH         | string  |           |                         |
+| Offline flag source path     | FLAGD_OFFLINE_FLAG_SOURCE_PATH | string  |           |                         |
 | Hash file change detection   | FLAGD_HASH_FILE_CHANGE         | boolean | false     |                         |
-| Hash file change interval    | FLAGD_HASH_FILE_CHANGE_INTERVAL_MS | number | 5000 |                      |
-| File ready interval          | FLAGD_FILE_READY_INTERVAL_MS   | number  | 300000    |                         |
+| Offline poll interval        | FLAGD_OFFLINE_POLL_MS          | number  | 5000      |                         |
+| Deadline                     | FLAGD_DEADLINE_MS              | number  | 300000    |                         |
 | Logger                       | n/a                            | n/a     |           |                         |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
@@ -257,11 +257,11 @@ This is useful for local development, testing, or air-gapped environments where 
 (e.g., via ConfigMaps, volume mounts, or file sync).
 
 The file resolver is activated by setting the `FLAGD_RESOLVER` environment variable to `file` and providing the
-path to the flag definition file via `FLAGD_SOURCE_FILE_PATH`:
+path to the flag definition file via `FLAGD_OFFLINE_FLAG_SOURCE_PATH`:
 
 ```shell
 export FLAGD_RESOLVER=file
-export FLAGD_SOURCE_FILE_PATH=/etc/flags/my-flags.json
+export FLAGD_OFFLINE_FLAG_SOURCE_PATH=/etc/flags/my-flags.json
 ```
 
 Or by configuring the provider programmatically:
@@ -271,7 +271,7 @@ using OpenFeature.Providers.Flagd;
 
 var flagdConfig = new FlagdConfigBuilder()
     .WithResolverType(ResolverType.FILE)
-    .WithSourceFilePath("/etc/flags/my-flags.json")
+    .WithOfflineFlagSourcePath("/etc/flags/my-flags.json")
     .Build();
 
 var flagdProvider = new FlagdProvider(flagdConfig);
@@ -279,17 +279,19 @@ OpenFeature.Api.Instance.SetProvider(flagdProvider);
 ```
 
 The file resolver watches for changes to the flag file and automatically reloads the configuration when changes are
-detected. By default, it uses the operating system's `FileSystemWatcher` for change notification.
+detected. By default, it polls the file's modification time and size at a regular interval. Modification-time polling
+is used by default because native file system event APIs are unreliable in the environments this resolver typically
+targets (e.g. Linux overlay/NFS mounts and bind-mounted ConfigMaps), where events are frequently missed.
 
 ### Hash-based file change detection
 
-In some environments (e.g., NFS mounts, certain container runtimes, or network file systems), native file system
-events may not be reliable. For these cases, you can enable content-based change detection using MurmurHash:
+In some environments, the file's modification time may not be updated reliably (e.g. certain network or virtual file
+systems). For these cases, you can opt in to content-based change detection using MurmurHash:
 
 ```csharp
 var flagdConfig = new FlagdConfigBuilder()
     .WithResolverType(ResolverType.FILE)
-    .WithSourceFilePath("/etc/flags/my-flags.json")
+    .WithOfflineFlagSourcePath("/etc/flags/my-flags.json")
     .WithUseHashFileChangeDetection(true)
     .Build();
 ```
@@ -300,32 +302,32 @@ Or via environment variable:
 export FLAGD_HASH_FILE_CHANGE=true
 ```
 
-When enabled, the provider polls the file at a regular interval and compares content hashes rather than relying on
-OS-level file change notifications. This is more reliable but has a slightly higher I/O cost due to periodic file reads.
+When enabled, the provider polls the file at a regular interval and compares content hashes rather than the file's
+modification time. This is more robust against unreliable timestamps but has a slightly higher I/O cost due to
+periodic full-file reads.
 
 ### Tuning the file watcher intervals
 
-Two timing-related settings can be tuned for the file resolver. Both are expressed in **milliseconds** when set via
-environment variables:
+Two timing-related settings can be tuned for the file resolver. Both are expressed in **milliseconds**:
 
-- **Hash file change polling interval** (`FLAGD_HASH_FILE_CHANGE_INTERVAL_MS`, default `5000` / 5 seconds) — how often
-  the hash-based watcher polls the file for content changes. Only applies when hash-based change detection is enabled.
-- **File ready interval** (`FLAGD_FILE_READY_INTERVAL_MS`, default `300000` / 5 minutes) — the maximum time to wait
-  during initialization for the flag file to become available before timing out. Applies regardless of the watcher mode.
+- **Offline poll interval** (`FLAGD_OFFLINE_POLL_MS`, default `5000` / 5 seconds) — how often the watcher polls the
+  file for changes. Applies to both the modification-time watcher (default) and the hash-based watcher.
+- **Deadline** (`FLAGD_DEADLINE_MS`, default `300000` / 5 minutes) — the maximum time to wait during initialization
+  for the flag file to become available before timing out. Applies regardless of the watcher mode.
 
 ```shell
-export FLAGD_HASH_FILE_CHANGE_INTERVAL_MS=30000
-export FLAGD_FILE_READY_INTERVAL_MS=60000
+export FLAGD_OFFLINE_POLL_MS=30000
+export FLAGD_DEADLINE_MS=60000
 ```
 
-Or programmatically using `TimeSpan` values:
+Or programmatically (values in milliseconds):
 
 ```csharp
 var flagdConfig = new FlagdConfigBuilder()
     .WithResolverType(ResolverType.FILE)
-    .WithSourceFilePath("/etc/flags/my-flags.json")
+    .WithOfflineFlagSourcePath("/etc/flags/my-flags.json")
     .WithUseHashFileChangeDetection(true)
-    .WithHashFileChangePollingInterval(TimeSpan.FromSeconds(30))
-    .WithFileReadyInterval(TimeSpan.FromMinutes(1))
+    .WithOfflinePollIntervalMs(30000)
+    .WithDeadlineMs(60000)
     .Build();
 ```

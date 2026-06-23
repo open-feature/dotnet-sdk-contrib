@@ -183,14 +183,14 @@ public class FlagdProviderOptionsExtensionsTests
         // Arrange
         var options = new FlagdProviderOptions
         {
-            SourceFilePath = "/flags/config.json"
+            OfflineFlagSourcePath = "/flags/config.json"
         };
 
         // Act
         var config = options.ToFlagdConfig();
 
         // Assert
-        Assert.Equal("/flags/config.json", config.SourceFilePath);
+        Assert.Equal("/flags/config.json", config.OfflineFlagSourcePath);
     }
 
     [Fact]

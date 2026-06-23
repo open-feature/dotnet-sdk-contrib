@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -231,7 +230,7 @@ internal class InProcessResolver : Resolver
 #endif
             if (config.UseCertificate)
             {
-                if (File.Exists(config.CertificatePath))
+                if (System.IO.File.Exists(config.CertificatePath))
                 {
                     var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 
@@ -312,7 +311,7 @@ internal class InProcessResolver : Resolver
 #endif
             if (config.UseCertificate)
             {
-                if (File.Exists(config.CertificatePath))
+                if (System.IO.File.Exists(config.CertificatePath))
                 {
                     var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 #if NET5_0_OR_GREATER

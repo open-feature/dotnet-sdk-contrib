@@ -1,4 +1,3 @@
-using System;
 using OpenFeature.Providers.Flagd;
 
 namespace OpenFeature.DependencyInjection.Providers.Flagd;
@@ -68,31 +67,31 @@ public record FlagdProviderOptions
     /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
     /// Defaults to empty string.
     /// </summary>
-    public string SourceFilePath { get; set; } = string.Empty;
+    public string OfflineFlagSourcePath { get; set; } = string.Empty;
 
     /// <summary>
     /// When true, the file watcher uses content hashing (MurmurHash) to detect changes.
-    /// When false, the file watcher relies on file system events from the OS.
-    /// File system events can be unreliable in certain containerized environments or mount types;
-    /// hashing always works reliably but has a higher I/O cost.
+    /// When false (the default), the file watcher polls the file's modification time and size.
+    /// Modification-time polling is reliable in most environments; content hashing is an opt-in
+    /// for file systems that do not update modification times reliably, at a higher I/O cost.
     /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
     /// Defaults to false.
     /// </summary>
     public bool UseHashFileChangeDetection { get; set; } = false;
 
     /// <summary>
-    /// The interval at which the file watcher polls the flag file for content changes when
-    /// <see cref="UseHashFileChangeDetection"/> is enabled.
+    /// The interval, in milliseconds, at which the file watcher polls the flag file for changes.
+    /// Applies to both the modification-time watcher (default) and the hash-based watcher.
     /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
-    /// Defaults to 5 seconds.
+    /// Defaults to 5000 (5 seconds).
     /// </summary>
-    public TimeSpan HashFileChangePollingInterval { get; set; } = TimeSpan.FromSeconds(5);
+    public int OfflinePollIntervalMs { get; set; } = 5000;
 
     /// <summary>
-    /// The maximum time to wait for the flag file to become available during initialization
-    /// before timing out.
+    /// The maximum time, in milliseconds, to wait for the flag file to become available during
+    /// initialization before timing out.
     /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
-    /// Defaults to 5 minutes.
+    /// Defaults to 300000 (5 minutes).
     /// </summary>
-    public TimeSpan FileReadyInterval { get; set; } = TimeSpan.FromMinutes(5);
+    public int DeadlineMs { get; set; } = 300000;
 }

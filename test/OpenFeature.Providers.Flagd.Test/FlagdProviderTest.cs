@@ -12,6 +12,7 @@ using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc.Evaluation.V2;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
+using OpenFeature.Providers.Flagd.Resolver.File;
 using OpenFeature.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Providers.Flagd.Resolver.Rpc;
 using Xunit;
@@ -1023,7 +1024,7 @@ public class UnitTestFlagdProvider
 
             var config = FlagdConfig.Builder()
                 .WithResolverType(ResolverType.FILE)
-                .WithSourceFilePath(tempFile)
+                .WithOfflineFlagSourcePath(tempFile)
                 .Build();
 
             var flagdProvider = new FlagdProvider(config);
@@ -1059,7 +1060,7 @@ public class UnitTestFlagdProvider
             File.WriteAllText(tempFile, Utils.validFlagConfig);
 
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "file");
-            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceFilePath, tempFile);
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarOfflineFlagSourcePath, tempFile);
 
             var flagdProvider = new FlagdProvider();
 

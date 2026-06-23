@@ -2,10 +2,12 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
-using OpenFeature.Providers.Flagd.Resolver.InProcess;
+using OpenFeature.Providers.Flagd.Resolver.File;
 using Xunit;
 
-namespace OpenFeature.Providers.Flagd.Test.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Test.Resolver.File;
+
+using File = System.IO.File;
 
 public class FileSystemHashWatcherTests : IDisposable
 {

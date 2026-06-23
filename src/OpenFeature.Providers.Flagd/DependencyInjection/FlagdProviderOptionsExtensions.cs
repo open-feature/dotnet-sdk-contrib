@@ -23,10 +23,10 @@ internal static class FlagdProviderOptionsExtensions
             .WithMaxEventStreamRetries(options.MaxEventStreamRetries)
             .WithResolverType(options.ResolverType)
             .WithSourceSelector(options.SourceSelector)
-            .WithSourceFilePath(options.SourceFilePath)
+            .WithOfflineFlagSourcePath(options.OfflineFlagSourcePath)
             .WithUseHashFileChangeDetection(options.UseHashFileChangeDetection)
-            .WithHashFileChangePollingInterval(options.HashFileChangePollingInterval)
-            .WithFileReadyInterval(options.FileReadyInterval)
+            .WithOfflinePollIntervalMs(options.OfflinePollIntervalMs)
+            .WithDeadlineMs(options.DeadlineMs)
             .Build();
 
         return config;

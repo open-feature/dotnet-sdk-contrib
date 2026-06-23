@@ -44,10 +44,10 @@ public class FlagdConfig
     internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
     internal const string EnvVarResolverType = "FLAGD_RESOLVER";
     internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
-    internal const string EnvVarSourceFilePath = "FLAGD_SOURCE_FILE_PATH";
+    internal const string EnvVarOfflineFlagSourcePath = "FLAGD_OFFLINE_FLAG_SOURCE_PATH";
     internal const string EnvVarHashFileChange = "FLAGD_HASH_FILE_CHANGE";
-    internal const string EnvVarHashFileChangeIntervalMs = "FLAGD_HASH_FILE_CHANGE_INTERVAL_MS";
-    internal const string EnvVarFileReadyIntervalMs = "FLAGD_FILE_READY_INTERVAL_MS";
+    internal const string EnvVarOfflinePollMs = "FLAGD_OFFLINE_POLL_MS";
+    internal const string EnvVarDeadlineMs = "FLAGD_DEADLINE_MS";
     internal const string FlagdSelectorHeaderName = "flagd-selector";
     internal static int CacheSizeDefault = 10;
     internal static string InProcessResolverValue = "in-process";
@@ -189,17 +189,17 @@ public class FlagdConfig
     /// <summary>
     ///     Path to the flag definition JSON file. Used when ResolverType is FILE.
     /// </summary>
-    public string SourceFilePath
+    public string OfflineFlagSourcePath
     {
-        get => _sourceFilePath;
-        set => _sourceFilePath = value;
+        get => _offlineFlagSourcePath;
+        set => _offlineFlagSourcePath = value;
     }
 
     /// <summary>
     ///     When true, the file watcher uses content hashing (MurmurHash) to detect changes.
-    ///     When false, the file watcher relies on file system events from the OS.
-    ///     File system events can be unreliable in certain containerized environments or mount types;
-    ///     hashing always works reliably but has a higher I/O cost.
+    ///     When false (the default), the file watcher polls the file's modification time and size.
+    ///     Modification-time polling is reliable in most environments; content hashing is an opt-in
+    ///     for file systems that do not update modification times reliably, at a higher I/O cost.
     ///     Defaults to false. Used when ResolverType is FILE.
     /// </summary>
     public bool UseHashFileChangeDetection
@@ -209,24 +209,25 @@ public class FlagdConfig
     }
 
     /// <summary>
-    ///     The interval at which the file watcher polls the flag file for content changes when
-    ///     <see cref="UseHashFileChangeDetection"/> is enabled. When not set, a default of 5 seconds is used.
-    ///     Used when ResolverType is FILE.
+    ///     The interval, in milliseconds, at which the file watcher polls the flag file for changes.
+    ///     Applies to both the modification-time watcher (default) and the hash-based watcher.
+    ///     When not set, a default of 5 seconds is used. Used when ResolverType is FILE.
     /// </summary>
-    public TimeSpan? HashFileChangePollingInterval
+    public int? OfflinePollIntervalMs
     {
-        get => _hashFileChangePollingInterval;
-        set => _hashFileChangePollingInterval = value;
+        get => _offlinePollIntervalMs;
+        set => _offlinePollIntervalMs = value;
     }
 
     /// <summary>
-    ///     The maximum time to wait for the flag file to become available during initialization before
-    ///     timing out. When not set, a default of 5 minutes is used. Used when ResolverType is FILE.
+    ///     The maximum time, in milliseconds, to wait for the flag file to become available during
+    ///     initialization before timing out. When not set, a default of 5 minutes is used.
+    ///     Used when ResolverType is FILE.
     /// </summary>
-    public TimeSpan? FileReadyInterval
+    public int? DeadlineMs
     {
-        get => _fileReadyInterval;
-        set => _fileReadyInterval = value;
+        get => _deadlineMs;
+        set => _deadlineMs = value;
     }
 
     internal bool UseCertificate => _cert.Length > 0;
@@ -242,10 +243,10 @@ public class FlagdConfig
     private string _sourceSelector;
     private ILogger _logger;
     private ResolverType _resolverType;
-    private string _sourceFilePath;
+    private string _offlineFlagSourcePath;
     private bool _useHashFileChangeDetection;
-    private TimeSpan? _hashFileChangePollingInterval;
-    private TimeSpan? _fileReadyInterval;
+    private int? _offlinePollIntervalMs;
+    private int? _deadlineMs;
 
     internal FlagdConfig()
     {
@@ -266,10 +267,10 @@ public class FlagdConfig
         }
 
         _resolverType = GetResolverTypeFromEnvironment();
-        _sourceFilePath = GetSourceFilePathFromEnvironment();
+        _offlineFlagSourcePath = GetOfflineFlagSourcePathFromEnvironment();
         _useHashFileChangeDetection = GetUseHashFileChangeDetectionFromEnvironment();
-        _hashFileChangePollingInterval = GetIntervalFromMillisecondsEnvironment(EnvVarHashFileChangeIntervalMs);
-        _fileReadyInterval = GetIntervalFromMillisecondsEnvironment(EnvVarFileReadyIntervalMs);
+        _offlinePollIntervalMs = GetMillisecondsFromEnvironment(EnvVarOfflinePollMs);
+        _deadlineMs = GetMillisecondsFromEnvironment(EnvVarDeadlineMs);
     }
 
     internal Uri GetUri()
@@ -310,10 +311,10 @@ public class FlagdConfig
         return ResolverType.RPC;
     }
 
-    private static string GetSourceFilePathFromEnvironment()
+    private static string GetOfflineFlagSourcePathFromEnvironment()
     {
-        var sourceFilePathStr = Environment.GetEnvironmentVariable(EnvVarSourceFilePath);
-        return string.IsNullOrWhiteSpace(sourceFilePathStr) ? string.Empty : sourceFilePathStr;
+        var offlineFlagSourcePathStr = Environment.GetEnvironmentVariable(EnvVarOfflineFlagSourcePath);
+        return string.IsNullOrWhiteSpace(offlineFlagSourcePathStr) ? string.Empty : offlineFlagSourcePathStr;
     }
 
     private static bool GetUseHashFileChangeDetectionFromEnvironment()
@@ -322,14 +323,14 @@ public class FlagdConfig
         return !string.IsNullOrEmpty(value) && bool.TryParse(value, out var parsed) && parsed;
     }
 
-    private static TimeSpan? GetIntervalFromMillisecondsEnvironment(string envVarName)
+    private static int? GetMillisecondsFromEnvironment(string envVarName)
     {
         var value = Environment.GetEnvironmentVariable(envVarName);
         if (!string.IsNullOrWhiteSpace(value)
             && int.TryParse(value, out var milliseconds)
             && milliseconds > 0)
         {
-            return TimeSpan.FromMilliseconds(milliseconds);
+            return milliseconds;
         }
 
         return null;
@@ -437,16 +438,16 @@ public class FlagdConfigBuilder
     /// <summary>
     ///     Path to the flag definition JSON file for file-based in-memory resolution.
     /// </summary>
-    public FlagdConfigBuilder WithSourceFilePath(string sourceFilePath)
+    public FlagdConfigBuilder WithOfflineFlagSourcePath(string offlineFlagSourcePath)
     {
-        _config.SourceFilePath = sourceFilePath;
+        _config.OfflineFlagSourcePath = offlineFlagSourcePath;
         return this;
     }
 
     /// <summary>
     ///     Enable or disable content hashing for file change detection.
     ///     When true, the file watcher uses content hashing (MurmurHash) to detect changes.
-    ///     When false, the file watcher relies on file system events from the OS.
+    ///     When false (the default), the file watcher polls the file's modification time and size.
     /// </summary>
     public FlagdConfigBuilder WithUseHashFileChangeDetection(bool useHash)
     {
@@ -455,22 +456,23 @@ public class FlagdConfigBuilder
     }
 
     /// <summary>
-    ///     The interval at which the file watcher polls the flag file for content changes when
-    ///     hash-based change detection is enabled. Defaults to 5 seconds when not set.
+    ///     The interval, in milliseconds, at which the file watcher polls the flag file for changes.
+    ///     Applies to both the modification-time watcher (default) and the hash-based watcher.
+    ///     Defaults to 5 seconds when not set.
     /// </summary>
-    public FlagdConfigBuilder WithHashFileChangePollingInterval(TimeSpan pollingInterval)
+    public FlagdConfigBuilder WithOfflinePollIntervalMs(int offlinePollIntervalMs)
     {
-        _config.HashFileChangePollingInterval = pollingInterval;
+        _config.OfflinePollIntervalMs = offlinePollIntervalMs;
         return this;
     }
 
     /// <summary>
-    ///     The maximum time to wait for the flag file to become available during initialization
-    ///     before timing out. Defaults to 5 minutes when not set.
+    ///     The maximum time, in milliseconds, to wait for the flag file to become available during
+    ///     initialization before timing out. Defaults to 5 minutes when not set.
     /// </summary>
-    public FlagdConfigBuilder WithFileReadyInterval(TimeSpan fileReadyInterval)
+    public FlagdConfigBuilder WithDeadlineMs(int deadlineMs)
     {
-        _config.FileReadyInterval = fileReadyInterval;
+        _config.DeadlineMs = deadlineMs;
         return this;
     }
 

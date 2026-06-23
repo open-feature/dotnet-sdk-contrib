@@ -235,11 +235,11 @@ public class UnitTestFlagdConfig
     [Fact]
     public void TestFlagdConfigSourceFilePathFromEnvVar()
     {
-        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSourceFilePath, "/path/to/flags.json");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarOfflineFlagSourcePath, "/path/to/flags.json");
 
         var config = FlagdConfig.Builder().Build();
 
-        Assert.Equal("/path/to/flags.json", config.SourceFilePath);
+        Assert.Equal("/path/to/flags.json", config.OfflineFlagSourcePath);
     }
 
     [Fact]
@@ -247,7 +247,7 @@ public class UnitTestFlagdConfig
     {
         var config = FlagdConfig.Builder().Build();
 
-        Assert.Equal(string.Empty, config.SourceFilePath);
+        Assert.Equal(string.Empty, config.OfflineFlagSourcePath);
     }
 
     [Fact]
@@ -273,11 +273,11 @@ public class UnitTestFlagdConfig
     {
         var config = new FlagdConfigBuilder()
             .WithResolverType(ResolverType.FILE)
-            .WithSourceFilePath("/my/flags.json")
+            .WithOfflineFlagSourcePath("/my/flags.json")
             .Build();
 
         Assert.Equal(ResolverType.FILE, config.ResolverType);
-        Assert.Equal("/my/flags.json", config.SourceFilePath);
+        Assert.Equal("/my/flags.json", config.OfflineFlagSourcePath);
     }
 
     [Fact]
@@ -285,7 +285,7 @@ public class UnitTestFlagdConfig
     {
         var config = new FlagdConfigBuilder()
             .WithResolverType(ResolverType.FILE)
-            .WithSourceFilePath("/my/flags.json")
+            .WithOfflineFlagSourcePath("/my/flags.json")
             .WithUseHashFileChangeDetection(true)
             .Build();
 

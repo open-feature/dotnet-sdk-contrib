@@ -7,10 +7,11 @@ using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
+using OpenFeature.Providers.Flagd.Resolver.File;
 using OpenFeature.Providers.Flagd.Resolver.InProcess;
 using Xunit;
 
-namespace OpenFeature.Providers.Flagd.Test.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Test.Resolver.File;
 
 public class FileBasedResolverTests : IDisposable
 {
@@ -39,7 +40,7 @@ public class FileBasedResolverTests : IDisposable
     private string CreateTempFlagFile(string content)
     {
         var filePath = Path.Combine(_tempDir, "flags.json");
-        File.WriteAllText(filePath, content);
+        System.IO.File.WriteAllText(filePath, content);
         return filePath;
     }
 
@@ -244,14 +245,15 @@ public class FileBasedResolverTests : IDisposable
     }
 
     [Fact]
-    public async Task FileChange_WithFSWatcher_RaisesProviderConfigurationChangedEvent()
+    public async Task FileChange_WithMtimeWatcher_RaisesProviderConfigurationChangedEvent()
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.validFlagConfig);
         var mockValidator = Substitute.For<IJsonSchemaValidator>();
         var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
             useHashFileChangeDetection: false,
-            waitForFileReadyInterval: TimeSpan.FromSeconds(5));
+            waitForFileReadyInterval: TimeSpan.FromSeconds(5),
+            fileChangePollingInterval: TimeSpan.FromMilliseconds(200));
 
         FlagdProviderEvent configChangedEvent = null;
         resolver.ProviderEvent += (sender, evt) =>
@@ -272,9 +274,9 @@ public class FileBasedResolverTests : IDisposable
                 }
             }
         }";
-        File.WriteAllText(filePath, updatedConfig);
+        System.IO.File.WriteAllText(filePath, updatedConfig);
 
-        // Assert - wait for debounced reload
+        // Assert - wait for the modification-time watcher to detect the change
         await Utils.AssertUntilAsync(async (ct) =>
         {
             Assert.NotNull(configChangedEvent);
@@ -316,7 +318,7 @@ public class FileBasedResolverTests : IDisposable
                 }
             }
         }";
-        File.WriteAllText(filePath, updatedConfig);
+        System.IO.File.WriteAllText(filePath, updatedConfig);
 
         // Assert - wait for hash-based change detection
         await Utils.AssertUntilAsync(async (ct) =>

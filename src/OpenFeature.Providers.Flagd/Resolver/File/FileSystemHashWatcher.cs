@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Murmur;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Resolver.File;
 
-internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
+internal class FileSystemHashWatcher : IFileWatcher, IAsyncDisposable
 {
     private readonly string _filePath;
     private readonly TimeSpan _pollingInterval;
@@ -46,12 +46,12 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
 
         // Establish the baseline hash synchronously so that any file changes
         // occurring after Start() returns are reliably detected.
-        if (File.Exists(_filePath))
+        if (System.IO.File.Exists(_filePath))
         {
             var (hash, size) = GetFileContentHash();
             _lastFileHash = hash;
             _lastSize = size;
-            _lastModified = File.GetLastWriteTimeUtc(_filePath);
+            _lastModified = System.IO.File.GetLastWriteTimeUtc(_filePath);
             _logger?.LogInformation("Initial file read for file '{FilePath}', Hash={LastFileHash}, Size={LastFileSize}, Modified={LastModified}.",
                 _filePath, BitConverter.ToString(hash).Replace("-", ""), _lastSize, _lastModified);
         }
@@ -110,7 +110,7 @@ internal class FileSystemHashWatcher : IAsyncDisposable, IDisposable
         {
             try
             {
-                if (File.Exists(_filePath))
+                if (System.IO.File.Exists(_filePath))
                 {
                     var (currentHash, currentSize) = GetFileContentHash();
 

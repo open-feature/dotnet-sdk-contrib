@@ -8,8 +8,9 @@ using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
+using OpenFeature.Providers.Flagd.Resolver.InProcess;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Resolver.File;
 
 internal class FileBasedResolver : Resolver
 {
@@ -23,12 +24,10 @@ internal class FileBasedResolver : Resolver
     private readonly bool _useHashFileChangeDetection;
     private readonly TimeSpan? _fileChangePollingInterval;
     private IDisposable _fileWatcher;
-    private Timer _debounceTimer;
     private Task _fileExistTask;
 
     internal static readonly TimeSpan DefaultWaitForFileReadyInterval = TimeSpan.FromMinutes(5);
     internal static readonly TimeSpan WaitForFileReadyPollingInterval = TimeSpan.FromSeconds(1);
-    internal static readonly TimeSpan FileSystemWatcherDebounceInterval = TimeSpan.FromMilliseconds(500);
 
     public event EventHandler<FlagdProviderEvent> ProviderEvent;
 
@@ -125,26 +124,6 @@ internal class FileBasedResolver : Resolver
                 _fileWatcher.Dispose();
             }
             _fileWatcher = null;
-        }
-
-        // Drain any in-flight debounce timer callback before disposing the
-        // evaluator lock. A callback may be executing LoadFlags() while holding
-        // the write lock; disposing the lock underneath it would throw a
-        // SynchronizationLockException. The WaitHandle overload of
-        // Timer.Dispose signals once all pending callbacks have completed.
-        if (_debounceTimer != null)
-        {
-            using (var timerDisposed = new ManualResetEvent(false))
-            {
-                if (_debounceTimer.Dispose(timerDisposed))
-                {
-                    if (!timerDisposed.WaitOne(TimeSpan.FromSeconds(10)))
-                    {
-                        _logger?.LogWarning("Timed out waiting for in-flight file reload to complete during shutdown for file '{FilePath}'", _filePath);
-                    }
-                }
-            }
-            _debounceTimer = null;
         }
 
         _evaluatorLock.Dispose();
@@ -258,7 +237,7 @@ internal class FileBasedResolver : Resolver
 
                 try
                 {
-                    if (File.Exists(_filePath))
+                    if (System.IO.File.Exists(_filePath))
                     {
                         _logger?.LogInformation("File '{FilePath}' exists. Loading flag file", _filePath);
                         return;
@@ -323,114 +302,50 @@ internal class FileBasedResolver : Resolver
 
     private void CreateFileWatcher()
     {
+        IFileWatcher fileWatcher;
+
         if (_useHashFileChangeDetection)
         {
             _logger?.LogInformation("File watcher for '{FilePath}' is using content hashing for change detection", _filePath);
-
-            var fileWatcher = new FileSystemHashWatcher(_filePath, _logger, _fileChangePollingInterval);
-
-            fileWatcher.FileChanged += (sender, e) =>
-            {
-                try
-                {
-                    _logger?.LogInformation("File '{FilePath}' content change detected at {LastModified}.", _filePath, e.LastModified);
-
-                    var flagKeys = LoadFlags();
-
-                    var flagdEvent = new FlagdProviderEvent(
-                        ProviderEventTypes.ProviderConfigurationChanged,
-                        flagKeys,
-                        Structure.Empty);
-
-                    RaiseEvent(flagdEvent);
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogError(ex, "Error reloading flags from file '{FilePath}'", _filePath);
-
-                    var flagdEvent = new FlagdProviderEvent(
-                        ProviderEventTypes.ProviderError,
-                        null,
-                        Structure.Empty);
-
-                    RaiseEvent(flagdEvent);
-                }
-            };
-
-            fileWatcher.Start();
-
-            _fileWatcher = fileWatcher;
+            fileWatcher = new FileSystemHashWatcher(_filePath, _logger, _fileChangePollingInterval);
         }
         else
         {
-            _logger?.LogInformation("File watcher for '{FilePath}' is using file system events for change detection", _filePath);
+            _logger?.LogInformation("File watcher for '{FilePath}' is using modification-time polling for change detection", _filePath);
+            fileWatcher = new FileSystemMtimeWatcher(_filePath, _logger, _fileChangePollingInterval);
+        }
 
-            var directory = Path.GetDirectoryName(_filePath);
-            var fileName = Path.GetFileName(_filePath);
-            var fileWatcher = new FileSystemWatcher(directory, fileName);
+        fileWatcher.FileChanged += OnFileChanged;
+        fileWatcher.Start();
 
-            fileWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName;
-            fileWatcher.IncludeSubdirectories = false;
+        _fileWatcher = fileWatcher;
+    }
 
-            _debounceTimer = new Timer(_ =>
-            {
-                try
-                {
-                    _logger?.LogInformation("Debounced file change reload for '{FilePath}'.", _filePath);
+    private void OnFileChanged(object sender, FileChangedEventArgs e)
+    {
+        try
+        {
+            _logger?.LogInformation("File '{FilePath}' content change detected at {LastModified}.", _filePath, e.LastModified);
 
-                    var flagKeys = LoadFlags();
+            var flagKeys = LoadFlags();
 
-                    var flagdEvent = new FlagdProviderEvent(
-                        ProviderEventTypes.ProviderConfigurationChanged,
-                        flagKeys,
-                        Structure.Empty);
+            var flagdEvent = new FlagdProviderEvent(
+                ProviderEventTypes.ProviderConfigurationChanged,
+                flagKeys,
+                Structure.Empty);
 
-                    RaiseEvent(flagdEvent);
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogError(ex, "Error reloading flags from file '{FilePath}'", _filePath);
+            RaiseEvent(flagdEvent);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Error reloading flags from file '{FilePath}'", _filePath);
 
-                    var flagdEvent = new FlagdProviderEvent(
-                        ProviderEventTypes.ProviderError,
-                        null,
-                        Structure.Empty);
+            var flagdEvent = new FlagdProviderEvent(
+                ProviderEventTypes.ProviderError,
+                null,
+                Structure.Empty);
 
-                    RaiseEvent(flagdEvent);
-                }
-            }, null, Timeout.Infinite, Timeout.Infinite);
-
-            FileSystemEventHandler fileChangeHandler = (object sender, FileSystemEventArgs e) =>
-            {
-                _logger?.LogInformation("File '{FilePath}' file change detected type={ChangeType}, debouncing reload.", _filePath, e.ChangeType);
-                _debounceTimer.Change(FileSystemWatcherDebounceInterval, Timeout.InfiniteTimeSpan);
-            };
-
-            fileWatcher.Changed += fileChangeHandler;
-            fileWatcher.Created += fileChangeHandler;
-
-            fileWatcher.Renamed += (object sender, RenamedEventArgs e) =>
-            {
-                fileChangeHandler.Invoke(sender, e);
-            };
-
-            // A deleted flag file does not trigger a reload: the last-known-good
-            // configuration is retained (consistent with the hash watcher path).
-            // A subsequent re-creation of the file raises a Created event which
-            // reloads the flags.
-            fileWatcher.Deleted += (object sender, FileSystemEventArgs e) =>
-            {
-                _logger?.LogWarning("Watched file '{FilePath}' was deleted; retaining last-known-good flag configuration", _filePath);
-            };
-
-            fileWatcher.Error += (object sender, ErrorEventArgs e) =>
-            {
-                _logger?.LogError(e.GetException(), "File watcher for '{FilePath}' encountered an error", _filePath);
-            };
-
-            fileWatcher.EnableRaisingEvents = true;
-
-            _fileWatcher = fileWatcher;
+            RaiseEvent(flagdEvent);
         }
     }
 }
