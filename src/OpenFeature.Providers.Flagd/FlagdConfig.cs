@@ -523,6 +523,11 @@ public class FlagdConfigBuilder
 
     private static int TryGetEnvironmentVariableOrDefault(string environmentVariable, int defaultPort)
     {
-        return int.TryParse(Environment.GetEnvironmentVariable(environmentVariable), out var p) ? p : defaultPort;
+        if (int.TryParse(Environment.GetEnvironmentVariable(environmentVariable), out var p))
+        {
+            // Validate port is within valid TCP port range (1-65535)
+            return p >= 1 && p <= 65535 ? p : defaultPort;
+        }
+        return defaultPort;
     }
 }

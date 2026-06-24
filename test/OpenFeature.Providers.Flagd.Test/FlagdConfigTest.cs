@@ -374,4 +374,103 @@ public class UnitTestFlagdConfig
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, null);
         }
     }
+
+    [Fact]
+    public void InvalidPortLessThan1_FallsBackToDefault()
+    {
+        // Arrange
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "0");
+
+        // Act & Assert
+        try
+        {
+            var config = FlagdConfig.Builder().Build();
+
+            Assert.Equal(8013, config.Port);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, null);
+        }
+    }
+
+    [Fact]
+    public void InvalidPortNegative_FallsBackToDefault()
+    {
+        // Arrange
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "-1");
+
+        // Act & Assert
+        try
+        {
+            var config = FlagdConfig.Builder().Build();
+
+            Assert.Equal(8013, config.Port);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, null);
+        }
+    }
+
+    [Fact]
+    public void InvalidPortGreaterThan65535_FallsBackToDefault()
+    {
+        // Arrange
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, "65536");
+
+        // Act & Assert
+        try
+        {
+            var config = FlagdConfig.Builder().Build();
+
+            Assert.Equal(8013, config.Port);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarPort, null);
+        }
+    }
+
+    [Fact]
+    public void InvalidSyncPortLessThan1_FallsBackToDefault()
+    {
+        // Arrange
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, "0");
+
+        // Act & Assert
+        try
+        {
+            var config = new FlagdConfigBuilder()
+                .WithResolverType(ResolverType.IN_PROCESS)
+                .Build();
+
+            Assert.Equal(8015, config.Port);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, null);
+        }
+    }
+
+    [Fact]
+    public void InvalidSyncPortGreaterThan65535_FallsBackToDefault()
+    {
+        // Arrange
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, "70000");
+
+        // Act & Assert
+        try
+        {
+            var config = new FlagdConfigBuilder()
+                .WithResolverType(ResolverType.IN_PROCESS)
+                .Build();
+
+            Assert.Equal(8015, config.Port);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, null);
+        }
+    }
 }
