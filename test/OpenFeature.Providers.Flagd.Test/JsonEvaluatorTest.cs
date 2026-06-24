@@ -400,6 +400,46 @@ public class UnitTestJsonEvaluator
     }
 
     [Fact]
+    public void TestJsonEvaluatorTargetingReturnsNull_FallsBackToDefaultVariant()
+    {
+        // Arrange - flag with targeting that returns null when condition is false
+        var flag = //lang=json
+            """
+            {
+              "flags": {
+                "conditional-flag": {
+                  "state": "ENABLED",
+                  "variants": {
+                    "on": true,
+                    "off": false
+                  },
+                  "defaultVariant": "off",
+                  "targeting": {
+                    "if": [
+                      { "==": [{ "var": "env" }, "production"] },
+                      "on",
+                      null
+                    ]
+                  }
+                }
+              }
+            }
+            """;
+
+        this._jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, flag);
+
+        // Act - evaluate with context that doesn't match targeting
+        var context = EvaluationContext.Builder().Set("env", "staging").Build();
+        var result = this._jsonEvaluator.ResolveBooleanValueAsync("conditional-flag", true, context);
+
+        // Assert
+        Assert.False(result.Value);
+        Assert.Equal("off", result.Variant);
+        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal(ErrorType.None, result.ErrorType);
+    }
+
+    [Fact]
     public void TestJsonEvaluatorFlagWithEmptyDefaultVariantReturnsNotFound()
     {
         // Arrange

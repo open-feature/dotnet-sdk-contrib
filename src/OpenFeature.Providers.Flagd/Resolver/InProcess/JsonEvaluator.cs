@@ -339,7 +339,8 @@ internal class JsonEvaluator
 
                 // if variant is null, revert to default
                 reason = Reason.Default;
-                flagConfiguration.Variants.TryGetValue(flagConfiguration.DefaultVariant,
+                variant = flagConfiguration.DefaultVariant;
+                flagConfiguration.Variants.TryGetValue(variant,
                     out var defaultVariantValue);
                 if (defaultVariantValue.ValueKind == JsonValueKind.Undefined || defaultVariantValue.ValueKind == JsonValueKind.Null)
                 {

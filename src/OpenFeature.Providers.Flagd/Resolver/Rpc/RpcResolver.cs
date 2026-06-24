@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -543,7 +542,7 @@ internal class RpcResolver : Resolver
 #endif
             if (config.UseCertificate)
             {
-                if (File.Exists(config.CertificatePath))
+                if (System.IO.File.Exists(config.CertificatePath))
                 {
                     var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 #if NET5_0_OR_GREATER
