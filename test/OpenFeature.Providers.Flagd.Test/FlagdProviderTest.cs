@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
@@ -11,6 +12,7 @@ using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc.Evaluation.V2;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
+using OpenFeature.Providers.Flagd.Resolver.File;
 using OpenFeature.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Providers.Flagd.Resolver.Rpc;
 using Xunit;
@@ -1009,5 +1011,67 @@ public class UnitTestFlagdProvider
 
         Assert.Equal(0, flagdProvider._enrichedContext.Count);
         return Task.CompletedTask;
+    }
+
+    [Fact]
+    public void TestGetProviderWithFileResolverType()
+    {
+        Utils.CleanEnvVars();
+        var tempFile = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(tempFile, Utils.validFlagConfig);
+
+            var config = FlagdConfig.Builder()
+                .WithResolverType(ResolverType.FILE)
+                .WithOfflineFlagSourcePath(tempFile)
+                .Build();
+
+            var flagdProvider = new FlagdProvider(config);
+
+            var resolver = flagdProvider.GetResolver();
+            Assert.NotNull(resolver);
+            Assert.IsType<FileBasedResolver>(resolver);
+        }
+        finally
+        {
+            File.Delete(tempFile);
+        }
+    }
+
+    [Fact]
+    public void TestGetProviderWithFileResolverType_MissingSourceFilePath_Throws()
+    {
+        Utils.CleanEnvVars();
+        var config = FlagdConfig.Builder()
+            .WithResolverType(ResolverType.FILE)
+            .Build();
+
+        Assert.Throws<ArgumentException>(() => new FlagdProvider(config));
+    }
+
+    [Fact]
+    public void TestGetProviderWithFileResolverTypeFromEnvVar()
+    {
+        Utils.CleanEnvVars();
+        var tempFile = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(tempFile, Utils.validFlagConfig);
+
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "file");
+            Environment.SetEnvironmentVariable(FlagdConfig.EnvVarOfflineFlagSourcePath, tempFile);
+
+            var flagdProvider = new FlagdProvider();
+
+            var resolver = flagdProvider.GetResolver();
+            Assert.NotNull(resolver);
+            Assert.IsType<FileBasedResolver>(resolver);
+        }
+        finally
+        {
+            Utils.CleanEnvVars();
+            File.Delete(tempFile);
+        }
     }
 }

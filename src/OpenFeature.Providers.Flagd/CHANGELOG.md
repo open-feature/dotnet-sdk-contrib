@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.0...OpenFeature.Providers.Flagd-v0.7.1) (2026-06-16)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** apply in-process flag updates after initial sync ([#685](https://github.com/open-feature/dotnet-sdk-contrib/issues/685)) ([148ad21](https://github.com/open-feature/dotnet-sdk-contrib/commit/148ad21dbffebdeacc9fa534a63500a6ee9a12a6))
+
+## [0.7.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.6.1...OpenFeature.Providers.Flagd-v0.7.0) (2026-06-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* DISABLED is a successful evaluation (still defaults) ([#671](https://github.com/open-feature/dotnet-sdk-contrib/issues/671))
+
+### ✨ New Features
+
+* DISABLED is a successful evaluation (still defaults) ([#671](https://github.com/open-feature/dotnet-sdk-contrib/issues/671)) ([7d3665b](https://github.com/open-feature/dotnet-sdk-contrib/commit/7d3665b9fc60fc40c263c96df9e1209be28872c1))
+* make use of flagd-selector header in RPC mode ([#673](https://github.com/open-feature/dotnet-sdk-contrib/issues/673)) ([c2afa7e](https://github.com/open-feature/dotnet-sdk-contrib/commit/c2afa7ee8e9bbd5cb9515c410590d79846c09bd8))
+
 ## [0.6.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.6.0...OpenFeature.Providers.Flagd-v0.6.1) (2026-04-30)
 
 

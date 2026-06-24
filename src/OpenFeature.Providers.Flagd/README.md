@@ -156,19 +156,23 @@ namespace OpenFeatureTestApp
 
 The URI of the flagd server to which the `flagd Provider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
 
-| Option name                  | Environment variable name      | Type    | Default   | Values          |
-| ---------------------------- | ------------------------------ | ------- | --------- | --------------- |
-| host                         | FLAGD_HOST                     | string  | localhost |                 |
-| port                         | FLAGD_PORT (FLAGD_SYNC_PORT when resolver is in-process)   | number  | 8013 (8015 when resolver is in-process)      |                 |
-| tls                          | FLAGD_TLS                      | boolean | false     |                 |
-| tls certPath                 | FLAGD_SERVER_CERT_PATH         | string  |           |                 |
-| unix socket path             | FLAGD_SOCKET_PATH              | string  |           |                 |
-| Caching                      | FLAGD_CACHE                    | string  |           | lru             |
-| Maximum cache size           | FLAGD_MAX_CACHE_SIZE           | number  | 10        |                 |
-| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |                 |
-| Resolver type                | FLAGD_RESOLVER                 | string  | rpc       | rpc, in-process |
-| Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                 |
-| Logger                       | n/a                            | n/a     |           |                 |
+| Option name                  | Environment variable name                                  | Type    | Default                                 | Values                  |
+| ---------------------------- | ---------------------------------------------------------- | ------- | --------------------------------------- | ----------------------- |
+| host                         | FLAGD_HOST                                                 | string  | localhost                               |                         |
+| port                         | FLAGD_PORT (FLAGD_SYNC_PORT when resolver is in-process)   | number  | 8013 (8015 when resolver is in-process) |                         |
+| tls                          | FLAGD_TLS                                                  | boolean | false                                   |                         |
+| tls certPath                 | FLAGD_SERVER_CERT_PATH                                     | string  |                                         |                         |
+| unix socket path             | FLAGD_SOCKET_PATH                                          | string  |                                         |                         |
+| Caching                      | FLAGD_CACHE                                                | string  |                                         | lru                     |
+| Maximum cache size           | FLAGD_MAX_CACHE_SIZE                                       | number  | 10                                      |                         |
+| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES                             | number  | 3                                       |                         |
+| Resolver type                | FLAGD_RESOLVER                                             | string  | rpc                                     | rpc, in-process, file   |
+| Source selector              | FLAGD_SOURCE_SELECTOR                                      | string  |                                         |                         |
+| Offline flag source path     | FLAGD_OFFLINE_FLAG_SOURCE_PATH                             | string  |                                         |                         |
+| Hash file change detection   | FLAGD_HASH_FILE_CHANGE                                     | boolean | false                                   |                         |
+| Offline poll interval        | FLAGD_OFFLINE_POLL_MS                                      | number  | 5000                                    |                         |
+| Deadline                     | FLAGD_DEADLINE_MS                                          | number  | 300000                                  |                         |
+| Logger                       | n/a                                                        | n/a     |                                         |                         |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
 
@@ -243,5 +247,87 @@ By default the in-process provider will attempt to validate the flag configurati
 var logger = loggerFactory.CreateLogger<Program>();
 var flagdConfig = new FlagdConfigBuilder()
     .WithLogger(logger)
+    .Build();
+```
+
+## File resolver type
+
+The flagd provider supports a **file-based resolver mode**, which reads flag definitions from a local JSON file.
+This is useful for local development, testing, or air-gapped environments where flags are distributed as files
+(e.g., via ConfigMaps, volume mounts, or file sync).
+
+The file resolver is activated by setting the `FLAGD_RESOLVER` environment variable to `file` and providing the
+path to the flag definition file via `FLAGD_OFFLINE_FLAG_SOURCE_PATH`:
+
+```shell
+export FLAGD_RESOLVER=file
+export FLAGD_OFFLINE_FLAG_SOURCE_PATH=/etc/flags/my-flags.json
+```
+
+Or by configuring the provider programmatically:
+
+```csharp
+using OpenFeature.Providers.Flagd;
+
+var flagdConfig = new FlagdConfigBuilder()
+    .WithResolverType(ResolverType.FILE)
+    .WithOfflineFlagSourcePath("/etc/flags/my-flags.json")
+    .Build();
+
+var flagdProvider = new FlagdProvider(flagdConfig);
+OpenFeature.Api.Instance.SetProvider(flagdProvider);
+```
+
+The file resolver watches for changes to the flag file and automatically reloads the configuration when changes are
+detected. By default, it polls the file's modification time and size at a regular interval. Modification-time polling
+is used by default because native file system event APIs are unreliable in the environments this resolver typically
+targets (e.g. Linux overlay/NFS mounts and bind-mounted ConfigMaps), where events are frequently missed.
+
+### Hash-based file change detection
+
+In some environments, the file's modification time may not be updated reliably (e.g. certain network or virtual file
+systems). For these cases, you can opt in to content-based change detection using MurmurHash:
+
+```csharp
+var flagdConfig = new FlagdConfigBuilder()
+    .WithResolverType(ResolverType.FILE)
+    .WithOfflineFlagSourcePath("/etc/flags/my-flags.json")
+    .WithUseHashFileChangeDetection(true)
+    .Build();
+```
+
+Or via environment variable:
+
+```shell
+export FLAGD_HASH_FILE_CHANGE=true
+```
+
+When enabled, the provider polls the file at a regular interval and compares content hashes rather than the file's
+modification time. This is more robust against unreliable timestamps but has a slightly higher I/O cost due to
+periodic full-file reads.
+
+### Tuning the file watcher intervals
+
+Two timing-related settings can be tuned for the file resolver. Both are expressed in **milliseconds**:
+
+- **Offline poll interval** (`FLAGD_OFFLINE_POLL_MS`, default `5000` / 5 seconds) — how often the watcher polls the
+  file for changes. Applies to both the modification-time watcher (default) and the hash-based watcher.
+- **Deadline** (`FLAGD_DEADLINE_MS`, default `300000` / 5 minutes) — the maximum time to wait during initialization
+  for the flag file to become available before timing out. Applies regardless of the watcher mode.
+
+```shell
+export FLAGD_OFFLINE_POLL_MS=30000
+export FLAGD_DEADLINE_MS=60000
+```
+
+Or programmatically (values in milliseconds):
+
+```csharp
+var flagdConfig = new FlagdConfigBuilder()
+    .WithResolverType(ResolverType.FILE)
+    .WithOfflineFlagSourcePath("/etc/flags/my-flags.json")
+    .WithUseHashFileChangeDetection(true)
+    .WithOfflinePollIntervalMs(30000)
+    .WithDeadlineMs(60000)
     .Build();
 ```

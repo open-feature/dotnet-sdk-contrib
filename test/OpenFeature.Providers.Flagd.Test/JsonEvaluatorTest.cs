@@ -245,19 +245,28 @@ public class UnitTestJsonEvaluator
     }
 
     [Fact]
-    public void TestJsonEvaluatorDisabledBoolEvaluation()
+    public void TestJsonEvaluatorDisabledFlagReturnsDisabledReason()
     {
         _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
 
-        var attributes = ImmutableDictionary.CreateBuilder<string, Value>();
-        attributes.Add("color", new Value("yellow"));
+        var result = _jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false);
 
-        var builder = EvaluationContext.Builder();
-        builder
-            .Set("color", "yellow");
+        Assert.False(result.Value);
+        Assert.Equal(Reason.Disabled, result.Reason);
+        Assert.Null(result.Variant);
+    }
 
-        Assert.Throws<FeatureProviderException>(() =>
-            _jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false, builder.Build()));
+    [Fact]
+    public void TestJsonEvaluatorDisabledFlagIgnoresTargeting()
+    {
+        _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+        var context = EvaluationContext.Builder().Set("color", "yellow").Build();
+        var result = _jsonEvaluator.ResolveBooleanValueAsync("disabledFlag", false, context);
+
+        Assert.False(result.Value);
+        Assert.Equal(Reason.Disabled, result.Reason);
+        Assert.Null(result.Variant);
     }
 
     [Fact]
@@ -388,6 +397,46 @@ public class UnitTestJsonEvaluator
         Assert.Equal(2, result.FlagMetadata.GetDouble("integer"));
         Assert.Equal(true, result.FlagMetadata.GetBool("boolean"));
         Assert.Equal(.1, result.FlagMetadata.GetDouble("float"));
+    }
+
+    [Fact]
+    public void TestJsonEvaluatorTargetingReturnsNull_FallsBackToDefaultVariant()
+    {
+        // Arrange - flag with targeting that returns null when condition is false
+        var flag = //lang=json
+            """
+            {
+              "flags": {
+                "conditional-flag": {
+                  "state": "ENABLED",
+                  "variants": {
+                    "on": true,
+                    "off": false
+                  },
+                  "defaultVariant": "off",
+                  "targeting": {
+                    "if": [
+                      { "==": [{ "var": "env" }, "production"] },
+                      "on",
+                      null
+                    ]
+                  }
+                }
+              }
+            }
+            """;
+
+        this._jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, flag);
+
+        // Act - evaluate with context that doesn't match targeting
+        var context = EvaluationContext.Builder().Set("env", "staging").Build();
+        var result = this._jsonEvaluator.ResolveBooleanValueAsync("conditional-flag", true, context);
+
+        // Assert
+        Assert.False(result.Value);
+        Assert.Equal("off", result.Variant);
+        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal(ErrorType.None, result.ErrorType);
     }
 
     [Fact]

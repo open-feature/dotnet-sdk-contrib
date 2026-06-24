@@ -20,7 +20,13 @@ public enum ResolverType
     ///     locally for in-process evaluation.
     ///     Evaluations are preformed in-process.
     /// </summary>
-    IN_PROCESS
+    IN_PROCESS,
+    /// <summary>
+    ///     This is the file-based resolving type, where flags are loaded from a local JSON file
+    ///     and evaluated in-process without creating any gRPC streams.
+    ///     Evaluations are preformed in-process.
+    /// </summary>
+    FILE
 }
 
 /// <summary>
@@ -39,9 +45,15 @@ public class FlagdConfig
     internal const string EnvVarMaxEventStreamRetries = "FLAGD_MAX_EVENT_STREAM_RETRIES";
     internal const string EnvVarResolverType = "FLAGD_RESOLVER";
     internal const string EnvVarSourceSelector = "FLAGD_SOURCE_SELECTOR";
+    internal const string EnvVarOfflineFlagSourcePath = "FLAGD_OFFLINE_FLAG_SOURCE_PATH";
+    internal const string EnvVarHashFileChange = "FLAGD_HASH_FILE_CHANGE";
+    internal const string EnvVarOfflinePollMs = "FLAGD_OFFLINE_POLL_MS";
+    internal const string EnvVarDeadlineMs = "FLAGD_DEADLINE_MS";
     internal const string FlagdSelectorHeaderName = "flagd-selector";
     internal static int CacheSizeDefault = 10;
     internal static string InProcessResolverValue = "in-process";
+    internal static string RpcResolverValue = "rpc";
+    internal static string FileResolverValue = "file";
     internal static string LruCacheValue = "lru";
 
     /// <summary>
@@ -157,7 +169,8 @@ public class FlagdConfig
     }
 
     /// <summary>
-    ///     Source selector for the in-process provider.
+    ///     Selects which flag set the provider sees from the flagd source.
+    ///     Supported by both the in-process and RPC resolvers.
     /// </summary>
     public string SourceSelector
     {
@@ -174,6 +187,50 @@ public class FlagdConfig
         set => _logger = value;
     }
 
+    /// <summary>
+    ///     Path to the flag definition JSON file. Used when ResolverType is FILE.
+    /// </summary>
+    public string OfflineFlagSourcePath
+    {
+        get => _offlineFlagSourcePath;
+        set => _offlineFlagSourcePath = value;
+    }
+
+    /// <summary>
+    ///     When true, the file watcher uses content hashing (MurmurHash) to detect changes.
+    ///     When false (the default), the file watcher polls the file's modification time and size.
+    ///     Modification-time polling is reliable in most environments; content hashing is an opt-in
+    ///     for file systems that do not update modification times reliably, at a higher I/O cost.
+    ///     Defaults to false. Used when ResolverType is FILE.
+    /// </summary>
+    public bool UseHashFileChangeDetection
+    {
+        get => _useHashFileChangeDetection;
+        set => _useHashFileChangeDetection = value;
+    }
+
+    /// <summary>
+    ///     The interval, in milliseconds, at which the file watcher polls the flag file for changes.
+    ///     Applies to both the modification-time watcher (default) and the hash-based watcher.
+    ///     When not set, a default of 5 seconds is used. Used when ResolverType is FILE.
+    /// </summary>
+    public int? OfflinePollIntervalMs
+    {
+        get => _offlinePollIntervalMs;
+        set => _offlinePollIntervalMs = value;
+    }
+
+    /// <summary>
+    ///     The maximum time, in milliseconds, to wait for the flag file to become available during
+    ///     initialization before timing out. When not set, a default of 5 minutes is used.
+    ///     Used when ResolverType is FILE.
+    /// </summary>
+    public int? DeadlineMs
+    {
+        get => _deadlineMs;
+        set => _deadlineMs = value;
+    }
+
     internal bool UseCertificate => _cert.Length > 0;
 
     private string _host;
@@ -187,6 +244,10 @@ public class FlagdConfig
     private string _sourceSelector;
     private ILogger _logger;
     private ResolverType _resolverType;
+    private string _offlineFlagSourcePath;
+    private bool _useHashFileChangeDetection;
+    private int? _offlinePollIntervalMs;
+    private int? _deadlineMs;
 
     internal FlagdConfig()
     {
@@ -205,8 +266,11 @@ public class FlagdConfig
             _maxEventStreamRetries = int.TryParse(Environment.GetEnvironmentVariable(EnvVarMaxEventStreamRetries), out var maxEventStreamRetries) ? maxEventStreamRetries : 3;
         }
 
-        var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType) ?? "RPC";
-        _resolverType = string.Equals(resolverTypeStr, InProcessResolverValue, StringComparison.OrdinalIgnoreCase) ? ResolverType.IN_PROCESS : ResolverType.RPC;
+        _resolverType = GetResolverTypeFromEnvironment();
+        _offlineFlagSourcePath = GetOfflineFlagSourcePathFromEnvironment();
+        _useHashFileChangeDetection = GetUseHashFileChangeDetectionFromEnvironment();
+        _offlinePollIntervalMs = GetMillisecondsFromEnvironment(EnvVarOfflinePollMs);
+        _deadlineMs = GetMillisecondsFromEnvironment(EnvVarDeadlineMs);
     }
 
     internal Uri GetUri()
@@ -228,6 +292,48 @@ public class FlagdConfig
             uri = new Uri(protocol + "://" + _host + ":" + _port);
         }
         return uri;
+    }
+
+    private static ResolverType GetResolverTypeFromEnvironment()
+    {
+        var resolverTypeStr = Environment.GetEnvironmentVariable(EnvVarResolverType);
+
+        if (string.IsNullOrWhiteSpace(resolverTypeStr))
+        {
+            return ResolverType.RPC;
+        }
+
+        if (string.Equals(resolverTypeStr, InProcessResolverValue, StringComparison.OrdinalIgnoreCase))
+            return ResolverType.IN_PROCESS;
+        if (string.Equals(resolverTypeStr, FileResolverValue, StringComparison.OrdinalIgnoreCase))
+            return ResolverType.FILE;
+
+        return ResolverType.RPC;
+    }
+
+    private static string GetOfflineFlagSourcePathFromEnvironment()
+    {
+        var offlineFlagSourcePathStr = Environment.GetEnvironmentVariable(EnvVarOfflineFlagSourcePath);
+        return string.IsNullOrWhiteSpace(offlineFlagSourcePathStr) ? string.Empty : offlineFlagSourcePathStr;
+    }
+
+    private static bool GetUseHashFileChangeDetectionFromEnvironment()
+    {
+        var value = Environment.GetEnvironmentVariable(EnvVarHashFileChange);
+        return !string.IsNullOrEmpty(value) && bool.TryParse(value, out var parsed) && parsed;
+    }
+
+    private static int? GetMillisecondsFromEnvironment(string envVarName)
+    {
+        var value = Environment.GetEnvironmentVariable(envVarName);
+        if (!string.IsNullOrWhiteSpace(value)
+            && int.TryParse(value, out var milliseconds)
+            && milliseconds > 0)
+        {
+            return milliseconds;
+        }
+
+        return null;
     }
 }
 
@@ -320,11 +426,53 @@ public class FlagdConfigBuilder
     }
 
     /// <summary>
-    ///     Source selector for the in-process provider.
+    ///     Selects which flag set the provider sees from the flagd source.
+    ///     Supported by both the in-process and RPC resolvers.
     /// </summary>
     public FlagdConfigBuilder WithSourceSelector(string sourceSelector)
     {
         _config.SourceSelector = sourceSelector;
+        return this;
+    }
+
+    /// <summary>
+    ///     Path to the flag definition JSON file for file-based in-memory resolution.
+    /// </summary>
+    public FlagdConfigBuilder WithOfflineFlagSourcePath(string offlineFlagSourcePath)
+    {
+        _config.OfflineFlagSourcePath = offlineFlagSourcePath;
+        return this;
+    }
+
+    /// <summary>
+    ///     Enable or disable content hashing for file change detection.
+    ///     When true, the file watcher uses content hashing (MurmurHash) to detect changes.
+    ///     When false (the default), the file watcher polls the file's modification time and size.
+    /// </summary>
+    public FlagdConfigBuilder WithUseHashFileChangeDetection(bool useHash)
+    {
+        _config.UseHashFileChangeDetection = useHash;
+        return this;
+    }
+
+    /// <summary>
+    ///     The interval, in milliseconds, at which the file watcher polls the flag file for changes.
+    ///     Applies to both the modification-time watcher (default) and the hash-based watcher.
+    ///     Defaults to 5 seconds when not set.
+    /// </summary>
+    public FlagdConfigBuilder WithOfflinePollIntervalMs(int offlinePollIntervalMs)
+    {
+        _config.OfflinePollIntervalMs = offlinePollIntervalMs;
+        return this;
+    }
+
+    /// <summary>
+    ///     The maximum time, in milliseconds, to wait for the flag file to become available during
+    ///     initialization before timing out. Defaults to 5 minutes when not set.
+    /// </summary>
+    public FlagdConfigBuilder WithDeadlineMs(int deadlineMs)
+    {
+        _config.DeadlineMs = deadlineMs;
         return this;
     }
 
@@ -351,13 +499,18 @@ public class FlagdConfigBuilder
 
     private void PreBuild()
     {
+        if (this._config.ResolverType == ResolverType.FILE)
+        {
+            return;
+        }
+
         if (this._config.Port == 0)
         {
             var defaultPort = this._config.ResolverType switch
             {
                 ResolverType.RPC => 8013,
                 ResolverType.IN_PROCESS => 8015,
-                _ => throw new NotImplementedException("ResolverType does not use Ports.")
+                _ => throw new NotImplementedException($"No default port defined for resolver type '{this._config.ResolverType}'.")
             };
 
             var fromPortEnv = TryGetEnvironmentVariableOrDefault(FlagdConfig.EnvVarPort, defaultPort);

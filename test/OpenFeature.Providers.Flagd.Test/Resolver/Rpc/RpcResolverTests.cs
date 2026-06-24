@@ -60,31 +60,36 @@ public class RpcResolverTests
             }
         };
 
-        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
-        var config = FlagdConfig.Builder().Build();
+        var config = FlagdConfig.Builder().WithMaxEventStreamRetries(1).Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
 
-        // Act
-        await resolver.Init();
+        try
+        {
+            // Act
+            await resolver.Init();
 
-        // Assert
-        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
+            // Assert
+            await Utils.AssertUntilAsync(_ => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; }, TestTimeoutMilliseconds);
 
-        Assert.NotNull(flagdProviderEvent);
-        Assert.Equal(ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
-        Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
-        Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
-        Assert.Contains("key2", flagdProviderEvent.FlagsChanged);
-        Assert.Contains("key3", flagdProviderEvent.FlagsChanged);
-        Assert.Contains("key4", flagdProviderEvent.FlagsChanged);
-        Assert.Contains("key5", flagdProviderEvent.FlagsChanged);
-        Assert.Contains("key6", flagdProviderEvent.FlagsChanged);
-        Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
+            Assert.Equal(ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
+            Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
+            Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
+            Assert.Contains("key2", flagdProviderEvent.FlagsChanged);
+            Assert.Contains("key3", flagdProviderEvent.FlagsChanged);
+            Assert.Contains("key4", flagdProviderEvent.FlagsChanged);
+            Assert.Contains("key5", flagdProviderEvent.FlagsChanged);
+            Assert.Contains("key6", flagdProviderEvent.FlagsChanged);
+            Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
+        }
+        finally
+        {
+            await resolver.Shutdown();
+        }
     }
 
     [Fact]
@@ -100,25 +105,30 @@ public class RpcResolverTests
             }
         };
 
-        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
-        var config = FlagdConfig.Builder().Build();
+        var config = FlagdConfig.Builder().WithMaxEventStreamRetries(1).Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
 
-        // Act
-        await resolver.Init();
+        try
+        {
+            // Act
+            await resolver.Init();
 
-        // Assert
-        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
+            // Assert
+            await Utils.AssertUntilAsync(_ => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; }, TestTimeoutMilliseconds);
 
-        Assert.NotNull(flagdProviderEvent);
-        Assert.Equal(ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
-        Assert.Empty(flagdProviderEvent.FlagsChanged);
-        Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
+            Assert.Equal(ProviderEventTypes.ProviderReady, flagdProviderEvent.EventType);
+            Assert.Empty(flagdProviderEvent.FlagsChanged);
+            Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
+        }
+        finally
+        {
+            await resolver.Shutdown();
+        }
     }
 
     [Fact]
@@ -141,25 +151,30 @@ public class RpcResolverTests
             }
         };
 
-        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
-        var config = FlagdConfig.Builder().Build();
+        var config = FlagdConfig.Builder().WithMaxEventStreamRetries(1).Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new RpcResolver(mockGrpcClient, config, null);
-        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; autoResetEvent.Set(); };
+        resolver.ProviderEvent += (sender, args) => { flagdProviderEvent = args; };
 
-        // Act
-        await resolver.Init();
+        try
+        {
+            // Act
+            await resolver.Init();
 
-        // Assert
-        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
+            // Assert
+            await Utils.AssertUntilAsync(_ => { Assert.NotNull(flagdProviderEvent); return Task.CompletedTask; }, TestTimeoutMilliseconds);
 
-        Assert.NotNull(flagdProviderEvent);
-        Assert.Equal(ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
-        Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
-        Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
+            Assert.Equal(ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
+            Assert.Contains("key1", flagdProviderEvent.FlagsChanged);
+            Assert.Equal(Structure.Empty, flagdProviderEvent.SyncMetadata);
+        }
+        finally
+        {
+            await resolver.Shutdown();
+        }
     }
 
     [Fact]
@@ -182,27 +197,31 @@ public class RpcResolverTests
             }
         };
 
-        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
         var config = FlagdConfig.Builder()
             .WithCache(true)
+            .WithMaxEventStreamRetries(1)
             .Build();
 
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "key1")).Returns(null);
         mockCache.Add(Arg.Is<string>(s => s == "key1"), Arg.Any<object>());
-        mockCache.When(x => x.Purge()).Do(_ => { autoResetEvent.Set(); });
 
         var resolver = new RpcResolver(mockGrpcClient, config, mockCache);
 
-        // Act
-        await resolver.Init();
+        try
+        {
+            // Act
+            await resolver.Init();
 
-        // Assert
-        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
-
-        mockCache.Received().Purge();
+            // Assert
+            await Utils.AssertUntilAsync(_ => { mockCache.Received().Purge(); return Task.CompletedTask; }, TestTimeoutMilliseconds);
+        }
+        finally
+        {
+            await resolver.Shutdown();
+        }
     }
 
     [Fact]
@@ -225,27 +244,31 @@ public class RpcResolverTests
             }
         };
 
-        var autoResetEvent = new AutoResetEvent(false);
         var mockGrpcClient = SetupGrpcStream(responses);
 
         var config = FlagdConfig.Builder()
             .WithCache(true)
+            .WithMaxEventStreamRetries(1)
             .Build();
 
         var mockCache = Substitute.For<ICache<string, object>>();
         mockCache.TryGet(Arg.Is<string>(s => s == "key1")).Returns(null);
         mockCache.Add(Arg.Is<string>(s => s == "key1"), Arg.Any<object>());
-        mockCache.When(x => x.Delete("key1")).Do(_ => { autoResetEvent.Set(); });
 
         var resolver = new RpcResolver(mockGrpcClient, config, mockCache);
 
-        // Act
-        await resolver.Init();
+        try
+        {
+            // Act
+            await resolver.Init();
 
-        // Assert
-        Assert.True(autoResetEvent.WaitOne(TestTimeoutMilliseconds));
-
-        mockCache.Received().Delete("key1");
+            // Assert
+            await Utils.AssertUntilAsync(_ => { mockCache.Received().Delete("key1"); return Task.CompletedTask; }, TestTimeoutMilliseconds);
+        }
+        finally
+        {
+            await resolver.Shutdown();
+        }
     }
 
     [Theory]
@@ -407,7 +430,18 @@ public class RpcResolverTests
         var asyncStreamReader = Substitute.For<IAsyncStreamReader<EventStreamResponse>>();
 
         var enumerator = responses.GetEnumerator();
-        asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(_ => enumerator.MoveNext());
+        asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(callInfo =>
+        {
+            if (enumerator.MoveNext())
+            {
+                return Task.FromResult(true);
+            }
+
+            // Emulate a real, long-lived gRPC stream that stays open until it is closed,
+            // instead of signalling end-of-stream immediately (which makes the resolver
+            // reconnect in a tight, CPU-bound loop and leaks a spinning background task).
+            return WaitForCancellationAsync(callInfo.Arg<CancellationToken>());
+        });
         asyncStreamReader.Current.Returns(_ => enumerator.Current);
 
         var grpcEventStreamResp = new AsyncServerStreamingCall<EventStreamResponse>(asyncStreamReader, null, null, null, null, null);
@@ -415,5 +449,19 @@ public class RpcResolverTests
             .Returns(grpcEventStreamResp);
 
         return mockGrpcClient;
+    }
+
+    private static async Task<bool> WaitForCancellationAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(Timeout.Infinite, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // The stream was closed (resolver shut down).
+        }
+
+        return false;
     }
 }

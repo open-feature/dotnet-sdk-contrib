@@ -27,6 +27,8 @@ components:
   src/OpenFeature.Providers.Ofrep:
     - askpt
     - weyert
+  src/OpenFeature.Providers.Unleash:
+    - PSanetra
 
   # test/
   test/OpenFeature.Providers.Flagd.Test:
@@ -55,6 +57,8 @@ components:
   test/OpenFeature.Providers.Ofrep.Test:
     - askpt
     - weyert
+  test/OpenFeature.Providers.Unleash.Test:
+    - PSanetra
 
 ignored-authors:
   - renovate-bot
