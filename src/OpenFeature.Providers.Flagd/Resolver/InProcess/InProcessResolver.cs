@@ -24,12 +24,11 @@ namespace OpenFeature.Providers.Flagd.Resolver.InProcess;
 
 internal class InProcessResolver : Resolver
 {
-    static readonly int InitialEventStreamRetryBaseBackoff = 1;
-    static readonly int MaxEventStreamRetryBackoff = 60;
     readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly FlagSyncService.FlagSyncServiceClient _client;
     private readonly JsonEvaluator _evaluator;
-    private int _eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
+    private int _eventStreamRetryBackoff;
+    private readonly int _maxEventStreamRetryBackoff;
     private readonly FlagdConfig _config;
     private GrpcChannel _channel;
     private readonly IJsonSchemaValidator _jsonSchemaValidator;
@@ -42,6 +41,10 @@ internal class InProcessResolver : Resolver
         this._config = config;
         this._client = this.BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
         this._evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
+        
+        // Initialize backoff values from config (convert from ms to seconds)
+        this._eventStreamRetryBackoff = CalculateBackoffSeconds(config.RetryBackoffMs, FlagdConfig.RetryBackoffMsDefault);
+        this._maxEventStreamRetryBackoff = CalculateBackoffSeconds(config.RetryBackoffMaxMs, FlagdConfig.RetryBackoffMaxMsDefault);
     }
 
     internal InProcessResolver(
@@ -139,7 +142,7 @@ internal class InProcessResolver : Resolver
                     tcs.TrySetResult(true);
 
                     // Reset delay backoff on successful response
-                    this._eventStreamRetryBackoff = InitialEventStreamRetryBaseBackoff;
+                    this._eventStreamRetryBackoff = CalculateBackoffSeconds(_config.RetryBackoffMs, FlagdConfig.RetryBackoffMsDefault);
 
                     var metadata = Structure.Builder();
                     if (response.SyncContext != null)
@@ -171,7 +174,7 @@ internal class InProcessResolver : Resolver
 
                 tcs.TrySetResult(true);
 
-                this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, MaxEventStreamRetryBackoff);
+                this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, this._maxEventStreamRetryBackoff);
                 await Task.Delay(TimeSpan.FromSeconds(this._eventStreamRetryBackoff), token).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -186,6 +189,11 @@ internal class InProcessResolver : Resolver
 
         // If the loop exits cleanly (e.g., via cancellation), ensure the TCS is completed.
         tcs.TrySetResult(true);
+    }
+
+    private static int CalculateBackoffSeconds(int? configValue, int defaultValue)
+    {
+        return (configValue.HasValue ? configValue.Value : defaultValue) / 1000;
     }
 
     private static Value ExtractValue(Google.Protobuf.WellKnownTypes.Value value)

@@ -21,13 +21,13 @@ internal class RpcResolver : Resolver
 {
     private const string FLAGS_RPC_FIELD_NAME = "flags";
 
-    static int EventStreamRetryBaseBackoff = 1;
     readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly FlagdConfig _config;
     private readonly ICache<string, object> _cache;
     private readonly Service.ServiceClient _client;
     private int _eventStreamRetries;
-    private int _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+    private int _eventStreamRetryBackoff;
+    private readonly int _maxEventStreamRetryBackoff;
     private GrpcChannel _channel;
 
     public event EventHandler<FlagdProviderEvent> ProviderEvent;
@@ -41,6 +41,10 @@ internal class RpcResolver : Resolver
 
         this._config = config;
         this._client = this.BuildClientForPlatform(_config);
+        
+        // Initialize backoff values from config (convert from ms to seconds)
+        this._eventStreamRetryBackoff = CalculateBackoffSeconds(config.RetryBackoffMs, FlagdConfig.RetryBackoffMsDefault);
+        this._maxEventStreamRetryBackoff = CalculateBackoffSeconds(config.RetryBackoffMaxMs, FlagdConfig.RetryBackoffMaxMsDefault);
 
         if (this._config.CacheEnabled)
         {
@@ -315,7 +319,7 @@ internal class RpcResolver : Resolver
     private void HandleProviderReadyEvent(List<string> flagsChanged)
     {
         _eventStreamRetries = 0;
-        _eventStreamRetryBackoff = EventStreamRetryBaseBackoff;
+        _eventStreamRetryBackoff = CalculateBackoffSeconds(_config.RetryBackoffMs, FlagdConfig.RetryBackoffMsDefault);
 
         var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderReady, flagsChanged, Structure.Empty);
         ProviderEvent?.Invoke(this, flagdEvent);
@@ -324,6 +328,11 @@ internal class RpcResolver : Resolver
         {
             this._cache.Purge();
         }
+    }
+
+    private static int CalculateBackoffSeconds(int? configValue, int defaultValue)
+    {
+        return (configValue.HasValue ? configValue.Value : defaultValue) / 1000;
     }
 
     private async Task HandleErrorEvent(CancellationToken token)
@@ -344,7 +353,8 @@ internal class RpcResolver : Resolver
         ProviderEvent?.Invoke(this, flagdEvent);
 
         // Handle the dropped connection by reconnecting and retrying the stream
-        this._eventStreamRetryBackoff = this._eventStreamRetryBackoff * 2;
+        // Cap the exponential backoff at the configured maximum
+        this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, this._maxEventStreamRetryBackoff);
         try
         {
             await Task.Delay(this._eventStreamRetryBackoff * 1000, token).ConfigureAwait(false);
