@@ -42,9 +42,9 @@ internal class RpcResolver : Resolver
         this._config = config;
         this._client = this.BuildClientForPlatform(_config);
 
-        // Initialize backoff values from config (convert from ms to seconds)
-        this._eventStreamRetryBackoff = CalculateBackoffSeconds(config.RetryBackoffMs, FlagdConfig.RetryBackoffMsDefault);
-        this._maxEventStreamRetryBackoff = CalculateBackoffSeconds(config.RetryBackoffMaxMs, FlagdConfig.RetryBackoffMaxMsDefault);
+        // Initialize backoff values from config (in milliseconds)
+        this._eventStreamRetryBackoff = config.RetryBackoffMs ?? FlagdConfig.RetryBackoffMsDefault;
+        this._maxEventStreamRetryBackoff = config.RetryBackoffMaxMs ?? FlagdConfig.RetryBackoffMaxMsDefault;
 
         if (this._config.CacheEnabled)
         {
@@ -319,7 +319,7 @@ internal class RpcResolver : Resolver
     private void HandleProviderReadyEvent(List<string> flagsChanged)
     {
         _eventStreamRetries = 0;
-        _eventStreamRetryBackoff = CalculateBackoffSeconds(_config.RetryBackoffMs, FlagdConfig.RetryBackoffMsDefault);
+        _eventStreamRetryBackoff = _config.RetryBackoffMs ?? FlagdConfig.RetryBackoffMsDefault;
 
         var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderReady, flagsChanged, Structure.Empty);
         ProviderEvent?.Invoke(this, flagdEvent);
@@ -328,11 +328,6 @@ internal class RpcResolver : Resolver
         {
             this._cache.Purge();
         }
-    }
-
-    private static int CalculateBackoffSeconds(int? configValue, int defaultValue)
-    {
-        return (configValue.HasValue ? configValue.Value : defaultValue) / 1000;
     }
 
     private async Task HandleErrorEvent(CancellationToken token)
@@ -357,7 +352,7 @@ internal class RpcResolver : Resolver
         this._eventStreamRetryBackoff = Math.Min(this._eventStreamRetryBackoff * 2, this._maxEventStreamRetryBackoff);
         try
         {
-            await Task.Delay(this._eventStreamRetryBackoff * 1000, token).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(this._eventStreamRetryBackoff), token).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
