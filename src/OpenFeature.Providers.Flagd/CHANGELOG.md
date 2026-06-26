@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.0...OpenFeature.Providers.Flagd-v0.7.1) (2026-06-16)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** apply in-process flag updates after initial sync ([#685](https://github.com/open-feature/dotnet-sdk-contrib/issues/685)) ([148ad21](https://github.com/open-feature/dotnet-sdk-contrib/commit/148ad21dbffebdeacc9fa534a63500a6ee9a12a6))
+
 ## [0.7.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.6.1...OpenFeature.Providers.Flagd-v0.7.0) (2026-06-02)
 
 

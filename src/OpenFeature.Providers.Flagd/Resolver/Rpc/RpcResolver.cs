@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -230,7 +229,7 @@ internal class RpcResolver : Resolver
             try
             {
                 // Read the response stream asynchronously
-                while (!token.IsCancellationRequested && call != null && await call.ResponseStream.MoveNext().ConfigureAwait(false))
+                while (!token.IsCancellationRequested && call != null && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
 
@@ -264,6 +263,19 @@ internal class RpcResolver : Resolver
                             break;
                     }
                 }
+
+                // The stream ended gracefully without an exception (the server closed it).
+                // Unless we're shutting down, treat this like a dropped connection and go
+                // through the retry/backoff path instead of immediately reconnecting in a
+                // tight loop.
+                if (!token.IsCancellationRequested)
+                {
+                    await this.HandleErrorEvent(token).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // do nothing, we've been shutdown
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
             {
@@ -271,7 +283,7 @@ internal class RpcResolver : Resolver
             }
             catch (RpcException)
             {
-                await this.HandleErrorEvent().ConfigureAwait(false);
+                await this.HandleErrorEvent(token).ConfigureAwait(false);
             }
         }
     }
@@ -314,8 +326,13 @@ internal class RpcResolver : Resolver
         }
     }
 
-    private async Task HandleErrorEvent()
+    private async Task HandleErrorEvent(CancellationToken token)
     {
+        if (token.IsCancellationRequested)
+        {
+            return;
+        }
+
         this._eventStreamRetries++;
 
         if (this._eventStreamRetries > this._config.MaxEventStreamRetries)
@@ -328,7 +345,14 @@ internal class RpcResolver : Resolver
 
         // Handle the dropped connection by reconnecting and retrying the stream
         this._eventStreamRetryBackoff = this._eventStreamRetryBackoff * 2;
-        await Task.Delay(this._eventStreamRetryBackoff * 1000).ConfigureAwait(false);
+        try
+        {
+            await Task.Delay(this._eventStreamRetryBackoff * 1000, token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            // shutting down; stop waiting for the backoff to elapse
+        }
     }
 
     /// <summary>
@@ -518,7 +542,7 @@ internal class RpcResolver : Resolver
 #endif
             if (config.UseCertificate)
             {
-                if (File.Exists(config.CertificatePath))
+                if (System.IO.File.Exists(config.CertificatePath))
                 {
                     var certificate = CertificateLoader.LoadCertificate(config.CertificatePath);
 #if NET5_0_OR_GREATER

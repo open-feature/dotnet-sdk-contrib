@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.Converters;
 using Xunit;
@@ -10,14 +10,19 @@ namespace OpenFeature.Providers.GOFeatureFlag.Test.Converters;
 
 public class SerializationTest
 {
+    private static JsonNode ParseJson(string json)
+    {
+        return JsonNode.Parse(json) ?? throw new InvalidOperationException("Unexpected null JSON node.");
+    }
+
     [Fact]
     public void ToStringDictionary_WithEmptyContext_ShouldReturnEmptyDictionary()
     {
         var evaluationContext = EvaluationContext.Builder().Build();
-        var want = JObject.Parse("{\"context\":{}}");
+        var want = ParseJson("{\"context\":{}}");
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
-        var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+        var got = ParseJson(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
+        Assert.True(JsonNode.DeepEquals(want, got), "unexpected json");
     }
 
     [Fact]
@@ -29,10 +34,10 @@ public class SerializationTest
             .Build();
 
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
-        var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse(
+        var got = ParseJson(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
+        var want = ParseJson(
             "{\"context\":{\"location\":\"somewhere\",\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+        Assert.True(JsonNode.DeepEquals(want, got), "unexpected json");
     }
 
     [Fact]
@@ -43,10 +48,10 @@ public class SerializationTest
             .Set("age", 23)
             .Build();
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
-        var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse(
+        var got = ParseJson(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
+        var want = ParseJson(
             "{\"context\":{\"age\":23,\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+        Assert.True(JsonNode.DeepEquals(want, got), "unexpected json");
     }
 
     [Fact]
@@ -62,10 +67,10 @@ public class SerializationTest
             .Set("config", testStructure)
             .Build();
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
-        var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse(
+        var got = ParseJson(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
+        var want = ParseJson(
             "{\"context\":{\"config\":{\"config1\":\"value1\", \"config2\":\"value2\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+        Assert.True(JsonNode.DeepEquals(want, got), "unexpected json");
     }
 
     [Fact]
@@ -83,10 +88,10 @@ public class SerializationTest
             .Build();
 
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
-        var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse(
+        var got = ParseJson(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
+        var want = ParseJson(
             "{\"context\":{\"config\":{\"config3\":\"2025-09-01T00:00:00\",\"config2\":\"value2\",\"config1\":1},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+        Assert.True(JsonNode.DeepEquals(want, got), "unexpected json");
     }
 
     [Fact]
@@ -108,10 +113,10 @@ public class SerializationTest
             .Build();
 
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
-        var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse(
+        var got = ParseJson(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
+        var want = ParseJson(
             "{\"context\":{\"config\":{\"config2\":[[\"element1-1\",\"element1-2\"],\"element2\",\"element3\"],\"config3\":\"2025-09-01T00:00:00\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+        Assert.True(JsonNode.DeepEquals(want, got), "unexpected json");
     }
 
     [Fact]
@@ -131,9 +136,9 @@ public class SerializationTest
             .Set("config", testStructure)
             .Build();
         var request = new Dictionary<string, object> { { "context", evaluationContext.AsDictionary() } };
-        var got = JObject.Parse(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
-        var want = JObject.Parse(
+        var got = ParseJson(JsonSerializer.Serialize(request, JsonConverterExtensions.DefaultSerializerSettings));
+        var want = ParseJson(
             "{\"context\":{\"config\":{\"config-value-struct\":{\"nested1\":1},\"config-value-value\":\"2025-09-01T00:00:00\"},\"targetingKey\":\"828c9b62-94c4-4ef3-bddc-e024bfa51a67\"}}");
-        Assert.True(JToken.DeepEquals(want, got), "unexpected json");
+        Assert.True(JsonNode.DeepEquals(want, got), "unexpected json");
     }
 }

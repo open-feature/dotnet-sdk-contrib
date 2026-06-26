@@ -61,4 +61,37 @@ public record FlagdProviderOptions
     /// Source selector for the in-process provider. Defaults to empty string.
     /// </summary>
     public string SourceSelector { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Path to the flag definition JSON file for file-based in-memory resolution.
+    /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
+    /// Defaults to empty string.
+    /// </summary>
+    public string OfflineFlagSourcePath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// When true, the file watcher uses content hashing (MurmurHash) to detect changes.
+    /// When false (the default), the file watcher polls the file's modification time and size.
+    /// Modification-time polling is reliable in most environments; content hashing is an opt-in
+    /// for file systems that do not update modification times reliably, at a higher I/O cost.
+    /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
+    /// Defaults to false.
+    /// </summary>
+    public bool UseHashFileChangeDetection { get; set; } = false;
+
+    /// <summary>
+    /// The interval, in milliseconds, at which the file watcher polls the flag file for changes.
+    /// Applies to both the modification-time watcher (default) and the hash-based watcher.
+    /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
+    /// Defaults to 5000 (5 seconds).
+    /// </summary>
+    public int OfflinePollIntervalMs { get; set; } = 5000;
+
+    /// <summary>
+    /// The maximum time, in milliseconds, to wait for the flag file to become available during
+    /// initialization before timing out.
+    /// Used when <see cref="ResolverType"/> is <see cref="ResolverType.FILE"/>.
+    /// Defaults to 300000 (5 minutes).
+    /// </summary>
+    public int DeadlineMs { get; set; } = 300000;
 }

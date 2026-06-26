@@ -93,6 +93,16 @@
       "extra-files": [
         "OpenFeature.Providers.Ofrep.csproj"
       ]
+    },
+    "src/OpenFeature.Providers.Unleash": {
+      "package-name": "OpenFeature.Providers.Unleash",
+      "release-type": "simple",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "versioning": "default",
+      "extra-files": [
+        "OpenFeature.Providers.Unleash.csproj"
+      ]
     }
   },
   "changelog-sections": [
