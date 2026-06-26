@@ -41,7 +41,7 @@ internal class RpcResolver : Resolver
 
         this._config = config;
         this._client = this.BuildClientForPlatform(_config);
-        
+
         // Initialize backoff values from config (convert from ms to seconds)
         this._eventStreamRetryBackoff = CalculateBackoffSeconds(config.RetryBackoffMs, FlagdConfig.RetryBackoffMsDefault);
         this._maxEventStreamRetryBackoff = CalculateBackoffSeconds(config.RetryBackoffMaxMs, FlagdConfig.RetryBackoffMaxMsDefault);
