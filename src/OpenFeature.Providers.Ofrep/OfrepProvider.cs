@@ -6,7 +6,6 @@ using OpenFeature.Providers.Ofrep.Client;
 using OpenFeature.Providers.Ofrep.Client.Constants;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Extensions;
-using OpenFeature.Providers.Ofrep.Models;
 
 namespace OpenFeature.Providers.Ofrep;
 

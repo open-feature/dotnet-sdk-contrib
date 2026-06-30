@@ -57,6 +57,10 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Authenticate against GitHub Registry
+        shell: pwsh
+        run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/open-feature/index.json"
+
       - name: Restore dependencies
         shell: pwsh
         run: dotnet restore
