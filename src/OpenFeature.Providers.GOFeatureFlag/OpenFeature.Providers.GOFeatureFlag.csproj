@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>OpenFeature.Providers.GOFeatureFlag</PackageId>
-    <VersionNumber>1.1.0</VersionNumber> <!--x-release-please-version -->
+    <VersionNumber>1.2.0</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
