@@ -156,23 +156,23 @@ namespace OpenFeatureTestApp
 
 The URI of the flagd server to which the `flagd Provider` connects to can either be passed directly to the constructor, or be configured using the following environment variables:
 
-| Option name                  | Environment variable name      | Type    | Default   | Values                  |
-| ---------------------------- | ------------------------------ | ------- | --------- | ----------------------- |
-| host                         | FLAGD_HOST                     | string  | localhost |                         |
-| port                         | FLAGD_PORT                     | number  | 8013      |                         |
-| tls                          | FLAGD_TLS                      | boolean | false     |                         |
-| tls certPath                 | FLAGD_SERVER_CERT_PATH         | string  |           |                         |
-| unix socket path             | FLAGD_SOCKET_PATH              | string  |           |                         |
-| Caching                      | FLAGD_CACHE                    | string  |           | lru                     |
-| Maximum cache size           | FLAGD_MAX_CACHE_SIZE           | number  | 10        |                         |
-| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES | number  | 3         |                         |
-| Resolver type                | FLAGD_RESOLVER                 | string  | rpc       | rpc, in-process, file   |
-| Source selector              | FLAGD_SOURCE_SELECTOR          | string  |           |                         |
-| Offline flag source path     | FLAGD_OFFLINE_FLAG_SOURCE_PATH | string  |           |                         |
-| Hash file change detection   | FLAGD_HASH_FILE_CHANGE         | boolean | false     |                         |
-| Offline poll interval        | FLAGD_OFFLINE_POLL_MS          | number  | 5000      |                         |
-| Deadline                     | FLAGD_DEADLINE_MS              | number  | 300000    |                         |
-| Logger                       | n/a                            | n/a     |           |                         |
+| Option name                  | Environment variable name                                  | Type    | Default                                 | Values                  |
+| ---------------------------- | ---------------------------------------------------------- | ------- | --------------------------------------- | ----------------------- |
+| host                         | FLAGD_HOST                                                 | string  | localhost                               |                         |
+| port                         | FLAGD_SYNC_PORT (in-process, priority), FLAGD_PORT, default | number  | 8013 (8015 when resolver is in-process) |                         |
+| tls                          | FLAGD_TLS                                                  | boolean | false                                   |                         |
+| tls certPath                 | FLAGD_SERVER_CERT_PATH                                     | string  |                                         |                         |
+| unix socket path             | FLAGD_SOCKET_PATH                                          | string  |                                         |                         |
+| Caching                      | FLAGD_CACHE                                                | string  |                                         | lru                     |
+| Maximum cache size           | FLAGD_MAX_CACHE_SIZE                                       | number  | 10                                      |                         |
+| Maximum event stream retries | FLAGD_MAX_EVENT_STREAM_RETRIES                             | number  | 3                                       |                         |
+| Resolver type                | FLAGD_RESOLVER                                             | string  | rpc                                     | rpc, in-process, file   |
+| Source selector              | FLAGD_SOURCE_SELECTOR                                      | string  |                                         |                         |
+| Offline flag source path     | FLAGD_OFFLINE_FLAG_SOURCE_PATH                             | string  |                                         |                         |
+| Hash file change detection   | FLAGD_HASH_FILE_CHANGE                                     | boolean | false                                   |                         |
+| Offline poll interval        | FLAGD_OFFLINE_POLL_MS                                      | number  | 5000                                    |                         |
+| Deadline                     | FLAGD_DEADLINE_MS                                          | number  | 300000                                  |                         |
+| Logger                       | n/a                                                        | n/a     |                                         |                         |
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
 
