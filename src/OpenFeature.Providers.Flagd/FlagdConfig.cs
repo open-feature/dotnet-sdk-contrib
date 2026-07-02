@@ -48,8 +48,12 @@ public class FlagdConfig
     internal const string EnvVarHashFileChange = "FLAGD_HASH_FILE_CHANGE";
     internal const string EnvVarOfflinePollMs = "FLAGD_OFFLINE_POLL_MS";
     internal const string EnvVarDeadlineMs = "FLAGD_DEADLINE_MS";
+    internal const string EnvVarRetryBackoffMs = "FLAGD_RETRY_BACKOFF_MS";
+    internal const string EnvVarRetryBackoffMaxMs = "FLAGD_RETRY_BACKOFF_MAX_MS";
     internal const string FlagdSelectorHeaderName = "flagd-selector";
     internal static int CacheSizeDefault = 10;
+    internal static int RetryBackoffMsDefault = 1000;
+    internal static int RetryBackoffMaxMsDefault = 12000;
     internal static string InProcessResolverValue = "in-process";
     internal static string RpcResolverValue = "rpc";
     internal static string FileResolverValue = "file";
@@ -230,6 +234,28 @@ public class FlagdConfig
         set => _deadlineMs = value;
     }
 
+    /// <summary>
+    ///     The initial backoff time, in milliseconds, for stream reconnection attempts.
+    ///     When not set, a default of 1000ms is used.
+    ///     Used when ResolverType is RPC or IN_PROCESS.
+    /// </summary>
+    public int? RetryBackoffMs
+    {
+        get => _retryBackoffMs ?? RetryBackoffMsDefault;
+        set => _retryBackoffMs = value;
+    }
+
+    /// <summary>
+    ///     The maximum backoff time, in milliseconds, for stream reconnection attempts.
+    ///     When not set, a default of 12000ms (12 seconds) is used.
+    ///     Used when ResolverType is RPC or IN_PROCESS.
+    /// </summary>
+    public int? RetryBackoffMaxMs
+    {
+        get => _retryBackoffMaxMs ?? RetryBackoffMaxMsDefault;
+        set => _retryBackoffMaxMs = value;
+    }
+
     internal bool UseCertificate => _cert.Length > 0;
 
     private string _host;
@@ -247,6 +273,8 @@ public class FlagdConfig
     private bool _useHashFileChangeDetection;
     private int? _offlinePollIntervalMs;
     private int? _deadlineMs;
+    private int? _retryBackoffMs;
+    private int? _retryBackoffMaxMs;
 
     internal FlagdConfig()
     {
@@ -271,6 +299,8 @@ public class FlagdConfig
         _useHashFileChangeDetection = GetUseHashFileChangeDetectionFromEnvironment();
         _offlinePollIntervalMs = GetMillisecondsFromEnvironment(EnvVarOfflinePollMs);
         _deadlineMs = GetMillisecondsFromEnvironment(EnvVarDeadlineMs);
+        _retryBackoffMs = GetMillisecondsFromEnvironment(EnvVarRetryBackoffMs);
+        _retryBackoffMaxMs = GetMillisecondsFromEnvironment(EnvVarRetryBackoffMaxMs);
     }
 
     internal Uri GetUri()
@@ -473,6 +503,26 @@ public class FlagdConfigBuilder
     public FlagdConfigBuilder WithDeadlineMs(int deadlineMs)
     {
         _config.DeadlineMs = deadlineMs;
+        return this;
+    }
+
+    /// <summary>
+    ///     The initial backoff time, in milliseconds, for stream reconnection attempts.
+    ///     Defaults to 1000ms when not set.
+    /// </summary>
+    public FlagdConfigBuilder WithRetryBackoffMs(int retryBackoffMs)
+    {
+        _config.RetryBackoffMs = retryBackoffMs;
+        return this;
+    }
+
+    /// <summary>
+    ///     The maximum backoff time, in milliseconds, for stream reconnection attempts.
+    ///     Defaults to 12000ms (12 seconds) when not set.
+    /// </summary>
+    public FlagdConfigBuilder WithRetryBackoffMaxMs(int retryBackoffMaxMs)
+    {
+        _config.RetryBackoffMaxMs = retryBackoffMaxMs;
         return this;
     }
 

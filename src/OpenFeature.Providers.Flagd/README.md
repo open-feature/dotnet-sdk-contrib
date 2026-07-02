@@ -172,7 +172,11 @@ The URI of the flagd server to which the `flagd Provider` connects to can either
 | Hash file change detection   | FLAGD_HASH_FILE_CHANGE         | boolean | false     |                         |
 | Offline poll interval        | FLAGD_OFFLINE_POLL_MS          | number  | 5000      |                         |
 | Deadline                     | FLAGD_DEADLINE_MS              | number  | 300000    |                         |
+| Retry backoff (ms)           | FLAGD_RETRY_BACKOFF_MS         | number  | 1000      |                         |
+| Retry backoff max (ms)       | FLAGD_RETRY_BACKOFF_MAX_MS     | number  | 12000     |                         |
 | Logger                       | n/a                            | n/a     |           |                         |
+
+> **Note:** The `retryBackoffMs` and `retryBackoffMaxMs` settings control the exponential backoff behavior for stream reconnection in the RPC and in-process resolvers. The backoff starts at `retryBackoffMs` and doubles on each retry, up to a maximum of `retryBackoffMaxMs`. Per the [flagd provider specification](https://flagd.dev/reference/specifications/providers/#stream-reconnection), the default maximum is 12000ms (12 seconds).
 
 Note that if `FLAGD_SOCKET_PATH` is set, this value takes precedence, and the other variables (`FLAGD_HOST`, `FLAGD_PORT`, `FLAGD_TLS`, `FLAGD_SERVER_CERT_PATH`) are disregarded.
 
@@ -248,6 +252,26 @@ var logger = loggerFactory.CreateLogger<Program>();
 var flagdConfig = new FlagdConfigBuilder()
     .WithLogger(logger)
     .Build();
+```
+
+### Configuring retry backoff
+
+You can customize the stream reconnection backoff behavior for both RPC and in-process resolvers:
+
+```csharp
+var flagdConfig = new FlagdConfigBuilder()
+    .WithRetryBackoffMs(500)           // Initial backoff of 500ms
+    .WithRetryBackoffMaxMs(10000)      // Maximum backoff of 10 seconds
+    .Build();
+
+var flagdProvider = new FlagdProvider(flagdConfig);
+```
+
+Or via environment variables:
+
+```shell
+export FLAGD_RETRY_BACKOFF_MS=500
+export FLAGD_RETRY_BACKOFF_MAX_MS=10000
 ```
 
 ## File resolver type
