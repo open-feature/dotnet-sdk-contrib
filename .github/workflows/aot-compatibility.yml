@@ -1,0 +1,92 @@
+name: AOT Compatibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  merge_group:
+  workflow_dispatch:
+
+jobs:
+  aot-compatibility:
+    name: AOT Test (${{ matrix.os }}, ${{ matrix.arch }})
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x64
+          - os: ubuntu-latest
+            arch: x64
+            runtime: linux-x64
+          # Linux ARM64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+            runtime: linux-arm64
+          # Windows x64
+          - os: windows-latest
+            arch: x64
+            runtime: win-x64
+          # Windows ARM64
+          - os: windows-11-arm
+            arch: arm64
+            runtime: win-arm64
+          # macOS x64
+          - os: macos-15-intel
+            arch: x64
+            runtime: osx-x64
+          # macOS ARM64 (Apple Silicon)
+          - os: macos-latest
+            arch: arm64
+            runtime: osx-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Authenticate against GitHub Registry
+        shell: pwsh
+        run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/open-feature/index.json"
+
+      - name: Restore dependencies
+        shell: pwsh
+        run: dotnet restore
+
+      - name: Build solution
+        shell: pwsh
+        run: dotnet build -c Release --no-restore
+
+      - name: Test AOT compatibility project build
+        shell: pwsh
+        run: dotnet build test/OpenFeature.Providers.Ofrep.AotCompatibility/OpenFeature.Providers.Ofrep.AotCompatibility.csproj -c Release --no-restore
+
+      - name: Publish AOT compatibility test (cross-platform)
+        shell: pwsh
+        run: |
+          dotnet publish test/OpenFeature.Providers.Ofrep.AotCompatibility/OpenFeature.Providers.Ofrep.AotCompatibility.csproj `
+            -f net9.0 `
+            -r ${{ matrix.runtime }} `
+            -o ./aot-output
+
+      - name: Run AOT compatibility test
+        shell: pwsh
+        run: |
+          if ("${{ runner.os }}" -eq "Windows") {
+            ./aot-output/OpenFeature.Providers.Ofrep.AotCompatibility.exe
+          } else {
+            chmod +x ./aot-output/OpenFeature.Providers.Ofrep.AotCompatibility
+            ./aot-output/OpenFeature.Providers.Ofrep.AotCompatibility
+          }
