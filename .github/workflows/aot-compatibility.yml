@@ -54,9 +54,12 @@ jobs:
           persist-credentials: false
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           global-json-file: global.json
+          source-url: https://nuget.pkg.github.com/open-feature/index.json
 
       - name: Restore dependencies
         shell: pwsh
