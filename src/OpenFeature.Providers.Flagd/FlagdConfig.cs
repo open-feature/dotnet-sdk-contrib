@@ -36,6 +36,7 @@ public class FlagdConfig
 {
     internal const string EnvVarHost = "FLAGD_HOST";
     internal const string EnvVarPort = "FLAGD_PORT";
+    internal const string EnvVarSyncPort = "FLAGD_SYNC_PORT";
     internal const string EnvVarTLS = "FLAGD_TLS";
     internal const string EnvCertPart = "FLAGD_SERVER_CERT_PATH";
     internal const string EnvVarSocketPath = "FLAGD_SOCKET_PATH";
@@ -259,7 +260,7 @@ public class FlagdConfig
     internal bool UseCertificate => _cert.Length > 0;
 
     private string _host;
-    private int _port;
+    private int _port = 0;
     private bool _useTLS;
     private string _cert;
     private string _socketPath;
@@ -279,7 +280,6 @@ public class FlagdConfig
     internal FlagdConfig()
     {
         _host = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvVarHost)) ? "localhost" : Environment.GetEnvironmentVariable(EnvVarHost);
-        _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 0;
         _useTLS = bool.TryParse(Environment.GetEnvironmentVariable(EnvVarTLS), out var useTLS) ? useTLS : false;
         _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
         _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
@@ -556,14 +556,28 @@ public class FlagdConfigBuilder
 
         if (this._config.Port == 0)
         {
-            var defaultPortForResolver = this._config.ResolverType switch
+            var defaultPort = this._config.ResolverType switch
             {
                 ResolverType.RPC => 8013,
                 ResolverType.IN_PROCESS => 8015,
                 _ => throw new NotImplementedException($"No default port defined for resolver type '{this._config.ResolverType}'.")
             };
 
-            this._config.Port = defaultPortForResolver;
+            var fromPortEnv = TryGetEnvironmentVariableOrDefault(FlagdConfig.EnvVarPort, defaultPort);
+
+            this._config.Port = this._config.ResolverType == ResolverType.IN_PROCESS ?
+                TryGetEnvironmentVariableOrDefault(FlagdConfig.EnvVarSyncPort, fromPortEnv) :
+                fromPortEnv;
         }
+    }
+
+    private static int TryGetEnvironmentVariableOrDefault(string environmentVariable, int defaultPort)
+    {
+        if (int.TryParse(Environment.GetEnvironmentVariable(environmentVariable), out var p))
+        {
+            // Validate port is within valid TCP port range (1-65535)
+            return p >= 1 && p <= 65535 ? p : defaultPort;
+        }
+        return defaultPort;
     }
 }
