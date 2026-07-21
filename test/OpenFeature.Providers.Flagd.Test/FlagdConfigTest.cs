@@ -473,4 +473,59 @@ public class UnitTestFlagdConfig
             Environment.SetEnvironmentVariable(FlagdConfig.EnvVarSyncPort, null);
         }
     }
+
+    [Fact]
+    public void TestFlagdConfigDefaultRetryBackoffValues()
+    {
+        var config = FlagdConfig.Builder().Build();
+
+        Assert.Equal(FlagdConfig.RetryBackoffMsDefault, config.RetryBackoffMs);
+        Assert.Equal(FlagdConfig.RetryBackoffMaxMsDefault, config.RetryBackoffMaxMs);
+    }
+
+    [Fact]
+    public void TestFlagdConfigRetryBackoffFromEnvVar()
+    {
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarRetryBackoffMs, "2000");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarRetryBackoffMaxMs, "20000");
+
+        var config = FlagdConfig.Builder().Build();
+
+        Assert.Equal(2000, config.RetryBackoffMs);
+        Assert.Equal(20000, config.RetryBackoffMaxMs);
+
+        Utils.CleanEnvVars();
+    }
+
+    [Fact]
+    public void TestFlagdConfigBuilderWithRetryBackoffMs()
+    {
+        var config = new FlagdConfigBuilder()
+            .WithRetryBackoffMs(500)
+            .Build();
+
+        Assert.Equal(500, config.RetryBackoffMs);
+    }
+
+    [Fact]
+    public void TestFlagdConfigBuilderWithRetryBackoffMaxMs()
+    {
+        var config = new FlagdConfigBuilder()
+            .WithRetryBackoffMaxMs(5000)
+            .Build();
+
+        Assert.Equal(5000, config.RetryBackoffMaxMs);
+    }
+
+    [Fact]
+    public void TestFlagdConfigBuilderWithBothRetryBackoffValues()
+    {
+        var config = new FlagdConfigBuilder()
+            .WithRetryBackoffMs(500)
+            .WithRetryBackoffMaxMs(5000)
+            .Build();
+
+        Assert.Equal(500, config.RetryBackoffMs);
+        Assert.Equal(5000, config.RetryBackoffMaxMs);
+    }
 }
