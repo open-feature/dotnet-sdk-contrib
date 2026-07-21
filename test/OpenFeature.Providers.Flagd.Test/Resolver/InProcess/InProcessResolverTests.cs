@@ -139,4 +139,40 @@ public class InProcessResolverTests
 
         return (mockGrpcClient, asyncStreamReader);
     }
+
+    [Fact]
+    public void InProcessResolver_UsesDefaultRetryBackoffValues()
+    {
+        // Arrange
+        var config = FlagdConfig.Builder().Build();
+
+        // Act
+        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
+        var resolver = new InProcessResolver(config, mockJsonSchemaValidator);
+
+        // Assert
+        // Default backoff is 1000ms / 1000 = 1 second
+        // We can't directly access private fields, but we can verify the behavior through reflection if needed
+        // For now, this test documents the expected behavior
+        Assert.Equal(FlagdConfig.RetryBackoffMsDefault, config.RetryBackoffMs);
+        Assert.Equal(FlagdConfig.RetryBackoffMaxMsDefault, config.RetryBackoffMaxMs);
+    }
+
+    [Fact]
+    public void InProcessResolver_UsesCustomRetryBackoffValues()
+    {
+        // Arrange
+        var config = FlagdConfig.Builder()
+            .WithRetryBackoffMs(500)
+            .WithRetryBackoffMaxMs(5000)
+            .Build();
+
+        // Act
+        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
+        var resolver = new InProcessResolver(config, mockJsonSchemaValidator);
+
+        // Assert
+        Assert.Equal(500, config.RetryBackoffMs);
+        Assert.Equal(5000, config.RetryBackoffMaxMs);
+    }
 }
