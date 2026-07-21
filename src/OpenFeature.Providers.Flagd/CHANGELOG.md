@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.2...OpenFeature.Providers.Flagd-v0.7.3) (2026-07-21)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** Add support for FLAGD_SYNC_PORT ([#626](https://github.com/open-feature/dotnet-sdk-contrib/issues/626)) ([060fa63](https://github.com/open-feature/dotnet-sdk-contrib/commit/060fa63b61b762cc155f4426db12067566aa5486))
+
 ## [0.7.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.1...OpenFeature.Providers.Flagd-v0.7.2) (2026-06-24)
 
 
