@@ -9,9 +9,9 @@ internal static class UserBuilder
 {
     private static readonly string[] PossibleUserIds = { "ID", "IDENTIFIER" };
 
-    internal static User BuildUser(this EvaluationContext context)
+    internal static User? BuildUser(this EvaluationContext? context)
     {
-        if (context == null)
+        if (context is null)
         {
             return null;
         }
@@ -30,7 +30,7 @@ internal static class UserBuilder
             }
             else
             {
-                user.Custom.Add(value.Key, value.Value.AsString);
+                user.Custom.Add(value.Key, value.Value.AsString!);
             }
         }
 
@@ -41,6 +41,6 @@ internal static class UserBuilder
     {
         var pair = context.AsDictionary().FirstOrDefault(x => PossibleUserIds.Contains(x.Key, StringComparer.OrdinalIgnoreCase));
 
-        return pair.Key != null ? pair.Value.AsString : "<n/a>";
+        return pair.Key != null ? pair.Value.AsString! : "<n/a>";
     }
 }

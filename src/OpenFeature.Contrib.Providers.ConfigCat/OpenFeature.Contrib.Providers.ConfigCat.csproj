@@ -9,6 +9,7 @@
     <Description>ConfigCat provider for .NET</Description>
     <Authors>Luiz Bon</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <!-- make the internal methods visble to our test project -->
