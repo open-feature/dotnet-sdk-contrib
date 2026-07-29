@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ConfigCat.Client;
 using OpenFeature.Model;
@@ -16,31 +17,41 @@ internal static class UserBuilder
             return null;
         }
 
-        var user = new User(context.GetUserId());
+        string? identifier = context.TargetingKey, email = null, country = null;
+        Dictionary<string, object>? customAttributes = null;
 
-        foreach (var value in context)
+        foreach (var entry in context)
         {
-            if (StringComparer.OrdinalIgnoreCase.Equals("EMAIL", value.Key))
+            // NOTE: Attribute key matching shouldn't really be case-insensitive as it may lead to confusing behavior
+            // in some edge cases. However, fixing this would be a significant breaking change, so we keep it this way.
+
+            if (identifier is null && PossibleUserIds.Contains(entry.Key, StringComparer.OrdinalIgnoreCase))
             {
-                user.Email = value.Value.AsString;
+                identifier = entry.Value.AsString;
             }
-            else if (StringComparer.OrdinalIgnoreCase.Equals("COUNTRY", value.Key))
+            else if (email is null && StringComparer.OrdinalIgnoreCase.Equals("EMAIL", entry.Key))
             {
-                user.Country = value.Value.AsString;
+                email = entry.Value.AsString;
             }
-            else
+            else if (country is null && StringComparer.OrdinalIgnoreCase.Equals("COUNTRY", entry.Key))
             {
-                user.Custom.Add(value.Key, value.Value.AsString!);
+                country = entry.Value.AsString;
+            }
+
+            if (!entry.Value.IsNull && entry.Key is not (nameof(User.Identifier) or nameof(User.Email) or nameof(User.Country)))
+            {
+                // NOTE: No need to check for unsupported attribute values as the ConfigCat SDK handles those internally.
+                (customAttributes ??= new())[entry.Key] = entry.Value.AsObject!;
             }
         }
 
+        var user = new User(identifier ?? "<n/a>")
+        {
+            Email = email,
+            Country = country,
+            Custom = customAttributes!
+        };
+
         return user;
-    }
-
-    private static string GetUserId(this EvaluationContext context)
-    {
-        var pair = context.AsDictionary().FirstOrDefault(x => PossibleUserIds.Contains(x.Key, StringComparer.OrdinalIgnoreCase));
-
-        return pair.Key != null ? pair.Value.AsString! : "<n/a>";
     }
 }
