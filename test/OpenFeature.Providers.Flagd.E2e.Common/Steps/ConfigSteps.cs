@@ -31,6 +31,7 @@ public class ConfigSteps
         "FLAGD_RESOLVER",
         "FLAGD_HOST",
         "FLAGD_PORT",
+        "FLAGD_SYNC_PORT",
         "FLAGD_TARGET_URI",
         "FLAGD_TLS",
         "FLAGD_SOCKET_PATH",

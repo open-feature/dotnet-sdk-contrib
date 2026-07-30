@@ -447,5 +447,7 @@ public class Utils
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarResolverType, "");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarOfflineFlagSourcePath, "");
         Environment.SetEnvironmentVariable(FlagdConfig.EnvVarHashFileChange, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarRetryBackoffMs, "");
+        Environment.SetEnvironmentVariable(FlagdConfig.EnvVarRetryBackoffMaxMs, "");
     }
 }

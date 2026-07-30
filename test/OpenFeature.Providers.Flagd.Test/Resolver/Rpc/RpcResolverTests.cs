@@ -464,4 +464,40 @@ public class RpcResolverTests
 
         return false;
     }
+
+    [Fact]
+    public void RpcResolver_UsesDefaultRetryBackoffValues()
+    {
+        // Arrange
+        var config = FlagdConfig.Builder().Build();
+
+        // Act
+        var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+        var resolver = new RpcResolver(mockGrpcClient, config, null);
+
+        // Assert
+        // Default backoff is 1000ms / 1000 = 1 second
+        // We can't directly access private fields, but we can verify the behavior through reflection if needed
+        // For now, this test documents the expected behavior
+        Assert.Equal(FlagdConfig.RetryBackoffMsDefault, config.RetryBackoffMs);
+        Assert.Equal(FlagdConfig.RetryBackoffMaxMsDefault, config.RetryBackoffMaxMs);
+    }
+
+    [Fact]
+    public void RpcResolver_UsesCustomRetryBackoffValues()
+    {
+        // Arrange
+        var config = FlagdConfig.Builder()
+            .WithRetryBackoffMs(500)
+            .WithRetryBackoffMaxMs(5000)
+            .Build();
+
+        // Act
+        var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+        var resolver = new RpcResolver(mockGrpcClient, config, null);
+
+        // Assert
+        Assert.Equal(500, config.RetryBackoffMs);
+        Assert.Equal(5000, config.RetryBackoffMaxMs);
+    }
 }

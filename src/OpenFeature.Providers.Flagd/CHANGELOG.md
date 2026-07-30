@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.1...OpenFeature.Providers.Flagd-v0.7.2) (2026-06-24)
+
+
+### 🐛 Bug Fixes
+
+* prevent flaky RpcResolver tests and event stream hot-spin ([#697](https://github.com/open-feature/dotnet-sdk-contrib/issues/697)) ([85acb30](https://github.com/open-feature/dotnet-sdk-contrib/commit/85acb303f3a1ec4464dc89daecc179959147aeb5))
+
+
+### ✨ New Features
+
+* **flagd:** add FILE resolver type for local flag definition files ([#647](https://github.com/open-feature/dotnet-sdk-contrib/issues/647)) ([40cd909](https://github.com/open-feature/dotnet-sdk-contrib/commit/40cd9095fc0701a97438f78192cc77af15b74c4f))
+
 ## [0.7.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.0...OpenFeature.Providers.Flagd-v0.7.1) (2026-06-16)
 
 

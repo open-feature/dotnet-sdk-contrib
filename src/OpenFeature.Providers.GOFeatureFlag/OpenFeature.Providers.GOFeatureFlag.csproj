@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>OpenFeature.Providers.GOFeatureFlag</PackageId>
-    <VersionNumber>1.1.0</VersionNumber> <!--x-release-please-version -->
+    <VersionNumber>1.2.0</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>
     <FileVersion>$(VersionNumber)</FileVersion>
@@ -10,7 +10,7 @@
     <Authors>Thomas Poignant</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <WasmVersion>0.2.2</WasmVersion>
+    <WasmVersion>0.2.3</WasmVersion>
     <OutputDirectory>$(ProjectDir)WasmModules</OutputDirectory>
     <SourceFile>$(ProjectDir)wasm-releases/evaluation/gofeatureflag-evaluation_$(WasmVersion).wasi</SourceFile>
     <DestinationFile>$(OutputDirectory)\gofeatureflag-evaluation.wasi</DestinationFile>

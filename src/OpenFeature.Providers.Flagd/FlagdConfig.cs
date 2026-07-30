@@ -36,6 +36,7 @@ public class FlagdConfig
 {
     internal const string EnvVarHost = "FLAGD_HOST";
     internal const string EnvVarPort = "FLAGD_PORT";
+    internal const string EnvVarSyncPort = "FLAGD_SYNC_PORT";
     internal const string EnvVarTLS = "FLAGD_TLS";
     internal const string EnvCertPart = "FLAGD_SERVER_CERT_PATH";
     internal const string EnvVarSocketPath = "FLAGD_SOCKET_PATH";
@@ -48,8 +49,12 @@ public class FlagdConfig
     internal const string EnvVarHashFileChange = "FLAGD_HASH_FILE_CHANGE";
     internal const string EnvVarOfflinePollMs = "FLAGD_OFFLINE_POLL_MS";
     internal const string EnvVarDeadlineMs = "FLAGD_DEADLINE_MS";
+    internal const string EnvVarRetryBackoffMs = "FLAGD_RETRY_BACKOFF_MS";
+    internal const string EnvVarRetryBackoffMaxMs = "FLAGD_RETRY_BACKOFF_MAX_MS";
     internal const string FlagdSelectorHeaderName = "flagd-selector";
     internal static int CacheSizeDefault = 10;
+    internal static int RetryBackoffMsDefault = 1000;
+    internal static int RetryBackoffMaxMsDefault = 12000;
     internal static string InProcessResolverValue = "in-process";
     internal static string RpcResolverValue = "rpc";
     internal static string FileResolverValue = "file";
@@ -230,10 +235,32 @@ public class FlagdConfig
         set => _deadlineMs = value;
     }
 
+    /// <summary>
+    ///     The initial backoff time, in milliseconds, for stream reconnection attempts.
+    ///     When not set, a default of 1000ms is used.
+    ///     Used when ResolverType is RPC or IN_PROCESS.
+    /// </summary>
+    public int? RetryBackoffMs
+    {
+        get => _retryBackoffMs ?? RetryBackoffMsDefault;
+        set => _retryBackoffMs = value;
+    }
+
+    /// <summary>
+    ///     The maximum backoff time, in milliseconds, for stream reconnection attempts.
+    ///     When not set, a default of 12000ms (12 seconds) is used.
+    ///     Used when ResolverType is RPC or IN_PROCESS.
+    /// </summary>
+    public int? RetryBackoffMaxMs
+    {
+        get => _retryBackoffMaxMs ?? RetryBackoffMaxMsDefault;
+        set => _retryBackoffMaxMs = value;
+    }
+
     internal bool UseCertificate => _cert.Length > 0;
 
     private string _host;
-    private int _port;
+    private int _port = 0;
     private bool _useTLS;
     private string _cert;
     private string _socketPath;
@@ -247,11 +274,12 @@ public class FlagdConfig
     private bool _useHashFileChangeDetection;
     private int? _offlinePollIntervalMs;
     private int? _deadlineMs;
+    private int? _retryBackoffMs;
+    private int? _retryBackoffMaxMs;
 
     internal FlagdConfig()
     {
         _host = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvVarHost)) ? "localhost" : Environment.GetEnvironmentVariable(EnvVarHost);
-        _port = int.TryParse(Environment.GetEnvironmentVariable(EnvVarPort), out var port) ? port : 0;
         _useTLS = bool.TryParse(Environment.GetEnvironmentVariable(EnvVarTLS), out var useTLS) ? useTLS : false;
         _cert = Environment.GetEnvironmentVariable(EnvCertPart) ?? "";
         _socketPath = Environment.GetEnvironmentVariable(EnvVarSocketPath) ?? "";
@@ -271,6 +299,8 @@ public class FlagdConfig
         _useHashFileChangeDetection = GetUseHashFileChangeDetectionFromEnvironment();
         _offlinePollIntervalMs = GetMillisecondsFromEnvironment(EnvVarOfflinePollMs);
         _deadlineMs = GetMillisecondsFromEnvironment(EnvVarDeadlineMs);
+        _retryBackoffMs = GetMillisecondsFromEnvironment(EnvVarRetryBackoffMs);
+        _retryBackoffMaxMs = GetMillisecondsFromEnvironment(EnvVarRetryBackoffMaxMs);
     }
 
     internal Uri GetUri()
@@ -477,6 +507,26 @@ public class FlagdConfigBuilder
     }
 
     /// <summary>
+    ///     The initial backoff time, in milliseconds, for stream reconnection attempts.
+    ///     Defaults to 1000ms when not set.
+    /// </summary>
+    public FlagdConfigBuilder WithRetryBackoffMs(int retryBackoffMs)
+    {
+        _config.RetryBackoffMs = retryBackoffMs;
+        return this;
+    }
+
+    /// <summary>
+    ///     The maximum backoff time, in milliseconds, for stream reconnection attempts.
+    ///     Defaults to 12000ms (12 seconds) when not set.
+    /// </summary>
+    public FlagdConfigBuilder WithRetryBackoffMaxMs(int retryBackoffMaxMs)
+    {
+        _config.RetryBackoffMaxMs = retryBackoffMaxMs;
+        return this;
+    }
+
+    /// <summary>
     ///     Provide a <see cref="ILogger"/> to be used by the Flagd provider.
     /// </summary>
     /// <param name="logger"></param>
@@ -506,14 +556,28 @@ public class FlagdConfigBuilder
 
         if (this._config.Port == 0)
         {
-            var defaultPortForResolver = this._config.ResolverType switch
+            var defaultPort = this._config.ResolverType switch
             {
                 ResolverType.RPC => 8013,
                 ResolverType.IN_PROCESS => 8015,
                 _ => throw new NotImplementedException($"No default port defined for resolver type '{this._config.ResolverType}'.")
             };
 
-            this._config.Port = defaultPortForResolver;
+            var fromPortEnv = TryGetEnvironmentVariableOrDefault(FlagdConfig.EnvVarPort, defaultPort);
+
+            this._config.Port = this._config.ResolverType == ResolverType.IN_PROCESS ?
+                TryGetEnvironmentVariableOrDefault(FlagdConfig.EnvVarSyncPort, fromPortEnv) :
+                fromPortEnv;
         }
+    }
+
+    private static int TryGetEnvironmentVariableOrDefault(string environmentVariable, int defaultPort)
+    {
+        if (int.TryParse(Environment.GetEnvironmentVariable(environmentVariable), out var p))
+        {
+            // Validate port is within valid TCP port range (1-65535)
+            return p >= 1 && p <= 65535 ? p : defaultPort;
+        }
+        return defaultPort;
     }
 }
