@@ -102,19 +102,16 @@ The ConfigCat provider translates these evaluation contexts to ConfigCat [User O
 
 The following table shows how the attributes are mapped:
 
-| EvaluationContext Key                | ConfigCat User Property |
+| EvaluationContext key                | User Object property    |
 | ------------------------------------ | ----------------------- |
-| `targetingKey`                       | Identifier              |
-| `id` (or `Id`, `ID`, etc.)           | Identifier              |
-| `identifier` (or `Identifier`, etc.) | Identifier              |
-| `email` (or `Email`, etc.)           | Email                   |
-| `country` (or `Country`, etc.)       | Country                 |
+| `targetingKey` (`Id` / `Identifier`) | Identifier              |
+| `Email`                              | Email                   |
+| `Country`                            | Country                 |
 | Any Other                            | Custom                  |
 
 Remarks:
-- If `targetingKey` is specified, it will be mapped to the `Identifier` property, regardless of other identifier attributes.
-- If `targetingKey` is not specified, `id` or `identifier` will be mapped to the `Identifier` property, whichever occurs first. These keys are matched case-insensitively, so for example, `ID` or `Identifier` would also work.
-- If no identifier attribute is specified, the `Identifier` property will be set to the fallback value `<n/a>`.
-- The keys `email` and `country` are also matched case-insensitively. If the same key appears in multiple cases - e.g. `email` and `EMAIL` - the first occurrence will be mapped to the corresponding property.
-- All of the above will also be included in the `Custom` dictionary, except for the exact keys `Identifier`, `Email`, and `Country`. This allows them to be referenced using their original names in feature flag rules.
+- If `targetingKey` is present in the evaluation context, it will be mapped to the `Identifier` property. Otherwise, `Id` or `Identifier` will be mapped, whichever occurs first.
+  (If none of these keys are present, the `Identifier` property will be set to the fallback value `"<n/a>"`.)
+- The keys `Id`, `Identifier`, `Email` and `Country` are matched case-insensitively. If the same key appears in multiple cases - e.g. `email` and `Email` - the first occurrence will be mapped to the corresponding property.
+- All of the above will also be included in the `Custom` dictionary (except for the exact keys `Identifier`, `Email` and `Country`). This allows them to be referenced using their original names in feature flag rules.
 - Other keys are mapped as custom user attributes with their values unchanged. (Although the ConfigCat SDK handles value conversion internally, it's recommended to use the type expected by the referencing feature flag rules. Read more [here](https://configcat.com/docs/sdk-reference/dotnet/#user-object-attribute-types).)
