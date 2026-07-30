@@ -635,10 +635,10 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "object-flag";
-        var defaultValue = new SampleObject { Name = "default", Value = 0, Enabled = false };
         var expectedValue = new SampleObject { Name = "test", Value = 123, Enabled = true };
 
-        var expectedResponse = new OfrepResponse<SampleObject>(flagKey, expectedValue) { Reason = "DISABLED" };
+        var jsonElementValue = JsonSerializer.SerializeToElement(expectedValue, this._jsonSerializerCamelCase);
+        var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElementValue) { Reason = "DISABLED" };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
@@ -646,14 +646,16 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag<JsonElement?>(flagKey, null, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.Value);
-        Assert.Equal(expectedValue.Name, result.Value.Name);
-        Assert.Equal(expectedValue.Value, result.Value.Value);
-        Assert.Equal(expectedValue.Enabled, result.Value.Enabled);
+        var actualValue = result.Value.Value.Deserialize<SampleObject>(this._jsonSerializerCamelCase);
+        Assert.NotNull(actualValue);
+        Assert.Equal(expectedValue.Name, actualValue.Name);
+        Assert.Equal(expectedValue.Value, actualValue.Value);
+        Assert.Equal(expectedValue.Enabled, actualValue.Enabled);
         Assert.Equal("DISABLED", result.Reason);
     }
 
