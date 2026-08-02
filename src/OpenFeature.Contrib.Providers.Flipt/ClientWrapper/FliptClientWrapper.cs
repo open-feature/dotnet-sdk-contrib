@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Flipt.Rest;
 
 namespace OpenFeature.Contrib.Providers.Flipt.ClientWrapper;
 
