@@ -156,7 +156,14 @@ public class ConfigCatProviderTest
     public async Task OpenFeatureAPI_EndToEnd_Test(string email, bool expectedValue)
     {
         var configCatProvider = new ConfigCatProvider("fake-67890123456789012/1234567890123456789012", options =>
-            { options.ConfigFetcher = new FakeConfigFetcher(TestConfigJson); });
+        {
+            options.ConfigFetcher = new FakeConfigFetcher(TestConfigJson);
+            // The default AutoPoll mode gives up waiting for the initial config after 5 seconds,
+            // which a loaded CI agent can exceed even with the in-memory fetcher above. When that
+            // happens the client reports ConfigJsonNotAvailable and the assertions below see
+            // ErrorType.ProviderNotReady instead of ErrorType.None.
+            options.PollingMode = PollingModes.AutoPoll(maxInitWaitTime: TimeSpan.FromSeconds(30));
+        });
 
         await Api.Instance.SetProviderAsync(configCatProvider);
 

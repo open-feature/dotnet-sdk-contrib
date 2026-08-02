@@ -26,5 +26,8 @@ public class BeforeHooks
         var tags = new HashSet<string>(scenarioTags.Concat(featureTags));
         Skip.If(!tags.Contains("rpc"), "Skipping scenario because it does not have required tag.");
         Skip.If(tags.Contains("fractional-v1"), "Skipping legacy fractional bucketing test; v2 algorithm is implemented.");
+        // TODO: remove once the CBOR-based fractional hashing from the flagd
+        // "fractional-non-string-rand-units" ADR is implemented (see open-feature/dotnet-sdk-contrib#516).
+        Skip.If(tags.Contains("fractional-v3"), "Skipping fractional v3 (CBOR-encoded hashing input) test; v2 algorithm is implemented.");
     }
 }
