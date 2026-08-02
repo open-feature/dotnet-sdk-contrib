@@ -102,9 +102,9 @@ internal sealed partial class OfrepClient : IOfrepClient
     /// <summary>
     /// Evaluates a flag value using the OFREP API. This generic method supports the Native AOT-safe
     /// evaluation types: <see cref="bool"/>, <see cref="string"/>, <see cref="int"/>, <see cref="double"/>,
-    /// <see cref="System.Text.Json.JsonElement"/>, and <see cref="System.Text.Json.JsonElement"/>?.
+    /// <see cref="JsonElement"/>, and <see cref="JsonElement"/>?.
     /// Object and structure flag values are resolved through the provider's ResolveStructureValueAsync
-    /// path using <see cref="System.Text.Json.JsonElement"/>?.
+    /// path using <see cref="JsonElement"/>?.
     /// </summary>
     /// <typeparam name="T">The type of the flag value.</typeparam>
     /// <param name="flagKey">The key of the flag to evaluate.</param>
