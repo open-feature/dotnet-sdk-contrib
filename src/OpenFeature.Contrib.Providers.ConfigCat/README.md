@@ -1,6 +1,6 @@
 # ConfigCat Feature Flag .NET Provider
 
-The ConfigCat Flag provider allows you to connect to your ConfigCat instance.
+The ConfigCat provider allows you to use [ConfigCat](https://configcat.com) with the OpenFeature .NET SDK.
 
 # .NET SDK usage
 
@@ -97,22 +97,21 @@ await OpenFeature.Api.Instance.ShutdownAsync();
 ## EvaluationContext and ConfigCat User Object relationship
 
 An <a href="https://openfeature.dev/docs/reference/concepts/evaluation-context" target="_blank">evaluation context</a> in the OpenFeature specification is a container for arbitrary contextual data that can be used as a basis for feature flag evaluation.
-The ConfigCat provider translates these evaluation contexts to ConfigCat [User Objects](https://configcat.com/docs/targeting/user-object/).
 
-The ConfigCat User Object has a few pre-defined attributes that can be used to evaluate a flag. These are:
+The ConfigCat provider translates these evaluation contexts to ConfigCat [User Objects](https://configcat.com/docs/targeting/user-object/), which have three predefined attributes and allow for additional custom attributes.
 
-| Attribute    | Description                                                                                                    |
-|--------------|----------------------------------------------------------------------------------------------------------------|
-| `Identifier` | *REQUIRED*. Unique identifier of a user in your application. Can be any `string` value, even an email address. |
-| `Email`      | The email address of the user.                                                                                 |
-| `Country`    | The country of the user.                                                                                       |
+The following table shows how the attributes are mapped:
 
-Since `EvaluationContext` is a simple dictionary, the provider will try to match the keys to ConfigCat user attributes following the table below in a case-insensitive manner.
+| EvaluationContext key                | User Object property    |
+| ------------------------------------ | ----------------------- |
+| `targetingKey` (`Id` / `Identifier`) | Identifier              |
+| `Email`                              | Email                   |
+| `Country`                            | Country                 |
+| Any Other                            | Custom                  |
 
-| EvaluationContext Key | ConfigCat User Attribute |
-|-----------------------|--------------------------|
-| `id`                  | `Identifier`             |
-| `identifier`          | `Identifier`             |
-| `email`               | `Email`                  |
-| `country`             | `Country`                |
-| Any other             | `Custom`                 |
+Remarks:
+- If `targetingKey` is present in the evaluation context, it will be mapped to the `Identifier` property. Otherwise, `Id` or `Identifier` will be mapped, whichever occurs first.
+  (If none of these keys are present, the `Identifier` property will be set to the fallback value `"<n/a>"`.)
+- The keys `Id`, `Identifier`, `Email` and `Country` are matched case-insensitively. If the same key appears in multiple cases - e.g. `email` and `Email` - the first occurrence will be mapped to the corresponding property.
+- All of the above will also be included in the `Custom` dictionary (except for the exact keys `Identifier`, `Email` and `Country`). This allows them to be referenced using their original names in feature flag rules.
+- Other keys are mapped as custom user attributes with their values unchanged. (Although the ConfigCat SDK handles value conversion internally, it's recommended to use the type expected by the referencing feature flag rules. Read more [here](https://configcat.com/docs/sdk-reference/dotnet/#user-object-attribute-types).)

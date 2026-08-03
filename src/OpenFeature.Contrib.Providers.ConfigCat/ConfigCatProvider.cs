@@ -24,7 +24,7 @@ public sealed class ConfigCatProvider : FeatureProvider
     /// <param name="configBuilder">The action used to configure the client.</param>
     /// <exception cref="ArgumentNullException"><paramref name="sdkKey"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException"><paramref name="sdkKey"/> is an empty string or in an invalid format.</exception>
-    public ConfigCatProvider(string sdkKey, Action<ConfigCatClientOptions> configBuilder = null)
+    public ConfigCatProvider(string sdkKey, Action<ConfigCatClientOptions>? configBuilder = null)
     {
         Client = ConfigCatClient.Get(sdkKey, configBuilder);
     }
@@ -49,35 +49,35 @@ public sealed class ConfigCatProvider : FeatureProvider
     }
 
     /// <inheritdoc/>
-    public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         return ResolveFlag(flagKey, context, defaultValue, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         return ResolveFlag(flagKey, context, defaultValue, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         return ResolveFlag(flagKey, context, defaultValue, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         return ResolveFlag(flagKey, context, defaultValue, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
+    public override async Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext? context = null, CancellationToken cancellationToken = default)
     {
         var user = context?.BuildUser();
-        var result = await Client.GetValueDetailsAsync(flagKey, defaultValue?.AsObject, user, cancellationToken).ConfigureAwait(false);
-        var returnValue = result.IsDefaultValue ? defaultValue : new Value(result.Value);
+        var result = await Client.GetValueDetailsAsync(flagKey, defaultValue.AsObject, user, cancellationToken).ConfigureAwait(false);
+        var returnValue = result.IsDefaultValue ? defaultValue : new Value(result.Value!);
         var details = new ResolutionDetails<Value>(flagKey, returnValue, TranslateErrorCode(result.ErrorCode), errorMessage: result.ErrorMessage, variant: result.VariationId);
         if (details.ErrorType == ErrorType.None)
         {
@@ -87,7 +87,7 @@ public sealed class ConfigCatProvider : FeatureProvider
         throw new FeatureProviderException(details.ErrorType, details.ErrorMessage);
     }
 
-    private async Task<ResolutionDetails<T>> ResolveFlag<T>(string flagKey, EvaluationContext context, T defaultValue, CancellationToken cancellationToken)
+    private async Task<ResolutionDetails<T>> ResolveFlag<T>(string flagKey, EvaluationContext? context, T defaultValue, CancellationToken cancellationToken)
     {
         var user = context?.BuildUser();
         var result = await Client.GetValueDetailsAsync(flagKey, defaultValue, user, cancellationToken).ConfigureAwait(false);
