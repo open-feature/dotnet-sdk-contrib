@@ -77,9 +77,9 @@ jobs:
         shell: pwsh
         run: >
           dotnet publish test/OpenFeature.Providers.Ofrep.AotCompatibility/OpenFeature.Providers.Ofrep.AotCompatibility.csproj
-            -f net9.0
-            -r ${{ matrix.runtime }}
-            -o ./aot-output
+          -f net9.0
+          -r ${{ matrix.runtime }}
+          -o ./aot-output
 
       - name: Run AOT compatibility test
         shell: pwsh
