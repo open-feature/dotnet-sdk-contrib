@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.2...OpenFeature.Providers.Flagd-v0.7.3) (2026-08-04)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** Add support for FLAGD_SYNC_PORT ([#626](https://github.com/open-feature/dotnet-sdk-contrib/issues/626)) ([060fa63](https://github.com/open-feature/dotnet-sdk-contrib/commit/060fa63b61b762cc155f4426db12067566aa5486))
+
+
+### ✨ New Features
+
+* **flagd:** add retry backoff configuration options ([#699](https://github.com/open-feature/dotnet-sdk-contrib/issues/699)) ([398e324](https://github.com/open-feature/dotnet-sdk-contrib/commit/398e3244131a63560a4a710853b5bcfef473e3fb))
+
 ## [0.7.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.1...OpenFeature.Providers.Flagd-v0.7.2) (2026-06-24)
 
 
