@@ -11,5 +11,5 @@ internal class OfrepRequest
     /// Gets or sets the evaluation context for the request.
     /// </summary>
     [JsonPropertyName("context")]
-    public object? Context { get; set; }
+    public IDictionary<string, object?>? Context { get; set; }
 }
