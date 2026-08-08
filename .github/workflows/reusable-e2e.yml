@@ -1,0 +1,31 @@
+name: Reusable / E2E Tests
+
+on:
+  workflow_call:
+
+jobs:
+  e2e:
+    name: dotnet test
+
+    permissions:
+      contents: read
+      packages: read # restore pulls OpenFeature.* from GitHub Packages
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # `submodules: recursive` is required: the flagd E2E suite runs the flagd-testbed
+      # submodule through Testcontainers.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet
+
+      - name: Test
+        run: dotnet build && E2E=true dotnet test --logger GitHubActions
