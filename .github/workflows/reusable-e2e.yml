@@ -28,6 +28,7 @@ jobs:
         uses: ./.github/actions/setup-dotnet
 
       - name: Build
+        id: build
         run: dotnet build
 
       # Scoped to the two E2E projects on purpose. Running `dotnet test` across the whole
@@ -53,8 +54,11 @@ jobs:
           -- RunConfiguration.TreatNoTestsAsError=true
 
       - name: E2E (rpc resolver)
-        # Report both resolvers even when the first one fails.
-        if: ${{ !cancelled() }}
+        # Report both resolvers even when the in-process one fails, but stay skipped when
+        # the build never produced test assemblies: `!cancelled()` on its own replaces the
+        # implicit success() check, so without the build gate this would still run (and
+        # fail redundantly) after a failed Checkout, Setup .NET, or Build.
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           E2E: "true"
         run: >
