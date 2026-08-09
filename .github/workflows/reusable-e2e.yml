@@ -27,5 +27,29 @@ jobs:
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet
 
-      - name: Test
-        run: dotnet build && E2E=true dotnet test --logger GitHubActions
+      - name: Build
+        run: dotnet build
+
+      # Scoped to the two E2E projects on purpose. Running `dotnet test` across the whole
+      # solution here re-ran every unit test that the Build job already covers, and buried
+      # the E2E results among 20+ other test assemblies.
+      #
+      # `summary.includePassedTests` defaults to false, so with no failures the logger
+      # rendered an empty summary and the E2E scenarios were invisible in the run UI.
+      - name: E2E (in-process resolver)
+        env:
+          E2E: "true"
+        run: >
+          dotnet test test/OpenFeature.Providers.Flagd.E2e.ProcessTest/OpenFeature.Providers.Flagd.E2e.ProcessTest.csproj
+          --no-build
+          --logger "GitHubActions;summary.includePassedTests=true"
+
+      - name: E2E (rpc resolver)
+        # Report both resolvers even when the first one fails.
+        if: ${{ !cancelled() }}
+        env:
+          E2E: "true"
+        run: >
+          dotnet test test/OpenFeature.Providers.Flagd.E2e.RpcTest/OpenFeature.Providers.Flagd.E2e.RpcTest.csproj
+          --no-build
+          --logger "GitHubActions;summary.includePassedTests=true"
