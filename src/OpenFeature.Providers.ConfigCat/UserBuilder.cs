@@ -4,7 +4,7 @@ using System.Linq;
 using ConfigCat.Client;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.ConfigCat;
+namespace OpenFeature.Providers.ConfigCat;
 
 internal static class UserBuilder
 {

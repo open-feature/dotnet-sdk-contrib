@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>OpenFeature.Contrib.Providers.ConfigCat</PackageId>
+    <PackageId>OpenFeature.Providers.ConfigCat</PackageId>
     <VersionNumber>0.1.1</VersionNumber> <!--x-release-please-version -->
     <VersionPrefix>$(VersionNumber)</VersionPrefix>
     <AssemblyVersion>$(VersionNumber)</AssemblyVersion>

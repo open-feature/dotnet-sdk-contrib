@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoFixture.Xunit2" Version="4.18.1" />
-    <ProjectReference Include="..\..\src\OpenFeature.Contrib.Providers.ConfigCat\OpenFeature.Contrib.Providers.ConfigCat.csproj" />
+    <ProjectReference Include="..\..\src\OpenFeature.Providers.ConfigCat\OpenFeature.Providers.ConfigCat.csproj" />
   </ItemGroup>
 
 </Project>
