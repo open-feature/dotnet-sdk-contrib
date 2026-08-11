@@ -1,0 +1,67 @@
+name: Reusable / E2E Tests
+
+on:
+  workflow_call:
+
+jobs:
+  e2e:
+    name: dotnet test
+
+    permissions:
+      contents: read
+      packages: read # restore pulls OpenFeature.* from GitHub Packages
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # `submodules: recursive` is required: the flagd E2E suite runs the flagd-testbed
+      # submodule through Testcontainers.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet
+
+      - name: Build
+        id: build
+        run: dotnet build
+
+      # Scoped to the two E2E projects on purpose. Running `dotnet test` across the whole
+      # solution here re-ran every unit test that the Build job already covers, and buried
+      # the E2E results among 20+ other test assemblies.
+      #
+      # Do NOT add `--no-build`. The gherkin .feature files are copied into each project's
+      # Features/ directory *during* the build, but Reqnroll globs them at project
+      # evaluation time. On a clean checkout that directory is empty, so the first build
+      # copies the files and a second build is what actually generates the test classes.
+      # `dotnet test` performing that second build is load-bearing: with `--no-build` zero
+      # tests are discovered, and `dotnet test` exits 0 for that, so the job goes green
+      # having run nothing. TreatNoTestsAsError makes that failure mode loud.
+      #
+      # `summary.includePassedTests` defaults to false, so with no failures the logger
+      # rendered an empty summary and the E2E scenarios were invisible in the run UI.
+      - name: E2E (in-process resolver)
+        env:
+          E2E: "true"
+        run: >
+          dotnet test test/OpenFeature.Providers.Flagd.E2e.ProcessTest/OpenFeature.Providers.Flagd.E2e.ProcessTest.csproj
+          --logger "GitHubActions;summary.includePassedTests=true"
+          -- RunConfiguration.TreatNoTestsAsError=true
+
+      - name: E2E (rpc resolver)
+        # Report both resolvers even when the in-process one fails, but stay skipped when
+        # the build never produced test assemblies: `!cancelled()` on its own replaces the
+        # implicit success() check, so without the build gate this would still run (and
+        # fail redundantly) after a failed Checkout, Setup .NET, or Build.
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          E2E: "true"
+        run: >
+          dotnet test test/OpenFeature.Providers.Flagd.E2e.RpcTest/OpenFeature.Providers.Flagd.E2e.RpcTest.csproj
+          --logger "GitHubActions;summary.includePassedTests=true"
+          -- RunConfiguration.TreatNoTestsAsError=true
