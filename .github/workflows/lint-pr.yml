@@ -1,6 +1,11 @@
 name: "Lint PR"
 
 on:
+  # `pull_request_target` never fires for the merge queue, so a required `Validate PR title`
+  # context would stay pending forever and deadlock the queue. Triggering on `merge_group`
+  # and skipping the work reports the check without re-linting a title that was already
+  # validated on the pull request.
+  merge_group:
   pull_request_target:
     types:
       - opened
@@ -15,7 +20,12 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
+      - name: Skip for merge queue
+        if: github.event_name == 'merge_group'
+        run: echo "PR title lint is not applicable to merge_group; passing required check."
+
       - id: lint_pr_title
+        if: github.event_name == 'pull_request_target'
         uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -23,7 +33,7 @@ jobs:
       - uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         # When the previous steps fails, the workflow would stop. By adding this
         # condition you can continue the execution with the populated error message.
-        if: always() && (steps.lint_pr_title.outputs.error_message != null)
+        if: always() && github.event_name == 'pull_request_target' && steps.lint_pr_title.outputs.error_message != null
         with:
           header: pr-title-lint-error
           message: |
@@ -36,7 +46,7 @@ jobs:
             ${{ steps.lint_pr_title.outputs.error_message }}
             ```
       # Delete a previous comment when the issue has been resolved
-      - if: ${{ steps.lint_pr_title.outputs.error_message == null }}
+      - if: github.event_name == 'pull_request_target' && steps.lint_pr_title.outputs.error_message == null
         uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
           header: pr-title-lint-error
