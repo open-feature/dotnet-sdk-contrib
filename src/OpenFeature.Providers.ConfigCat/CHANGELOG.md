@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.ConfigCat-v0.1.1...OpenFeature.Providers.ConfigCat-v0.2.0) (2026-08-26)
+## [1.0.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.ConfigCat-v0.1.1...OpenFeature.Providers.ConfigCat-v1.0.0) (2026-08-26)
 
 
 ### ⚠ BREAKING CHANGES
