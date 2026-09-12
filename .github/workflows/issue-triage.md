@@ -147,7 +147,7 @@ Use `.github/component_owners.yml` as source of truth. Suggest owners in a comme
 
 Provider-to-component mapping:
 
-- `provider:configcat` -> `src/OpenFeature.Contrib.Providers.ConfigCat`
+- `provider:configcat` -> `src/OpenFeature.Providers.ConfigCat`
 - `provider:envvar` -> `src/OpenFeature.Contrib.Providers.EnvVar`
 - `provider:featuremanagement` -> `src/OpenFeature.Contrib.Providers.FeatureManagement`
 - `provider:flagd` -> `src/OpenFeature.Contrib.Providers.Flagd`
