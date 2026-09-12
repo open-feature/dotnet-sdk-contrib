@@ -33,14 +33,14 @@
         "OpenFeature.Contrib.Providers.Flagsmith.csproj"
       ]
     },
-    "src/OpenFeature.Contrib.Providers.ConfigCat": {
-      "package-name": "OpenFeature.Contrib.Providers.ConfigCat",
+    "src/OpenFeature.Providers.ConfigCat": {
+      "package-name": "OpenFeature.Providers.ConfigCat",
       "release-type": "simple",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
       "extra-files": [
-        "OpenFeature.Contrib.Providers.ConfigCat.csproj"
+        "OpenFeature.Providers.ConfigCat.csproj"
       ]
     },
     "src/OpenFeature.Contrib.Providers.FeatureManagement": {

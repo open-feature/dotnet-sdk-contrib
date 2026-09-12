@@ -14,32 +14,32 @@ The first things we will do is install the **Open Feature SDK** and the **Config
 
 ### .NET Cli
 ```shell
-dotnet add package OpenFeature.Contrib.Providers.ConfigCat
+dotnet add package OpenFeature.Providers.ConfigCat
 ```
 ### Package Manager
 
 ```shell
-NuGet\Install-Package OpenFeature.Contrib.Providers.ConfigCat
+NuGet\Install-Package OpenFeature.Providers.ConfigCat
 ```
 ### Package Reference
 
 ```xml
-<PackageReference Include="OpenFeature.Contrib.Providers.ConfigCat" />
+<PackageReference Include="OpenFeature.Providers.ConfigCat" />
 ```
 ### Packet cli
 
 ```shell
-paket add OpenFeature.Contrib.Providers.ConfigCat
+paket add OpenFeature.Providers.ConfigCat
 ```
 
 ### Cake
 
 ```shell
-// Install OpenFeature.Contrib.Providers.ConfigCat as a Cake Addin
-#addin nuget:?package=OpenFeature.Contrib.Providers.ConfigCat
+// Install OpenFeature.Providers.ConfigCat as a Cake Addin
+#addin nuget:?package=OpenFeature.Providers.ConfigCat
 
-// Install OpenFeature.Contrib.Providers.ConfigCat as a Cake Tool
-#tool nuget:?package=OpenFeature.Contrib.Providers.ConfigCat
+// Install OpenFeature.Providers.ConfigCat as a Cake Tool
+#tool nuget:?package=OpenFeature.Providers.ConfigCat
 ```
 
 ## Using the ConfigCat Provider with the OpenFeature SDK
@@ -49,7 +49,7 @@ The following example shows how to use the ConfigCat provider with the OpenFeatu
 ```csharp
 using System;
 using ConfigCat.Client;
-using OpenFeature.Contrib.ConfigCat;
+using OpenFeature.Providers.ConfigCat;
 
 var configCatProvider = new ConfigCatProvider("#YOUR-SDK-KEY#");
 

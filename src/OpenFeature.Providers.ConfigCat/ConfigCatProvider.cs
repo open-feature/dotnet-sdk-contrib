@@ -7,7 +7,7 @@ using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
 
-namespace OpenFeature.Contrib.ConfigCat;
+namespace OpenFeature.Providers.ConfigCat;
 
 /// <summary>
 /// ConfigCatProvider is the .NET provider implementation for the feature flag solution ConfigCat.

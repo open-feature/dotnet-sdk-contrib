@@ -11,7 +11,7 @@ components:
   src/OpenFeature.Contrib.Providers.Flagsmith:
     - vpetrusevici
     - matthewelwell
-  src/OpenFeature.Contrib.Providers.ConfigCat:
+  src/OpenFeature.Providers.ConfigCat:
     - luizbon
     - adams85
   src/OpenFeature.Contrib.Providers.FeatureManagement:
@@ -41,7 +41,7 @@ components:
   test/OpenFeature.Contrib.Providers.Flagsmith.Test:
     - vpetrusevici
     - matthewelwell
-  test/OpenFeature.Contrib.Providers.ConfigCat.Test:
+  test/OpenFeature.Providers.ConfigCat.Test:
     - luizbon
     - adams85
   test/OpenFeature.Contrib.Providers.FeatureManagement.Test:

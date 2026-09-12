@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.ConfigCat-v0.1.1...OpenFeature.Providers.ConfigCat-v1.0.0) (2026-08-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* **configcat:** Rename OpenFeature.Contrib.Providers.ConfigCat to OpenFeature.Providers.ConfigCat ([#727](https://github.com/open-feature/dotnet-sdk-contrib/issues/727))
+
+### 🐛 Bug Fixes
+
+* **configcat:** Rename OpenFeature.Contrib.Providers.ConfigCat to OpenFeature.Providers.ConfigCat ([#727](https://github.com/open-feature/dotnet-sdk-contrib/issues/727)) ([2121afe](https://github.com/open-feature/dotnet-sdk-contrib/commit/2121afe369b8071a9e76688945d33cb1511b4f0e))
+
 ## [0.1.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Contrib.Providers.ConfigCat-v0.1.0...OpenFeature.Contrib.Providers.ConfigCat-v0.1.1) (2024-09-17)
 
 

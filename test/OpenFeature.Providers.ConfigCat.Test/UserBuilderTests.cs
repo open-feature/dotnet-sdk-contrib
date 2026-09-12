@@ -1,7 +1,7 @@
 using OpenFeature.Model;
 using Xunit;
 
-namespace OpenFeature.Contrib.ConfigCat.Test;
+namespace OpenFeature.Providers.ConfigCat.Test;
 
 public class UserBuilderTests
 {
