@@ -58,10 +58,17 @@ jobs:
       packages: write
     uses: ./.github/workflows/reusable-packaging.yml
 
+  aot-compatibility:
+    name: AOT Compatibility
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/reusable-aot-compatibility.yml
+
   ci-gate:
     name: CI Gate
     if: always()
-    needs: [build, format, e2e, packaging]
+    needs: [build, format, e2e, packaging, aot-compatibility]
 
     permissions:
       contents: read

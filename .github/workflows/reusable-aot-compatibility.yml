@@ -1,19 +1,16 @@
-name: AOT Compatibility
+name: Reusable / AOT Compatibility
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  merge_group:
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   aot-compatibility:
     name: AOT Test (${{ matrix.os }}, ${{ matrix.arch }})
+
     permissions:
       contents: read
       packages: read
+
     strategy:
       fail-fast: false
       matrix:
