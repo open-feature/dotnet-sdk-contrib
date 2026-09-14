@@ -450,6 +450,60 @@ public class OfrepClientTest : IDisposable
         Assert.Contains("count", requestContent);
     }
 
+    [Fact]
+    public async Task EvaluateFlag_WithStructureListAndDateContext_ShouldSerializeCorrectly()
+    {
+        // Arrange
+        const string flagKey = "rich-context-flag";
+        const string defaultValue = "default";
+
+        var richContext = EvaluationContext.Builder()
+            .Set("userId", "user123")
+            .Set("updatedAt", new DateTime(2024, 1, 2, 3, 4, 5, DateTimeKind.Utc))
+            .Set("tags", new Value(new List<Value> { new("beta"), new("gold") }))
+            .Set("attributes", Structure.Builder()
+                .Set("tier", 3)
+                .Set("loyal", true)
+                .Build())
+            .Build();
+
+        var expectedResponse = new OfrepResponse<string>(flagKey, "success");
+        this._mockHandler.SetupResponse(HttpStatusCode.OK,
+            JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
+
+        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
+
+        // Act
+        var result = await client.EvaluateFlag(flagKey, defaultValue, richContext);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(expectedResponse.Value, result.Value);
+        Assert.Single(this._mockHandler.Requests); // request was sent; no NotSupportedException fallback
+
+        var request = this._mockHandler.Requests[0];
+        var requestContent = await request.Content!.ReadAsStringAsync();
+        var requestBody = JsonSerializer.Deserialize<JsonElement>(requestContent);
+        Assert.True(requestBody.TryGetProperty("context", out var contextElement));
+
+        Assert.True(contextElement.TryGetProperty("userId", out var userIdElement));
+        Assert.Equal("user123", userIdElement.GetString());
+
+        Assert.True(contextElement.TryGetProperty("updatedAt", out var updatedAtElement));
+        Assert.Equal("2024-01-02T03:04:05Z", updatedAtElement.GetString());
+
+        Assert.True(contextElement.TryGetProperty("tags", out var tagsElement));
+        Assert.Equal(JsonValueKind.Array, tagsElement.ValueKind);
+        Assert.Equal(new[] { "beta", "gold" }, tagsElement.EnumerateArray().Select(e => e.GetString()));
+
+        Assert.True(contextElement.TryGetProperty("attributes", out var attributesElement));
+        Assert.Equal(JsonValueKind.Object, attributesElement.ValueKind);
+        Assert.True(attributesElement.TryGetProperty("tier", out var tierElement));
+        Assert.Equal(3, tierElement.GetInt32());
+        Assert.True(attributesElement.TryGetProperty("loyal", out var loyalElement));
+        Assert.True(loyalElement.GetBoolean());
+    }
+
     [Theory]
     [InlineData("flag-with-special-chars-!@#", "flag-with-special-chars-%21%40%23")]
     [InlineData("flag with spaces", "flag%20with%20spaces")]
@@ -635,10 +689,10 @@ public class OfrepClientTest : IDisposable
     {
         // Arrange
         const string flagKey = "object-flag";
-        var defaultValue = new { test = "default" };
-        var expectedValue = new { name = "test", value = 123, enabled = true };
+        var expectedValue = new SampleObject { Name = "test", Value = 123, Enabled = true };
 
-        var expectedResponse = new OfrepResponse<object>(flagKey, expectedValue) { Reason = "DISABLED" };
+        var jsonElementValue = JsonSerializer.SerializeToElement(expectedValue, this._jsonSerializerCamelCase);
+        var expectedResponse = new OfrepResponse<JsonElement?>(flagKey, jsonElementValue) { Reason = "DISABLED" };
 
         this._mockHandler.SetupResponse(HttpStatusCode.OK,
             JsonSerializer.Serialize(expectedResponse, this._jsonSerializerCamelCase));
@@ -646,11 +700,16 @@ public class OfrepClientTest : IDisposable
         using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
 
         // Act
-        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+        var result = await client.EvaluateFlag<JsonElement?>(flagKey, null, EvaluationContext.Empty);
 
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.Value);
+        var actualValue = result.Value.Value.Deserialize<SampleObject>(this._jsonSerializerCamelCase);
+        Assert.NotNull(actualValue);
+        Assert.Equal(expectedValue.Name, actualValue.Name);
+        Assert.Equal(expectedValue.Value, actualValue.Value);
+        Assert.Equal(expectedValue.Enabled, actualValue.Enabled);
         Assert.Equal("DISABLED", result.Reason);
     }
 
@@ -702,6 +761,15 @@ public class OfrepClientTest : IDisposable
         Assert.Equal("provider_not_ready", result.ErrorCode);
         Assert.Equal("ERROR", result.Reason);
         Assert.Equal("Unauthorized access to flag evaluation.", result.ErrorMessage);
+    }
+
+    private sealed class SampleObject
+    {
+        public string Name { get; init; } = string.Empty;
+
+        public int Value { get; init; }
+
+        public bool Enabled { get; init; }
     }
 
     [Fact]
