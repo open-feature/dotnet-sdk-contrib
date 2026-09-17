@@ -459,6 +459,36 @@ public class UnitTestFlagsmithProvider
         Assert.Equal(ErrorType.None, result.ErrorType);
     }
 
+    [Theory]
+    [InlineData("1e400")]
+    [InlineData("-1e400")]
+    [InlineData("{ \"huge\": 1e400 }")]
+    [InlineData("[1e400]")]
+    public async Task GetStructureValueAsync_ForNumberOutsideDoubleRange_DoesNotLeakParsingException(string settedValue)
+    {
+        // Arrange
+        var flagsmithClient = Substitute.For<IFlagsmithClient>();
+        var flags = Substitute.For<IFlags>();
+        flags.GetFeatureValue("example-feature").Returns(settedValue);
+        flags.IsFeatureEnabled("example-feature").Returns(true);
+        flagsmithClient.GetEnvironmentFlags().Returns(flags);
+
+        var defaultObject = new Value("default");
+        var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+        var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
+
+        // Act
+        var exception = await Record.ExceptionAsync(() => flagsmithProvider.ResolveStructureValueAsync("example-feature", defaultObject));
+
+        // Assert
+        // The runtime decides whether such a number is representable: the modern targets widen it to
+        // infinity, while JsonElement.GetDouble throws FormatException on .NET Framework. Either way
+        // the provider must surface a TypeMismatchException rather than the raw parsing exception.
+        Assert.True(
+            exception is null or TypeMismatchException,
+            $"Expected no exception or TypeMismatchException, but got {exception?.GetType().FullName}");
+    }
+
     [Fact]
     public async Task GetStructureValueAsync_ForEnabledFeatureWithWrongFormatValue_ThrowsTypeMismatch()
     {

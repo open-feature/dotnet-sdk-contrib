@@ -155,7 +155,10 @@ public class FlagsmithProvider : FeatureProvider
         {
             result = ConvertValue(JsonNode.Parse(stringValue));
         }
-        catch (JsonException)
+        // JsonException: the value is not well-formed JSON.
+        // FormatException: a number is well-formed but not representable as a double, which
+        // JsonElement.GetDouble reports by throwing on the .NET Framework / netstandard2.0 builds.
+        catch (Exception e) when (e is JsonException or FormatException)
         {
             result = null;
         }
@@ -174,16 +177,16 @@ public class FlagsmithProvider : FeatureProvider
             case null:
                 return null;
             case JsonArray jsonArray:
-            {
-                var arr = jsonArray.Select(ConvertValue).Where(convertedValue => convertedValue != null).ToList();
-                return new(arr);
-            }
+                {
+                    var arr = jsonArray.Select(ConvertValue).Where(convertedValue => convertedValue != null).ToList();
+                    return new(arr);
+                }
             case JsonObject jsonObject:
-            {
-                var dict = jsonObject.ToDictionary(x => x.Key, x => ConvertValue(x.Value));
+                {
+                    var dict = jsonObject.ToDictionary(x => x.Key, x => ConvertValue(x.Value));
 
-                return new(new Structure(dict));
-            }
+                    return new(new Structure(dict));
+                }
         }
 
         if (!node.AsValue().TryGetValue<JsonElement>(out var jsonElement))
