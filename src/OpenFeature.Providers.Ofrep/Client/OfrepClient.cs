@@ -338,7 +338,11 @@ internal sealed partial class OfrepClient : IOfrepClient
     private static async Task<OfrepResponse<JsonElement>?> ReadRawResponseAsync(HttpResponseMessage response,
         CancellationToken cancellationToken)
     {
+#if NET5_0_OR_GREATER
+         using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+#else
         using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+#endif
         return await JsonSerializer.DeserializeAsync(responseStream,
                 OfrepJsonSerializerContext.Default.OfrepResponseJsonElement, cancellationToken)
             .ConfigureAwait(false);
