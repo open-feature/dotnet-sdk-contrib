@@ -26,6 +26,14 @@ public class FlagsmithProvider : FeatureProvider
     /// </summary>
     private const string TargetingKeyAttribute = "targetingKey";
 
+    /// <summary>
+    /// Parses the raw string Flagsmith stores for a feature into the type the caller asked for.
+    /// Mirrors the shape of <c>bool.TryParse</c> so the framework parsers can be passed directly.
+    /// </summary>
+    /// <typeparam name="T">The type the flag value is resolved as.</typeparam>
+    /// <param name="value">The raw feature value returned by Flagsmith.</param>
+    /// <param name="x">The parsed value, or the default of <typeparamref name="T"/> when parsing fails.</param>
+    /// <returns><c>true</c> when <paramref name="value"/> was parsed successfully.</returns>
     private delegate bool TryParseDelegate<T>(string value, out T x);
 
     internal readonly IFlagsmithClient _flagsmithClient;
@@ -72,6 +80,13 @@ public class FlagsmithProvider : FeatureProvider
         _flagsmithClient = flagsmithClient;
     }
 
+    /// <summary>
+    /// Fetches the flags that apply to an evaluation context. A context carrying a targeting key is
+    /// resolved as a Flagsmith identity, with the remaining context attributes sent as that identity's
+    /// traits; without one the environment flags are used.
+    /// </summary>
+    /// <param name="ctx">The evaluation context, which may be <c>null</c>.</param>
+    /// <returns>The flags Flagsmith resolved for the context.</returns>
     private Task<IFlags> GetFlags(EvaluationContext ctx)
     {
         var identifier = ctx?.TargetingKey;
@@ -92,6 +107,17 @@ public class FlagsmithProvider : FeatureProvider
         return _flagsmithClient.GetIdentityFlags(identifier, traits);
     }
 
+    /// <summary>
+    /// Resolves the configured value of a feature. A feature that is turned off in Flagsmith resolves to
+    /// <paramref name="defaultValue"/> with <see cref="Reason.Disabled"/> rather than to its stored value.
+    /// </summary>
+    /// <typeparam name="T">The type the flag value is resolved as.</typeparam>
+    /// <param name="flagKey">The key of the feature to resolve.</param>
+    /// <param name="defaultValue">The value to fall back to when the feature is disabled.</param>
+    /// <param name="tryParse">Parser turning the stored string into <typeparamref name="T"/>.</param>
+    /// <param name="context">The evaluation context, which may be <c>null</c>.</param>
+    /// <returns>The resolution details for the feature.</returns>
+    /// <exception cref="TypeMismatchException">The stored value cannot be parsed as <typeparamref name="T"/>.</exception>
     private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, T defaultValue, TryParseDelegate<T> tryParse, EvaluationContext context)
     {
         var flags = await GetFlags(context).ConfigureAwait(false);
@@ -108,6 +134,14 @@ public class FlagsmithProvider : FeatureProvider
             : throw new TypeMismatchException("Failed to parse value in the expected type");
     }
 
+    /// <summary>
+    /// Resolves a feature from its enabled state rather than from its configured value, which is how a
+    /// boolean flag is evaluated unless <see cref="IFlagsmithProviderConfiguration.UsingBooleanConfigValue"/>
+    /// is set.
+    /// </summary>
+    /// <param name="flagKey">The key of the feature to resolve.</param>
+    /// <param name="context">The evaluation context, which may be <c>null</c>.</param>
+    /// <returns>The resolution details holding whether the feature is enabled.</returns>
     private async Task<ResolutionDetails<bool>> IsFeatureEnabled(string flagKey, EvaluationContext context)
     {
         var flags = await GetFlags(context).ConfigureAwait(false);
@@ -143,6 +177,14 @@ public class FlagsmithProvider : FeatureProvider
     public override Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         => ResolveValue(flagKey, defaultValue, TryParseValue, context);
 
+    /// <summary>
+    /// Parses a feature value holding a JSON document into a <see cref="Value"/>. Anything that is not
+    /// usable JSON is reported as a failed parse rather than as an exception, so that
+    /// <see cref="ResolveValue{T}"/> can turn it into a <see cref="TypeMismatchException"/>.
+    /// </summary>
+    /// <param name="stringValue">The raw feature value returned by Flagsmith.</param>
+    /// <param name="result">The converted value, or <c>null</c> when the input is not usable JSON.</param>
+    /// <returns><c>true</c> when <paramref name="stringValue"/> was converted successfully.</returns>
     private static bool TryParseValue(string stringValue, out Value result)
     {
         if (string.IsNullOrWhiteSpace(stringValue))
@@ -166,10 +208,14 @@ public class FlagsmithProvider : FeatureProvider
     }
 
     /// <summary>
-    ///     convertValue is converting the dynamically typed object received from Flagsmith into the correct type
+    /// Converts the dynamically typed JSON received from Flagsmith into the matching OpenFeature type,
+    /// recursing through arrays and objects.
     /// </summary>
-    /// <param name="node">The dynamically typed value we received from Flagsmith</param>
-    /// <returns>A correctly typed object representing the flag value</returns>
+    /// <param name="node">The dynamically typed value we received from Flagsmith.</param>
+    /// <returns>
+    /// A correctly typed object representing the flag value, or <c>null</c> for a JSON null and for a
+    /// scalar that cannot be represented, such as a number outside the range of a double.
+    /// </returns>
     private static Value ConvertValue(JsonNode node)
     {
         switch (node)
