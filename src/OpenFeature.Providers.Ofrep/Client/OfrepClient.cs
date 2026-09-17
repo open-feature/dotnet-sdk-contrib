@@ -267,8 +267,11 @@ internal sealed partial class OfrepClient : IOfrepClient
             {
                 resolvedValue = DeserializeResponseValue(rawResponse.Value, defaultValue);
             }
-            catch (JsonException ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
+                // DeserializeResponseValue throws InvalidOperationException/FormatException/OverflowException
+                // when the server-provided value does not match T. Keep the server error metadata instead of
+                // replacing it with a generic parse failure.
                 this.LogJsonParseError(flagKey, ex.Message, ex);
             }
         }
@@ -307,10 +310,18 @@ internal sealed partial class OfrepClient : IOfrepClient
             {
                 resolvedValue = DeserializeResponseValue(rawResponse.Value, defaultValue);
             }
-            catch (JsonException ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
+                // DeserializeResponseValue throws InvalidOperationException/FormatException/OverflowException
+                // when the server-provided value does not match T. Report a parse error instead of letting the
+                // exception escape or degrading to a generic error.
                 this.LogJsonParseError(flagKey, ex.Message, ex);
-                return HandleEvaluationError(flagKey, ex, defaultValue);
+                return new OfrepResponse<T>(flagKey, defaultValue)
+                {
+                    ErrorCode = ErrorCodes.ParseError,
+                    Reason = Reason.Error,
+                    ErrorMessage = "Failed to parse flag value."
+                };
             }
         }
         else

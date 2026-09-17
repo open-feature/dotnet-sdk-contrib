@@ -835,6 +835,69 @@ public class OfrepClientTest : IDisposable
         Assert.Equal("Invalid evaluation context provided", result.ErrorMessage);
     }
 
+    [Fact]
+    public async Task EvaluateFlag_WithOkResponseAndMismatchedValueType_ShouldReturnParseError()
+    {
+        // Arrange
+        const string flagKey = "ok-mismatched-value-flag";
+        const bool defaultValue = false;
+
+        var response = new
+        {
+            key = flagKey,
+            value = "not-a-bool",
+            reason = "TARGETING_MATCH",
+            variant = "on"
+        };
+
+        this._mockHandler.SetupResponse(HttpStatusCode.OK,
+            JsonSerializer.Serialize(response, this._jsonSerializerCamelCase));
+
+        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
+
+        // Act
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(defaultValue, result.Value);
+        Assert.Equal("parse_error", result.ErrorCode);
+        Assert.Equal("ERROR", result.Reason);
+        Assert.Equal("Failed to parse flag value.", result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task EvaluateFlag_WithBadRequestResponseAndMismatchedValueType_ShouldPreserveServerErrorWithDefaultValue()
+    {
+        // Arrange
+        const string flagKey = "bad-request-mismatched-value-flag";
+        const int defaultValue = 0;
+
+        var errorResponse = new
+        {
+            key = flagKey,
+            errorCode = "INVALID_CONTEXT",
+            errorDetails = "missing targeting key",
+            value = "not-an-int",
+            reason = "ERROR"
+        };
+
+        this._mockHandler.SetupResponse(HttpStatusCode.BadRequest,
+            JsonSerializer.Serialize(errorResponse, this._jsonSerializerCamelCase));
+
+        using var client = new OfrepClient(this._configuration, this._mockHandler, this._mockLogger);
+
+        // Act
+        var result = await client.EvaluateFlag(flagKey, defaultValue, EvaluationContext.Empty);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(defaultValue, result.Value);
+        Assert.Equal("INVALID_CONTEXT", result.ErrorCode);
+        Assert.Equal("ERROR", result.Reason);
+        Assert.Contains("missing targeting key", result.ErrorMessage);
+    }
+
     #endregion
 
     #region Rate Limiting Tests
