@@ -134,10 +134,10 @@ public class UnitTestFlagsmithProvider
     [InlineData(false, true, "false", false, "DISABLED", false)]
     [InlineData(true, false, "false", false, null, false)]
     [InlineData(false, false, "false", false, null, false)]
-    public async Task GetBooleanValueAsync_ForEnabledFeatureWithValidFormatAndSettedConfigValue_ReturnExpectedResult(
+    public async Task GetBooleanValueAsync_ForEnabledFeatureWithValidFormatAndConfiguredFeatureValue_ReturnExpectedResult(
         bool defaultValue,
         bool enabledValueConfig,
-        string settedValue,
+        string featureValue,
         bool featureEnabled,
         string expectedReason,
         bool expectedResult)
@@ -145,7 +145,7 @@ public class UnitTestFlagsmithProvider
         // Arrange
         var flagsmithClient = Substitute.For<IFlagsmithClient>();
         var flags = Substitute.For<IFlags>();
-        flags.GetFeatureValue("example-feature").Returns(settedValue);
+        flags.GetFeatureValue("example-feature").Returns(featureValue);
         flags.IsFeatureEnabled("example-feature").Returns(featureEnabled);
         flagsmithClient.GetEnvironmentFlags().Returns(flags);
         var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
