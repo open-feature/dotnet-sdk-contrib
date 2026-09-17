@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -19,8 +19,15 @@ namespace OpenFeature.Contrib.Providers.Flagsmith;
 /// </summary>
 public class FlagsmithProvider : FeatureProvider
 {
-    private readonly static Metadata Metadata = new("Flagsmith Provider");
-    delegate bool TryParseDelegate<T>(string value, out T x);
+    private static readonly Metadata Metadata = new("Flagsmith Provider");
+
+    /// <summary>
+    /// Key under which the OpenFeature SDK stores the targeting key inside the evaluation context.
+    /// </summary>
+    private const string TargetingKeyAttribute = "targetingKey";
+
+    private delegate bool TryParseDelegate<T>(string value, out T x);
+
     internal readonly IFlagsmithClient _flagsmithClient;
 
     /// <summary>
@@ -67,19 +74,26 @@ public class FlagsmithProvider : FeatureProvider
 
     private Task<IFlags> GetFlags(EvaluationContext ctx)
     {
-        var key = ctx?.TargetingKey;
+        var identifier = ctx?.TargetingKey;
 
-        return string.IsNullOrEmpty(key)
-            ? _flagsmithClient.GetEnvironmentFlags()
-            : _flagsmithClient.GetIdentityFlags(key, ctx
-                .AsDictionary()
-                .Select(x => new Trait(x.Key, x.Value.AsObject) as ITrait)
-                .ToList());
+        if (string.IsNullOrEmpty(identifier))
+        {
+            return _flagsmithClient.GetEnvironmentFlags();
+        }
+
+        // The targeting key identifies the Flagsmith identity, it is not a trait of that identity,
+        // so it must not be sent along with the traits.
+        var traits = ctx
+            .AsDictionary()
+            .Where(x => !string.Equals(x.Key, TargetingKeyAttribute, StringComparison.Ordinal))
+            .Select(x => new Trait(x.Key, x.Value.AsObject) as ITrait)
+            .ToList();
+
+        return _flagsmithClient.GetIdentityFlags(identifier, traits);
     }
 
     private async Task<ResolutionDetails<T>> ResolveValue<T>(string flagKey, T defaultValue, TryParseDelegate<T> tryParse, EvaluationContext context)
     {
-
         var flags = await GetFlags(context).ConfigureAwait(false);
         var isFlagEnabled = await flags.IsFeatureEnabled(flagKey).ConfigureAwait(false);
         if (!isFlagEnabled)
@@ -89,12 +103,9 @@ public class FlagsmithProvider : FeatureProvider
 
         var stringValue = await flags.GetFeatureValue(flagKey).ConfigureAwait(false);
 
-        if (tryParse(stringValue, out var parsedValue))
-        {
-            return new(flagKey, parsedValue);
-        }
-        throw new TypeMismatchException("Failed to parse value in the expected type");
-
+        return tryParse(stringValue, out var parsedValue)
+            ? new(flagKey, parsedValue)
+            : throw new TypeMismatchException("Failed to parse value in the expected type");
     }
 
     private async Task<ResolutionDetails<bool>> IsFeatureEnabled(string flagKey, EvaluationContext context)
@@ -109,7 +120,6 @@ public class FlagsmithProvider : FeatureProvider
     public override Metadata GetMetadata() => Metadata;
 
     /// <inheritdoc/>
-
     public override Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         => Configuration.UsingBooleanConfigValue
         ? ResolveValue(flagKey, defaultValue, bool.TryParse, context)
@@ -133,14 +143,19 @@ public class FlagsmithProvider : FeatureProvider
     public override Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null, CancellationToken cancellationToken = default)
         => ResolveValue(flagKey, defaultValue, TryParseValue, context);
 
-    private bool TryParseValue(string stringValue, out Value result)
+    private static bool TryParseValue(string stringValue, out Value result)
     {
+        if (string.IsNullOrWhiteSpace(stringValue))
+        {
+            result = null;
+            return false;
+        }
+
         try
         {
-            var mappedValue = JsonNode.Parse(stringValue);
-            result = ConvertValue(mappedValue);
+            result = ConvertValue(JsonNode.Parse(stringValue));
         }
-        catch
+        catch (JsonException)
         {
             result = null;
         }
@@ -152,38 +167,36 @@ public class FlagsmithProvider : FeatureProvider
     /// </summary>
     /// <param name="node">The dynamically typed value we received from Flagsmith</param>
     /// <returns>A correctly typed object representing the flag value</returns>
-    private Value ConvertValue(JsonNode node)
+    private static Value ConvertValue(JsonNode node)
     {
-        if (node == null)
-            return null;
-        if (node is JsonArray jsonArray)
+        switch (node)
         {
-            var arr = new List<Value>();
-            foreach (var item in jsonArray)
+            case null:
+                return null;
+            case JsonArray jsonArray:
             {
-                var convertedValue = ConvertValue(item);
-                if (convertedValue != null) arr.Add(convertedValue);
+                var arr = jsonArray.Select(ConvertValue).Where(convertedValue => convertedValue != null).ToList();
+                return new(arr);
             }
-            return new(arr);
+            case JsonObject jsonObject:
+            {
+                var dict = jsonObject.ToDictionary(x => x.Key, x => ConvertValue(x.Value));
+
+                return new(new Structure(dict));
+            }
         }
 
-        if (node is JsonObject jsonObject)
+        if (!node.AsValue().TryGetValue<JsonElement>(out var jsonElement))
         {
-            var dict = jsonObject.ToDictionary(x => x.Key, x => ConvertValue(x.Value));
-
-            return new(new Structure(dict));
+            return null;
         }
 
-        if (node.AsValue().TryGetValue<JsonElement>(out var jsonElement))
+        return jsonElement.ValueKind switch
         {
-            if (jsonElement.ValueKind == JsonValueKind.False || jsonElement.ValueKind == JsonValueKind.True)
-                return new(jsonElement.GetBoolean());
-            if (jsonElement.ValueKind == JsonValueKind.Number)
-                return new(jsonElement.GetDouble());
-
-            if (jsonElement.ValueKind == JsonValueKind.String)
-                return new(jsonElement.ToString());
-        }
-        return null;
+            JsonValueKind.False or JsonValueKind.True => new(jsonElement.GetBoolean()),
+            JsonValueKind.Number => new(jsonElement.GetDouble()),
+            JsonValueKind.String => new(jsonElement.ToString()),
+            _ => null
+        };
     }
 }

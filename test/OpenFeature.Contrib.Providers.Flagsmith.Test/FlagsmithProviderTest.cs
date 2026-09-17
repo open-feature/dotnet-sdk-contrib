@@ -66,7 +66,7 @@ public class UnitTestFlagsmithProvider
         var date = DateTime.Now;
         flags.GetFeatureValue("example-feature").Returns("true");
         flags.IsFeatureEnabled("example-feature").Returns(true);
-        flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count > 6 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
+        flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count == 6 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
 
         var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
         var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
@@ -89,6 +89,32 @@ public class UnitTestFlagsmithProvider
         Assert.Equal(ErrorType.None, result.ErrorType);
     }
 
+    [Fact]
+    public async Task GetValue_ForEvaluationContextWithTargetingKey_DoesNotSendTargetingKeyAsTrait()
+    {
+        // Arrange
+        var flagsmithClient = Substitute.For<IFlagsmithClient>();
+        var flags = Substitute.For<IFlags>();
+        flags.GetFeatureValue("example-feature").Returns("true");
+        flags.IsFeatureEnabled("example-feature").Returns(true);
+        flagsmithClient.GetIdentityFlags("233", Arg.Any<List<ITrait>>()).Returns(flags);
+
+        var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+        var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
+
+        var context = EvaluationContext.Builder()
+            .Set("key1", "value")
+            .SetTargetingKey("233")
+            .Build();
+
+        // Act
+        await flagsmithProvider.ResolveBooleanValueAsync("example-feature", false, context);
+
+        // Assert
+        await flagsmithClient.Received(1).GetIdentityFlags(
+            "233",
+            Arg.Is<List<ITrait>>(traits => traits.Count == 1 && traits.Single().GetTraitKey() == "key1"));
+    }
 
     [Theory]
     [InlineData(true, true, "true", true, null, true)]
