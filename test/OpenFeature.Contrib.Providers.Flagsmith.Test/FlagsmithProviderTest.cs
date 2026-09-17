@@ -464,12 +464,12 @@ public class UnitTestFlagsmithProvider
     [InlineData("-1e400")]
     [InlineData("{ \"huge\": 1e400 }")]
     [InlineData("[1e400]")]
-    public async Task GetStructureValueAsync_ForNumberOutsideDoubleRange_DoesNotLeakParsingException(string settedValue)
+    public async Task GetStructureValueAsync_ForNumberOutsideDoubleRange_DoesNotLeakParsingException(string featureValue)
     {
         // Arrange
         var flagsmithClient = Substitute.For<IFlagsmithClient>();
         var flags = Substitute.For<IFlags>();
-        flags.GetFeatureValue("example-feature").Returns(settedValue);
+        flags.GetFeatureValue("example-feature").Returns(featureValue);
         flags.IsFeatureEnabled("example-feature").Returns(true);
         flagsmithClient.GetEnvironmentFlags().Returns(flags);
 
