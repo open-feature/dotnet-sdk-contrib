@@ -16,10 +16,10 @@ var serverTask = Task.Run(async () =>
 {
     while (listener.IsListening)
     {
-        HttpListenerContext context;
+        HttpListenerContext listenerContext;
         try
         {
-            context = await listener.GetContextAsync().ConfigureAwait(false);
+            listenerContext = await listener.GetContextAsync().ConfigureAwait(false);
         }
         catch (HttpListenerException)
         {
@@ -30,13 +30,13 @@ var serverTask = Task.Run(async () =>
             break; // listener disposed while waiting for a request
         }
 
-        var (statusCode, responseBody) = GetResponse(ExtractFlagKey(context.Request.Url?.AbsolutePath));
+        var (statusCode, responseBody) = GetResponse(ExtractFlagKey(listenerContext.Request.Url?.AbsolutePath));
         var bytes = Encoding.UTF8.GetBytes(responseBody);
-        context.Response.StatusCode = statusCode;
-        context.Response.ContentType = "application/json";
-        context.Response.ContentLength64 = bytes.Length;
-        await context.Response.OutputStream.WriteAsync(bytes).ConfigureAwait(false);
-        context.Response.Close();
+        listenerContext.Response.StatusCode = statusCode;
+        listenerContext.Response.ContentType = "application/json";
+        listenerContext.Response.ContentLength64 = bytes.Length;
+        await listenerContext.Response.OutputStream.WriteAsync(bytes).ConfigureAwait(false);
+        listenerContext.Response.Close();
     }
 });
 
