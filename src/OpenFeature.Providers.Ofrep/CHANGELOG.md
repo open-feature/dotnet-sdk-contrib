@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.5...OpenFeature.Providers.Ofrep-v0.1.6) (2026-09-26)
+
+
+### ✨ New Features
+
+* **ofrep:** AOT compatibility ([#651](https://github.com/open-feature/dotnet-sdk-contrib/issues/651)) ([cbcfff8](https://github.com/open-feature/dotnet-sdk-contrib/commit/cbcfff8af94b8db98dfe6fd897dc05c2b2d86f7a))
+
 ## [0.1.5](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.4...OpenFeature.Providers.Ofrep-v0.1.5) (2026-01-23)
 
 
