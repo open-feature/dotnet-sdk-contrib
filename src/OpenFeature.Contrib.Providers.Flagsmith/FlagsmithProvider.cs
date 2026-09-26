@@ -91,7 +91,7 @@ public class FlagsmithProvider : FeatureProvider
     {
         var identifier = ctx?.TargetingKey;
 
-        if (string.IsNullOrEmpty(identifier))
+        if (string.IsNullOrWhiteSpace(identifier))
         {
             return _flagsmithClient.GetEnvironmentFlags();
         }
