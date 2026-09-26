@@ -5,15 +5,22 @@ on:
     types: [opened, edited, reopened]
   workflow_dispatch:
   roles: all
+  # Dependency bots edit their dashboard issues constantly; there is nothing to triage there.
+  skip-bots: [renovate, dependabot]
 permissions:
   contents: read
   issues: read
   pull-requests: read
   copilot-requests: write # This enables the workflow to use organization tokens for Copilot requests. See: https://github.blog/changelog/2026-06-11-agentic-workflows-no-longer-need-a-personal-access-token/
 tools:
+  # Narrow allowlist: this workflow reads untrusted issue text. MCP CLI shims (github:*, safeoutputs:*) are added automatically.
+  bash: [cat, ls, find, grep, head, tail, wc, jq, echo, printf]
   github:
     toolsets: [default]
-    lockdown: false
+    # Triage must read issues from anyone, including first-time reporters (author_association NONE).
+    # Without this, public repos default to `approved` and every community issue is filtered out.
+    # Writes stay constrained by the safe-outputs allowlists below.
+    min-integrity: none
 safe-outputs:
   add-labels:
     allowed:
