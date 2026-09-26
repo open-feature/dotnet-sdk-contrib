@@ -401,7 +401,8 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveBooleanValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
+        await this._mockClient.Received(1)
+            .EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
     }
 
     [Fact]
@@ -425,7 +426,8 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveStringValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
+        await this._mockClient.Received(1)
+            .EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
     }
 
     [Fact]
@@ -449,7 +451,8 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveIntegerValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
+        await this._mockClient.Received(1)
+            .EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
     }
 
     [Fact]
@@ -473,7 +476,8 @@ public class OfrepProviderTest : IDisposable
         await this._provider.ResolveDoubleValueAsync(flagKey, defaultValue, context, cancellationToken);
 
         // Assert
-        await this._mockClient.Received(1).EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
+        await this._mockClient.Received(1)
+            .EvaluateFlag(flagKey, defaultValue, context, cancellationToken);
     }
 
     [Fact]
