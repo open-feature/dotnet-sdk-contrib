@@ -1,12 +1,32 @@
+# The `branch` line below is load-bearing, not decorative.
+#
+# Renovate's git-submodules manager reads `branch` as the dependency's current
+# version. With it, a new submodule release arrives as an ordinary version PR
+# that bumps both the pointer and the `branch` value. Without it there is no
+# version to compare against, so Renovate can only chase the upstream default
+# branch instead -- which is not what we want to track, and which
+# open-feature/community-tooling#126 switches off entirely.
+#
+# So deleting a `branch` line silently switches off updates for that submodule.
+# That has happened several times; see open-feature/flagd-testbed#398. Keep the
+# pin, and let Renovate move it.
+#
+# The remaining submodules are deliberately left unpinned for now, each needing a
+# decision rather than a no-op -- see open-feature/community-tooling#125:
+#   schemas       tracks an untagged commit, and flagd-schemas publishes two
+#                 independent release-please series to choose between
+#   spec          sits on an untagged commit; pinning would roll it back to v0.9.0
+#   wasm-releases has no tags, only `publish-wasm-evaluation-v*` branches
 [submodule "src/OpenFeature.Providers.Flagd/schemas"]
 	path = src/OpenFeature.Providers.Flagd/schemas
-	url = https://github.com/open-feature/schemas.git
+	url = https://github.com/open-feature/flagd-schemas.git
 [submodule "spec"]
 	path = spec
 	url = https://github.com/open-feature/spec.git
 [submodule "src/OpenFeature.Providers.Flagd/flagd-testbed"]
 	path = src/OpenFeature.Providers.Flagd/flagd-testbed
 	url = https://github.com/open-feature/flagd-testbed.git
+	branch = v3.10.1
 [submodule "src/OpenFeature.Providers.GOFeatureFlag/wasm-releases"]
 	path = src/OpenFeature.Providers.GOFeatureFlag/wasm-releases
 	url = https://github.com/go-feature-flag/wasm-releases.git

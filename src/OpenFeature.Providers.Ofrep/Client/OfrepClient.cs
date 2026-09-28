@@ -1,16 +1,16 @@
 using System.Net;
+using System.Text;
 #if NETFRAMEWORK
 using System.Net.Http;
 #endif
-using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OpenFeature.Constant;
 using OpenFeature.Providers.Ofrep.Configuration;
 using OpenFeature.Providers.Ofrep.Extensions;
 using OpenFeature.Providers.Ofrep.Models;
+using OpenFeature.Providers.Ofrep.Serialization;
 using OpenFeature.Model;
 using OpenFeature.Providers.Ofrep.Client.Constants;
 
@@ -26,12 +26,6 @@ internal sealed partial class OfrepClient : IOfrepClient
     private readonly ILogger _logger;
     private readonly TimeProvider _timeProvider;
     private bool _disposed;
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-    };
 
     /// <summary>
     /// Creates a new instance of <see cref="OfrepClient"/>.
@@ -105,7 +99,19 @@ internal sealed partial class OfrepClient : IOfrepClient
         this._timeProvider = timeProvider ?? TimeProvider.System;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Evaluates a flag value using the OFREP API. This generic method supports the Native AOT-safe
+    /// evaluation types: <see cref="bool"/>, <see cref="string"/>, <see cref="int"/>, <see cref="double"/>,
+    /// <see cref="JsonElement"/>, and <see cref="JsonElement"/>?.
+    /// Object and structure flag values are resolved through the provider's ResolveStructureValueAsync
+    /// path using <see cref="JsonElement"/>?.
+    /// </summary>
+    /// <typeparam name="T">The type of the flag value.</typeparam>
+    /// <param name="flagKey">The key of the flag to evaluate.</param>
+    /// <param name="defaultValue">The default value to return if evaluation fails.</param>
+    /// <param name="context">The evaluation context.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>The evaluated flag response.</returns>
     public async Task<OfrepResponse<T>> EvaluateFlag<T>(string flagKey, T defaultValue,
         EvaluationContext? context, CancellationToken cancellationToken = default)
     {
@@ -240,9 +246,8 @@ internal sealed partial class OfrepClient : IOfrepClient
         HttpResponseMessage response,
         CancellationToken cancellationToken = default)
     {
-        var evaluationResponse = await response.Content
-            .ReadFromJsonAsync<OfrepResponse<T>>(JsonOptions, cancellationToken).ConfigureAwait(false);
-        if (evaluationResponse == null)
+        var rawResponse = await ReadRawResponseAsync(response, cancellationToken).ConfigureAwait(false);
+        if (rawResponse == null)
         {
             this.LogNullResponse(flagKey);
             return new OfrepResponse<T>(flagKey, defaultValue)
@@ -252,14 +257,39 @@ internal sealed partial class OfrepClient : IOfrepClient
             };
         }
 
-        return evaluationResponse;
+        T resolvedValue = defaultValue;
+        var hasValue = rawResponse.Value.ValueKind != JsonValueKind.Undefined &&
+                       rawResponse.Value.ValueKind != JsonValueKind.Null;
+
+        if (hasValue)
+        {
+            try
+            {
+                resolvedValue = DeserializeResponseValue(rawResponse.Value, defaultValue);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                // DeserializeResponseValue throws InvalidOperationException/FormatException/OverflowException
+                // when the server-provided value does not match T. Keep the server error metadata instead of
+                // replacing it with a generic parse failure.
+                this.LogJsonParseError(flagKey, ex.Message, ex);
+            }
+        }
+
+        return new OfrepResponse<T>(rawResponse.Key ?? flagKey, resolvedValue)
+        {
+            ErrorCode = rawResponse.ErrorCode,
+            ErrorMessage = rawResponse.ErrorMessage,
+            Reason = rawResponse.Reason,
+            Variant = rawResponse.Variant,
+            Metadata = rawResponse.Metadata
+        };
     }
 
     private async Task<OfrepResponse<T>> ProcessOkResponseAsync<T>(string flagKey, T defaultValue,
         HttpResponseMessage response, CancellationToken cancellationToken = default)
     {
-        var rawResponse = await response.Content
-            .ReadFromJsonAsync<OfrepResponse<JsonElement>>(JsonOptions, cancellationToken).ConfigureAwait(false);
+        var rawResponse = await ReadRawResponseAsync(response, cancellationToken).ConfigureAwait(false);
         if (rawResponse == null)
         {
             this.LogNullResponse(flagKey);
@@ -278,12 +308,20 @@ internal sealed partial class OfrepClient : IOfrepClient
         {
             try
             {
-                resolvedValue = rawResponse.Value.Deserialize<T>(JsonOptions) ?? defaultValue;
+                resolvedValue = DeserializeResponseValue(rawResponse.Value, defaultValue);
             }
-            catch (JsonException ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
+                // DeserializeResponseValue throws InvalidOperationException/FormatException/OverflowException
+                // when the server-provided value does not match T. Report a parse error instead of letting the
+                // exception escape or degrading to a generic error.
                 this.LogJsonParseError(flagKey, ex.Message, ex);
-                return HandleEvaluationError(flagKey, ex, defaultValue);
+                return new OfrepResponse<T>(flagKey, defaultValue)
+                {
+                    ErrorCode = ErrorCodes.ParseError,
+                    Reason = Reason.Error,
+                    ErrorMessage = "Failed to parse flag value."
+                };
             }
         }
         else
@@ -306,6 +344,19 @@ internal sealed partial class OfrepClient : IOfrepClient
         }
 
         return evaluationResponse;
+    }
+
+    private static async Task<OfrepResponse<JsonElement>?> ReadRawResponseAsync(HttpResponseMessage response,
+        CancellationToken cancellationToken)
+    {
+#if NET5_0_OR_GREATER
+         using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+#else
+        using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+#endif
+        return await JsonSerializer.DeserializeAsync(responseStream,
+                OfrepJsonSerializerContext.Default.OfrepResponseJsonElement, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public void Dispose()
@@ -339,14 +390,54 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         var evaluationContextDict = (context ?? EvaluationContext.Empty).ToDictionary();
 
+        var requestBody = JsonSerializer.Serialize(new OfrepRequest { Context = evaluationContextDict },
+            OfrepJsonSerializerContext.Default.OfrepRequest);
+
         var request = new HttpRequestMessage()
         {
             Method = HttpMethod.Post,
             RequestUri = new Uri(path, UriKind.Relative),
-            Content = JsonContent.Create(new OfrepRequest { Context = evaluationContextDict }, options: JsonOptions)
+            Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
         };
 
         return request;
+    }
+
+    private static T DeserializeResponseValue<T>(JsonElement valueElement, T defaultValue)
+    {
+        if (typeof(T) == typeof(bool))
+        {
+            return (T)(object)valueElement.GetBoolean();
+        }
+
+        if (typeof(T) == typeof(string))
+        {
+            var stringValue = valueElement.GetString();
+            return stringValue is null ? defaultValue : (T)(object)stringValue;
+        }
+
+        if (typeof(T) == typeof(int))
+        {
+            return (T)(object)valueElement.GetInt32();
+        }
+
+        if (typeof(T) == typeof(double))
+        {
+            return (T)(object)valueElement.GetDouble();
+        }
+
+        if (typeof(T) == typeof(JsonElement))
+        {
+            return (T)(object)valueElement;
+        }
+
+        if (typeof(T) == typeof(JsonElement?))
+        {
+            JsonElement? nullableElement = valueElement;
+            return (T)(object)nullableElement;
+        }
+
+        return defaultValue;
     }
 
     /// <summary>
