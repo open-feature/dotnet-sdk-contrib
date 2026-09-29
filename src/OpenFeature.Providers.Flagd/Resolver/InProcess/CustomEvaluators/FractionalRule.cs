@@ -15,6 +15,7 @@ namespace OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
 internal sealed class FractionalEvaluator : IRule
 {
     private const int MaxWeight = int.MaxValue; // 2,147,483,647
+    private const double MaxValue = 9223372036854775808d;
     private readonly ILogger _logger;
 
     class FractionalEvaluationDistribution
@@ -58,6 +59,11 @@ internal sealed class FractionalEvaluator : IRule
         {
             propertyValue = arg0;
             bucketStartIndex = 1;
+        }
+        else if (args[0]?.GetValueKind() != JsonValueKind.Array)
+        {
+            _logger.LogDebug("Invalid arguments for fractional targeting: unsupported bucketing value");
+            return null;
         }
         else
         {
@@ -228,7 +234,7 @@ internal sealed class FractionalEvaluator : IRule
                     if (!double.IsInfinity(doubleVal)
                         && doubleVal == Math.Floor(doubleVal)
                         && doubleVal >= long.MinValue
-                        && doubleVal <= long.MaxValue)
+                        && doubleVal < MaxValue)
                     {
                         writer.WriteInt64((long)doubleVal);
                     }
