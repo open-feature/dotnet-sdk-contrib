@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using OpenFeature.Model;
 using OpenFeature.Providers.GOFeatureFlag.Api;
@@ -385,8 +386,41 @@ public class GOFeatureFlagApiTest
             Assert.NotNull(request.Content);
             var body = await request.Content.ReadAsStringAsync();
             var want =
-                "{\n  \"meta\": {\n    \"env\": \"production\"\n  },\n  \"events\": [\n    {\n      \"kind\": \"feature\",\n      \"defaultValue\": false,\n      \"value\": \"toto\",\n      \"variation\": \"on\",\n      \"version\": \"1.0.0\",\n      \"creationDate\": 1750406145,\n      \"contextKind\": \"user\",\n      \"key\": \"TEST\",\n      \"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"\n    },\n    {\n      \"kind\": \"tracking\",\n      \"evaluationContext\": null,\n      \"trackingEventDetails\": {\n        \"action\": \"click\",\n        \"label\": \"button1\"\n      },\n      \"creationDate\": 1750406145,\n      \"contextKind\": \"user\",\n      \"key\": \"TEST2\",\n      \"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"\n    }\n  ]\n}";
+                "{\n  \"meta\": {\n    \"env\": \"production\"\n  },\n  \"events\": [\n    {\n      \"kind\": \"feature\",\n      \"default\": false,\n      \"value\": \"toto\",\n      \"variation\": \"on\",\n      \"version\": \"1.0.0\",\n      \"creationDate\": 1750406145,\n      \"contextKind\": \"user\",\n      \"key\": \"TEST\",\n      \"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"\n    },\n    {\n      \"kind\": \"tracking\",\n      \"evaluationContext\": null,\n      \"trackingEventDetails\": {\n        \"action\": \"click\",\n        \"label\": \"button1\"\n      },\n      \"creationDate\": 1750406145,\n      \"contextKind\": \"user\",\n      \"key\": \"TEST2\",\n      \"userKey\": \"642e135a-1df9-4419-a3d3-3c42e0e67509\"\n    }\n  ]\n}";
             AssertUtil.JsonEqual(want, body);
+        }
+
+        [Fact(DisplayName = "GOFF-COLL-004: a failed evaluation should be serialised as default")]
+        public async Task RequestShouldSerialiseFailedEvaluationAsDefault()
+        {
+            var mockHttp = new RelayProxyMock();
+            var options = new GOFeatureFlagProviderOptions
+            {
+                HttpMessageHandler = mockHttp.GetRelayProxyMock(""),
+                Endpoint = RelayProxyMock.baseUrl
+            };
+            var api = new GOFeatureFlagApi(options);
+            var events = new List<IEvent>
+            {
+                new FeatureEvent
+                {
+                    CreationDate = 1750406145,
+                    ContextKind = "user",
+                    Key = "TEST",
+                    UserKey = "642e135a-1df9-4419-a3d3-3c42e0e67509",
+                    DefaultValue = true,
+                    Value = "sdk-default",
+                    Variation = "SdkDefault"
+                }
+            };
+
+            await api.SendEventToDataCollectorAsync(events, new ExporterMetadata());
+
+            var body = await mockHttp.LastRequest.Content.ReadAsStringAsync();
+            var featureEvent = JsonNode.Parse(body)?["events"]?[0]?.AsObject();
+            Assert.NotNull(featureEvent);
+            Assert.True(featureEvent!["default"]?.GetValue<bool>());
+            Assert.False(featureEvent.ContainsKey("defaultValue"));
         }
 
         [Fact(DisplayName = "request should return a an error if 401 received")]

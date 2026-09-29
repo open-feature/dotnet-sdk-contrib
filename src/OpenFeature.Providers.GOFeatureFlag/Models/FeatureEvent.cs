@@ -15,7 +15,7 @@ public sealed record FeatureEvent : CommonEvent
     /// <summary>
     ///     Default value is true if the feature is using the default value.
     /// </summary>
-    [JsonPropertyName("defaultValue")]
+    [JsonPropertyName("default")]
     public bool DefaultValue { get; init; }
 
     /// <summary>
