@@ -152,6 +152,21 @@ public class RelayProxyMock
                     .With(this.RecordRequest)
                     .Respond(request => GetFirstChangeConfigMessage());
                 break;
+            case "NULL_FLAGS":
+                mockHttp.When(path).With(this.RecordRequest).Respond(request => GetNullFlagsConfigMessage());
+                break;
+            case "MISSING_FLAGS":
+                mockHttp.When(path).With(this.RecordRequest).Respond(mediaType,
+                    "{\"evaluationContextEnrichment\": {\"env\": \"production\"}}");
+                break;
+            case "EMPTY_FLAGS":
+                mockHttp.When(path).With(this.RecordRequest).Respond(mediaType,
+                    "{\"flags\": {}, \"evaluationContextEnrichment\": {\"env\": \"production\"}}");
+                break;
+            case "NULL_ENRICHMENT":
+                mockHttp.When(path).With(this.RecordRequest).Respond(mediaType,
+                    "{\"flags\": {\"TEST\": {\"variations\": {\"off\": false, \"on\": true}, \"defaultRule\": {\"variation\": \"off\"}}}, \"evaluationContextEnrichment\": null}");
+                break;
             case "SIMPLE_FLAG_CONFIG":
                 mockHttp.When(path).With(this.RecordRequest).Respond(request =>
                 {
@@ -228,7 +243,35 @@ public class RelayProxyMock
                     .With(this.RecordRequest)
                     .Respond(request => GetOlderChangeConfigMessage());
                 break;
+            case "304_NO_ETAG":
+                mockHttp.When(path).With(this.RecordRequest).Respond(HttpStatusCode.NotModified);
+                break;
+            case "NULL_FLAGS":
+                mockHttp.When(path).With(this.RecordRequest).Respond(request => GetNullFlagsConfigMessage());
+                break;
         }
+    }
+
+    private static HttpResponseMessage GetNullFlagsConfigMessage()
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                """
+                {
+                  "flags": null,
+                  "evaluationContextEnrichment": {
+                    "env": "production"
+                  }
+                }
+                """,
+                Encoding.UTF8,
+                mediaType)
+        };
+        // newer than GetFirstChangeConfigMessage, so only the null flags map can reject this response
+        response.Content.Headers.LastModified = new DateTimeOffset(2015, 10, 21, 7, 30, 0, TimeSpan.Zero).ToUniversalTime();
+        response.Headers.ETag = new EntityTagHeaderValue("\"999999999\"");
+        return response;
     }
 
     private static HttpResponseMessage GetFirstChangeConfigMessage()

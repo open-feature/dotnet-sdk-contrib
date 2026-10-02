@@ -301,14 +301,25 @@ public class InProcessEvaluator : IEvaluator
     private async Task LoadConfigurationAsync()
     {
         // call the API to retrieve the flags' configuration and store it in the local copy
-        var flagConfigResponse =
+        var result =
             await this._api.RetrieveFlagConfigurationAsync(this._etag, this._options.EvaluationFlagList)
                 .ConfigureAwait(false);
 
-        if (flagConfigResponse is null)
+        // a 304 carries no configuration: the flags, enrichment, timestamps and ETag in use stay untouched
+        if (result is FlagConfigNotModified)
+        {
+            this._options.Logger?.LogDebug("Flag configuration has not changed (304 Not Modified)");
+            return;
+        }
+
+        if (result is not FlagConfigResponse flagConfigResponse)
         {
             throw new ImpossibleToRetrieveConfigurationException("Flag configuration response is null");
         }
+
+        var flags = flagConfigResponse.Flags
+                    ?? throw new ImpossibleToRetrieveConfigurationException(
+                        "Flag configuration response has no flags map");
 
         if ((this._etag ?? "").Equals(flagConfigResponse.Etag))
         {
@@ -328,7 +339,7 @@ public class InProcessEvaluator : IEvaluator
         this._options.Logger?.LogInformation("flag configuration has changed");
         this._etag = flagConfigResponse.Etag;
         this._lastUpdate = flagConfigResponse.LastUpdated?.UtcDateTime ?? DateTime.MinValue;
-        this._flags = flagConfigResponse.Flags ?? new Dictionary<string, Flag>();
+        this._flags = flags;
         this._evaluationContextEnrichment =
             flagConfigResponse.EvaluationContextEnrichment ?? new Dictionary<string, object>();
 

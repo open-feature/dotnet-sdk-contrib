@@ -58,10 +58,15 @@ public class GOFeatureFlagApi
     /// </summary>
     /// <param name="etag">If provided, we call the API with "If-None-Match" header.</param>
     /// <param name="flags">List of flags to retrieve, if not set or empty, we will retrieve all available flags.</param>
-    /// <returns>A FlagConfigResponse returning the success data.</returns>
+    /// <returns>
+    ///     A <see cref="FlagConfigResponse" /> when the relay proxy returned a configuration, or
+    ///     <see cref="FlagConfigNotModified" /> when it answered 304 Not Modified.
+    /// </returns>
     /// <exception cref="FlagConfigurationEndpointNotFoundException">Thrown if the endpoint is not reachable.</exception>
-    /// <exception cref="ImpossibleToRetrieveConfigurationException">Thrown if the endpoint is returning an error.</exception>
-    public async Task<FlagConfigResponse> RetrieveFlagConfigurationAsync(string? etag, List<string>? flags)
+    /// <exception cref="ImpossibleToRetrieveConfigurationException">
+    ///     Thrown if the endpoint is returning an error, or a configuration without a flags map.
+    /// </exception>
+    public async Task<FlagConfigResult> RetrieveFlagConfigurationAsync(string? etag, List<string>? flags)
     {
         var requestStr = JsonSerializer.Serialize(new FlagConfigRequest(flags));
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/flag/configuration")
@@ -77,8 +82,9 @@ public class GOFeatureFlagApi
         var response = await this._httpClient.SendAsync(httpRequest).ConfigureAwait(false);
         switch (response.StatusCode)
         {
-            case HttpStatusCode.OK:
             case HttpStatusCode.NotModified:
+                return FlagConfigNotModified.Instance;
+            case HttpStatusCode.OK:
                 var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return HandleFlagConfigurationSuccess(response, body);
             case HttpStatusCode.NotFound:
@@ -138,26 +144,33 @@ public class GOFeatureFlagApi
 
 
     /// <summary>
-    ///     HandleFlagConfigurationSuccess is handling the success response of the flag configuration request.
+    ///     HandleFlagConfigurationSuccess is handling the 200 response of the flag configuration request.
     /// </summary>
     /// <param name="response">HTTP response.</param>
     /// <param name="body">String of the body.</param>
     /// <returns>A FlagConfigResponse object.</returns>
+    /// <exception cref="ImpossibleToRetrieveConfigurationException">Thrown if the body has no flags map.</exception>
     private static FlagConfigResponse HandleFlagConfigurationSuccess(HttpResponseMessage response, string body)
     {
+        var goffResp = JsonSerializer.Deserialize<FlagConfigResponse>(body,
+            JsonConverterExtensions.DefaultSerializerSettings);
+        // A missing or null flags map is a failed refresh: applying it would wipe every flag.
+        if (goffResp?.Flags is null)
+        {
+            throw new ImpossibleToRetrieveConfigurationException(
+                "retrieve flag configuration error: the response has no flags map");
+        }
+
         var etagHeader = response.Headers.TryGetValues("ETag", out var values) ? values.FirstOrDefault() : null;
         var lastUpdated = response.Content.Headers.LastModified?.UtcDateTime
                           ?? DateTime.MinValue.ToUniversalTime();
-        var result = new FlagConfigResponse { Etag = etagHeader, LastUpdated = lastUpdated };
-        if (response.StatusCode == HttpStatusCode.OK)
+        return new FlagConfigResponse
         {
-            var goffResp = JsonSerializer.Deserialize<FlagConfigResponse>(body,
-                JsonConverterExtensions.DefaultSerializerSettings);
-
-            result.EvaluationContextEnrichment = goffResp?.EvaluationContextEnrichment ?? new Dictionary<string, object>();
-            result.Flags = goffResp?.Flags ?? new Dictionary<string, Flag>();
-        }
-
-        return result;
+            Etag = etagHeader,
+            LastUpdated = lastUpdated,
+            Flags = goffResp.Flags,
+            // The relay proxy sends a nil enrichment map as null, which means "no enrichment".
+            EvaluationContextEnrichment = goffResp.EvaluationContextEnrichment ?? new Dictionary<string, object>()
+        };
     }
 }

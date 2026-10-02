@@ -242,7 +242,7 @@ public class GOFeatureFlagApiTest
                 LastUpdated = DateTime.Parse("Wed, 21 Oct 2015 07:28:00 GMT")
             };
 
-            var got = await api.RetrieveFlagConfigurationAsync("", []);
+            var got = Assert.IsType<FlagConfigResponse>(await api.RetrieveFlagConfigurationAsync("", []));
             Assert.Equivalent(want, got);
         }
 
@@ -256,13 +256,12 @@ public class GOFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GOFeatureFlagApi(options);
-            var got = await api.RetrieveFlagConfigurationAsync("", []);
+            var got = Assert.IsType<FlagConfigResponse>(await api.RetrieveFlagConfigurationAsync("", []));
             Assert.Equal(DateTime.MinValue.ToUniversalTime(), got.LastUpdated);
         }
 
-        [Fact(DisplayName =
-            "request should return a valid FlagConfigResponse without flags and context if 304 received")]
-        public async Task RequestShouldHaveReturn304WithoutFlagsAndContext()
+        [Fact(DisplayName = "GOFF-IP-007: a 304 should return the not-modified sentinel, not a configuration")]
+        public async Task RequestShouldReturnNotModifiedIf304Received()
         {
             var mockHttp = new RelayProxyMock();
             var options = new GOFeatureFlagProviderOptions
@@ -271,14 +270,72 @@ public class GOFeatureFlagApiTest
                 Endpoint = RelayProxyMock.baseUrl
             };
             var api = new GOFeatureFlagApi(options);
-            var want = new FlagConfigResponse
-            {
-                Etag = "\"123456789\"",
-                LastUpdated = DateTime.Parse("Wed, 21 Oct 2015 07:28:00 GMT")
-            };
 
-            var got = await api.RetrieveFlagConfigurationAsync("", []);
-            Assert.Equivalent(want, got);
+            var got = await api.RetrieveFlagConfigurationAsync("\"123456789\"", []);
+            Assert.Same(FlagConfigNotModified.Instance, got);
+        }
+
+        [Fact(DisplayName = "GOFF-IP-009: a 200 with a null flags map should be a failed refresh")]
+        public async Task RequestShouldFailIfFlagsMapIsNull()
+        {
+            var mockHttp = new RelayProxyMock();
+            var options = new GOFeatureFlagProviderOptions
+            {
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("NULL_FLAGS"),
+                Endpoint = RelayProxyMock.baseUrl
+            };
+            var api = new GOFeatureFlagApi(options);
+
+            await Assert.ThrowsAsync<ImpossibleToRetrieveConfigurationException>(() =>
+                api.RetrieveFlagConfigurationAsync("", []));
+        }
+
+        [Fact(DisplayName = "GOFF-IP-009: a 200 without a flags map should be a failed refresh")]
+        public async Task RequestShouldFailIfFlagsMapIsMissing()
+        {
+            var mockHttp = new RelayProxyMock();
+            var options = new GOFeatureFlagProviderOptions
+            {
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("MISSING_FLAGS"),
+                Endpoint = RelayProxyMock.baseUrl
+            };
+            var api = new GOFeatureFlagApi(options);
+
+            await Assert.ThrowsAsync<ImpossibleToRetrieveConfigurationException>(() =>
+                api.RetrieveFlagConfigurationAsync("", []));
+        }
+
+        [Fact(DisplayName = "GOFF-IP-009: a 200 with an empty flags map is a valid configuration")]
+        public async Task RequestShouldAcceptAnEmptyFlagsMap()
+        {
+            var mockHttp = new RelayProxyMock();
+            var options = new GOFeatureFlagProviderOptions
+            {
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("EMPTY_FLAGS"),
+                Endpoint = RelayProxyMock.baseUrl
+            };
+            var api = new GOFeatureFlagApi(options);
+
+            var got = Assert.IsType<FlagConfigResponse>(await api.RetrieveFlagConfigurationAsync("", []));
+            Assert.NotNull(got.Flags);
+            Assert.Empty(got.Flags!);
+        }
+
+        [Fact(DisplayName = "GOFF-IP-009: a null evaluationContextEnrichment should be accepted as no enrichment")]
+        public async Task RequestShouldAcceptANullEvaluationContextEnrichment()
+        {
+            var mockHttp = new RelayProxyMock();
+            var options = new GOFeatureFlagProviderOptions
+            {
+                HttpMessageHandler = mockHttp.GetRelayProxyMock("NULL_ENRICHMENT"),
+                Endpoint = RelayProxyMock.baseUrl
+            };
+            var api = new GOFeatureFlagApi(options);
+
+            var got = Assert.IsType<FlagConfigResponse>(await api.RetrieveFlagConfigurationAsync("", []));
+            Assert.NotNull(got.Flags);
+            Assert.Contains("TEST", got.Flags!.Keys);
+            Assert.Empty(got.EvaluationContextEnrichment);
         }
     }
 

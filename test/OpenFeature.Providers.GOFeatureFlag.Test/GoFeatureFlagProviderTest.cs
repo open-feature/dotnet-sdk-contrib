@@ -570,6 +570,79 @@ public class GOFeatureFlagProviderTest
                     .ToImmutableMetadata());
             Assert.Equivalent(want, got);
         }
+
+        [Fact(DisplayName = "GOFF-IP-007/GOFF-IP-015: a 304 without ETag should keep the flags and the stored ETag")]
+        public async Task ShouldKeepConfigurationOnNotModifiedWithoutEtag()
+        {
+            var mockHttp = new RelayProxyMock();
+            var handler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG");
+            var provider = new GOFeatureFlagProvider(new GOFeatureFlagProviderOptions
+            {
+                HttpMessageHandler = handler,
+                Endpoint = RelayProxyMock.baseUrl,
+                EvaluationType = EvaluationType.InProcess,
+                FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
+            });
+            await provider.InitializeAsync(EvaluationContext.Empty);
+            try
+            {
+                mockHttp.UpdateConfigurationMock(handler, "304_NO_ETAG");
+                await WaitForConfigurationRequestsAsync(mockHttp, 2);
+
+                var got = await provider.ResolveBooleanValueAsync("TEST", true, DefaultEvaluationContext);
+                Assert.Equal(ErrorType.None, got.ErrorType);
+                Assert.False(got.Value);
+                Assert.Equal("\"123456789\"", LastIfNoneMatch(mockHttp));
+            }
+            finally
+            {
+                await provider.ShutdownAsync();
+            }
+        }
+
+        [Fact(DisplayName = "GOFF-IP-009: a 200 with a null flags map should keep the flags and the stored ETag")]
+        public async Task ShouldKeepConfigurationWhenFlagsMapIsNull()
+        {
+            var mockHttp = new RelayProxyMock();
+            var handler = mockHttp.GetRelayProxyMock("CHANGE_CONFIG");
+            var provider = new GOFeatureFlagProvider(new GOFeatureFlagProviderOptions
+            {
+                HttpMessageHandler = handler,
+                Endpoint = RelayProxyMock.baseUrl,
+                EvaluationType = EvaluationType.InProcess,
+                FlagChangePollingIntervalMs = TimeSpan.FromMilliseconds(50)
+            });
+            await provider.InitializeAsync(EvaluationContext.Empty);
+            try
+            {
+                mockHttp.UpdateConfigurationMock(handler, "NULL_FLAGS");
+                await WaitForConfigurationRequestsAsync(mockHttp, 2);
+
+                var got = await provider.ResolveBooleanValueAsync("TEST", true, DefaultEvaluationContext);
+                Assert.Equal(ErrorType.None, got.ErrorType);
+                Assert.False(got.Value);
+                Assert.Equal("\"123456789\"", LastIfNoneMatch(mockHttp));
+            }
+            finally
+            {
+                await provider.ShutdownAsync();
+            }
+        }
+
+        private static async Task WaitForConfigurationRequestsAsync(RelayProxyMock mock, int count)
+        {
+            var target = mock.RequestCount + count;
+            var deadline = DateTime.UtcNow.AddSeconds(5);
+            while (mock.RequestCount < target && DateTime.UtcNow < deadline)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(20));
+            }
+
+            Assert.True(mock.RequestCount >= target, $"expected {count} more configuration requests");
+        }
+
+        private static string LastIfNoneMatch(RelayProxyMock mock) =>
+            mock.LastRequest.Headers.TryGetValues("If-None-Match", out var values) ? values.FirstOrDefault() : null;
 #endif
     }
 
