@@ -12,17 +12,17 @@ internal class FractionalEvaluationTestData
 {
     public static IEnumerable<object[]> FractionalEvaluationContext()
     {
-        yield return new object[] { "rachel@faas.com", "headerColor", "blue" };
-        yield return new object[] { "monica@faas.com", "headerColor", "yellow" };
+        yield return new object[] { "rachel@faas.com", "headerColor", "red" };
+        yield return new object[] { "monica@faas.com", "headerColor", "green" };
         yield return new object[] { "joey@faas.com", "headerColor", "red" };
-        yield return new object[] { "ross@faas.com", "headerColor", "blue" };
-        yield return new object[] { "ross@faas.com", "footerColor", "yellow" };
+        yield return new object[] { "ross@faas.com", "headerColor", "green" };
+        yield return new object[] { "ross@faas.com", "footerColor", "red" };
     }
 
     public static IEnumerable<object[]> FractionalEvaluationWithTargetingKeyContext()
     {
-        yield return new object[] { "headerColor", "blue" };
-        yield return new object[] { "footerColor", "green" };
+        yield return new object[] { "headerColor", "yellow" };
+        yield return new object[] { "footerColor", "yellow" };
     }
 }
 public class FractionalEvaluatorTest

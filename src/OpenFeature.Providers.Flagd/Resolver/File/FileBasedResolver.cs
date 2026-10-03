@@ -47,7 +47,7 @@ internal class FileBasedResolver : Resolver
         _fileWatcherWaitForFileReadyInterval = waitForFileReadyInterval ?? DefaultWaitForFileReadyInterval;
         _useHashFileChangeDetection = useHashFileChangeDetection;
         _fileChangePollingInterval = fileChangePollingInterval;
-        _evaluator = new JsonEvaluator(sourceSelector, jsonSchemaValidator);
+        _evaluator = new JsonEvaluator(sourceSelector, jsonSchemaValidator, _logger);
     }
 
     public async Task Init()

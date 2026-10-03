@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462;net8.0;net9.0;net10.0</TargetFrameworks>
@@ -41,6 +41,7 @@
     <PackageReference Include="murmurhash" Version="1.0.3" />
     <PackageReference Include="NJsonSchema" Version="11.0.0" />
     <PackageReference Include="Semver" Version="3.0.0" />
+    <PackageReference Include="System.Formats.Cbor" Version="8.0.0" />
     <Protobuf Include="schemas\protobuf\flagd\evaluation\v2\evaluation.proto" GrpcServices="Client" />
     <Protobuf Include="schemas\protobuf\flagd\sync\v1\sync.proto" GrpcServices="Client" />
     <PackageReference Include="Google.Protobuf" Version="3.30.2" />

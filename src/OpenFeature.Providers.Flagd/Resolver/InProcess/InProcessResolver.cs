@@ -40,7 +40,7 @@ internal class InProcessResolver : Resolver
         this._jsonSchemaValidator = jsonSchemaValidator;
         this._config = config;
         this._client = this.BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
-        this._evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
+        this._evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator, config.Logger);
 
         // Initialize backoff values from config (in milliseconds)
         this._eventStreamRetryBackoff = config.RetryBackoffMs ?? FlagdConfig.RetryBackoffMsDefault;
