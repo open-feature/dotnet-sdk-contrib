@@ -15,6 +15,7 @@ using System.Net.Sockets; // needed for unix sockets
 #endif
 using Grpc.Core;
 using OpenFeature.Constant;
+using OpenFeature.Providers.Flagd.Core;
 using OpenFeature.Providers.Flagd.Utils;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
@@ -26,21 +27,19 @@ internal class InProcessResolver : Resolver
 {
     readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly FlagSyncService.FlagSyncServiceClient _client;
-    private readonly JsonEvaluator _evaluator;
+    private readonly FlagdCore _core;
     private int _eventStreamRetryBackoff;
     private readonly int _maxEventStreamRetryBackoff;
     private readonly FlagdConfig _config;
     private GrpcChannel _channel;
-    private readonly IJsonSchemaValidator _jsonSchemaValidator;
 
     public event EventHandler<FlagdProviderEvent> ProviderEvent;
 
-    internal InProcessResolver(FlagdConfig config, IJsonSchemaValidator jsonSchemaValidator)
+    internal InProcessResolver(FlagdConfig config, FlagdCore core)
     {
-        this._jsonSchemaValidator = jsonSchemaValidator;
+        this._core = core;
         this._config = config;
         this._client = this.BuildClient(config, channel => new FlagSyncService.FlagSyncServiceClient(channel));
-        this._evaluator = new JsonEvaluator(config.SourceSelector, jsonSchemaValidator);
 
         // Initialize backoff values from config (in milliseconds)
         this._eventStreamRetryBackoff = config.RetryBackoffMs ?? FlagdConfig.RetryBackoffMsDefault;
@@ -50,15 +49,15 @@ internal class InProcessResolver : Resolver
     internal InProcessResolver(
         FlagSyncService.FlagSyncServiceClient client,
         FlagdConfig config,
-        IJsonSchemaValidator jsonSchemaValidator)
-            : this(config, jsonSchemaValidator)
+        FlagdCore core)
+            : this(config, core)
     {
         this._client = client;
     }
 
     public async Task Init()
     {
-        await _jsonSchemaValidator.InitializeAsync().ConfigureAwait(false);
+        await _core.InitializeAsync().ConfigureAwait(false);
 
         // RunContinuationsAsynchronously is required: this TCS is completed from inside
         // the HandleEvents stream-reading loop (on the first received message). Without
@@ -90,27 +89,27 @@ internal class InProcessResolver : Resolver
 
     public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
     {
-        return Task.FromResult(_evaluator.ResolveBooleanValueAsync(flagKey, defaultValue, context));
+        return Task.FromResult(_core.ResolveBoolean(flagKey, defaultValue, context));
     }
 
     public Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
     {
-        return Task.FromResult(_evaluator.ResolveStringValueAsync(flagKey, defaultValue, context));
+        return Task.FromResult(_core.ResolveString(flagKey, defaultValue, context));
     }
 
     public Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
     {
-        return Task.FromResult(_evaluator.ResolveIntegerValueAsync(flagKey, defaultValue, context));
+        return Task.FromResult(_core.ResolveInteger(flagKey, defaultValue, context));
     }
 
     public Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
     {
-        return Task.FromResult(_evaluator.ResolveDoubleValueAsync(flagKey, defaultValue, context));
+        return Task.FromResult(_core.ResolveDouble(flagKey, defaultValue, context));
     }
 
     public Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
     {
-        return Task.FromResult(_evaluator.ResolveStructureValueAsync(flagKey, defaultValue, context));
+        return Task.FromResult(_core.ResolveStructure(flagKey, defaultValue, context));
     }
 
     private async Task HandleEvents(TaskCompletionSource<bool> tcs)
@@ -137,7 +136,7 @@ internal class InProcessResolver : Resolver
                 while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
-                    this._evaluator.Sync(FlagConfigurationUpdateType.ALL, response.FlagConfiguration);
+                    this._core.SetConfigurations(response.FlagConfiguration);
 
                     tcs.TrySetResult(true);
 
@@ -153,7 +152,7 @@ internal class InProcessResolver : Resolver
                         }
                     }
 
-                    var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(this._evaluator.Flags.Keys), metadata.Build());
+                    var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(this._core.GetFlagKeys()), metadata.Build());
                     ProviderEvent?.Invoke(this, flagdEvent);
                 }
             }
@@ -296,9 +295,10 @@ internal class InProcessResolver : Resolver
             HttpHandler = socketsHttpHandler,
         });
         return constructorFunc(_channel);
-#endif
+#else
         // unix socket support is not available in this dotnet version
         throw new Exception("unix sockets are not supported in this version.");
+#endif
     }
 
     private FlagSyncService.FlagSyncServiceClient BuildClientForPlatform(FlagdConfig config)
@@ -373,9 +373,10 @@ internal class InProcessResolver : Resolver
         {
             HttpHandler = socketsHttpHandler,
         }));
-#endif
+#else
         // unix socket support is not available in this dotnet version
         throw new Exception("unix sockets are not supported in this version.");
+#endif
     }
 
 }

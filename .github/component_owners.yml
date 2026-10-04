@@ -6,6 +6,11 @@ components:
     - bacherfl
     - kylejuliandev
     - toddbaert
+  src/OpenFeature.Providers.Flagd.Core:
+    - askpt
+    - bacherfl
+    - kylejuliandev
+    - toddbaert
   src/OpenFeature.Providers.GOFeatureFlag:
     - thomaspoignant
   src/OpenFeature.Contrib.Providers.Flagsmith:
@@ -31,6 +36,11 @@ components:
     - PSanetra
 
   # test/
+  test/OpenFeature.Providers.Flagd.Core.Test:
+    - askpt
+    - bacherfl
+    - kylejuliandev
+    - toddbaert
   test/OpenFeature.Providers.Flagd.Test:
     - askpt
     - bacherfl

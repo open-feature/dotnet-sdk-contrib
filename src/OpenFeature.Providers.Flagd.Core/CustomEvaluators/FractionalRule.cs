@@ -7,7 +7,7 @@ using System.Text.Json.Nodes;
 using Json.Logic;
 using Murmur;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 
 /// <inheritdoc/>
 internal sealed class FractionalEvaluator : IRule

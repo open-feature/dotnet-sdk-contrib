@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Core;
 
 #nullable enable
 
