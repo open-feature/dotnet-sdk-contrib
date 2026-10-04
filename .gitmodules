@@ -14,7 +14,9 @@
 # The remaining submodules are deliberately left unpinned for now, each needing a
 # decision rather than a no-op -- see open-feature/community-tooling#125:
 #   schemas       tracks an untagged commit, and flagd-schemas publishes two
-#                 independent release-please series to choose between
+#                 independent release-please series to choose between. There are
+#                 two copies (Flagd: protobuf, Flagd.Core: JSON schemas); keep
+#                 them on the same commit.
 #   spec          sits on an untagged commit; pinning would roll it back to v0.9.0
 #   wasm-releases has no tags, only `publish-wasm-evaluation-v*` branches
 [submodule "src/OpenFeature.Providers.Flagd/schemas"]
@@ -30,3 +32,6 @@
 [submodule "src/OpenFeature.Providers.GOFeatureFlag/wasm-releases"]
 	path = src/OpenFeature.Providers.GOFeatureFlag/wasm-releases
 	url = https://github.com/go-feature-flag/wasm-releases.git
+[submodule "src/OpenFeature.Providers.Flagd.Core/schemas"]
+	path = src/OpenFeature.Providers.Flagd.Core/schemas
+	url = https://github.com/open-feature/flagd-schemas.git

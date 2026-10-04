@@ -13,6 +13,16 @@
         "OpenFeature.Providers.Flagd.csproj"
       ]
     },
+    "src/OpenFeature.Providers.Flagd.Core": {
+      "package-name": "OpenFeature.Providers.Flagd.Core",
+      "release-type": "simple",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "versioning": "default",
+      "extra-files": [
+        "OpenFeature.Providers.Flagd.Core.csproj"
+      ]
+    },
     "src/OpenFeature.Providers.GOFeatureFlag": {
       "package-name": "OpenFeature.Providers.GOFeatureFlag",
       "release-type": "simple",

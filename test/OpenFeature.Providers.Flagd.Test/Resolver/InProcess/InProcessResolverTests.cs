@@ -5,6 +5,7 @@ using Grpc.Core;
 using NSubstitute;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
+using OpenFeature.Providers.Flagd.Core;
 using OpenFeature.Providers.Flagd.Resolver.InProcess;
 using Xunit;
 
@@ -31,7 +32,7 @@ public class InProcessResolverTests
             }
         };
 
-        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
+        var core = new FlagdCore();
         var (mockGrpcClient, asyncStreamReader) = SetupGrpcStream(responses);
 
         var config = FlagdConfig.Builder()
@@ -41,7 +42,7 @@ public class InProcessResolverTests
             .Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        var resolver = new InProcessResolver(mockGrpcClient, config, core);
         resolver.ProviderEvent += (sender, evt) => flagdProviderEvent = evt;
 
         // Act
@@ -63,7 +64,7 @@ public class InProcessResolverTests
     public async Task HandleEvents_WhenRpcErrors_CallsFlagdProviderEventHandler()
     {
         // Arrange
-        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
+        var core = new FlagdCore();
         var (mockGrpcClient, asyncStreamReader) = SetupGrpcStream(new List<SyncFlagsResponse>());
 
         asyncStreamReader.MoveNext(Arg.Any<CancellationToken>())
@@ -76,7 +77,7 @@ public class InProcessResolverTests
             .Build();
 
         FlagdProviderEvent flagdProviderEvent = null;
-        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        var resolver = new InProcessResolver(mockGrpcClient, config, core);
         resolver.ProviderEvent += (sender, evt) => flagdProviderEvent = evt;
 
         // Act
@@ -98,7 +99,7 @@ public class InProcessResolverTests
     public async Task HandleEvents_WhenRpcCancelled_DoesNotCallFlagdProviderEventHandler()
     {
         // Arrange
-        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
+        var core = new FlagdCore();
         var (mockGrpcClient, asyncStreamReader) = SetupGrpcStream(new List<SyncFlagsResponse>());
 
         asyncStreamReader.MoveNext(Arg.Any<CancellationToken>())
@@ -111,7 +112,7 @@ public class InProcessResolverTests
             .Build();
 
         var counter = 0;
-        var resolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        var resolver = new InProcessResolver(mockGrpcClient, config, core);
         resolver.ProviderEvent += (sender, evt) => { counter++; };
 
         // Act
@@ -147,8 +148,8 @@ public class InProcessResolverTests
         var config = FlagdConfig.Builder().Build();
 
         // Act
-        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new InProcessResolver(config, mockJsonSchemaValidator);
+        var core = new FlagdCore();
+        var resolver = new InProcessResolver(config, core);
 
         // Assert
         // Default backoff is 1000ms / 1000 = 1 second
@@ -168,8 +169,8 @@ public class InProcessResolverTests
             .Build();
 
         // Act
-        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new InProcessResolver(config, mockJsonSchemaValidator);
+        var core = new FlagdCore();
+        var resolver = new InProcessResolver(config, core);
 
         // Assert
         Assert.Equal(500, config.RetryBackoffMs);

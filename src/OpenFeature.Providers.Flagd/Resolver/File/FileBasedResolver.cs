@@ -8,15 +8,14 @@ using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using OpenFeature.Providers.Flagd.Resolver.InProcess;
+using OpenFeature.Providers.Flagd.Core;
 
 namespace OpenFeature.Providers.Flagd.Resolver.File;
 
 internal class FileBasedResolver : Resolver
 {
     private readonly string _filePath;
-    private readonly JsonEvaluator _evaluator;
-    private readonly IJsonSchemaValidator _jsonSchemaValidator;
+    private readonly FlagdCore _core;
     private readonly TimeSpan _fileWatcherWaitForFileReadyInterval;
     private readonly CancellationTokenSource _cts = new CancellationTokenSource();
     private readonly ILogger _logger;
@@ -32,8 +31,7 @@ internal class FileBasedResolver : Resolver
     public event EventHandler<FlagdProviderEvent> ProviderEvent;
 
     internal FileBasedResolver(ILogger logger, string filePath,
-        IJsonSchemaValidator jsonSchemaValidator,
-        string sourceSelector = "",
+        FlagdCore core,
         bool useHashFileChangeDetection = false,
         TimeSpan? waitForFileReadyInterval = null,
         TimeSpan? fileChangePollingInterval = null)
@@ -43,18 +41,17 @@ internal class FileBasedResolver : Resolver
 
         _logger = logger;
         _filePath = Path.GetFullPath(filePath);
-        _jsonSchemaValidator = jsonSchemaValidator ?? throw new ArgumentNullException(nameof(jsonSchemaValidator));
+        _core = core ?? throw new ArgumentNullException(nameof(core));
         _fileWatcherWaitForFileReadyInterval = waitForFileReadyInterval ?? DefaultWaitForFileReadyInterval;
         _useHashFileChangeDetection = useHashFileChangeDetection;
         _fileChangePollingInterval = fileChangePollingInterval;
-        _evaluator = new JsonEvaluator(sourceSelector, jsonSchemaValidator);
     }
 
     public async Task Init()
     {
         _logger?.LogInformation("{Resolver} for '{FilePath}' is initializing", nameof(FileBasedResolver), _filePath);
 
-        await _jsonSchemaValidator.InitializeAsync(_cts.Token).ConfigureAwait(false);
+        await _core.InitializeAsync(_cts.Token).ConfigureAwait(false);
 
         await (_fileExistTask = WaitForFileExists()).ConfigureAwait(false);
 
@@ -135,7 +132,7 @@ internal class FileBasedResolver : Resolver
         _evaluatorLock.EnterReadLock();
         try
         {
-            return Task.FromResult(_evaluator.ResolveBooleanValueAsync(flagKey, defaultValue, context));
+            return Task.FromResult(_core.ResolveBoolean(flagKey, defaultValue, context));
         }
         finally
         {
@@ -148,7 +145,7 @@ internal class FileBasedResolver : Resolver
         _evaluatorLock.EnterReadLock();
         try
         {
-            return Task.FromResult(_evaluator.ResolveStringValueAsync(flagKey, defaultValue, context));
+            return Task.FromResult(_core.ResolveString(flagKey, defaultValue, context));
         }
         finally
         {
@@ -161,7 +158,7 @@ internal class FileBasedResolver : Resolver
         _evaluatorLock.EnterReadLock();
         try
         {
-            return Task.FromResult(_evaluator.ResolveIntegerValueAsync(flagKey, defaultValue, context));
+            return Task.FromResult(_core.ResolveInteger(flagKey, defaultValue, context));
         }
         finally
         {
@@ -174,7 +171,7 @@ internal class FileBasedResolver : Resolver
         _evaluatorLock.EnterReadLock();
         try
         {
-            return Task.FromResult(_evaluator.ResolveDoubleValueAsync(flagKey, defaultValue, context));
+            return Task.FromResult(_core.ResolveDouble(flagKey, defaultValue, context));
         }
         finally
         {
@@ -187,7 +184,7 @@ internal class FileBasedResolver : Resolver
         _evaluatorLock.EnterReadLock();
         try
         {
-            return Task.FromResult(_evaluator.ResolveStructureValueAsync(flagKey, defaultValue, context));
+            return Task.FromResult(_core.ResolveStructure(flagKey, defaultValue, context));
         }
         finally
         {
@@ -285,9 +282,9 @@ internal class FileBasedResolver : Resolver
 
         try
         {
-            _evaluator.Sync(FlagConfigurationUpdateType.ALL, flagJson);
+            _core.SetConfigurations(flagJson);
             _logger?.LogInformation("Flags were loaded successfully from file '{FilePath}'", _filePath);
-            return new List<string>(_evaluator.Flags.Keys);
+            return new List<string>(_core.GetFlagKeys());
         }
         catch (Exception ex)
         {

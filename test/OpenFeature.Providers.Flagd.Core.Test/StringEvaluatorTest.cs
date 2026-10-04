@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Logic;
-using OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+using OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 using Xunit;
 
-namespace OpenFeature.Providers.Flagd.Test;
+namespace OpenFeature.Providers.Flagd.Core.Test;
 
 public class StringEvaluatorTest
 {

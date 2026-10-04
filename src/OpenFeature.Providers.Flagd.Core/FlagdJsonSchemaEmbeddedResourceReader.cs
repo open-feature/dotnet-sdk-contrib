@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Core;
 
 internal sealed class FlagdJsonSchemaEmbeddedResourceReader : IFlagdJsonSchemaProvider
 {
-    const string TargetingJsonResourceName = "OpenFeature.Providers.Flagd.Resources.targeting.json";
-    const string FlagJsonResourceName = "OpenFeature.Providers.Flagd.Resources.flags.json";
+    const string TargetingJsonResourceName = "OpenFeature.Providers.Flagd.Core.Resources.targeting.json";
+    const string FlagJsonResourceName = "OpenFeature.Providers.Flagd.Core.Resources.flags.json";
 
     public Task<string> ReadSchemaAsync(FlagdSchema flagdSchema, CancellationToken cancellationToken = default)
     {

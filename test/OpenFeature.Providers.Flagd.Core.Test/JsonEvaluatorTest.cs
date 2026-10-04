@@ -4,10 +4,10 @@ using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using OpenFeature.Providers.Flagd.Resolver.InProcess;
+using OpenFeature.Providers.Flagd.Core;
 using Xunit;
 
-namespace OpenFeature.Providers.Flagd.Test;
+namespace OpenFeature.Providers.Flagd.Core.Test;
 
 public class UnitTestJsonEvaluator
 {

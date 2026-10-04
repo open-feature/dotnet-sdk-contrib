@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OpenFeature.Constant;
 using OpenFeature.Model;
+using OpenFeature.Providers.Flagd.Core;
 using OpenFeature.Providers.Flagd.Resolver.File;
 using OpenFeature.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Providers.Flagd.Resolver.Rpc;
@@ -76,20 +77,17 @@ public sealed class FlagdProvider : FeatureProvider
 
         if (_config.ResolverType == ResolverType.IN_PROCESS)
         {
-            var jsonSchemaValidator = new JsonSchemaValidator(_config.Logger);
-            _resolver = new InProcessResolver(_config, jsonSchemaValidator);
+            _resolver = new InProcessResolver(_config, CreateCore(_config));
         }
         else if (_config.ResolverType == ResolverType.FILE)
         {
             if (string.IsNullOrWhiteSpace(_config.OfflineFlagSourcePath))
                 throw new ArgumentException("OfflineFlagSourcePath must be set when using ResolverType.FILE");
 
-            var jsonSchemaValidator = new JsonSchemaValidator(_config.Logger);
             _resolver = new FileBasedResolver(
                 _config.Logger,
                 _config.OfflineFlagSourcePath,
-                jsonSchemaValidator,
-                _config.SourceSelector,
+                CreateCore(_config),
                 _config.UseHashFileChangeDetection,
                 _config.DeadlineMs.HasValue ? TimeSpan.FromMilliseconds(_config.DeadlineMs.Value) : (TimeSpan?)null,
                 _config.OfflinePollIntervalMs.HasValue ? TimeSpan.FromMilliseconds(_config.OfflinePollIntervalMs.Value) : (TimeSpan?)null);
@@ -102,6 +100,12 @@ public sealed class FlagdProvider : FeatureProvider
         _hooks.Add(new SyncMetadataHook(() => this._enrichedContext));
         this._resolver.ProviderEvent += this.OnProviderEvent;
     }
+
+    private static FlagdCore CreateCore(FlagdConfig config) => new FlagdCore(new FlagdCoreOptions
+    {
+        SourceSelector = config.SourceSelector,
+        Logger = config.Logger
+    });
 
     // just for testing, internal but visible in tests
     internal FlagdProvider(Resolver.Resolver resolver)
