@@ -83,7 +83,8 @@ When using dependency injection, the provider will automatically use any registe
 
 The `OfrepOptions` class supports the following options:
 
--   `BaseUrl` (required): The base URL for the OFREP API endpoint
+-   `BaseUrl` (required): The base URL for the OFREP API endpoint. Any path prefix is preserved, with or without a trailing slash.
+    For example, `https://example.com/my-service` evaluates `my-flag` at `https://example.com/my-service/ofrep/v1/evaluate/flags/my-flag`.
 -   `Timeout` (optional): HTTP client timeout. The default value is 10 seconds.
 -   `Headers` (optional): Additional HTTP headers to include in requests
 

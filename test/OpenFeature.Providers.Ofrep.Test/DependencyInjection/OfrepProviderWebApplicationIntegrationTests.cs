@@ -15,14 +15,21 @@ namespace OpenFeature.Providers.Ofrep.Test.DependencyInjection;
 
 public class OfrepProviderWebApplicationIntegrationTests
 {
-    [Fact]
-    public async Task OfrepProvider_Integration_WithTestServer_CanEvaluateFeatureFlag()
+    [Theory]
+    [InlineData("", false)]
+    [InlineData("/my-service", false)]
+    [InlineData("/my-service/", false)]
+    [InlineData("/gateway/my-service", false)]
+    [InlineData("/gateway/my-service/", false)]
+    [InlineData("/my-service", true)]
+    [InlineData("/my-service/", true)]
+    public async Task OfrepProvider_Integration_WithTestServer_CanEvaluateFeatureFlag(string basePath, bool configureClientBaseAddress)
     {
         const string httpClientName = "Test";
         const string flagKey = "test-flag";
 
         // Arrange - Create mock OFREP server first
-        await using var mockServer = await CreateMockOfrepServer();
+        await using var mockServer = await CreateMockOfrepServer(basePath.TrimEnd('/'));
 
         // Create the main application with TestServer
         var builder = WebApplication.CreateBuilder();
@@ -30,9 +37,15 @@ public class OfrepProviderWebApplicationIntegrationTests
 
         // Replace the entire HttpClientFactory
         var handler = mockServer.TestServer.CreateHandler();
-        var baseUrl = mockServer.BaseUrl;
+        var baseUrl = mockServer.BaseUrl + basePath;
 
-        builder.Services.AddHttpClient(httpClientName)
+        builder.Services.AddHttpClient(httpClientName, client =>
+        {
+            if (configureClientBaseAddress)
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+        })
             .ConfigurePrimaryHttpMessageHandler(() => handler);
 
         builder.Services.AddOpenFeature(openFeatureBuilder =>
@@ -40,7 +53,7 @@ public class OfrepProviderWebApplicationIntegrationTests
             openFeatureBuilder
                 .AddOfrepProvider(c =>
                 {
-                    c.BaseUrl = baseUrl;
+                    c.BaseUrl = configureClientBaseAddress ? "https://override.example/" : baseUrl;
                     c.HttpClientName = httpClientName;
                 });
         });
@@ -62,7 +75,7 @@ public class OfrepProviderWebApplicationIntegrationTests
         Assert.Equal(flagKey, result.FlagKey);
     }
 
-    private static async Task<MockOfrepServer> CreateMockOfrepServer()
+    private static async Task<MockOfrepServer> CreateMockOfrepServer(string basePath)
     {
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
@@ -72,7 +85,7 @@ public class OfrepProviderWebApplicationIntegrationTests
 
         // Configure mock OFREP endpoints
         // Mock OFREP evaluate endpoint for individual flags
-        app.MapPost("/ofrep/v1/evaluate/flags/{flagKey}", async (string flagKey, HttpContext context) =>
+        app.MapPost($"{basePath}/ofrep/v1/evaluate/flags/{{flagKey}}", async (string flagKey, HttpContext context) =>
         {
             // Log the request for debugging
             app.Logger.LogInformation("OFREP evaluate request for flag: {FlagKey}", flagKey);
