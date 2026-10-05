@@ -60,7 +60,7 @@ internal sealed class FractionalEvaluator : IRule
             propertyValue = arg0;
             bucketStartIndex = 1;
         }
-        else if (args[0]?.GetValueKind() != JsonValueKind.Array)
+        else if (args.AsArray().FirstOrDefault()?.GetValueKind() != JsonValueKind.Array)
         {
             _logger.LogDebug("Invalid arguments for fractional targeting: unsupported bucketing value");
             return null;
