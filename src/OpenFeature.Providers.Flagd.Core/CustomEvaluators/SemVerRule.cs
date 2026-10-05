@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 using Json.Logic;
 using Semver;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 
 /// <inheritdoc/>
 internal sealed class SemVerRule : IRule

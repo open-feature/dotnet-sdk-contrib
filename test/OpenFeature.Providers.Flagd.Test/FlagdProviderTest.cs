@@ -12,6 +12,7 @@ using OpenFeature.Error;
 using OpenFeature.Flagd.Grpc.Evaluation.V2;
 using OpenFeature.Flagd.Grpc.Sync;
 using OpenFeature.Model;
+using OpenFeature.Providers.Flagd.Core;
 using OpenFeature.Providers.Flagd.Resolver.File;
 using OpenFeature.Providers.Flagd.Resolver.InProcess;
 using OpenFeature.Providers.Flagd.Resolver.Rpc;
@@ -717,7 +718,7 @@ public class UnitTestFlagdProvider
 
         var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();
         var asyncStreamReader = Substitute.For<IAsyncStreamReader<SyncFlagsResponse>>();
-        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
+        var core = new FlagdCore();
 
         var l = new List<SyncFlagsResponse>
         {
@@ -740,7 +741,7 @@ public class UnitTestFlagdProvider
         config.MaxEventStreamRetries = 1;
         config.SourceSelector = "source-selector";
 
-        var rpcResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        var rpcResolver = new InProcessResolver(mockGrpcClient, config, core);
         var flagdProvider = new FlagdProvider(rpcResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 
@@ -773,7 +774,7 @@ public class UnitTestFlagdProvider
 
         var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();
         var asyncStreamReader = Substitute.For<IAsyncStreamReader<SyncFlagsResponse>>();
-        var mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
+        var core = new FlagdCore();
 
         var l = new List<SyncFlagsResponse>
         {
@@ -796,7 +797,7 @@ public class UnitTestFlagdProvider
         config.MaxEventStreamRetries = 1;
         config.SourceSelector = "source-selector";
 
-        var inProcessResolver = new InProcessResolver(mockGrpcClient, config, mockJsonSchemaValidator);
+        var inProcessResolver = new InProcessResolver(mockGrpcClient, config, core);
         var flagdProvider = new FlagdProvider(inProcessResolver);
         await flagdProvider.InitializeAsync(EvaluationContext.Empty);
 

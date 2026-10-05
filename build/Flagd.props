@@ -1,0 +1,7 @@
+<Project>
+  <!-- Shared by OpenFeature.Providers.Flagd and OpenFeature.Providers.Flagd.Core so both packages
+       always resolve the same OpenFeature SDK range. -->
+  <PropertyGroup>
+    <OpenFeatureVersion>[2.9,2.99999]</OpenFeatureVersion>
+  </PropertyGroup>
+</Project>

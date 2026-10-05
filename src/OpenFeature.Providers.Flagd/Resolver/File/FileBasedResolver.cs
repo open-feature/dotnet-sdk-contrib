@@ -8,19 +8,17 @@ using Microsoft.Extensions.Logging;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using OpenFeature.Providers.Flagd.Resolver.InProcess;
+using OpenFeature.Providers.Flagd.Core;
 
 namespace OpenFeature.Providers.Flagd.Resolver.File;
 
 internal class FileBasedResolver : Resolver
 {
     private readonly string _filePath;
-    private readonly JsonEvaluator _evaluator;
-    private readonly IJsonSchemaValidator _jsonSchemaValidator;
+    private readonly FlagdCore _core;
     private readonly TimeSpan _fileWatcherWaitForFileReadyInterval;
     private readonly CancellationTokenSource _cts = new CancellationTokenSource();
     private readonly ILogger _logger;
-    private readonly ReaderWriterLockSlim _evaluatorLock = new ReaderWriterLockSlim();
     private readonly bool _useHashFileChangeDetection;
     private readonly TimeSpan? _fileChangePollingInterval;
     private IDisposable _fileWatcher;
@@ -32,8 +30,7 @@ internal class FileBasedResolver : Resolver
     public event EventHandler<FlagdProviderEvent> ProviderEvent;
 
     internal FileBasedResolver(ILogger logger, string filePath,
-        IJsonSchemaValidator jsonSchemaValidator,
-        string sourceSelector = "",
+        FlagdCore core,
         bool useHashFileChangeDetection = false,
         TimeSpan? waitForFileReadyInterval = null,
         TimeSpan? fileChangePollingInterval = null)
@@ -43,18 +40,17 @@ internal class FileBasedResolver : Resolver
 
         _logger = logger;
         _filePath = Path.GetFullPath(filePath);
-        _jsonSchemaValidator = jsonSchemaValidator ?? throw new ArgumentNullException(nameof(jsonSchemaValidator));
+        _core = core ?? throw new ArgumentNullException(nameof(core));
         _fileWatcherWaitForFileReadyInterval = waitForFileReadyInterval ?? DefaultWaitForFileReadyInterval;
         _useHashFileChangeDetection = useHashFileChangeDetection;
         _fileChangePollingInterval = fileChangePollingInterval;
-        _evaluator = new JsonEvaluator(sourceSelector, jsonSchemaValidator);
     }
 
     public async Task Init()
     {
         _logger?.LogInformation("{Resolver} for '{FilePath}' is initializing", nameof(FileBasedResolver), _filePath);
 
-        await _jsonSchemaValidator.InitializeAsync(_cts.Token).ConfigureAwait(false);
+        await _core.InitializeAsync(_cts.Token).ConfigureAwait(false);
 
         await (_fileExistTask = WaitForFileExists()).ConfigureAwait(false);
 
@@ -126,74 +122,23 @@ internal class FileBasedResolver : Resolver
             _fileWatcher = null;
         }
 
-        _evaluatorLock.Dispose();
         _cts.Dispose();
     }
 
     public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_evaluator.ResolveBooleanValueAsync(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveBoolean(flagKey, defaultValue, context));
 
     public Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_evaluator.ResolveStringValueAsync(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveString(flagKey, defaultValue, context));
 
     public Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_evaluator.ResolveIntegerValueAsync(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveInteger(flagKey, defaultValue, context));
 
     public Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_evaluator.ResolveDoubleValueAsync(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveDouble(flagKey, defaultValue, context));
 
     public Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_evaluator.ResolveStructureValueAsync(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveStructure(flagKey, defaultValue, context));
 
     private static bool IsFilePathValid(string filePath)
     {
@@ -281,22 +226,16 @@ internal class FileBasedResolver : Resolver
             throw new ParseErrorException(errorMessage);
         }
 
-        _evaluatorLock.EnterWriteLock();
-
         try
         {
-            _evaluator.Sync(FlagConfigurationUpdateType.ALL, flagJson);
+            _core.SetConfigurations(flagJson);
             _logger?.LogInformation("Flags were loaded successfully from file '{FilePath}'", _filePath);
-            return new List<string>(_evaluator.Flags.Keys);
+            return new List<string>(_core.GetFlagKeys());
         }
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Error loading flags from file '{FilePath}'", _filePath);
             throw;
-        }
-        finally
-        {
-            _evaluatorLock.ExitWriteLock();
         }
     }
 

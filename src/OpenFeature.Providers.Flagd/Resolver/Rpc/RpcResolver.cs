@@ -607,9 +607,10 @@ internal class RpcResolver : Resolver
             HttpHandler = socketsHttpHandler,
         });
         return BuildServiceClient(_channel, config);
-#endif
-        // unix socket support is not available in this dotnet version
+#else
         throw new Exception("unix sockets are not supported in this version.");
+        // unix socket support is not available in this dotnet version
+#endif
     }
 
     private static Service.ServiceClient BuildServiceClient(GrpcChannel channel, FlagdConfig config)

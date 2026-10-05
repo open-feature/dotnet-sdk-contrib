@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Logic;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 
 internal sealed class FlagdProperties
 {
