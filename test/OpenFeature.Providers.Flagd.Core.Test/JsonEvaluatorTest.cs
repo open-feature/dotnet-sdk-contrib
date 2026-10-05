@@ -20,7 +20,7 @@ public class UnitTestJsonEvaluator
     {
         _fixture = new Fixture();
         _mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
-        _jsonEvaluator = new JsonEvaluator(_fixture.Create<string>(), _mockJsonSchemaValidator);
+        _jsonEvaluator = new JsonEvaluator(_mockJsonSchemaValidator);
     }
 
     [Fact]

@@ -70,12 +70,10 @@ internal class JsonEvaluator
 
     public IReadOnlyDictionary<string, FlagConfiguration> Flags { get => _state.Flags; }
 
-    private string _selector;
     private readonly IJsonSchemaValidator _schemaValidator;
 
-    internal JsonEvaluator(string selector, IJsonSchemaValidator schemaValidator)
+    internal JsonEvaluator(IJsonSchemaValidator schemaValidator)
     {
-        _selector = selector;
         _schemaValidator = schemaValidator;
 
         RuleRegistry.AddRule("starts_with", new StartsWithRule());

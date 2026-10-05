@@ -103,7 +103,6 @@ public sealed class FlagdProvider : FeatureProvider
 
     private static FlagdCore CreateCore(FlagdConfig config) => new FlagdCore(new FlagdCoreOptions
     {
-        SourceSelector = config.SourceSelector,
         Logger = config.Logger
     });
 

@@ -19,7 +19,6 @@ internal class FileBasedResolver : Resolver
     private readonly TimeSpan _fileWatcherWaitForFileReadyInterval;
     private readonly CancellationTokenSource _cts = new CancellationTokenSource();
     private readonly ILogger _logger;
-    private readonly ReaderWriterLockSlim _evaluatorLock = new ReaderWriterLockSlim();
     private readonly bool _useHashFileChangeDetection;
     private readonly TimeSpan? _fileChangePollingInterval;
     private IDisposable _fileWatcher;
@@ -123,74 +122,23 @@ internal class FileBasedResolver : Resolver
             _fileWatcher = null;
         }
 
-        _evaluatorLock.Dispose();
         _cts.Dispose();
     }
 
     public Task<ResolutionDetails<bool>> ResolveBooleanValueAsync(string flagKey, bool defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_core.ResolveBoolean(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveBoolean(flagKey, defaultValue, context));
 
     public Task<ResolutionDetails<string>> ResolveStringValueAsync(string flagKey, string defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_core.ResolveString(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveString(flagKey, defaultValue, context));
 
     public Task<ResolutionDetails<int>> ResolveIntegerValueAsync(string flagKey, int defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_core.ResolveInteger(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveInteger(flagKey, defaultValue, context));
 
     public Task<ResolutionDetails<double>> ResolveDoubleValueAsync(string flagKey, double defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_core.ResolveDouble(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveDouble(flagKey, defaultValue, context));
 
     public Task<ResolutionDetails<Value>> ResolveStructureValueAsync(string flagKey, Value defaultValue, EvaluationContext context = null)
-    {
-        _evaluatorLock.EnterReadLock();
-        try
-        {
-            return Task.FromResult(_core.ResolveStructure(flagKey, defaultValue, context));
-        }
-        finally
-        {
-            _evaluatorLock.ExitReadLock();
-        }
-    }
+        => Task.FromResult(_core.ResolveStructure(flagKey, defaultValue, context));
 
     private static bool IsFilePathValid(string filePath)
     {
@@ -278,8 +226,6 @@ internal class FileBasedResolver : Resolver
             throw new ParseErrorException(errorMessage);
         }
 
-        _evaluatorLock.EnterWriteLock();
-
         try
         {
             _core.SetConfigurations(flagJson);
@@ -290,10 +236,6 @@ internal class FileBasedResolver : Resolver
         {
             _logger?.LogError(ex, "Error loading flags from file '{FilePath}'", _filePath);
             throw;
-        }
-        finally
-        {
-            _evaluatorLock.ExitWriteLock();
         }
     }
 

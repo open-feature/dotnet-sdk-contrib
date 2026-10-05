@@ -68,5 +68,5 @@ var core = new FlagdCore(new FlagdCoreOptions { Logger = logger });
 await core.InitializeAsync();
 ```
 
-`SourceSelector` and `Logger` are the only options. `FlagdCore` itself performs no I/O, so constructing and using it
+`Logger` is the only option. `FlagdCore` itself performs no I/O, so constructing and using it
 without calling `InitializeAsync` never touches the network or the file system.
