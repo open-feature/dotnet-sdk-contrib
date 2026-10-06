@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Murmur;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 
 /// <inheritdoc/>
 internal sealed class FractionalEvaluator : IRule

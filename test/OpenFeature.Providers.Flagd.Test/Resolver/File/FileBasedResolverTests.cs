@@ -7,8 +7,8 @@ using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
+using OpenFeature.Providers.Flagd.Core;
 using OpenFeature.Providers.Flagd.Resolver.File;
-using OpenFeature.Providers.Flagd.Resolver.InProcess;
 using Xunit;
 
 namespace OpenFeature.Providers.Flagd.Test.Resolver.File;
@@ -47,32 +47,32 @@ public class FileBasedResolverTests : IDisposable
     [Fact]
     public void Constructor_WithNullFilePath_ThrowsArgumentException()
     {
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
+        var core = new FlagdCore();
 
         Assert.Throws<ArgumentException>(() =>
-            new FileBasedResolver(_logger, null, mockValidator));
+            new FileBasedResolver(_logger, null, core));
     }
 
     [Fact]
     public void Constructor_WithEmptyFilePath_ThrowsArgumentException()
     {
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
+        var core = new FlagdCore();
 
         Assert.Throws<ArgumentException>(() =>
-            new FileBasedResolver(_logger, "", mockValidator));
+            new FileBasedResolver(_logger, "", core));
     }
 
     [Fact]
     public void Constructor_WithWhitespaceFilePath_ThrowsArgumentException()
     {
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
+        var core = new FlagdCore();
 
         Assert.Throws<ArgumentException>(() =>
-            new FileBasedResolver(_logger, "   ", mockValidator));
+            new FileBasedResolver(_logger, "   ", core));
     }
 
     [Fact]
-    public void Constructor_WithNullJsonSchemaValidator_ThrowsArgumentNullException()
+    public void Constructor_WithNullFlagdCore_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
             new FileBasedResolver(_logger, "/some/path.json", null));
@@ -83,8 +83,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.validFlagConfig);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
 
         FlagdProviderEvent receivedEvent = null;
@@ -106,8 +106,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = Path.Combine(_tempDir, "nonexistent.json");
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(1));
 
         // Act & Assert
@@ -121,8 +121,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile("");
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
 
         // Act & Assert
@@ -136,8 +136,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.validFlagConfig);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
         await resolver.Init();
 
@@ -155,8 +155,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.flags);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
         await resolver.Init();
 
@@ -174,8 +174,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.flags);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
         await resolver.Init();
 
@@ -193,8 +193,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.flags);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
         await resolver.Init();
 
@@ -212,8 +212,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.flags);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
         await resolver.Init();
 
@@ -232,8 +232,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.validFlagConfig);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
         await resolver.Init();
 
@@ -249,8 +249,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.validFlagConfig);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             useHashFileChangeDetection: false,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5),
             fileChangePollingInterval: TimeSpan.FromMilliseconds(200));
@@ -293,8 +293,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.validFlagConfig);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             useHashFileChangeDetection: true,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5),
             fileChangePollingInterval: TimeSpan.FromMilliseconds(200));
@@ -337,8 +337,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.validFlagConfig);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
         await resolver.Init();
 
@@ -351,8 +351,8 @@ public class FileBasedResolverTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFlagFile(Utils.validFlagConfig);
-        var mockValidator = Substitute.For<IJsonSchemaValidator>();
-        var resolver = new FileBasedResolver(_logger, filePath, mockValidator,
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
             waitForFileReadyInterval: TimeSpan.FromSeconds(5));
 
         // Act & Assert - should not throw

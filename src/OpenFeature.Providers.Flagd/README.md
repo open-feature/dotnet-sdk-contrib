@@ -44,6 +44,11 @@ paket add OpenFeature.Providers.Flagd
 #tool nuget:?package=OpenFeature.Providers.Flagd
 ```
 
+The in-process flag evaluation engine used by the `IN_PROCESS` and `FILE` resolvers is published separately as
+[OpenFeature.Providers.Flagd.Core](https://www.nuget.org/packages/OpenFeature.Providers.Flagd.Core). It is installed
+automatically as a dependency of this package. You only need to reference it directly to build your own
+flagd-compatible provider.
+
 ## Using the flagd Provider with the OpenFeature SDK
 
 This example assumes that the flagd server is running locally

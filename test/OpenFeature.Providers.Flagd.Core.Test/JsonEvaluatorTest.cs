@@ -4,10 +4,10 @@ using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using OpenFeature.Providers.Flagd.Resolver.InProcess;
+using OpenFeature.Providers.Flagd.Core;
 using Xunit;
 
-namespace OpenFeature.Providers.Flagd.Test;
+namespace OpenFeature.Providers.Flagd.Core.Test;
 
 public class UnitTestJsonEvaluator
 {
@@ -20,7 +20,7 @@ public class UnitTestJsonEvaluator
     {
         _fixture = new Fixture();
         _mockJsonSchemaValidator = Substitute.For<IJsonSchemaValidator>();
-        _jsonEvaluator = new JsonEvaluator(_fixture.Create<string>(), _mockJsonSchemaValidator);
+        _jsonEvaluator = new JsonEvaluator(_mockJsonSchemaValidator);
     }
 
     [Fact]

@@ -13,10 +13,10 @@ using Microsoft.Extensions.Logging.Abstractions;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
-using OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+using OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 using EvaluationContext = OpenFeature.Model.EvaluationContext;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Core;
 
 internal class FlagConfiguration
 {
@@ -51,19 +51,32 @@ internal enum FlagConfigurationUpdateType
 
 internal class JsonEvaluator
 {
-    private Dictionary<string, FlagConfiguration> _flags = new Dictionary<string, FlagConfiguration>();
+    // Flags and flag-set metadata are published together as one immutable snapshot, so a resolution running
+    // concurrently with Sync always sees a single, consistent configuration without taking a lock.
+    private sealed class FlagState
+    {
+        internal static readonly FlagState Empty = new FlagState(
+            new Dictionary<string, FlagConfiguration>(), new Dictionary<string, JsonElement>());
 
-    public IReadOnlyDictionary<string, FlagConfiguration> Flags { get => _flags; }
+        internal FlagState(Dictionary<string, FlagConfiguration> flags, Dictionary<string, JsonElement> metadata)
+        {
+            Flags = flags;
+            Metadata = metadata;
+        }
 
-    private Dictionary<string, JsonElement> _flagSetMetadata = new Dictionary<string, JsonElement>();
+        internal Dictionary<string, FlagConfiguration> Flags { get; }
+        internal Dictionary<string, JsonElement> Metadata { get; }
+    }
 
-    private string _selector;
+    private volatile FlagState _state = FlagState.Empty;
+
+    public IReadOnlyDictionary<string, FlagConfiguration> Flags { get => _state.Flags; }
+
     private readonly IJsonSchemaValidator _schemaValidator;
     private readonly ILogger _logger;
 
-    internal JsonEvaluator(string selector, IJsonSchemaValidator schemaValidator, ILogger logger = null)
+    internal JsonEvaluator(IJsonSchemaValidator schemaValidator, ILogger logger = null)
     {
-        _selector = selector;
         _schemaValidator = schemaValidator;
         _logger = logger ?? NullLogger.Instance;
 
@@ -79,6 +92,19 @@ internal class JsonEvaluator
         _schemaValidator.Validate(flagConfigurations);
 
         var parsed = JsonSerializer.Deserialize<FlagSyncData>(flagConfigurations);
+        if (parsed?.Flags == null)
+        {
+            throw new ParseErrorException("Flag configuration does not contain a 'flags' object");
+        }
+
+        foreach (var flag in parsed.Flags)
+        {
+            if (flag.Value == null)
+            {
+                throw new ParseErrorException("Flag configuration for key " + flag.Key + " is null");
+            }
+        }
+
         var transformed = JsonSerializer.Serialize(parsed);
         // replace evaluators
         if (parsed.Evaluators != null && parsed.Evaluators.Count > 0)
@@ -156,43 +182,99 @@ internal class JsonEvaluator
                       " is of unknown type");
     }
 
-    internal void Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
+    /// <summary>
+    /// Applies the given configuration. Parsing and validation happen before any state is touched, so a
+    /// failure leaves the previously loaded flags and metadata intact.
+    /// </summary>
+    /// <returns>The keys of flags that were added, removed or whose definition changed.</returns>
+    internal IReadOnlyList<string> Sync(FlagConfigurationUpdateType updateType, string flagConfigurations)
     {
         var flagConfigsMap = Parse(flagConfigurations);
+
+        var current = _state;
+        var newFlags = new Dictionary<string, FlagConfiguration>(current.Flags);
+        var newMetadata = new Dictionary<string, JsonElement>(current.Metadata);
 
         switch (updateType)
         {
             case FlagConfigurationUpdateType.ALL:
-                _flags = flagConfigsMap.Flags;
-                _flagSetMetadata = flagConfigsMap.Metadata;
+                newFlags = flagConfigsMap.Flags;
+                newMetadata = flagConfigsMap.Metadata;
 
                 break;
             case FlagConfigurationUpdateType.ADD:
             case FlagConfigurationUpdateType.UPDATE:
                 foreach (var keyAndValue in flagConfigsMap.Flags)
                 {
-                    _flags[keyAndValue.Key] = keyAndValue.Value;
+                    newFlags[keyAndValue.Key] = keyAndValue.Value;
                 }
 
                 foreach (var metadata in flagConfigsMap.Metadata)
                 {
-                    _flagSetMetadata[metadata.Key] = metadata.Value;
+                    newMetadata[metadata.Key] = metadata.Value;
                 }
 
                 break;
             case FlagConfigurationUpdateType.DELETE:
                 foreach (var keyAndValue in flagConfigsMap.Flags)
                 {
-                    _flags.Remove(keyAndValue.Key);
+                    newFlags.Remove(keyAndValue.Key);
                 }
 
                 foreach (var keyValuePair in flagConfigsMap.Metadata)
                 {
-                    _flagSetMetadata.Remove(keyValuePair.Key);
+                    newMetadata.Remove(keyValuePair.Key);
                 }
 
                 break;
         }
+
+        // flag-set metadata is merged into every flag's resolved metadata, so changing it changes every flag
+        var flagSetMetadataChanged =
+            JsonSerializer.Serialize(current.Metadata) != JsonSerializer.Serialize(newMetadata);
+        var changedKeys = GetChangedKeys(current.Flags, newFlags, flagSetMetadataChanged);
+
+        _state = new FlagState(newFlags, newMetadata);
+
+        return changedKeys;
+    }
+
+    /// <summary>
+    /// The flag-set level metadata of the currently loaded configuration.
+    /// </summary>
+    internal IReadOnlyDictionary<string, object> GetFlagSetMetadata()
+    {
+        return _state.Metadata.ToDictionary(
+            entry => entry.Key,
+            entry => ExtractMetadataValue(entry.Key, entry.Value));
+    }
+
+    private static List<string> GetChangedKeys(
+        IReadOnlyDictionary<string, FlagConfiguration> oldFlags,
+        IReadOnlyDictionary<string, FlagConfiguration> newFlags,
+        bool allChanged)
+    {
+        var changed = new List<string>();
+
+        foreach (var keyAndValue in newFlags)
+        {
+            if (allChanged
+                || !oldFlags.TryGetValue(keyAndValue.Key, out var oldFlag)
+                || JsonSerializer.Serialize(oldFlag) != JsonSerializer.Serialize(keyAndValue.Value))
+            {
+                changed.Add(keyAndValue.Key);
+            }
+        }
+
+        foreach (var key in oldFlags.Keys)
+        {
+            if (!newFlags.ContainsKey(key))
+            {
+                changed.Add(key);
+            }
+        }
+
+        return changed;
     }
 
     public ResolutionDetails<bool> ResolveBooleanValueAsync(string flagKey, bool defaultValue,
@@ -230,7 +312,8 @@ internal class JsonEvaluator
     {
         // check if we find the flag key
         var reason = Reason.Static;
-        if (_flags.TryGetValue(flagKey, out var flagConfiguration))
+        var state = _state;
+        if (state.Flags.TryGetValue(flagKey, out var flagConfiguration))
         {
             if ("DISABLED" == flagConfiguration.State)
             {
@@ -241,7 +324,7 @@ internal class JsonEvaluator
                 );
             }
 
-            Dictionary<string, object> combinedMetadata = _flagSetMetadata.ToDictionary(
+            Dictionary<string, object> combinedMetadata = state.Metadata.ToDictionary(
                 entry => entry.Key,
                 entry => ExtractMetadataValue(entry.Key, entry.Value));
 
