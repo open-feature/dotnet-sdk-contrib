@@ -16,7 +16,6 @@
     "src/OpenFeature.Providers.Flagd.Core": {
       "package-name": "OpenFeature.Providers.Flagd.Core",
       "release-type": "simple",
-      "release-as": "1.0.0",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "versioning": "default",
