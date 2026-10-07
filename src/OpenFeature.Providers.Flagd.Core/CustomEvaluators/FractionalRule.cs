@@ -15,7 +15,8 @@ namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 internal sealed class FractionalEvaluator : IRule
 {
     private const int MaxWeight = int.MaxValue; // 2,147,483,647
-    private const double MaxValue = 9223372036854775808d;
+    private const double MaxInt64Value = 9223372036854775808d;
+    private const double MaxUInt64Value = 18446744073709551616d;
     private readonly ILogger _logger;
 
     class FractionalEvaluationDistribution
@@ -231,12 +232,20 @@ internal sealed class FractionalEvaluator : IRule
                 else
                 {
                     var doubleVal = node.GetValue<double>();
-                    if (!double.IsInfinity(doubleVal)
-                        && doubleVal == Math.Floor(doubleVal)
-                        && doubleVal >= long.MinValue
-                        && doubleVal < MaxValue)
+                    if (!double.IsInfinity(doubleVal) && doubleVal == Math.Floor(doubleVal))
                     {
-                        writer.WriteInt64((long)doubleVal);
+                        if (doubleVal >= long.MinValue && doubleVal < MaxInt64Value)
+                        {
+                            writer.WriteInt64((long)doubleVal);
+                        }
+                        else if (doubleVal >= MaxInt64Value && doubleVal < MaxUInt64Value)
+                        {
+                            writer.WriteUInt64((ulong)doubleVal);
+                        }
+                        else
+                        {
+                            writer.WriteDouble(doubleVal);
+                        }
                     }
                     else
                     {
