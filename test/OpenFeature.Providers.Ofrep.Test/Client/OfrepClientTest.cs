@@ -104,6 +104,47 @@ public class OfrepClientTest : IDisposable
 
     #region EvaluateFlag Tests
 
+    [Theory]
+    [InlineData("https://api.example.com", "https://api.example.com/ofrep/v1/evaluate/flags/flag%2Fwith%20spaces")]
+    [InlineData("https://api.example.com/", "https://api.example.com/ofrep/v1/evaluate/flags/flag%2Fwith%20spaces")]
+    [InlineData("https://api.example.com/my-service", "https://api.example.com/my-service/ofrep/v1/evaluate/flags/flag%2Fwith%20spaces")]
+    [InlineData("https://api.example.com/my-service/", "https://api.example.com/my-service/ofrep/v1/evaluate/flags/flag%2Fwith%20spaces")]
+    [InlineData("https://api.example.com/gateway/my-service", "https://api.example.com/gateway/my-service/ofrep/v1/evaluate/flags/flag%2Fwith%20spaces")]
+    [InlineData("https://api.example.com/gateway/my-service/", "https://api.example.com/gateway/my-service/ofrep/v1/evaluate/flags/flag%2Fwith%20spaces")]
+    [InlineData("http://localhost:8080/service%20name", "http://localhost:8080/service%20name/ofrep/v1/evaluate/flags/flag%2Fwith%20spaces")]
+    [InlineData("https://api.example.com/my-service?query=value#fragment", "https://api.example.com/my-service/ofrep/v1/evaluate/flags/flag%2Fwith%20spaces")]
+    public async Task EvaluateFlag_WithBaseUrl_ShouldPreserveBasePath(string baseUrl, string expectedUrl)
+    {
+        const string flagKey = "flag/with spaces";
+        this._mockHandler.SetupResponse(HttpStatusCode.OK, "{\"value\":true}");
+        using var client = new OfrepClient(new OfrepOptions(baseUrl), this._mockHandler, this._mockLogger);
+
+        var result = await client.EvaluateFlag(flagKey, false, EvaluationContext.Empty);
+
+        Assert.True(result.Value);
+        var request = Assert.Single(this._mockHandler.Requests);
+        Assert.Equal(expectedUrl, request.RequestUri?.AbsoluteUri);
+        Assert.Equal(HttpMethod.Post, request.Method);
+    }
+
+    [Theory]
+    [InlineData("https://api.example.com", "https://api.example.com/ofrep/v1/evaluate/flags/test-flag")]
+    [InlineData("https://api.example.com/", "https://api.example.com/ofrep/v1/evaluate/flags/test-flag")]
+    [InlineData("https://api.example.com/gateway/my-service", "https://api.example.com/gateway/my-service/ofrep/v1/evaluate/flags/test-flag")]
+    [InlineData("https://api.example.com/gateway/my-service/", "https://api.example.com/gateway/my-service/ofrep/v1/evaluate/flags/test-flag")]
+    public async Task EvaluateFlag_WithProvidedHttpClient_ShouldPreserveBasePath(string baseUrl, string expectedUrl)
+    {
+        this._mockHandler.SetupResponse(HttpStatusCode.OK, "{\"value\":true}");
+        using var httpClient = new HttpClient(this._mockHandler) { BaseAddress = new Uri(baseUrl) };
+        using var client = new OfrepClient(httpClient, this._mockLogger);
+
+        var result = await client.EvaluateFlag("test-flag", false, EvaluationContext.Empty);
+
+        Assert.True(result.Value);
+        var request = Assert.Single(this._mockHandler.Requests);
+        Assert.Equal(expectedUrl, request.RequestUri?.AbsoluteUri);
+    }
+
     [Fact]
     public async Task EvaluateFlag_WithValidRequest_ShouldReturnSuccessResponse()
     {
