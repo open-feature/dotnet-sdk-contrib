@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Threading.Tasks;
-using OpenFeature.Providers.Flagd.Resolver.InProcess;
+using OpenFeature.Providers.Flagd.Core;
 using Xunit;
 
-namespace OpenFeature.Providers.Flagd.Test.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Core.Test;
 
 public class FlagdJsonSchemaEmbeddedResourceReaderTests
 {

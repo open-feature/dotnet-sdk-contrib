@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NJsonSchema;
 using NJsonSchema.Generation;
+using NJsonSchema.Validation;
+using OpenFeature.Error;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess;
+namespace OpenFeature.Providers.Flagd.Core;
 
 internal class JsonSchemaValidator : IJsonSchemaValidator
 {
@@ -60,7 +63,17 @@ internal class JsonSchemaValidator : IJsonSchemaValidator
     {
         if (_validator != null)
         {
-            var errors = _validator.Validate(configuration);
+            ICollection<ValidationError> errors;
+            try
+            {
+                errors = _validator.Validate(configuration);
+            }
+            catch (Newtonsoft.Json.JsonException ex)
+            {
+                // NJsonSchema parses with Newtonsoft.Json; don't leak that implementation detail to callers
+                throw new ParseErrorException($"Unable to parse flagd configuration: {ex.Message}", ex);
+            }
+
             if (errors.Count > 0)
             {
                 _logger.LogWarning("Validating Flagd configuration resulted in Schema Validation errors {Errors}",

@@ -7,6 +7,7 @@
   "src/OpenFeature.Contrib.Providers.Statsig": "0.1.1",
   "src/OpenFeature.Providers.ConfigCat": "1.0.0",
   "src/OpenFeature.Providers.Flagd": "0.7.3",
+  "src/OpenFeature.Providers.Flagd.Core": "1.0.0",
   "src/OpenFeature.Providers.GOFeatureFlag": "1.2.0",
   "src/OpenFeature.Providers.Ofrep": "0.1.6",
   "src/OpenFeature.Providers.Unleash": "0.1.1"

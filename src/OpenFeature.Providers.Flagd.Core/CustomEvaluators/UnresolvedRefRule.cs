@@ -2,7 +2,7 @@ using System;
 using System.Text.Json.Nodes;
 using Json.Logic;
 
-namespace OpenFeature.Providers.Flagd.Resolver.InProcess.CustomEvaluators;
+namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 
 /// <summary>
 /// Catch-all rule for unresolved $ref references.
