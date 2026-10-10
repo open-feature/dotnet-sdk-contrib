@@ -28,7 +28,7 @@
 [submodule "src/OpenFeature.Providers.Flagd/flagd-testbed"]
 	path = src/OpenFeature.Providers.Flagd/flagd-testbed
 	url = https://github.com/open-feature/flagd-testbed.git
-	branch = v3.10.2
+	branch = v3.10.3
 [submodule "src/OpenFeature.Providers.GOFeatureFlag/wasm-releases"]
 	path = src/OpenFeature.Providers.GOFeatureFlag/wasm-releases
 	url = https://github.com/go-feature-flag/wasm-releases.git
