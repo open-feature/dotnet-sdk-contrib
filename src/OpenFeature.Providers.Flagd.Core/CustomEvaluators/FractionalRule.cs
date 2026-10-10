@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Formats.Cbor;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Logic;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Murmur;
 
 namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
@@ -13,11 +15,19 @@ namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 internal sealed class FractionalEvaluator : IRule
 {
     private const int MaxWeight = int.MaxValue; // 2,147,483,647
+    private const double MaxInt64Value = 9223372036854775808d;
+    private const double MaxUInt64Value = 18446744073709551616d;
+    private readonly ILogger _logger;
 
     class FractionalEvaluationDistribution
     {
         public JsonNode variant;
         public int weight;
+    }
+
+    internal FractionalEvaluator(ILogger logger = null)
+    {
+        _logger = logger ?? NullLogger.Instance;
     }
 
     /// <inheritdoc/>
@@ -34,19 +44,37 @@ internal sealed class FractionalEvaluator : IRule
 
         var arg0 = JsonLogic.Apply(args[0], context);
 
-        string propertyValue;
-        if (arg0?.GetValueKind() == JsonValueKind.String)
+        JsonNode propertyValue;
+        var arg0Kind = arg0?.GetValueKind();
+
+        if (arg0 == null || arg0Kind == JsonValueKind.Null)
         {
-            propertyValue = arg0.ToString();
+            _logger.LogDebug("Invalid arguments for fractional targeting: first argument is null");
+            return null;
+        }
+        else if (arg0Kind == JsonValueKind.String
+            || arg0Kind == JsonValueKind.True
+            || arg0Kind == JsonValueKind.False
+            || arg0Kind == JsonValueKind.Number
+            || arg0Kind == JsonValueKind.Object)
+        {
+            propertyValue = arg0;
             bucketStartIndex = 1;
+        }
+        else if (args.AsArray().FirstOrDefault()?.GetValueKind() != JsonValueKind.Array)
+        {
+            _logger.LogDebug("Invalid arguments for fractional targeting: unsupported bucketing value");
+            return null;
         }
         else
         {
             if (string.IsNullOrWhiteSpace(flagdProperties.TargetingKey))
             {
+                _logger.LogDebug("Missing fallback targeting key");
                 return null;
             }
-            propertyValue = flagdProperties.FlagKey + flagdProperties.TargetingKey;
+            propertyValue = new JsonArray(flagdProperties.FlagKey, flagdProperties.TargetingKey);
+            bucketStartIndex = 0;
         }
 
         var distributions = new List<FractionalEvaluationDistribution>();
@@ -58,20 +86,20 @@ internal sealed class FractionalEvaluator : IRule
 
             if (bucketNode == null || bucketNode.GetValueKind() != JsonValueKind.Array)
             {
-                continue;
+                return null;
             }
 
             var bucketArr = bucketNode.AsArray();
 
             if (!bucketArr.Any())
             {
-                continue;
+                return null;
             }
 
             // resolve variant: accept string, number, bool, or null
-            var variantNode = bucketArr.ElementAt(0);
+            var variantNode = JsonLogic.Apply(bucketArr.ElementAt(0), context);
             JsonNode variant;
-            if (variantNode == null)
+            if (variantNode == null || variantNode.GetValueKind() == JsonValueKind.Null)
             {
                 variant = null;
             }
@@ -87,16 +115,15 @@ internal sealed class FractionalEvaluator : IRule
                 }
                 else
                 {
-                    // unsupported variant type (object, array); skip
-                    continue;
+                    // unsupported variant type (object, array)
+                    return null;
                 }
             }
-
             var weight = 1;
 
             if (bucketArr.Count >= 2)
             {
-                var weightNode = bucketArr.ElementAt(1);
+                var weightNode = JsonLogic.Apply(bucketArr.ElementAt(1), context);
                 if (weightNode != null && weightNode.GetValueKind() == JsonValueKind.Number)
                 {
                     var weightDouble = weightNode.GetValue<double>();
@@ -109,6 +136,11 @@ internal sealed class FractionalEvaluator : IRule
 
                     // negative weights can be the result of rollout calculations, so we clamp to 0 rather than returning an error
                     weight = (int)Math.Max(0, weightDouble);
+                }
+                else
+                {
+                    // weight is not a number
+                    return null;
                 }
             }
 
@@ -127,9 +159,18 @@ internal sealed class FractionalEvaluator : IRule
             return null;
         }
 
-        var valueToDistribute = propertyValue;
         var murmur32 = MurmurHash.Create32();
-        var bytes = Encoding.ASCII.GetBytes(valueToDistribute);
+        byte[] bytes;
+        try
+        {
+            bytes = EncodeNodeToCbor(propertyValue);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Failed to encode property value to CBOR for fractional evaluation");
+            return null;
+        }
+
         var hashBytes = murmur32.ComputeHash(bytes);
 
         // treat hash as unsigned 32-bit
@@ -151,5 +192,88 @@ internal sealed class FractionalEvaluator : IRule
         }
 
         return null;
+    }
+
+    private static byte[] EncodeNodeToCbor(JsonNode node)
+    {
+        var writer = new CborWriter(CborConformanceMode.Canonical);
+        WriteNode(writer, node);
+        return writer.Encode();
+    }
+
+    private static void WriteNode(CborWriter writer, JsonNode node)
+    {
+        if (node == null || node.GetValueKind() == JsonValueKind.Null)
+        {
+            writer.WriteNull();
+            return;
+        }
+
+        switch (node.GetValueKind())
+        {
+            case JsonValueKind.True:
+                writer.WriteBoolean(true);
+                break;
+            case JsonValueKind.False:
+                writer.WriteBoolean(false);
+                break;
+            case JsonValueKind.String:
+                writer.WriteTextString(node.GetValue<string>());
+                break;
+            case JsonValueKind.Number:
+                if (node.AsValue().TryGetValue<long>(out var longVal))
+                {
+                    writer.WriteInt64(longVal);
+                }
+                else if (node.AsValue().TryGetValue<ulong>(out var ulongVal))
+                {
+                    writer.WriteUInt64(ulongVal);
+                }
+                else
+                {
+                    var doubleVal = node.GetValue<double>();
+                    if (!double.IsInfinity(doubleVal) && doubleVal == Math.Floor(doubleVal))
+                    {
+                        if (doubleVal >= long.MinValue && doubleVal < MaxInt64Value)
+                        {
+                            writer.WriteInt64((long)doubleVal);
+                        }
+                        else if (doubleVal >= MaxInt64Value && doubleVal < MaxUInt64Value)
+                        {
+                            writer.WriteUInt64((ulong)doubleVal);
+                        }
+                        else
+                        {
+                            writer.WriteDouble(doubleVal);
+                        }
+                    }
+                    else
+                    {
+                        writer.WriteDouble(doubleVal);
+                    }
+                }
+                break;
+            case JsonValueKind.Array:
+                var arr = node.AsArray();
+                writer.WriteStartArray(arr.Count);
+                foreach (var item in arr)
+                {
+                    WriteNode(writer, item);
+                }
+                writer.WriteEndArray();
+                break;
+            case JsonValueKind.Object:
+                var obj = node.AsObject();
+                writer.WriteStartMap(obj.Count);
+                foreach (var kvp in obj)
+                {
+                    writer.WriteTextString(kvp.Key);
+                    WriteNode(writer, kvp.Value);
+                }
+                writer.WriteEndMap();
+                break;
+            default:
+                throw new ArgumentException($"Unsupported JsonValueKind: {node.GetValueKind()}");
+        }
     }
 }

@@ -8,6 +8,8 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Json.Logic;
 using Json.More;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using OpenFeature.Constant;
 using OpenFeature.Error;
 using OpenFeature.Model;
@@ -71,15 +73,17 @@ internal class JsonEvaluator
     public IReadOnlyDictionary<string, FlagConfiguration> Flags { get => _state.Flags; }
 
     private readonly IJsonSchemaValidator _schemaValidator;
+    private readonly ILogger _logger;
 
-    internal JsonEvaluator(IJsonSchemaValidator schemaValidator)
+    internal JsonEvaluator(IJsonSchemaValidator schemaValidator, ILogger logger = null)
     {
         _schemaValidator = schemaValidator;
+        _logger = logger ?? NullLogger.Instance;
 
         RuleRegistry.AddRule("starts_with", new StartsWithRule());
         RuleRegistry.AddRule("ends_with", new EndsWithRule());
         RuleRegistry.AddRule("sem_ver", new SemVerRule());
-        RuleRegistry.AddRule("fractional", new FractionalEvaluator());
+        RuleRegistry.AddRule("fractional", new FractionalEvaluator(_logger));
         RuleRegistry.AddRule("$ref", new UnresolvedRefRule());
     }
 
@@ -513,13 +517,30 @@ internal class JsonEvaluator
 
         foreach (var kvp in dictionary)
         {
-            expandoDict.Add(kvp.Key,
-                kvp.Value.IsStructure
-                    ? ConvertToDynamicObject(kvp.Value.AsStructure.AsDictionary())
-                    : kvp.Value.AsObject);
+            expandoDict.Add(kvp.Key, ConvertValue(kvp.Value));
         }
 
         return expandoObject;
+    }
+
+    static object ConvertValue(Value value)
+    {
+        if (value == null || value.IsNull)
+        {
+            return null;
+        }
+
+        if (value.IsStructure)
+        {
+            return ConvertToDynamicObject(value.AsStructure.AsDictionary());
+        }
+
+        if (value.IsList)
+        {
+            return value.AsList.Select(ConvertValue).ToList();
+        }
+
+        return value.AsObject;
     }
 
     static Value ConvertJsonObjectToOpenFeatureValue(JsonObject jsonValue)
