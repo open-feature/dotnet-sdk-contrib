@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.7](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.6...OpenFeature.Providers.Ofrep-v0.1.7) (2026-10-10)
+
+
+### 🐛 Bug Fixes
+
+* **ofrep:** preserve path prefixes in base URLs ([#755](https://github.com/open-feature/dotnet-sdk-contrib/issues/755)) ([929c438](https://github.com/open-feature/dotnet-sdk-contrib/commit/929c4386533c438eef1713735c65fec093c64455))
+
 ## [0.1.6](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Ofrep-v0.1.5...OpenFeature.Providers.Ofrep-v0.1.6) (2026-10-01)
 
 
