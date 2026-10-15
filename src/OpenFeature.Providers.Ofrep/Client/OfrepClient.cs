@@ -57,6 +57,7 @@ internal sealed partial class OfrepClient : IOfrepClient
 
         this._logger = logger ?? NullLogger<OfrepClient>.Instance;
         this._httpClient = httpClient;
+        EnsureBaseAddressTrailingSlash(this._httpClient);
         this._timeProvider = timeProvider ?? TimeProvider.System;
     }
 
@@ -90,6 +91,7 @@ internal sealed partial class OfrepClient : IOfrepClient
             BaseAddress = new Uri(configuration.BaseUrl),
             Timeout = configuration.Timeout
         };
+        EnsureBaseAddressTrailingSlash(this._httpClient);
 
         foreach (var header in configuration.Headers)
         {
@@ -451,6 +453,19 @@ internal sealed partial class OfrepClient : IOfrepClient
             Reason = Reason.Error,
             ErrorMessage = ex.Message
         };
+    }
+
+    private static void EnsureBaseAddressTrailingSlash(HttpClient httpClient)
+    {
+        var baseAddress = httpClient.BaseAddress;
+        if (baseAddress == null || baseAddress.AbsolutePath.EndsWith("/", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var builder = new UriBuilder(baseAddress);
+        builder.Path += "/";
+        httpClient.BaseAddress = builder.Uri;
     }
 
     private static HttpClientHandler CreateDefaultHandler()

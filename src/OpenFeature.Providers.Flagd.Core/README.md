@@ -1,15 +1,13 @@
 # flagd .NET Core
 
-The in-process [flagd](https://flagd.dev) flag evaluation engine for .NET.
+> **This is not an OpenFeature provider.** It's a library of common [flagd](https://flagd.dev) evaluation components, used internally by the [flagd provider](https://www.nuget.org/packages/OpenFeature.Providers.Flagd).
+>
+> If you want to evaluate flags with flagd (from a flagd service or a file), use [OpenFeature.Providers.Flagd](https://www.nuget.org/packages/OpenFeature.Providers.Flagd) instead; it installs the correct version of this package automatically. You only need to reference this package directly if you're building your own flagd implementation (e.g. a custom flagd-compatible provider or service).
 
 This package contains only the evaluation logic: parsing a flagd flag configuration and resolving flags against it,
 including targeting rules and the custom flagd operators (`fractional`, `sem_ver`, `starts_with`, `ends_with`) and
 shared `$evaluators`. It performs no I/O. Fetching, syncing and watching flag configurations is left to the
-concrete provider.
-
-If you want to evaluate flags from a flagd service or a file, use
-[OpenFeature.Providers.Flagd](https://www.nuget.org/packages/OpenFeature.Providers.Flagd) instead. Use this package when
-you are building your own flagd-compatible provider and want to reuse the evaluation engine.
+consumer.
 
 ## Requirements
 
