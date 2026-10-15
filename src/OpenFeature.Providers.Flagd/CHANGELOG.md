@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.4...OpenFeature.Providers.Flagd-v0.8.0) (2026-10-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* bucket on any context type; (fractional re-assignment) ([#748](https://github.com/open-feature/dotnet-sdk-contrib/issues/748))
+
+### ✨ New Features
+
+* bucket on any context type; (fractional re-assignment) ([#748](https://github.com/open-feature/dotnet-sdk-contrib/issues/748)) ([dc88359](https://github.com/open-feature/dotnet-sdk-contrib/commit/dc88359c603d8c2e198ffb2c6ba193c1a4e6ad96))
+
 ## [0.7.4](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.3...OpenFeature.Providers.Flagd-v0.7.4) (2026-10-14)
 
 
