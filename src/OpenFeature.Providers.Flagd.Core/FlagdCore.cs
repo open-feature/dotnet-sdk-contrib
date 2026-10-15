@@ -60,7 +60,7 @@ public sealed class FlagdCore
 
         _schemaValidator = schemaValidator
                            ?? new JsonSchemaValidator(options.Logger ?? NullLogger.Instance);
-        _evaluator = new JsonEvaluator(_schemaValidator);
+        _evaluator = new JsonEvaluator(_schemaValidator, options.Logger);
     }
 
     /// <summary>

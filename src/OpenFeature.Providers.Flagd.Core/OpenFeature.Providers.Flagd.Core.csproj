@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\build\Flagd.props" />
 
@@ -43,6 +43,7 @@
     <PackageReference Include="murmurhash" Version="1.0.3" />
     <PackageReference Include="NJsonSchema" Version="11.0.0" />
     <PackageReference Include="Semver" Version="3.0.0" />
+    <PackageReference Include="System.Formats.Cbor" Version="8.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="OpenFeature" Version="$(OpenFeatureVersion)" />
   </ItemGroup>
