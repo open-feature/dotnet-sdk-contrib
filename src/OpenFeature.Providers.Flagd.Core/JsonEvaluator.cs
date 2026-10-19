@@ -493,7 +493,7 @@ internal class JsonEvaluator
 
             if (foundVariantValue.ValueKind == JsonValueKind.Object || foundVariantValue.ValueKind == JsonValueKind.Array)
             {
-                var converted = ConvertJsonObjectToOpenFeatureValue(foundVariantValue.AsNode().AsObject());
+                var converted = ConvertJsonNodeToOpenFeatureValue(foundVariantValue.AsNode());
                 if (converted is T castValue)
                 {
                     return castValue;
@@ -543,38 +543,42 @@ internal class JsonEvaluator
         return value.AsObject;
     }
 
-    static Value ConvertJsonObjectToOpenFeatureValue(JsonObject jsonValue)
+    static Value ConvertJsonNodeToOpenFeatureValue(JsonNode jsonValue)
     {
-        var result = new Dictionary<string, Value>();
-
-        foreach (var property in jsonValue.AsEnumerable())
+        if (jsonValue == null)
         {
-            switch (property.Value.GetValueKind())
-            {
-                case JsonValueKind.String:
-                    result.Add(property.Key, new Value((string)property.Value));
-                    break;
-
-                case JsonValueKind.Number:
-                    result.Add(property.Key, new Value((long)property.Value));
-                    break;
-
-                case JsonValueKind.True:
-                case JsonValueKind.False:
-                    result.Add(property.Key, new Value((bool)property.Value));
-                    break;
-
-                case JsonValueKind.Object:
-                case JsonValueKind.Array:
-                    result.Add(property.Key, ConvertJsonObjectToOpenFeatureValue(property.Value.AsObject()));
-                    break;
-
-                default:
-                    // Handle unknown data type or throw an exception
-                    throw new InvalidOperationException($"Unsupported data type: {property.Value.GetType()}");
-            }
+            return new Value();
         }
 
-        return new Value(new Structure(result));
+        switch (jsonValue.GetValueKind())
+        {
+            case JsonValueKind.String:
+                return new Value((string)jsonValue);
+
+            case JsonValueKind.Number:
+                return new Value((double)jsonValue);
+
+            case JsonValueKind.True:
+            case JsonValueKind.False:
+                return new Value((bool)jsonValue);
+
+            case JsonValueKind.Null:
+                return new Value();
+
+            case JsonValueKind.Object:
+                var result = new Dictionary<string, Value>();
+                foreach (var property in jsonValue.AsObject())
+                {
+                    result.Add(property.Key, ConvertJsonNodeToOpenFeatureValue(property.Value));
+                }
+                return new Value(new Structure(result));
+
+            case JsonValueKind.Array:
+                return new Value(jsonValue.AsArray().Select(ConvertJsonNodeToOpenFeatureValue).ToList());
+
+            default:
+                // Handle unknown data type or throw an exception
+                throw new InvalidOperationException($"Unsupported data type: {jsonValue.GetType()}");
+        }
     }
 }
