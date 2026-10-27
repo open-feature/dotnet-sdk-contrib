@@ -43,7 +43,15 @@ public class InProcessResolverTests
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new InProcessResolver(mockGrpcClient, config, core);
-        resolver.ProviderEvent += (sender, evt) => flagdProviderEvent = evt;
+        // The mocked stream keeps returning the same configuration. Only the first sync changes flags, so keep
+        // that event: the later ones report no changed flags.
+        resolver.ProviderEvent += (sender, evt) =>
+        {
+            if (evt.EventType == Constant.ProviderEventTypes.ProviderConfigurationChanged)
+            {
+                Interlocked.CompareExchange(ref flagdProviderEvent, evt, null);
+            }
+        };
 
         // Act
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
