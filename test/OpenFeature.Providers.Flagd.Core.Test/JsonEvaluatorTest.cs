@@ -245,6 +245,28 @@ public class UnitTestJsonEvaluator
     }
 
     [Fact]
+    public void TestJsonEvaluatorObjectFlagWithArrayNullAndFractionalValues()
+    {
+        _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
+
+        var result = _jsonEvaluator.ResolveStructureValueAsync("complexObjectFlag", null);
+
+        var value = result.Value.AsStructure;
+        var list = value["list"].AsList;
+        Assert.Equal(5, list.Count);
+        Assert.Equal(1, list[0].AsInteger);
+        Assert.Equal("two", list[1].AsString);
+        Assert.True(list[2].AsBoolean);
+        Assert.True(list[3].IsNull);
+        Assert.Equal("v", list[4].AsStructure["k"].AsString);
+        Assert.True(value["nothing"].IsNull);
+        Assert.Equal(0.5, value["ratio"].AsDouble);
+        Assert.Equal(1.25, value["nested"].AsStructure["inner"].AsList[0].AsDouble);
+        Assert.Equal("obj1", result.Variant);
+        Assert.Equal(Reason.Static, result.Reason);
+    }
+
+    [Fact]
     public void TestJsonEvaluatorDisabledFlagReturnsDisabledReason()
     {
         _jsonEvaluator.Sync(FlagConfigurationUpdateType.ALL, Utils.flags);
