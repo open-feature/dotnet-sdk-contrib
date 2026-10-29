@@ -156,7 +156,8 @@ public sealed class FlagdProvider : FeatureProvider
                         this.EventChannel.Writer.TryWrite(new ProviderEventPayload
                         {
                             Type = ProviderEventTypes.ProviderConfigurationChanged,
-                            ProviderName = this._providerMetadata.Name
+                            ProviderName = this._providerMetadata.Name,
+                            FlagsChanged = new List<string>(payload.FlagsChanged)
                         });
 
                         break;

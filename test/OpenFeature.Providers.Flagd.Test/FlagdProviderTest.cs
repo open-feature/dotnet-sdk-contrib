@@ -938,6 +938,7 @@ public class UnitTestFlagdProvider
         Assert.NotNull(providerEvent);
         Assert.Equal(ProviderEventTypes.ProviderConfigurationChanged, providerEvent.Type);
         Assert.Equal("flagd Provider", providerEvent.ProviderName);
+        Assert.Equal(flagsChanged2, providerEvent.FlagsChanged);
     }
 
     [Fact]
