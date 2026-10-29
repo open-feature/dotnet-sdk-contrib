@@ -77,6 +77,18 @@ public class Utils
       },
       ""defaultVariant"": ""obj1""
     },
+        ""complexObjectFlag"": {
+      ""state"": ""ENABLED"",
+      ""variants"": {
+        ""obj1"": {
+          ""list"": [1, ""two"", true, null, { ""k"": ""v"" }],
+          ""nothing"": null,
+          ""ratio"": 0.5,
+          ""nested"": { ""inner"": [1.25] }
+        }
+      },
+      ""defaultVariant"": ""obj1""
+    },
         ""targetingBoolFlag"": {
       ""state"": ""ENABLED"",
       ""variants"": {
