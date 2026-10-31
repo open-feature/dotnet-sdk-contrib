@@ -1,4 +1,6 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -43,7 +45,15 @@ public class InProcessResolverTests
 
         FlagdProviderEvent flagdProviderEvent = null;
         var resolver = new InProcessResolver(mockGrpcClient, config, core);
-        resolver.ProviderEvent += (sender, evt) => flagdProviderEvent = evt;
+        // The mocked stream keeps returning the same configuration. Only the first sync changes flags, so keep
+        // that event: the later ones report no changed flags.
+        resolver.ProviderEvent += (sender, evt) =>
+        {
+            if (evt.EventType == Constant.ProviderEventTypes.ProviderConfigurationChanged)
+            {
+                Interlocked.CompareExchange(ref flagdProviderEvent, evt, null);
+            }
+        };
 
         // Act
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -56,6 +66,65 @@ public class InProcessResolverTests
         Assert.Equal(Constant.ProviderEventTypes.ProviderConfigurationChanged, flagdProviderEvent.EventType);
         Assert.Contains("validFlag", flagdProviderEvent.FlagsChanged);
         Assert.Contains("source-selector-value", flagdProviderEvent.SyncMetadata["source-selector"].AsString);
+
+        await resolver.Shutdown();
+    }
+
+    [Fact]
+    public async Task HandleEvents_ReportsOnlyTheFlagsASyncChanged()
+    {
+        // Arrange
+        const string flagB = @"""flagB"": { ""state"": ""ENABLED"", ""variants"": { ""on"": true, ""off"": false }, ""defaultVariant"": ""{0}"" }";
+        const string flagA = @"""flagA"": { ""state"": ""ENABLED"", ""variants"": { ""on"": true, ""off"": false }, ""defaultVariant"": ""on"" }";
+        var responses = new[]
+        {
+            new SyncFlagsResponse() { FlagConfiguration = "{ \"flags\": { " + flagA + ", " + flagB.Replace("{0}", "on") + " } }" },
+            // Only flagB changes.
+            new SyncFlagsResponse() { FlagConfiguration = "{ \"flags\": { " + flagA + ", " + flagB.Replace("{0}", "off") + " } }" },
+        };
+
+        var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();
+        var asyncStreamReader = Substitute.For<IAsyncStreamReader<SyncFlagsResponse>>();
+        var index = -1;
+        asyncStreamReader.MoveNext(Arg.Any<CancellationToken>()).Returns(callInfo =>
+        {
+            if (Interlocked.Increment(ref index) < responses.Length)
+            {
+                return Task.FromResult(true);
+            }
+            // Keep the stream open after the two syncs, as flagd does, until the resolver shuts down.
+            return Task.Delay(Timeout.Infinite, callInfo.Arg<CancellationToken>())
+                .ContinueWith(_ => false, TaskScheduler.Default);
+        });
+        asyncStreamReader.Current.Returns(_ => responses[Volatile.Read(ref index)]);
+        var grpcEventStreamResp = new AsyncServerStreamingCall<SyncFlagsResponse>(asyncStreamReader, null, null, null, null, null);
+        mockGrpcClient.SyncFlags(Arg.Any<SyncFlagsRequest>(), Arg.Any<Grpc.Core.Metadata>(), null, Arg.Any<CancellationToken>()).Returns(grpcEventStreamResp);
+
+        var config = FlagdConfig.Builder()
+            .WithMaxEventStreamRetries(1)
+            .Build();
+
+        var events = new ConcurrentQueue<FlagdProviderEvent>();
+        var resolver = new InProcessResolver(mockGrpcClient, config, new FlagdCore());
+        resolver.ProviderEvent += (sender, evt) =>
+        {
+            if (evt.EventType == Constant.ProviderEventTypes.ProviderConfigurationChanged)
+            {
+                events.Enqueue(evt);
+            }
+        };
+
+        // Act
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+        resolver.Init();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
+        // Assert
+        await Utils.AssertUntilAsync((ct) => { Assert.Equal(2, events.Count); return Task.CompletedTask; });
+
+        var received = events.ToArray();
+        Assert.Equal(new[] { "flagA", "flagB" }, received[0].FlagsChanged.OrderBy(key => key));
+        Assert.Equal(new[] { "flagB" }, received[1].FlagsChanged);
 
         await resolver.Shutdown();
     }

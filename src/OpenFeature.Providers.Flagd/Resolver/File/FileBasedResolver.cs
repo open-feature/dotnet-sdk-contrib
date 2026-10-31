@@ -228,9 +228,9 @@ internal class FileBasedResolver : Resolver
 
         try
         {
-            _core.SetConfigurations(flagJson);
+            var changedFlags = _core.SetConfigurations(flagJson);
             _logger?.LogInformation("Flags were loaded successfully from file '{FilePath}'", _filePath);
-            return new List<string>(_core.GetFlagKeys());
+            return new List<string>(changedFlags);
         }
         catch (Exception ex)
         {

@@ -289,6 +289,69 @@ public class FileBasedResolverTests : IDisposable
     }
 
     [Fact]
+    public async Task FileChange_ReportsOnlyChangedFlagKeys()
+    {
+        // Arrange
+        var initialConfig = @"{
+            ""flags"": {
+                ""changedFlag"": {
+                    ""state"": ""ENABLED"",
+                    ""variants"": { ""on"": true, ""off"": false },
+                    ""defaultVariant"": ""on""
+                },
+                ""unchangedFlag"": {
+                    ""state"": ""ENABLED"",
+                    ""variants"": { ""on"": true, ""off"": false },
+                    ""defaultVariant"": ""on""
+                }
+            }
+        }";
+        var filePath = CreateTempFlagFile(initialConfig);
+        var core = new FlagdCore();
+        var resolver = new FileBasedResolver(_logger, filePath, core,
+            useHashFileChangeDetection: false,
+            waitForFileReadyInterval: TimeSpan.FromSeconds(5),
+            fileChangePollingInterval: TimeSpan.FromMilliseconds(200));
+
+        FlagdProviderEvent configChangedEvent = null;
+        resolver.ProviderEvent += (sender, evt) =>
+        {
+            if (evt.EventType == ProviderEventTypes.ProviderConfigurationChanged)
+                configChangedEvent = evt;
+        };
+
+        await resolver.Init();
+
+        // Act - change the default variant of one flag only
+        var updatedConfig = @"{
+            ""flags"": {
+                ""changedFlag"": {
+                    ""state"": ""ENABLED"",
+                    ""variants"": { ""on"": true, ""off"": false },
+                    ""defaultVariant"": ""off""
+                },
+                ""unchangedFlag"": {
+                    ""state"": ""ENABLED"",
+                    ""variants"": { ""on"": true, ""off"": false },
+                    ""defaultVariant"": ""on""
+                }
+            }
+        }";
+        System.IO.File.WriteAllText(filePath, updatedConfig);
+
+        // Assert
+        await Utils.AssertUntilAsync(async (ct) =>
+        {
+            Assert.NotNull(configChangedEvent);
+            Assert.Contains("changedFlag", configChangedEvent.FlagsChanged);
+            Assert.DoesNotContain("unchangedFlag", configChangedEvent.FlagsChanged);
+            await Task.CompletedTask;
+        }, timeoutMillis: 5000);
+
+        await resolver.Shutdown();
+    }
+
+    [Fact]
     public async Task FileChange_WithHashWatcher_RaisesProviderConfigurationChangedEvent()
     {
         // Arrange

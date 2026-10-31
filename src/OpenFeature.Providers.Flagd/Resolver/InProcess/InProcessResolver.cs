@@ -136,7 +136,7 @@ internal class InProcessResolver : Resolver
                 while (!token.IsCancellationRequested && await call.ResponseStream.MoveNext(token).ConfigureAwait(false))
                 {
                     var response = call.ResponseStream.Current;
-                    this._core.SetConfigurations(response.FlagConfiguration);
+                    var changedFlags = this._core.SetConfigurations(response.FlagConfiguration);
 
                     tcs.TrySetResult(true);
 
@@ -152,7 +152,7 @@ internal class InProcessResolver : Resolver
                         }
                     }
 
-                    var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(this._core.GetFlagKeys()), metadata.Build());
+                    var flagdEvent = new FlagdProviderEvent(ProviderEventTypes.ProviderConfigurationChanged, new List<string>(changedFlags), metadata.Build());
                     ProviderEvent?.Invoke(this, flagdEvent);
                 }
             }
