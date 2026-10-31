@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.8.0...OpenFeature.Providers.Flagd-v0.8.1) (2026-10-31)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** report only changed flag keys in configuration change events ([#766](https://github.com/open-feature/dotnet-sdk-contrib/issues/766)) ([c4fcbbe](https://github.com/open-feature/dotnet-sdk-contrib/commit/c4fcbbed833a957b00e715a7ff6dceebe91c34ba))
+
 ## [0.8.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.7.4...OpenFeature.Providers.Flagd-v0.8.0) (2026-10-15)
 
 
