@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd.Core-v2.0.0...OpenFeature.Providers.Flagd.Core-v2.0.1) (2026-11-11)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** support arrays, nulls and fractional numbers in object flag values ([#764](https://github.com/open-feature/dotnet-sdk-contrib/issues/764)) ([3e2c912](https://github.com/open-feature/dotnet-sdk-contrib/commit/3e2c912e01f9327bb4af4a0f3710698d02e21569))
+* **security:** update dependency system.formats.cbor to 8.0.2 [security] ([#775](https://github.com/open-feature/dotnet-sdk-contrib/issues/775)) ([7814e00](https://github.com/open-feature/dotnet-sdk-contrib/commit/7814e004a962ecddc22c331bcb0bf65e723dc705))
+
 ## [2.0.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd.Core-v1.0.0...OpenFeature.Providers.Flagd.Core-v2.0.0) (2026-10-15)
 
 
