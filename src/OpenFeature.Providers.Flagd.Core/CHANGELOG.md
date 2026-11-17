@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd.Core-v2.0.1...OpenFeature.Providers.Flagd.Core-v2.0.2) (2026-11-17)
+
+
+### 🐛 Bug Fixes
+
+* **security:** evaluate fractional buckets only once ([20d703a](https://github.com/open-feature/dotnet-sdk-contrib/commit/20d703a92191839adeec15a3be3ffc83a247936c))
+
 ## [2.0.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd.Core-v2.0.0...OpenFeature.Providers.Flagd.Core-v2.0.1) (2026-11-11)
 
 
