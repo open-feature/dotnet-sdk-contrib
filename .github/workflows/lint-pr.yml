@@ -1,12 +1,8 @@
 name: "Lint PR"
 
 on:
-  # `pull_request_target` never fires for the merge queue, so a required `Validate PR title`
-  # context would stay pending forever and deadlock the queue. Triggering on `merge_group`
-  # and skipping the work reports the check without re-linting a title that was already
-  # validated on the pull request.
   merge_group:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
