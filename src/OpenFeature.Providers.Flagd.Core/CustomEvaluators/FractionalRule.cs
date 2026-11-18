@@ -23,6 +23,7 @@ internal sealed class FractionalEvaluator : IRule
     {
         public JsonNode variant;
         public int weight;
+        public ResolveResult resolveResult;
     }
 
     internal FractionalEvaluator(ILogger logger = null)
@@ -97,9 +98,10 @@ internal sealed class FractionalEvaluator : IRule
                 return null;
             }
 
-            // resolve variant: accept string, number, bool, or null
+            // resolve variant: accept string, number, bool, null, or a resolve result
             var variantNode = bucketArr.ElementAt(0);
             JsonNode variant;
+            ResolveResult bucketResolveResult = null;
             if (variantNode == null || variantNode.GetValueKind() == JsonValueKind.Null)
             {
                 variant = null;
@@ -108,6 +110,17 @@ internal sealed class FractionalEvaluator : IRule
             {
                 var kind = variantNode.GetValueKind();
                 if (kind == JsonValueKind.String
+                    && variantNode.GetValue<string>() == ResolveRule.Sentinel)
+                {
+                    // capture now, the next bucket's resolve would overwrite it
+                    bucketResolveResult = ResolveRule.ConsumePendingResult();
+                    if (bucketResolveResult == null)
+                    {
+                        return null;
+                    }
+                    variant = variantNode;
+                }
+                else if (kind == JsonValueKind.String
                     || kind == JsonValueKind.Number
                     || kind == JsonValueKind.True
                     || kind == JsonValueKind.False)
@@ -148,7 +161,8 @@ internal sealed class FractionalEvaluator : IRule
             distributions.Add(new FractionalEvaluationDistribution
             {
                 variant = variant,
-                weight = weight
+                weight = weight,
+                resolveResult = bucketResolveResult
             });
 
             totalWeight += weight;
@@ -188,6 +202,11 @@ internal sealed class FractionalEvaluator : IRule
             rangeEnd += (ulong)dist.weight;
             if (bucket < rangeEnd)
             {
+                if (dist.resolveResult != null)
+                {
+                    ResolveRule.SetPendingResult(dist.resolveResult);
+                    return JsonValue.Create(ResolveRule.Sentinel);
+                }
                 return dist.variant;
             }
         }

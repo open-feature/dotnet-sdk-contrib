@@ -84,6 +84,7 @@ internal class JsonEvaluator
         RuleRegistry.AddRule("ends_with", new EndsWithRule());
         RuleRegistry.AddRule("sem_ver", new SemVerRule());
         RuleRegistry.AddRule("fractional", new FractionalEvaluator(_logger));
+        RuleRegistry.AddRule("resolve", new ResolveRule(_logger));
         RuleRegistry.AddRule("$ref", new UnresolvedRefRule());
     }
 
@@ -368,6 +369,8 @@ internal class JsonEvaluator
 
                 // convert whatever is returned to a string to try to use it as an index to Variants
                 JsonNode ruleResult;
+                // clear anything a previous evaluation on this thread left behind (e.g. it threw mid-rule)
+                ResolveRule.ConsumePendingResult();
                 try
                 {
                     ruleResult = JsonLogic.Apply(rule, contextObj);
@@ -378,9 +381,29 @@ internal class JsonEvaluator
                         $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.", ex);
                 }
 
+                // a resolve evaluated in a non-terminal position also sets a pending result, so only trust it when the rule returned the sentinel
+                var resolveResult = ResolveRule.ConsumePendingResult();
+                if (ruleResult?.GetValueKind() != JsonValueKind.String || ruleResult.GetValue<string>() != ResolveRule.Sentinel)
+                {
+                    resolveResult = null;
+                }
+
                 if (ruleResult == null || ruleResult.GetValueKind() == JsonValueKind.Null)
                 {
                     variant = null;
+                }
+                else if (resolveResult != null)
+                {
+                    variant = resolveResult.Variant;
+                    reason = resolveResult.Reason ?? Reason.TargetingMatch;
+                    if (resolveResult.Metadata != null)
+                    {
+                        foreach (var kvp in resolveResult.Metadata)
+                        {
+                            combinedMetadata[kvp.Key] = kvp.Value;
+                        }
+                        flagMetadata = new ImmutableMetadata(combinedMetadata);
+                    }
                 }
                 else
                 {
