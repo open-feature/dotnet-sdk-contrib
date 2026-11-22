@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Auto Assign Owners
     steps:
-      - uses: dyladan/component-owners@7ff2b343629407c4dbe1c28ae66f55f723543d2b
+      - uses: dyladan/component-owners@d66f135510221a6915c8e27263e8b1c4a08b2d1c
         with:
           config-file: .github/component_owners.yml
           repo-token: ${{ secrets.GITHUB_TOKEN }}
