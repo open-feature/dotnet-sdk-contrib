@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.GOFeatureFlag-v1.3.0...OpenFeature.Providers.GOFeatureFlag-v1.4.0) (2026-11-17)
+
+
+### ✨ New Features
+
+* **go-feature-flag:** bump WASM to 0.3.1 ([#780](https://github.com/open-feature/dotnet-sdk-contrib/issues/780)) ([d1b3f58](https://github.com/open-feature/dotnet-sdk-contrib/commit/d1b3f5853e30f2f4d2bf7315a52b8fda9c066414))
+
 ## [1.3.0](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.GOFeatureFlag-v1.2.0...OpenFeature.Providers.GOFeatureFlag-v1.3.0) (2026-11-03)
 
 

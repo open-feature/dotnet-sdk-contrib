@@ -82,6 +82,7 @@ internal sealed class FractionalEvaluator : IRule
 
         for (var i = bucketStartIndex; i < args.AsArray().Count; i++)
         {
+            // evaluated once; the elements are data and must not be applied again
             var bucketNode = JsonLogic.Apply(args[i], context);
 
             if (bucketNode == null || bucketNode.GetValueKind() != JsonValueKind.Array)
@@ -97,7 +98,7 @@ internal sealed class FractionalEvaluator : IRule
             }
 
             // resolve variant: accept string, number, bool, or null
-            var variantNode = JsonLogic.Apply(bucketArr.ElementAt(0), context);
+            var variantNode = bucketArr.ElementAt(0);
             JsonNode variant;
             if (variantNode == null || variantNode.GetValueKind() == JsonValueKind.Null)
             {
@@ -123,7 +124,7 @@ internal sealed class FractionalEvaluator : IRule
 
             if (bucketArr.Count >= 2)
             {
-                var weightNode = JsonLogic.Apply(bucketArr.ElementAt(1), context);
+                var weightNode = bucketArr.ElementAt(1);
                 if (weightNode != null && weightNode.GetValueKind() == JsonValueKind.Number)
                 {
                     var weightDouble = weightNode.GetValue<double>();
