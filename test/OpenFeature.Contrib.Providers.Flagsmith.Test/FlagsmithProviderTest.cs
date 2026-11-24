@@ -66,7 +66,7 @@ public class UnitTestFlagsmithProvider
         var date = DateTime.Now;
         flags.GetFeatureValue("example-feature").Returns("true");
         flags.IsFeatureEnabled("example-feature").Returns(true);
-        flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count > 6 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
+        flagsmithClient.GetIdentityFlags("233", Arg.Is<List<ITrait>>(x => x.Count == 6 && x.Any(c => c.GetTraitKey() == "key1"))).Returns(flags);
 
         var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
         var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
@@ -89,6 +89,32 @@ public class UnitTestFlagsmithProvider
         Assert.Equal(ErrorType.None, result.ErrorType);
     }
 
+    [Fact]
+    public async Task GetValue_ForEvaluationContextWithTargetingKey_DoesNotSendTargetingKeyAsTrait()
+    {
+        // Arrange
+        var flagsmithClient = Substitute.For<IFlagsmithClient>();
+        var flags = Substitute.For<IFlags>();
+        flags.GetFeatureValue("example-feature").Returns("true");
+        flags.IsFeatureEnabled("example-feature").Returns(true);
+        flagsmithClient.GetIdentityFlags("233", Arg.Any<List<ITrait>>()).Returns(flags);
+
+        var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+        var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
+
+        var context = EvaluationContext.Builder()
+            .Set("key1", "value")
+            .SetTargetingKey("233")
+            .Build();
+
+        // Act
+        await flagsmithProvider.ResolveBooleanValueAsync("example-feature", false, context);
+
+        // Assert
+        await flagsmithClient.Received(1).GetIdentityFlags(
+            "233",
+            Arg.Is<List<ITrait>>(traits => traits.Count == 1 && traits.Single().GetTraitKey() == "key1"));
+    }
 
     [Theory]
     [InlineData(true, true, "true", true, null, true)]
@@ -108,10 +134,10 @@ public class UnitTestFlagsmithProvider
     [InlineData(false, true, "false", false, "DISABLED", false)]
     [InlineData(true, false, "false", false, null, false)]
     [InlineData(false, false, "false", false, null, false)]
-    public async Task GetBooleanValueAsync_ForEnabledFeatureWithValidFormatAndSettedConfigValue_ReturnExpectedResult(
+    public async Task GetBooleanValueAsync_ForEnabledFeatureWithValidFormatAndConfiguredFeatureValue_ReturnExpectedResult(
         bool defaultValue,
         bool enabledValueConfig,
-        string settedValue,
+        string featureValue,
         bool featureEnabled,
         string expectedReason,
         bool expectedResult)
@@ -119,7 +145,7 @@ public class UnitTestFlagsmithProvider
         // Arrange
         var flagsmithClient = Substitute.For<IFlagsmithClient>();
         var flags = Substitute.For<IFlags>();
-        flags.GetFeatureValue("example-feature").Returns(settedValue);
+        flags.GetFeatureValue("example-feature").Returns(featureValue);
         flags.IsFeatureEnabled("example-feature").Returns(featureEnabled);
         flagsmithClient.GetEnvironmentFlags().Returns(flags);
         var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
@@ -431,6 +457,36 @@ public class UnitTestFlagsmithProvider
         Assert.Equal("example-feature", result.FlagKey);
         Assert.Equal(Reason.Disabled, result.Reason);
         Assert.Equal(ErrorType.None, result.ErrorType);
+    }
+
+    [Theory]
+    [InlineData("1e400")]
+    [InlineData("-1e400")]
+    [InlineData("{ \"huge\": 1e400 }")]
+    [InlineData("[1e400]")]
+    public async Task GetStructureValueAsync_ForNumberOutsideDoubleRange_DoesNotLeakParsingException(string featureValue)
+    {
+        // Arrange
+        var flagsmithClient = Substitute.For<IFlagsmithClient>();
+        var flags = Substitute.For<IFlags>();
+        flags.GetFeatureValue("example-feature").Returns(featureValue);
+        flags.IsFeatureEnabled("example-feature").Returns(true);
+        flagsmithClient.GetEnvironmentFlags().Returns(flags);
+
+        var defaultObject = new Value("default");
+        var providerConfig = GetDefaultFlagsmithProviderConfigurationConfiguration();
+        var flagsmithProvider = new FlagsmithProvider(providerConfig, flagsmithClient);
+
+        // Act
+        var exception = await Record.ExceptionAsync(() => flagsmithProvider.ResolveStructureValueAsync("example-feature", defaultObject));
+
+        // Assert
+        // The runtime decides whether such a number is representable: the modern targets widen it to
+        // infinity, while JsonElement.GetDouble throws FormatException on .NET Framework. Either way
+        // the provider must surface a TypeMismatchException rather than the raw parsing exception.
+        Assert.True(
+            exception is null or TypeMismatchException,
+            $"Expected no exception or TypeMismatchException, but got {exception?.GetType().FullName}");
     }
 
     [Fact]
