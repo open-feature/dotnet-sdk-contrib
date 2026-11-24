@@ -369,23 +369,23 @@ internal class JsonEvaluator
 
                 // convert whatever is returned to a string to try to use it as an index to Variants
                 JsonNode ruleResult;
-                // clear anything a previous evaluation on this thread left behind (e.g. it threw mid-rule)
-                ResolveRule.ConsumePendingResult();
+                ResolveResult resolveResult;
+                // clear anything a previous evaluation on this thread left behind
+                ResolveRule.Reset();
                 try
                 {
                     ruleResult = JsonLogic.Apply(rule, contextObj);
+                    // only the rule's own result counts; a resolve evaluated elsewhere in the rule is ignored
+                    ResolveRule.TryGetResult(ruleResult, out resolveResult);
                 }
                 catch (Exception ex)
                 {
                     throw new FeatureProviderException(ErrorType.ParseError,
                         $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.", ex);
                 }
-
-                // a resolve evaluated in a non-terminal position also sets a pending result, so only trust it when the rule returned the sentinel
-                var resolveResult = ResolveRule.ConsumePendingResult();
-                if (ruleResult?.GetValueKind() != JsonValueKind.String || ruleResult.GetValue<string>() != ResolveRule.Sentinel)
+                finally
                 {
-                    resolveResult = null;
+                    ResolveRule.Reset();
                 }
 
                 if (ruleResult == null || ruleResult.GetValueKind() == JsonValueKind.Null)
@@ -394,6 +394,11 @@ internal class JsonEvaluator
                 }
                 else if (resolveResult != null)
                 {
+                    if (string.IsNullOrEmpty(resolveResult.Variant))
+                    {
+                        throw new FeatureProviderException(ErrorType.General,
+                            $"TARGETING_MATCH_ERROR: flag '{flagKey}' targeting resolved to an empty variant.");
+                    }
                     variant = resolveResult.Variant;
                     reason = resolveResult.Reason ?? Reason.TargetingMatch;
                     if (resolveResult.Metadata != null)

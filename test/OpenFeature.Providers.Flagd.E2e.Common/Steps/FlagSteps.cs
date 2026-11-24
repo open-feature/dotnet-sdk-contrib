@@ -122,6 +122,29 @@ public class FlagSteps
         }
     }
 
+    [Then("the variant should be {string}")]
+    public void ThenTheVariantShouldBe(string variant)
+    {
+        switch (this._state.Flag!.Type)
+        {
+            case FlagType.Integer:
+                this.AssertOnDetails<int>(r => Assert.Equal(variant, r.Variant));
+                break;
+            case FlagType.Float:
+                this.AssertOnDetails<double>(r => Assert.Equal(variant, r.Variant));
+                break;
+            case FlagType.String:
+                this.AssertOnDetails<string>(r => Assert.Equal(variant, r.Variant));
+                break;
+            case FlagType.Boolean:
+                this.AssertOnDetails<bool>(r => Assert.Equal(variant, r.Variant));
+                break;
+            default:
+                Assert.Fail("FlagType not yet supported.");
+                break;
+        }
+    }
+
     [Then("the variant should be null")]
     public void ThenTheVariantShouldBeNull()
     {

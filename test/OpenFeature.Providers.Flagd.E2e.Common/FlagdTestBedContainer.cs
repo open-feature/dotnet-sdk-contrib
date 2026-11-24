@@ -17,6 +17,9 @@ public class FlagdTestBedContainer
             .WithPortBinding(8016, true)
             .WithPortBinding(8080, true)
             .WithResourceMapping(new DirectoryInfo("./flags"), "/flags")
+            // drop these two mappings once version.txt points at a release that bundles resolve
+            .WithResourceMapping(new FileInfo("./flags/resolve-flags.json"), "/rawflags/")
+            .WithResourceMapping(new FileInfo("./launchpad-configs/resolve.json"), "/configs/")
             .WithWaitStrategy(
                 Wait.ForUnixContainer()
                     .AddCustomWaitStrategy(new FlagdHealthWaitStrategy())
