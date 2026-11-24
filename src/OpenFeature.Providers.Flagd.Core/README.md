@@ -12,6 +12,7 @@ consumer.
 ## Requirements
 
 - open-feature/dotnet-sdk v2.9.0 or later, below v3.0.0
+- `JsonLogic` 5.x, `JsonPointer.Net` 6.x and `Json.More.Net` 2.x (the last MIT-licensed versions; later versions are distributed under the [OSMF EULA](https://opensourcemaintenancefee.org/)). Projects that also depend on newer versions of these (e.g. via `JsonSchema.Net` 9.x+) may see restore warnings or conflicts.
 
 ## Install
 

@@ -39,7 +39,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonLogic" Version="[6.0.2]" />
+    <!-- json-everything 6.x/7.x/3.x binaries are not MIT licensed (OSMF EULA) -->
+    <PackageReference Include="Json.More.Net" Version="[2.2.0, 3.0.0)" />
+    <PackageReference Include="JsonLogic" Version="[5.5.0]" />
+    <PackageReference Include="JsonPointer.Net" Version="[6.0.0, 7.0.0)" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
     <PackageReference Include="NJsonSchema" Version="11.0.0" />
     <PackageReference Include="Semver" Version="3.0.0" />
