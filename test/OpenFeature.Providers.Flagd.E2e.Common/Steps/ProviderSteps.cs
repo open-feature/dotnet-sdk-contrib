@@ -67,11 +67,6 @@ public class ProviderSteps
                     config = "sync-payload";
                     break;
                 }
-            case "resolve":
-                {
-                    config = "resolve";
-                    break;
-                }
             default:
                 throw new NotImplementedException("Provider type not supported.");
         }
