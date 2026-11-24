@@ -5,6 +5,7 @@ The flagd Flag provider allows you to connect to your flagd instance.
 ## Requirements
 
 - open-feature/dotnet-sdk v2.0.0 > v3.0.0
+- see [flagd .NET Core requirements](../OpenFeature.Providers.Flagd.Core/README.md#requirements) for JSON Logic dependency constraints
 
 ## Install dependencies
 
