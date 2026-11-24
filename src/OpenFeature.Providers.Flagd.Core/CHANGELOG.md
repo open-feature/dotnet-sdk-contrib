@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd.Core-v2.0.2...OpenFeature.Providers.Flagd.Core-v2.0.3) (2026-11-24)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** pin json-everything deps to MIT-licensed versions ([#785](https://github.com/open-feature/dotnet-sdk-contrib/issues/785)) ([90f27de](https://github.com/open-feature/dotnet-sdk-contrib/commit/90f27de82d74129947a4e4fa028701bed3fc4de4))
+
 ## [2.0.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd.Core-v2.0.1...OpenFeature.Providers.Flagd.Core-v2.0.2) (2026-11-17)
 
 
