@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.2](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.8.1...OpenFeature.Providers.Flagd-v0.8.2) (2026-11-24)
+
+
+### 🐛 Bug Fixes
+
+* **flagd:** require latest flagd core ([#787](https://github.com/open-feature/dotnet-sdk-contrib/issues/787)) ([2f4be2e](https://github.com/open-feature/dotnet-sdk-contrib/commit/2f4be2e3d8891dbb8c3b15318ef26a98c0ca35b4))
+
 ## [0.8.1](https://github.com/open-feature/dotnet-sdk-contrib/compare/OpenFeature.Providers.Flagd-v0.8.0...OpenFeature.Providers.Flagd-v0.8.1) (2026-11-17)
 
 
