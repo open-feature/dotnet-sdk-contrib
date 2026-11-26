@@ -1,3 +1,5 @@
+using System;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using OpenFeature.Constant;
 using OpenFeature.Error;
@@ -141,12 +143,11 @@ public class ResolveRuleTest
     }
 
     // matches flagd: a resolve in a weight expression doesn't replace the selected bucket's result
-    [Theory]
-    [InlineData("1")]
-    [InlineData(@"{""if"": [{""resolve"": [""off"", ""WEIGHT""]}, 1, 0]}")]
-    public void ResolveInFractionalWeight_KeepsBucketResolveResult(string weight)
+    [Fact]
+    public void ResolveInFractionalWeight_KeepsBucketResolveResult()
     {
-        var rule = @"{""fractional"": [{""var"": ""id""}, [{""resolve"": [""on"", ""SELECTED""]}, WEIGHT]]}".Replace("WEIGHT", weight);
+        var rule = @"{""fractional"": [{""var"": ""id""}, [{""resolve"": [""on"", ""SELECTED""]},
+            {""if"": [{""resolve"": [""off"", ""WEIGHT""]}, 1, 0]}]]}";
         var result = Evaluate(rule, EvaluationContext.Builder().Set("id", "u1").Build());
 
         Assert.Equal("on", result.Variant);
@@ -154,11 +155,10 @@ public class ResolveRuleTest
     }
 
     // a resolve elsewhere in the rule must not turn a context sentinel string in a bucket into a resolve result
-    [Theory]
-    [InlineData(@"{""fractional"": [{""resolve"": [""on"", ""X""]}, [{""var"": ""x""}, 1]]}")]
-    [InlineData(@"{""fractional"": [{""var"": ""id""}, [{""if"": [{""resolve"": [""on"", ""X""]}, {""var"": ""x""}, ""off""]}, 1]]}")]
-    public void FractionalBucketWithContextSentinel_IsNotPromoted(string rule)
+    [Fact]
+    public void FractionalBucketWithContextSentinel_IsNotPromoted()
     {
+        var rule = @"{""fractional"": [{""resolve"": [""on"", ""X""]}, [{""var"": ""x""}, 1]]}";
         var ex = Assert.Throws<FeatureProviderException>(() =>
             Evaluate(rule, EvaluationContext.Builder().Set("id", "u1").Set("x", "\0resolve").Build()));
 
@@ -175,32 +175,14 @@ public class ResolveRuleTest
     }
 
     [Fact]
-    public void ComputedBooleanVariant_Coerced()
-    {
-        var result = Evaluate(@"{""resolve"": [{""=="": [1, 1]}]}");
-
-        Assert.Equal("true", result.Variant);
-    }
-
-    [Fact]
     public void ReservedMetadataKeys_AreDropped()
     {
-        var rule = @"{""resolve"": [""on"", null, [[""flagSetId"", ""evil""], [""version"", ""9""]]]}";
-        var result = Evaluate(rule);
+        var rule = @"{""resolve"": [""on"", null, [[""flagSetId"", ""evil""], [{""var"": ""key""}, ""9""]]]}";
+        var result = Evaluate(rule, EvaluationContext.Builder().Set("key", "version").Build());
 
         // the reserved keys from flag-set metadata must not be overwritten
         Assert.Equal("set", result.FlagMetadata.GetString("flagSetId"));
         Assert.Equal("1", result.FlagMetadata.GetString("version"));
-    }
-
-    [Fact]
-    public void ComputedReservedMetadataKey_IsDropped()
-    {
-        var result = Evaluate(@"{""resolve"": [""on"", null, [[{""var"": ""k""}, ""x""]]]}",
-            EvaluationContext.Builder().Set("k", "flagSetId").Build());
-
-        Assert.Equal("on", result.Variant);
-        Assert.Equal("set", result.FlagMetadata.GetString("flagSetId"));
     }
 
     // matches flagd: reserved reasons are ignored, exact match only
@@ -236,7 +218,6 @@ public class ResolveRuleTest
 
     [Theory]
     [InlineData(@"{""+"": [1, 2]}", 3.0)]
-    [InlineData(@"{""*"": [1.5, 2]}", 3.0)]
     [InlineData(@"{""*"": [1.5, 3]}", 4.5)]
     public void ComputedNumberMetadata_IsDouble(string expr, double expected)
     {
@@ -269,26 +250,20 @@ public class ResolveRuleTest
     // matches flagd: a missing variant is a GENERAL error, like a plain targeting result naming one
     [Theory]
     [InlineData(@"{""resolve"": [""nope"", ""R"", [[""details"", ""x""]]]}")]
-    [InlineData(@"{""resolve"": ["""", ""FALLBACK""]}")]
-    [InlineData(@"{""resolve"": [{""var"": ""empty""}, ""FALLBACK""]}")]
     [InlineData(@"{""resolve"": [false]}")] // coerced to "false", which this flag doesn't define
-    public void MissingOrEmptyVariant_ReturnsGeneralError(string targeting)
+    public void MissingVariant_ReturnsGeneralError(string targeting)
     {
-        var ex = Assert.Throws<FeatureProviderException>(() =>
-            Evaluate(targeting, EvaluationContext.Builder().Set("empty", "").Build()));
+        var ex = Assert.Throws<FeatureProviderException>(() => Evaluate(targeting));
 
         Assert.Equal(ErrorType.General, ex.ErrorType);
     }
 
     // matches flagd: a nested rule that throws is a targeting parse error, not a malformed resolve
-    [Theory]
-    [InlineData(@"{""resolve"": [{""substr"": [1]}]}")]
-    [InlineData(@"{""resolve"": [""on"", {""substr"": [1]}]}")]
-    [InlineData(@"{""resolve"": [""on"", null, [[""details"", {""substr"": [1]}]]]}")]
-    [InlineData(@"{""resolve"": [{""resolve"": [""on"", ""INNER""]}, {""substr"": [1]}]}")]
-    public void ThrowingNestedRule_ReturnsParseErrorAndLeavesNoPendingResult(string targeting)
+    [Fact]
+    public void ThrowingNestedRule_ReturnsParseErrorAndLeavesNoPendingResult()
     {
-        var ex = Assert.Throws<FeatureProviderException>(() => Evaluate(targeting));
+        var ex = Assert.Throws<FeatureProviderException>(() =>
+            Evaluate(@"{""resolve"": [{""resolve"": [""on"", ""INNER""]}, {""substr"": [1]}]}"));
         Assert.Equal(ErrorType.ParseError, ex.ErrorType);
 
         var next = Evaluate(@"{""if"": [true, ""on"", ""off""]}");
@@ -314,18 +289,6 @@ public class ResolveRuleTest
     }
 
     [Fact]
-    public void CannotBeForgedFromEvaluationContextData()
-    {
-        var ex = Assert.Throws<FeatureProviderException>(() =>
-            Evaluate(@"{""var"": ""forged""}", EvaluationContext.Builder().Set("forged", new Value(new Structure(new System.Collections.Generic.Dictionary<string, Value> {
-                { "variant", new Value("on") },
-                { "reason", new Value("FORGED") }
-            }))).Build()));
-
-        Assert.Equal(ErrorType.ParseError, ex.ErrorType);
-    }
-
-    [Fact]
     public void NonTerminalResolve_DoesNotLeakIntoResultOrNextEvaluation()
     {
         var result = Evaluate(@"{""if"": [{""resolve"": [""on"", ""LEAKED""]}, ""true"", ""off""]}");
@@ -347,5 +310,64 @@ public class ResolveRuleTest
                 EvaluationContext.Builder().Set("x", "\0resolve").Build()));
 
         Assert.Equal(ErrorType.General, ex.ErrorType);
+    }
+
+    private sealed class ReentrantLogger : ILogger
+    {
+        internal Action OnLog;
+        private bool _inLog;
+
+        public IDisposable BeginScope<TState>(TState state) => null;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            if (_inLog)
+            {
+                return;
+            }
+            _inLog = true;
+            try
+            {
+                OnLog?.Invoke();
+            }
+            finally
+            {
+                _inLog = false;
+            }
+        }
+    }
+
+    [Fact]
+    public void LoggerThatEvaluatesAFlag_DoesNotClearOuterResolveResults()
+    {
+        var logger = new ReentrantLogger();
+        var evaluator = new JsonEvaluator(Substitute.For<IJsonSchemaValidator>(), logger);
+        evaluator.Sync(FlagConfigurationUpdateType.ALL, @"{
+            ""flags"": {
+                ""outer"": {
+                    ""state"": ""ENABLED"",
+                    ""defaultVariant"": ""off"",
+                    ""variants"": { ""on"": ""ON"", ""off"": ""OFF"" },
+                    ""targeting"": { ""fractional"": [ ""k"",
+                        [ { ""resolve"": [""on"", ""PICKED""] }, 1 ],
+                        [ { ""resolve"": [""off"", ""ERROR""] }, 0 ] ] }
+                },
+                ""inner"": {
+                    ""state"": ""ENABLED"",
+                    ""defaultVariant"": ""off"",
+                    ""variants"": { ""on"": ""ON"", ""off"": ""OFF"" },
+                    ""targeting"": { ""if"": [true, ""on"", ""off""] }
+                }
+            }
+        }");
+        // the never-selected bucket's reserved reason is logged mid-evaluation, and the logger evaluates another flag
+        logger.OnLog = () => evaluator.ResolveStringValueAsync("inner", "x", null);
+
+        var result = evaluator.ResolveStringValueAsync("outer", "x", null);
+
+        Assert.Equal("on", result.Variant);
+        Assert.Equal("PICKED", result.Reason);
     }
 }

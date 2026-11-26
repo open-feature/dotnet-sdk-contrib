@@ -23,9 +23,8 @@ internal sealed class ResolveRule : IRule
         "ERROR", "DISABLED", "DEFAULT", "FALLBACK", "STATIC", "UNKNOWN", "CACHED", "STALE"
     };
 
-    // results of the current evaluation by marker; JsonLogic.Apply is synchronous, so one evaluation never spans threads.
-    // a marker is only found if this evaluation produced it, so context data can't forge a result,
-    // and a resolve that isn't the rule's result (e.g. in an if condition) is never looked up
+    // Per-thread results for the current synchronous evaluation, restored after nested evaluations.
+    // Evaluation-scoped markers prevent forged or non-terminal results from resolving.
     [ThreadStatic]
     private static Dictionary<string, ResolveResult> _results;
 
@@ -66,9 +65,16 @@ internal sealed class ResolveRule : IRule
             && _results.TryGetValue(node.GetValue<string>(), out result);
     }
 
-    internal static void Reset()
+    internal static Dictionary<string, ResolveResult> EnterEvaluation()
     {
-        _results?.Clear();
+        var outer = _results;
+        _results = null; // Apply creates the dictionary on first use, so flags without resolve allocate nothing
+        return outer;
+    }
+
+    internal static void ExitEvaluation(Dictionary<string, ResolveResult> outer)
+    {
+        _results = outer;
     }
 
     private ResolveResult Parse(JsonNode args)

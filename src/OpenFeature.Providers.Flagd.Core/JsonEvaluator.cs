@@ -370,8 +370,7 @@ internal class JsonEvaluator
                 // convert whatever is returned to a string to try to use it as an index to Variants
                 JsonNode ruleResult;
                 ResolveResult resolveResult;
-                // clear anything a previous evaluation on this thread left behind
-                ResolveRule.Reset();
+                var outerResolveResults = ResolveRule.EnterEvaluation();
                 try
                 {
                     ruleResult = JsonLogic.Apply(rule, contextObj);
@@ -385,7 +384,7 @@ internal class JsonEvaluator
                 }
                 finally
                 {
-                    ResolveRule.Reset();
+                    ResolveRule.ExitEvaluation(outerResolveResults);
                 }
 
                 if (ruleResult == null || ruleResult.GetValueKind() == JsonValueKind.Null)
