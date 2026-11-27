@@ -189,7 +189,7 @@ public class ResolveRuleTest
         Assert.Equal("1", result.FlagMetadata.GetString("version"));
     }
 
-    // matches flagd: reserved reasons are ignored, exact match only
+    // standard reasons are plain strings that never change the outcome
     [Theory]
     [InlineData("ERROR")]
     [InlineData("DISABLED")]
@@ -199,21 +199,104 @@ public class ResolveRuleTest
     [InlineData("UNKNOWN")]
     [InlineData("CACHED")]
     [InlineData("STALE")]
-    public void ReservedReason_KeepsTargetingMatch(string reason)
+    public void StandardReason_PassesThrough(string reason)
     {
         var literal = Evaluate(@"{""resolve"": [""on"", ""REASON""]}".Replace("REASON", reason));
         Assert.Equal("on", literal.Variant);
-        Assert.Equal(Reason.TargetingMatch, literal.Reason);
+        Assert.Equal("ON", literal.Value);
+        Assert.Equal(reason, literal.Reason);
+        Assert.Equal(ErrorType.None, literal.ErrorType);
 
         var computed = Evaluate(@"{""resolve"": [""on"", {""var"": ""r""}]}", EvaluationContext.Builder().Set("r", reason).Build());
-        Assert.Equal(Reason.TargetingMatch, computed.Reason);
+        Assert.Equal("on", computed.Variant);
+        Assert.Equal(reason, computed.Reason);
+    }
+
+    [Fact]
+    public void NullVariant_UsesDefaultVariantWithDefaultReason()
+    {
+        var result = Evaluate(@"{""resolve"": [null]}");
+
+        Assert.Equal("off", result.Variant);
+        Assert.Equal("OFF", result.Value);
+        Assert.Equal(Reason.Default, result.Reason);
+    }
+
+    [Fact]
+    public void NullVariant_WithReasonAndMetadata_UsesDefaultVariantWithRuleReasonAndMetadata()
+    {
+        var result = Evaluate(@"{""resolve"": [null, ""OPTED_OUT"", [[""details"", ""x""], [""team"", ""rule-team""]]]}");
+
+        Assert.Equal("off", result.Variant);
+        Assert.Equal("OFF", result.Value);
+        Assert.Equal("OPTED_OUT", result.Reason);
+        Assert.Equal("x", result.FlagMetadata.GetString("details"));
+        Assert.Equal("rule-team", result.FlagMetadata.GetString("team"));
+        Assert.Equal("set", result.FlagMetadata.GetString("flagSetId"));
+    }
+
+    private const string NoDefaultVariantConfig = @"{
+        ""flags"": {
+            ""f"": {
+                ""state"": ""ENABLED"",
+                ""variants"": { ""on"": ""ON"", ""off"": ""OFF"" },
+                ""targeting"": {TARGETING},
+                ""metadata"": { ""team"": ""flag-team"" }
+            }
+        }
+    }";
+
+    private ResolutionDetails<string> EvaluateNoDefaultVariant(string targeting, EvaluationContext ctx = null)
+    {
+        _evaluator.Sync(FlagConfigurationUpdateType.ALL, NoDefaultVariantConfig.Replace("{TARGETING}", targeting));
+        return _evaluator.ResolveStringValueAsync("f", "code-default", ctx);
+    }
+
+    [Fact]
+    public void NullVariant_NoDefaultVariant_ReturnsCodeDefault()
+    {
+        var result = EvaluateNoDefaultVariant(@"{""resolve"": [null]}");
+
+        Assert.Equal("code-default", result.Value);
+        Assert.Null(result.Variant);
+        Assert.Equal(Reason.Default, result.Reason);
+        Assert.Equal(ErrorType.None, result.ErrorType);
+    }
+
+    [Fact]
+    public void NullVariant_NoDefaultVariant_WithReasonAndMetadata_ReturnsCodeDefaultWithRuleReasonAndMetadata()
+    {
+        var result = EvaluateNoDefaultVariant(@"{""resolve"": [null, ""OPTED_OUT"", [[""details"", ""x""]]]}");
+
+        Assert.Equal("code-default", result.Value);
+        Assert.Null(result.Variant);
+        Assert.Equal("OPTED_OUT", result.Reason);
+        Assert.Equal("x", result.FlagMetadata.GetString("details"));
+        Assert.Equal("flag-team", result.FlagMetadata.GetString("team"));
+    }
+
+    [Fact]
+    public void DisabledWithOverrides_ServesOverrideOrCodeDefault()
+    {
+        const string rule = @"{""if"": [{""in"": [{""var"": ""targetingKey""}, [""alice""]]}, ""on"", {""resolve"": [null, ""DISABLED""]}]}";
+
+        var alice = EvaluateNoDefaultVariant(rule, EvaluationContext.Builder().SetTargetingKey("alice").Build());
+        Assert.Equal("on", alice.Variant);
+        Assert.Equal("ON", alice.Value);
+        Assert.Equal(Reason.TargetingMatch, alice.Reason);
+
+        var bob = EvaluateNoDefaultVariant(rule, EvaluationContext.Builder().SetTargetingKey("bob").Build());
+        Assert.Equal("code-default", bob.Value);
+        Assert.Null(bob.Variant);
+        Assert.Equal(Reason.Disabled, bob.Reason);
+        Assert.Equal(ErrorType.None, bob.ErrorType);
     }
 
     [Theory]
     [InlineData("error")]
     [InlineData("Default")]
     [InlineData("ERROR ")]
-    public void NearReservedReason_IsKept(string reason)
+    public void CustomReason_IsKept(string reason)
     {
         var result = Evaluate(@"{""resolve"": [""on"", {""var"": ""r""}]}", EvaluationContext.Builder().Set("r", reason).Build());
 

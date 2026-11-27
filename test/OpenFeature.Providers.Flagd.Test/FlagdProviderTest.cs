@@ -173,7 +173,8 @@ public class UnitTestFlagdProvider
     {
         var resp = new ResolveBooleanResponse
         {
-            Value = true
+            Value = true,
+            Variant = "on"
         };
 
         var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
@@ -203,7 +204,7 @@ public class UnitTestFlagdProvider
     [Fact]
     public async Task TestResolveStringValue()
     {
-        var resp = new ResolveStringResponse { Value = "my-value" };
+        var resp = new ResolveStringResponse { Value = "my-value", Variant = "on" };
 
         var grpcResp = new AsyncUnaryCall<ResolveStringResponse>(
             Task.FromResult(resp),
@@ -233,7 +234,8 @@ public class UnitTestFlagdProvider
     {
         var resp = new ResolveIntResponse
         {
-            Value = 10
+            Value = 10,
+            Variant = "on"
         };
 
         var grpcResp = new AsyncUnaryCall<ResolveIntResponse>(
@@ -262,7 +264,8 @@ public class UnitTestFlagdProvider
     {
         var resp = new ResolveFloatResponse
         {
-            Value = 10.0
+            Value = 10.0,
+            Variant = "on"
         };
 
         var grpcResp = new AsyncUnaryCall<ResolveFloatResponse>(
@@ -296,6 +299,7 @@ public class UnitTestFlagdProvider
 
 
         resp.Value = returnedValue;
+        resp.Variant = "on";
 
         var grpcResp = new AsyncUnaryCall<ResolveObjectResponse>(
             Task.FromResult(resp),
@@ -462,6 +466,7 @@ public class UnitTestFlagdProvider
     {
         var resp = new ResolveBooleanResponse();
         resp.Value = true;
+        resp.Variant = "on";
         resp.Reason = "STATIC";
 
         var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
@@ -607,6 +612,7 @@ public class UnitTestFlagdProvider
     {
         var resp = new ResolveBooleanResponse();
         resp.Value = true;
+        resp.Variant = "on";
         resp.Reason = "STATIC";
 
         var grpcResp = new AsyncUnaryCall<ResolveBooleanResponse>(
@@ -714,6 +720,7 @@ public class UnitTestFlagdProvider
     {
         var resp = new ResolveBooleanResponse();
         resp.Value = true;
+        resp.Variant = "on";
         resp.Reason = "STATIC";
 
         var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();
@@ -770,6 +777,7 @@ public class UnitTestFlagdProvider
     {
         var resp = new ResolveBooleanResponse();
         resp.Value = true;
+        resp.Variant = "on";
         resp.Reason = "STATIC";
 
         var mockGrpcClient = Substitute.For<FlagSyncService.FlagSyncServiceClient>();

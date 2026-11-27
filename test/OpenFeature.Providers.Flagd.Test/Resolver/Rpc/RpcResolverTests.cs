@@ -418,6 +418,38 @@ public class RpcResolverTests
         };
     }
 
+    [Theory]
+    [InlineData("DEFAULT")]
+    [InlineData("DISABLED")]
+    [InlineData("OPTED_OUT")]
+    public async Task ResolveAsync_NoVariant_ReturnsCodeDefaultRegardlessOfReason(string reason)
+    {
+        var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+        mockGrpcClient.ResolveStringAsync(Arg.Any<ResolveStringRequest>())
+            .Returns(CreateRpcResponse(new ResolveStringResponse() { Value = "", Reason = reason }));
+        var resolver = new RpcResolver(mockGrpcClient, FlagdConfig.Builder().Build(), null);
+
+        var value = await resolver.ResolveStringValueAsync("test-key", "def");
+
+        Assert.Equal("def", value.Value);
+        Assert.Equal(reason, value.Reason);
+    }
+
+    [Fact]
+    public async Task ResolveAsync_VariantWithDisabledReason_ReturnsValue()
+    {
+        var mockGrpcClient = Substitute.For<Service.ServiceClient>();
+        mockGrpcClient.ResolveStringAsync(Arg.Any<ResolveStringRequest>())
+            .Returns(CreateRpcResponse(new ResolveStringResponse() { Value = "one", Variant = "one", Reason = "DISABLED" }));
+        var resolver = new RpcResolver(mockGrpcClient, FlagdConfig.Builder().Build(), null);
+
+        var value = await resolver.ResolveStringValueAsync("test-key", "def");
+
+        Assert.Equal("one", value.Value);
+        Assert.Equal("one", value.Variant);
+        Assert.Equal("DISABLED", value.Reason);
+    }
+
     private static AsyncUnaryCall<T> CreateRpcResponse<T>(T resp)
         where T : IMessage<T>, IBufferMessage
     {

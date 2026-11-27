@@ -13,12 +13,6 @@ internal sealed class ResolveRule : IRule
 {
     private static readonly HashSet<string> ReservedMetadataKeys = new HashSet<string> { "flagSetId", "version" };
 
-    // OpenFeature and flagd reasons a rule can't truthfully return; matched exactly, like flagd
-    private static readonly HashSet<string> ReservedReasons = new HashSet<string>(StringComparer.Ordinal)
-    {
-        "ERROR", "DISABLED", "DEFAULT", "FALLBACK", "STATIC", "UNKNOWN", "CACHED", "STALE"
-    };
-
     private readonly ILogger _logger;
 
     internal ResolveRule(ILogger logger = null)
@@ -78,8 +72,12 @@ internal sealed class ResolveRule : IRule
             case JsonValueKind.Number:
                 variant = variantNode.ToString();
                 break;
+            case JsonValueKind.Null:
+                // same as a plain null targeting result
+                variant = null;
+                break;
             default:
-                throw new ArgumentException($"variant must be a string, boolean, or number; got {vKind}");
+                throw new ArgumentException($"variant must be a string, boolean, number, or null; got {vKind}");
         }
 
         string reason = null;
@@ -90,11 +88,6 @@ internal sealed class ResolveRule : IRule
             if (rKind == JsonValueKind.String)
             {
                 reason = reasonNode.GetValue<string>();
-                if (ReservedReasons.Contains(reason))
-                {
-                    _logger.LogDebug("Ignoring reserved reason '{Reason}' in resolve", reason);
-                    reason = null;
-                }
             }
             else if (rKind != JsonValueKind.Null)
             {
