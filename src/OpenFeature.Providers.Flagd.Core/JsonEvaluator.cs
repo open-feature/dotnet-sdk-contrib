@@ -369,23 +369,16 @@ internal class JsonEvaluator
 
                 // convert whatever is returned to a string to try to use it as an index to Variants
                 JsonNode ruleResult;
-                ResolveResult resolveResult;
-                var outerResolveResults = ResolveRule.EnterEvaluation();
                 try
                 {
                     ruleResult = JsonLogic.Apply(rule, contextObj);
-                    // only the rule's own result counts; a resolve evaluated elsewhere in the rule is ignored
-                    ResolveRule.TryGetResult(ruleResult, out resolveResult);
                 }
                 catch (Exception ex)
                 {
                     throw new FeatureProviderException(ErrorType.ParseError,
                         $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.", ex);
                 }
-                finally
-                {
-                    ResolveRule.ExitEvaluation(outerResolveResults);
-                }
+                ResolveRule.TryGetResult(ruleResult, out var resolveResult);
 
                 if (ruleResult == null || ruleResult.GetValueKind() == JsonValueKind.Null)
                 {

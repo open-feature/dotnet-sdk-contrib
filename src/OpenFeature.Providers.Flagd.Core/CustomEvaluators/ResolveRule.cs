@@ -11,10 +11,6 @@ namespace OpenFeature.Providers.Flagd.Core.CustomEvaluators;
 
 internal sealed class ResolveRule : IRule
 {
-    // IRule.Apply can only return JSON, so the operator returns its result's marker, which starts with this;
-    // the null byte keeps it out of reach of variant names in flag configs
-    internal const string Sentinel = "\0resolve";
-
     private static readonly HashSet<string> ReservedMetadataKeys = new HashSet<string> { "flagSetId", "version" };
 
     // OpenFeature and flagd reasons a rule can't truthfully return; matched exactly, like flagd
@@ -22,11 +18,6 @@ internal sealed class ResolveRule : IRule
     {
         "ERROR", "DISABLED", "DEFAULT", "FALLBACK", "STATIC", "UNKNOWN", "CACHED", "STALE"
     };
-
-    // Per-thread results for the current synchronous evaluation, restored after nested evaluations.
-    // Evaluation-scoped markers prevent forged or non-terminal results from resolving.
-    [ThreadStatic]
-    private static Dictionary<string, ResolveResult> _results;
 
     private readonly ILogger _logger;
 
@@ -52,29 +43,14 @@ internal sealed class ResolveRule : IRule
             return null;
         }
 
-        (_results ??= new Dictionary<string, ResolveResult>())[result.Marker] = result;
-        return JsonValue.Create(result.Marker);
+        // the node wraps the result itself, which JSON input can't produce
+        return JsonValue.Create(result);
     }
 
-    // finds the result whose marker node is, if this evaluation produced it
     internal static bool TryGetResult(JsonNode node, out ResolveResult result)
     {
         result = null;
-        return _results != null
-            && node?.GetValueKind() == JsonValueKind.String
-            && _results.TryGetValue(node.GetValue<string>(), out result);
-    }
-
-    internal static Dictionary<string, ResolveResult> EnterEvaluation()
-    {
-        var outer = _results;
-        _results = null; // Apply creates the dictionary on first use, so flags without resolve allocate nothing
-        return outer;
-    }
-
-    internal static void ExitEvaluation(Dictionary<string, ResolveResult> outer)
-    {
-        _results = outer;
+        return node is JsonValue value && value.TryGetValue(out result);
     }
 
     private ResolveResult Parse(JsonNode args)

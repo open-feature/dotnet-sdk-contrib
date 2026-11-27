@@ -82,27 +82,37 @@ internal sealed class FractionalEvaluator : IRule
 
         for (var i = bucketStartIndex; i < args.AsArray().Count; i++)
         {
-            // evaluated once; the elements are data and must not be applied again
-            var bucketNode = JsonLogic.Apply(args[i], context);
-
-            if (bucketNode == null || bucketNode.GetValueKind() != JsonValueKind.Array)
+            // evaluated once, element by element, since copying an array loses a "resolve" result
+            List<JsonNode> bucketArr;
+            if (args[i] is JsonArray literalBucket)
             {
-                return null;
+                bucketArr = literalBucket.Select(element => JsonLogic.Apply(element, context)).ToList();
             }
-
-            var bucketArr = bucketNode.AsArray();
+            else
+            {
+                var bucketNode = JsonLogic.Apply(args[i], context);
+                if (bucketNode == null || bucketNode.GetValueKind() != JsonValueKind.Array)
+                {
+                    return null;
+                }
+                bucketArr = bucketNode.AsArray().ToList();
+            }
 
             if (!bucketArr.Any())
             {
                 return null;
             }
 
-            // resolve variant: accept string, number, bool, or null; a resolve result is its marker string
+            // resolve variant: accept string, number, bool, null, or a resolve result
             var variantNode = bucketArr.ElementAt(0);
             JsonNode variant;
             if (variantNode == null || variantNode.GetValueKind() == JsonValueKind.Null)
             {
                 variant = null;
+            }
+            else if (ResolveRule.TryGetResult(variantNode, out _))
+            {
+                variant = variantNode;
             }
             else
             {
