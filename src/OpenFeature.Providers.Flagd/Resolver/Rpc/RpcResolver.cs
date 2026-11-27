@@ -91,7 +91,7 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // no variant means no value (code default), whatever the reason
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
             var value = string.IsNullOrEmpty(resolveBooleanResponse.Variant) ? defaultValue : resolveBooleanResponse.Value;
 
             return new ResolutionDetails<bool>(
@@ -114,7 +114,7 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // no variant means no value (code default), whatever the reason
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
             var value = string.IsNullOrEmpty(resolveStringResponse.Variant) ? defaultValue : resolveStringResponse.Value;
 
             return new ResolutionDetails<string>(
@@ -137,7 +137,7 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // no variant means no value (code default), whatever the reason
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
             var value = string.IsNullOrEmpty(resolveIntResponse.Variant) ? defaultValue : (int)resolveIntResponse.Value;
 
             return new ResolutionDetails<int>(
@@ -160,7 +160,7 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // no variant means no value (code default), whatever the reason
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
             var value = string.IsNullOrEmpty(resolveDoubleResponse.Variant) ? defaultValue : resolveDoubleResponse.Value;
 
             return new ResolutionDetails<double>(
@@ -183,7 +183,7 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // no variant means no value (code default), whatever the reason
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
             var value = string.IsNullOrEmpty(resolveObjectResponse.Variant) ? defaultValue : ConvertObjectToValue(resolveObjectResponse.Value);
 
             return new ResolutionDetails<Value>(

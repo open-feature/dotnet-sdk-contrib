@@ -443,7 +443,7 @@ internal class JsonEvaluator
             {
                 if (string.IsNullOrEmpty(flagConfiguration.DefaultVariant))
                 {
-                    // no variant means no value (code default), whatever the reason
+                    // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
                     return new ResolutionDetails<T>(
                         flagKey: flagKey,
                         defaultValue,
