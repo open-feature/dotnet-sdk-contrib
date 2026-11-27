@@ -91,8 +91,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
-            var value = string.IsNullOrEmpty(resolveBooleanResponse.Variant) && (resolveBooleanResponse.Reason == Reason.Default || resolveBooleanResponse.Reason == Reason.Disabled) ? defaultValue : resolveBooleanResponse.Value;
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
+            var value = string.IsNullOrEmpty(resolveBooleanResponse.Variant) ? defaultValue : resolveBooleanResponse.Value;
 
             return new ResolutionDetails<bool>(
                 flagKey: flagKey,
@@ -114,8 +114,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
-            var value = string.IsNullOrEmpty(resolveStringResponse.Variant) && (resolveStringResponse.Reason == Reason.Default || resolveStringResponse.Reason == Reason.Disabled) ? defaultValue : resolveStringResponse.Value;
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
+            var value = string.IsNullOrEmpty(resolveStringResponse.Variant) ? defaultValue : resolveStringResponse.Value;
 
             return new ResolutionDetails<string>(
                 flagKey: flagKey,
@@ -137,8 +137,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
-            var value = string.IsNullOrEmpty(resolveIntResponse.Variant) && (resolveIntResponse.Reason == Reason.Default || resolveIntResponse.Reason == Reason.Disabled) ? defaultValue : (int)resolveIntResponse.Value;
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
+            var value = string.IsNullOrEmpty(resolveIntResponse.Variant) ? defaultValue : (int)resolveIntResponse.Value;
 
             return new ResolutionDetails<int>(
                 flagKey: flagKey,
@@ -160,8 +160,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
-            var value = string.IsNullOrEmpty(resolveDoubleResponse.Variant) && (resolveDoubleResponse.Reason == Reason.Default || resolveDoubleResponse.Reason == Reason.Disabled) ? defaultValue : resolveDoubleResponse.Value;
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
+            var value = string.IsNullOrEmpty(resolveDoubleResponse.Variant) ? defaultValue : resolveDoubleResponse.Value;
 
             return new ResolutionDetails<double>(
                 flagKey: flagKey,
@@ -183,8 +183,8 @@ internal class RpcResolver : Resolver
                 FlagKey = flagKey
             }).ConfigureAwait(false);
 
-            // Use code default if variant is empty and reason is DEFAULT (no default variant) or DISABLED
-            var value = string.IsNullOrEmpty(resolveObjectResponse.Variant) && (resolveObjectResponse.Reason == Reason.Default || resolveObjectResponse.Reason == Reason.Disabled) ? defaultValue : ConvertObjectToValue(resolveObjectResponse.Value);
+            // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
+            var value = string.IsNullOrEmpty(resolveObjectResponse.Variant) ? defaultValue : ConvertObjectToValue(resolveObjectResponse.Value);
 
             return new ResolutionDetails<Value>(
                 flagKey: flagKey,

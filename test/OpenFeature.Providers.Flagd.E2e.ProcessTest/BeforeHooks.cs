@@ -27,5 +27,6 @@ public class BeforeHooks
         Skip.If(!tags.Contains("in-process"), "Skipping scenario because it does not have required tag.");
         Skip.If(tags.Contains("fractional-v1"), "Skipping legacy fractional bucketing test; v3 algorithm is implemented.");
         Skip.If(tags.Contains("fractional-v2"), "Skipping fractional v2 legacy fractional bucketing test; v3 algorithm is implemented.");
+        Skip.If(tags.Contains("large-integers"), "Skipping integers beyond 32 bits; integer flags resolve to int.");
     }
 }

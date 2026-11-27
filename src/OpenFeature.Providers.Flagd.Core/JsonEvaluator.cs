@@ -84,6 +84,7 @@ internal class JsonEvaluator
         RuleRegistry.AddRule("ends_with", new EndsWithRule());
         RuleRegistry.AddRule("sem_ver", new SemVerRule());
         RuleRegistry.AddRule("fractional", new FractionalEvaluator(_logger));
+        RuleRegistry.AddRule("resolve", new ResolveRule(_logger));
         RuleRegistry.AddRule("$ref", new UnresolvedRefRule());
     }
 
@@ -338,6 +339,7 @@ internal class JsonEvaluator
 
             var flagMetadata = new ImmutableMetadata(combinedMetadata);
             var variant = flagConfiguration.DefaultVariant;
+            string ruleReason = null;
             if (flagConfiguration.Targeting != null &&
                 !String.IsNullOrEmpty(flagConfiguration.Targeting.ToString()) &&
                 flagConfiguration.Targeting.ToString() != "{}")
@@ -377,10 +379,37 @@ internal class JsonEvaluator
                     throw new FeatureProviderException(ErrorType.ParseError,
                         $"PARSE_ERROR: flag '{flagKey}' has invalid targeting rule.", ex);
                 }
+                ResolveRule.TryGetResult(ruleResult, out var resolveResult);
 
                 if (ruleResult == null || ruleResult.GetValueKind() == JsonValueKind.Null)
                 {
                     variant = null;
+                }
+                else if (resolveResult != null)
+                {
+                    ruleReason = resolveResult.Reason;
+                    if (resolveResult.Metadata != null)
+                    {
+                        foreach (var kvp in resolveResult.Metadata)
+                        {
+                            combinedMetadata[kvp.Key] = kvp.Value;
+                        }
+                        flagMetadata = new ImmutableMetadata(combinedMetadata);
+                    }
+                    if (resolveResult.Variant == null)
+                    {
+                        variant = null;
+                    }
+                    else if (resolveResult.Variant.Length == 0)
+                    {
+                        throw new FeatureProviderException(ErrorType.General,
+                            $"TARGETING_MATCH_ERROR: flag '{flagKey}' targeting resolved to an empty variant.");
+                    }
+                    else
+                    {
+                        variant = resolveResult.Variant;
+                        reason = ruleReason ?? Reason.TargetingMatch;
+                    }
                 }
                 else
                 {
@@ -414,18 +443,18 @@ internal class JsonEvaluator
             {
                 if (string.IsNullOrEmpty(flagConfiguration.DefaultVariant))
                 {
-                    // No default variant defined, return code default with DEFAULT reason
+                    // no variant means no value (code default); reasons only affect telemetry and side effects such as caching
                     return new ResolutionDetails<T>(
                         flagKey: flagKey,
                         defaultValue,
-                        reason: Reason.Default,
+                        reason: ruleReason ?? Reason.Default,
                         variant: null,
                         flagMetadata: flagMetadata
                     );
                 }
 
                 // if variant is null, revert to default
-                reason = Reason.Default;
+                reason = ruleReason ?? Reason.Default;
                 variant = flagConfiguration.DefaultVariant;
                 flagConfiguration.Variants.TryGetValue(variant,
                     out var defaultVariantValue);
